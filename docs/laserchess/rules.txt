@@ -1,0 +1,24 @@
+A turn consists of two moves.
+
+Possible moves:
+
+- rotating a piece by any degree
+- moving a piece by one field
+- shooting a laser
+
+Notation:
+
+move1 ; move2 -> whole turn notation
+
+[position1]-[position2] -> move notation
+[position1]-[position2](teleportPosition) -> teleportation notation
+[position1]x[position2] -> capture notation
+[position](rotationDegree) -> rotation notation
+Laser -> laser has been shot
+
+a2-a3 -> piece moved from a2 to a3
+a2-a3(b1) -> hypercube moved from a2 to a3 and teleported piece to b1 / -> piece moved from a2 to a3 on a hypersquare and teleported on b1
+a2(1) -> piece rotated by 90 * 1 degrees
+
+a2-a3 ; a3(2) -> piece moved from a2 to a3 and rotated by 180 degrees
+

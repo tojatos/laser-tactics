@@ -1,0 +1,2 @@
+Can deflect laser in two positions
+Laser goes through it in two positions

@@ -1,0 +1,3 @@
+Vulnerable to laser in one position
+Splits laser into two beams in one position
+Deflects laser in two positions

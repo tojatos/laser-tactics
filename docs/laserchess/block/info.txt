@@ -1,0 +1,3 @@
+Vulnerable to laser in 3 positions
+Deflect laser in one position
+Can capture pieces
