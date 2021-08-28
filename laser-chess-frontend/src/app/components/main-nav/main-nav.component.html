@@ -1,0 +1,43 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav"
+      [ngClass]="{hidden: !(isHandset$ | async)}">
+    <mat-toolbar>LazerChezz</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item href="/login">New game</a>
+      <a mat-list-item routerLink="/new-game" (click)="drawer.toggle()">Puzzles</a>
+      <a mat-list-item routerLink="/puzzle" (click)="drawer.toggle()">Login</a>
+      <a mat-list-item routerLink="/settings" (click)="drawer.toggle()">Settings</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async"
+        onclick="this.blur()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>LazerChezz</span>
+      <span class="spacer"></span>
+      <div [ngClass]="{hidden: (isHandset$ | async)}">
+          <span class="menu">
+            <button mat-button>New game</button>
+            <button mat-button>Puzzles</button>
+            <button mat-button>Login</button>
+            <button mat-button style="margin-right: 10px;">Settings</button>
+          </span>
+      </div>
+    </mat-toolbar>
+    <div class="container">
+      <div class="mat-typography">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<mat-toolbar color="primary" class="footer">
+  <span class="footer-text">LazerChezz</span>
+</mat-toolbar>
