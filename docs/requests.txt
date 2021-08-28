@@ -1,0 +1,11 @@
+Register request (login: String, password: String, email: String, credit_card_number: String)
+Login request (login: String, password: String)
+Create lobby request (token: String)
+Join lobby request (token: String, id: String)
+Start game request (token: String, id: String)
+Get game state request (id: String) -> OK(GameState) | InternalServerError
+Make a move request (token: String, move: Move)
+Send message request (token: String, id: String, content: String)
+Get chat request (id: String)
+?? Change password request (token: String)
+Get user info request (userId: String)
