@@ -1,0 +1,20 @@
+import string
+
+from game_engine.models import GameState
+from game_engine.requests import ShootLaserRequest, GetGameStateRequest, StartGameRequest
+
+
+def get_game_state(request: GetGameStateRequest):
+    print(request.game_id)
+
+
+def start_game(user_id: string, request: StartGameRequest):
+    print(request.game_id)
+    # initial_state = GameState()
+
+
+def shoot_laser(user_id: string, request: ShootLaserRequest):
+    print(user_id)
+    print(request.game_id)
+
+
