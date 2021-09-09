@@ -22,7 +22,7 @@ class PieceType(Enum):
     TRIANGULAR_MIRROR = auto()
 
 
-class PieceOwner(Enum):
+class Player(Enum):
     PLAYER_ONE = auto()
     PLAYER_TWO = auto()
     NONE = auto()
@@ -31,7 +31,7 @@ class PieceOwner(Enum):
 @dataclass(frozen=True)
 class Piece:
     piece_type: PieceType
-    piece_owner: PieceOwner
+    piece_owner: Player
     rotation_degree: int = 0
 
 
@@ -53,47 +53,47 @@ class GameState:
     # history: List[Action] = []
     board: Board = Board(
         [
-            Cell(CellCoordinates(0, 0), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(1, 0), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(2, 0), Piece(PieceType.DIAGONAL_MIRROR, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(3, 0), Piece(PieceType.HYPER_CUBE, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(4, 0), Piece(PieceType.KING, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(5, 0), Piece(PieceType.LASER, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(6, 0), Piece(PieceType.DIAGONAL_MIRROR, PieceOwner.PLAYER_ONE, 90)),
-            Cell(CellCoordinates(7, 0), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_ONE, 270)),
-            Cell(CellCoordinates(8, 0), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_ONE, 270)),
+            Cell(CellCoordinates(0, 0), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(1, 0), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(2, 0), Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(3, 0), Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(4, 0), Piece(PieceType.KING, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(5, 0), Piece(PieceType.LASER, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(6, 0), Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE, 90)),
+            Cell(CellCoordinates(7, 0), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 270)),
+            Cell(CellCoordinates(8, 0), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 270)),
 
-            Cell(CellCoordinates(0, 1), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_ONE, 270)),
-            Cell(CellCoordinates(1, 1), Piece(PieceType.BLOCK, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(2, 1), Piece(PieceType.BLOCK, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(3, 1), Piece(PieceType.MIRROR, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(4, 1), Piece(PieceType.MIRROR, PieceOwner.PLAYER_ONE, 90)),
-            Cell(CellCoordinates(5, 1), Piece(PieceType.BEAM_SPLITTER, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(6, 1), Piece(PieceType.BLOCK, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(7, 1), Piece(PieceType.BLOCK, PieceOwner.PLAYER_ONE)),
-            Cell(CellCoordinates(8, 1), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_ONE)),
+            Cell(CellCoordinates(0, 1), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 270)),
+            Cell(CellCoordinates(1, 1), Piece(PieceType.BLOCK, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(2, 1), Piece(PieceType.BLOCK, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(3, 1), Piece(PieceType.MIRROR, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(4, 1), Piece(PieceType.MIRROR, Player.PLAYER_ONE, 90)),
+            Cell(CellCoordinates(5, 1), Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(6, 1), Piece(PieceType.BLOCK, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(7, 1), Piece(PieceType.BLOCK, Player.PLAYER_ONE)),
+            Cell(CellCoordinates(8, 1), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE)),
 
-            Cell(CellCoordinates(4, 4), Piece(PieceType.HYPER_SQUARE, PieceOwner.NONE)),
+            Cell(CellCoordinates(4, 4), Piece(PieceType.HYPER_SQUARE, Player.NONE)),
 
-            Cell(CellCoordinates(0, 7), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_TWO, 180)),
-            Cell(CellCoordinates(1, 7), Piece(PieceType.BLOCK, PieceOwner.PLAYER_TWO, 180)),
-            Cell(CellCoordinates(2, 7), Piece(PieceType.BLOCK, PieceOwner.PLAYER_TWO, 180)),
-            Cell(CellCoordinates(3, 7), Piece(PieceType.BEAM_SPLITTER, PieceOwner.PLAYER_TWO, 180)),
-            Cell(CellCoordinates(4, 7), Piece(PieceType.MIRROR, PieceOwner.PLAYER_TWO, 90)),
-            Cell(CellCoordinates(5, 7), Piece(PieceType.MIRROR, PieceOwner.PLAYER_TWO)),
-            Cell(CellCoordinates(6, 7), Piece(PieceType.BLOCK, PieceOwner.PLAYER_TWO, 180)),
-            Cell(CellCoordinates(7, 7), Piece(PieceType.BLOCK, PieceOwner.PLAYER_TWO, 180)),
-            Cell(CellCoordinates(8, 7), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_TWO, 90)),
+            Cell(CellCoordinates(0, 7), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(1, 7), Piece(PieceType.BLOCK, Player.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(2, 7), Piece(PieceType.BLOCK, Player.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(3, 7), Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(4, 7), Piece(PieceType.MIRROR, Player.PLAYER_TWO, 90)),
+            Cell(CellCoordinates(5, 7), Piece(PieceType.MIRROR, Player.PLAYER_TWO)),
+            Cell(CellCoordinates(6, 7), Piece(PieceType.BLOCK, Player.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(7, 7), Piece(PieceType.BLOCK, Player.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(8, 7), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 90)),
 
-            Cell(CellCoordinates(0, 8), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_TWO, 90)),
-            Cell(CellCoordinates(1, 8), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_TWO, 90)),
-            Cell(CellCoordinates(2, 8), Piece(PieceType.DIAGONAL_MIRROR, PieceOwner.PLAYER_TWO, 90)),
-            Cell(CellCoordinates(3, 8), Piece(PieceType.LASER, PieceOwner.PLAYER_TWO)),
-            Cell(CellCoordinates(4, 8), Piece(PieceType.KING, PieceOwner.PLAYER_TWO)),
-            Cell(CellCoordinates(5, 8), Piece(PieceType.HYPER_CUBE, PieceOwner.PLAYER_TWO)),
-            Cell(CellCoordinates(6, 8), Piece(PieceType.DIAGONAL_MIRROR, PieceOwner.PLAYER_TWO)),
-            Cell(CellCoordinates(7, 8), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_TWO, 180)),
-            Cell(CellCoordinates(8, 8), Piece(PieceType.TRIANGULAR_MIRROR, PieceOwner.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(0, 8), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 90)),
+            Cell(CellCoordinates(1, 8), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 90)),
+            Cell(CellCoordinates(2, 8), Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_TWO, 90)),
+            Cell(CellCoordinates(3, 8), Piece(PieceType.LASER, Player.PLAYER_TWO)),
+            Cell(CellCoordinates(4, 8), Piece(PieceType.KING, Player.PLAYER_TWO)),
+            Cell(CellCoordinates(5, 8), Piece(PieceType.HYPER_CUBE, Player.PLAYER_TWO)),
+            Cell(CellCoordinates(6, 8), Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_TWO)),
+            Cell(CellCoordinates(7, 8), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 180)),
+            Cell(CellCoordinates(8, 8), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 180)),
 
         ]
     )
