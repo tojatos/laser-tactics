@@ -17,12 +17,13 @@ export class LoginComponent {
   async login() {
       const userData = {login: "login", pass: "pass"}
 
-      if (userData.login && userData.pass) {
+      if (!this.authService.isLoggedIn()) {
           this.authService.login(userData.login, userData.pass).then(
                   res => {
                       console.log(`User with token ${res.tokenID} is logged in`);
                   }
               )
       }
+      else this.authService.clearJWT()
   }
 }

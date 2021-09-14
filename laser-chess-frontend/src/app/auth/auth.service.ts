@@ -10,6 +10,9 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  idToken = 'id_token'
+  expiresAt = 'expires_at'
+
   async login(login:string, pass:string): Promise<UserToken> {
     const promise = new Promise<UserToken>((resolve, reject) => {
       resolve({tokenID: "123", expiresIn: "222222"})
@@ -18,13 +21,22 @@ export class AuthService {
     //return this.http.post<UserToken>('/api/login', {login, pass}).toPromise().then(res => this.setSession(res))
   }
 
-  private setSession(authResult: UserToken) {
+private setSession(authResult: UserToken) {
     const expiresAt = moment().add(authResult.expiresIn,'second')
     console.log(expiresAt)
 
     localStorage.setItem('id_token', authResult.tokenID)
     localStorage.setItem("expires_at", JSON.stringify(expiresAt.valueOf()) )
     return authResult
+}
+
+clearJWT(){
+    localStorage.removeItem('id_token')
+    localStorage.removeItem("expires_at")
+}
+
+isLoggedIn(){
+  return localStorage.getItem(this.idToken) != null
 }
 
 }
