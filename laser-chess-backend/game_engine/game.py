@@ -13,5 +13,11 @@ class Game:
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):
         cells = self.game_state.board.cells
+
+        cell_to = next((x for x in cells if x.coordinates == to_cell))
         cell_from = next((x for x in cells if x.coordinates == from_cell))
+
+        cell_to.piece = cell_from.piece
+        cell_from.piece = None
+
 

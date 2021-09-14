@@ -17,4 +17,8 @@ def shoot_laser(user_id: string, request: ShootLaserRequest):
     print(user_id)
     print(request.game_id)
 
+    # GET GAME STATE FROM DB
+    # VALIDATE REQUEST
+    # MAKE A MOVE AND SAVE NEW GAME STATE
+
 

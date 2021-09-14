@@ -35,7 +35,8 @@ class Piece:
     rotation_degree: int = 0
 
 
-@dataclass(frozen=True)
+# @dataclass(frozen=True)
+@dataclass
 class Cell:
     coordinates: CellCoordinates
     piece: Optional[Piece] = None
