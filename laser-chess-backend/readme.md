@@ -7,5 +7,5 @@
 
 ### Run
 ```bash
-python manage.py runserver
+uvicorn main:app --reload
 ```
