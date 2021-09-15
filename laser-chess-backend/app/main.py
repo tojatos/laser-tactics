@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
+import uvicorn
 from fastapi import status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,8 +12,9 @@ from typing import List
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from core import crud, models, schemas
-from core.database import SessionLocal, engine
+from app.core import schemas
+from app.core import crud, models
+from app.core.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -167,7 +169,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 async def read_users_me(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
 
-#TODO idk something with this
+
+# TODO idk something with this
 @app.get("/users/me/items/")
 async def read_own_items(current_user: schemas.User = Depends(get_current_active_user)):
     return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
