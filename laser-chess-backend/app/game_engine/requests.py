@@ -3,22 +3,22 @@ from dataclasses import dataclass
 from .models import CellCoordinates
 
 
-@dataclass(frozen=True)
+@dataclass
 class GetGameStateRequest:
     game_id: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class StartGameRequest:
     game_id: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class ShootLaserRequest:
     game_id: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class MovePieceRequest:
     game_id: str
     move_from: CellCoordinates
