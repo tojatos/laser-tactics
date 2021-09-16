@@ -5,11 +5,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss']
 })
-export class GameComponent implements OnInit {
+export class GameComponent {
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }
