@@ -1,5 +1,10 @@
 ## How to run:
 ### Prepare environment
+#### Docker
+Simply run
+```bash
+docker-compose up -d
+```
 #### Windows
 ##### Prepare python environment
 ```powershell
