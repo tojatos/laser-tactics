@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angula
 import { COLS, ROWS, BLOCK_SIZE } from '../../src/constants';
 
 @Component({
-  selector: 'board',
+  selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss']
 })
