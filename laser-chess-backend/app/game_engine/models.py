@@ -3,7 +3,7 @@ from enum import Enum, auto
 from typing import List, Optional
 
 
-@dataclass(frozen=True)
+@dataclass
 class CellCoordinates:
     x: int
     y: int
@@ -27,30 +27,29 @@ class Player(Enum):
     NONE = auto()
 
 
-@dataclass(frozen=True)
+@dataclass
 class Piece:
     piece_type: PieceType
     piece_owner: Player
     rotation_degree: int = 0
 
 
-# @dataclass(frozen=True)
+# @dataclass
 @dataclass
 class Cell:
     coordinates: CellCoordinates
     piece: Optional[Piece] = None
 
 
-@dataclass(frozen=True)
+@dataclass
 class Board:
     cells: List[Cell]
 
 
-# @dataclass(frozen=True)
 @dataclass
 class GameState:
-    player_ids: (str, str)
-    # history: List[Action] = []
+    player_one_id: str
+    player_two_id: str
     board: Board = Board(
         [
             Cell(CellCoordinates(0, 0), Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE)),
