@@ -15,6 +15,9 @@ from sqlalchemy.orm import Session
 from app.core import schemas
 from app.core import crud, models
 from app.core.database import SessionLocal, engine
+from app.game_engine import game_service
+from app.game_engine.models import *
+from app.game_engine.requests import *
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -174,6 +177,21 @@ async def read_users_me(current_user: schemas.User = Depends(get_current_active_
 @app.get("/users/me/items/")
 async def read_own_items(current_user: schemas.User = Depends(get_current_active_user)):
     return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+@app.get("/get_game_state", response_model=GameState, responses={
+    404: {"detail": "Game with id {game_id} does not exist."}
+})
+def get_game_state(request: GetGameStateRequest, db: Session = Depends(get_db)):
+    game_state = game_service.get_game_state(request, db)
+    return game_state
+
+
+@app.post("/start_game")
+def start_game(request: StartGameRequest,
+               current_user: schemas.User = Depends(get_current_active_user),
+               db: Session = Depends(get_db)):
+    game_service.start_game(current_user.username, request, db)
 
 
 if __name__ == "__main__":

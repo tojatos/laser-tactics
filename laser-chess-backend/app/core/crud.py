@@ -1,7 +1,13 @@
+import dataclasses
+import json
+
 from sqlalchemy.orm import Session
 
 from . import models, schemas
 from passlib.context import CryptContext
+
+from ..game_engine.models import GameState
+from ..game_engine.requests import StartGameRequest
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -41,3 +47,18 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def get_game_state_table(db: Session, game_id: str):
+    return db.query(models.GameStateTable).filter(models.GameStateTable.game_id == game_id).first()
+
+
+def start_game(db: Session, game_state: GameState, request: StartGameRequest):
+    db_game_state = models.GameStateTable(player_one_id=request.player_one_id,
+                                          player_two_id=request.player_two_id,
+                                          game_id=request.game_id,
+                                          game_state_json=json.dumps(dataclasses.asdict(game_state)))
+    db.add(db_game_state)
+    db.commit()
+    db.refresh(db_game_state)
+    return db_game_state

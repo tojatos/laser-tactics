@@ -12,7 +12,6 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
 Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
@@ -57,3 +56,39 @@ def test_create_user():
     assert data["id"] == user_id
 
 
+def test_start_game():
+    response = client.post(
+        "/users/",
+        json={"username": "test", "email": "test@example.com", "password": "admin123"},
+    )
+    assert response.status_code == 200
+    response = client.post(
+        "/token",
+        data={"username": "test", "password": "admin123"},
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert "access_token" in data
+    token = data["access_token"]
+
+    response = client.get(
+        "/get_game_state",
+        json={"game_id": "some_id"},
+    )
+    assert response.status_code == 404
+
+    response = client.post(
+        "/start_game",
+        json={"game_id": "some_id", "player_one_id": "test", "player_two_id": "test2"},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+
+    response = client.get(
+        "/get_game_state",
+        json={"game_id": "some_id"},
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["player_one_id"] == "test"
+    assert data["player_two_id"] == "test2"
