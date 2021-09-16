@@ -1,4 +1,3 @@
-import string
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Optional
@@ -50,7 +49,7 @@ class Board:
 # @dataclass(frozen=True)
 @dataclass
 class GameState:
-    player_ids: (string, string)
+    player_ids: (str, str)
     # history: List[Action] = []
     board: Board = Board(
         [

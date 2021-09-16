@@ -1,7 +1,7 @@
 import string
 
-from game_engine.models import GameState
-from game_engine.requests import ShootLaserRequest, GetGameStateRequest, StartGameRequest
+from .models import GameState
+from .requests import ShootLaserRequest, GetGameStateRequest, StartGameRequest
 
 
 def get_game_state(request: GetGameStateRequest):
