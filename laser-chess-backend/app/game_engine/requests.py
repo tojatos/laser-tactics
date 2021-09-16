@@ -11,6 +11,8 @@ class GetGameStateRequest:
 @dataclass
 class StartGameRequest:
     game_id: str
+    player_one_id: str
+    player_two_id: str
 
 
 @dataclass

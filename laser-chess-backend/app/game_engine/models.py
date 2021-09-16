@@ -9,7 +9,7 @@ class CellCoordinates:
     y: int
 
 
-class PieceType(Enum):
+class PieceType(str, Enum):
     BEAM_SPLITTER = auto()
     BLOCK = auto()
     DIAGONAL_MIRROR = auto()
@@ -21,7 +21,7 @@ class PieceType(Enum):
     TRIANGULAR_MIRROR = auto()
 
 
-class Player(Enum):
+class Player(str, Enum):
     PLAYER_ONE = auto()
     PLAYER_TWO = auto()
     NONE = auto()
