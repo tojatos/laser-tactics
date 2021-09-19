@@ -1,28 +1,28 @@
 export interface GameState {
-  player_one_id: String,
-  player_two_id: String,
-  board: Board,
+  player_one_id: string,
+  player_two_id: string,
+  board: BoardInterface,
   is_started: boolean,
-  turn_number: Number
+  turn_number: number
 }
 
-export interface Board {
-  cells: Array<Cell>
+export interface BoardInterface {
+  cells: Array<CellInterface>
 }
 
-export interface Cell {
-  coordinates: CellCoordinates,
-  piece: PieceInterface
+export interface CellInterface {
+  coordinates: Coordinates,
+  piece: PieceInterface | null
 }
 
-export interface CellCoordinates {
-  x: Number,
-  y: Number
+export interface Coordinates {
+  x: number,
+  y: number
 }
 
 export interface PieceInterface {
-  piece_type: String,
-  piece_owner: String,
-  rotation_degree: Number
+  piece_type: string,
+  piece_owner: string,
+  rotation_degree: number
 }
 

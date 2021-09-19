@@ -1,29 +1,29 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { COLS, ROWS, BLOCK_SIZE } from '../../src/constants';
+import { GameService } from '../../game.service';
+import { Board } from '../../src/board';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss']
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent implements AfterViewInit {
   // Get reference to the canvas.
-  @ViewChild('board', { static: true })
+
+  @ViewChild('canvas', { static: true })
   canvas!: ElementRef<HTMLCanvasElement>
 
-  ctx!: CanvasRenderingContext2D | null
+  board!: Board
 
-  ngOnInit() {
-    this.initBoard();
+  constructor(private gameService: GameService){}
+
+  ngAfterViewInit() {
+    const canvasContext = this.canvas.nativeElement.getContext('2d')
+    if(canvasContext == null)
+      alert("xD")
+    this.board = new Board(canvasContext!)
+    this.gameService.getGameState().then(res => this.board.initBoard(res))
   }
 
-  initBoard() {
-    this.ctx = this.canvas.nativeElement.getContext('2d');
-
-    this.ctx!.canvas.width = COLS * BLOCK_SIZE;
-    this.ctx!.canvas.height = ROWS * BLOCK_SIZE;
-
-  }
-
-  play() {}
+  play() {  }
 }
