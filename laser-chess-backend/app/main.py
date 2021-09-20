@@ -179,7 +179,7 @@ async def read_own_items(current_user: schemas.User = Depends(get_current_active
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 
-@app.get("/get_game_state", response_model=GameState, responses={
+@app.get("/get_game_state", response_model=GameStateSerializable, responses={
     404: {"detail": "Game with id {game_id} does not exist."}
 })
 def get_game_state(request: GetGameStateRequest, db: Session = Depends(get_db)):

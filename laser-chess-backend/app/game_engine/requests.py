@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from .models import CellCoordinates
-
 
 @dataclass
 class GetGameStateRequest:
@@ -23,5 +21,5 @@ class ShootLaserRequest:
 @dataclass
 class MovePieceRequest:
     game_id: str
-    move_from: CellCoordinates
-    move_to: CellCoordinates
+    move_from: Tuple[int, int]
+    move_to: Tuple[int, int]
