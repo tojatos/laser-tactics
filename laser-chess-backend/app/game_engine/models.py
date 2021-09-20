@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, NewType
 
+CellCoordinates = NewType('CellCoordinates', Tuple[int, int])
 
 class PieceType(str, Enum):
     BEAM_SPLITTER = auto()
@@ -30,7 +31,7 @@ class Piece:
 
 @dataclass
 class Cell:
-    coordinates: Tuple[int, int]
+    coordinates: CellCoordinates
     piece: Optional[Piece] = None
 
 
@@ -41,7 +42,7 @@ class BoardSerializable:
 
 @dataclass
 class Board:
-    cells: Dict[Tuple[int, int], Optional[Piece]]
+    cells: Dict[CellCoordinates, Optional[Piece]]
 
     def to_serializable(self) -> BoardSerializable:
         cells_transformed = [Cell(coordinates, piece) for coordinates, piece in self.cells.items()]

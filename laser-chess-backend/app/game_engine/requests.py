@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from app.game_engine.models import CellCoordinates
 
 @dataclass
 class GetGameStateRequest:
@@ -21,5 +21,5 @@ class ShootLaserRequest:
 @dataclass
 class MovePieceRequest:
     game_id: str
-    move_from: Tuple[int, int]
-    move_to: Tuple[int, int]
+    move_from: CellCoordinates
+    move_to: CellCoordinates
