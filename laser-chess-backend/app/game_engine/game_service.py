@@ -9,7 +9,7 @@ from .requests import ShootLaserRequest, GetGameStateRequest, StartGameRequest
 from ..core import crud
 
 
-def get_game_state(request: GetGameStateRequest, db: Session) -> GameState:
+def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerializable:
     game_state_table = crud.get_game_state_table(db, game_id=request.game_id)
 
     if game_state_table is None:

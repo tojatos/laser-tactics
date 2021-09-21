@@ -31,7 +31,7 @@ class Piece:
 
 @dataclass
 class Cell:
-    coordinates: CellCoordinates
+    coordinates: List[int]
     piece: Optional[Piece] = None
 
 
@@ -45,7 +45,7 @@ class Board:
     cells: Dict[CellCoordinates, Optional[Piece]]
 
     def to_serializable(self) -> BoardSerializable:
-        cells_transformed = [Cell(coordinates, piece) for coordinates, piece in self.cells.items()]
+        cells_transformed = [Cell(list(coordinates), piece) for coordinates, piece in self.cells.items()]
         return BoardSerializable(cells_transformed)
 
 
