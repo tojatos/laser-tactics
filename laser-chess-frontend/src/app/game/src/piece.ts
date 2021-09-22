@@ -1,19 +1,21 @@
-import { Coordinates, PieceInterface } from "../game.models";
-import { PIECE_SIZE } from "./constants";
-import { PieceType } from "./PieceType";
+import { Coordinates, PieceInterface } from "../game.models"
+import { Board } from "./Board"
+import { Cell } from "./Cell"
+import { PIECE_SIZE } from "./constants"
+import { PieceType } from "./PieceType"
 
 export class Piece implements PieceInterface {
   piece_type: string
   piece_owner: string
   rotation_degree: number
   piece_img = new Image()
+  move_made = false
 
-  constructor(owner: string, pieceType: string, rotation_degree: number){
+  constructor(owner: string, pieceType: string, rotation_degree: number, mirror_perspective: boolean = false){
     this.piece_owner = owner
     this.rotation_degree = rotation_degree
-    //this.piece_type = (<any>PieceType)[pieceType] || "unknown"
-    this.piece_type = pieceType
-
+    if(mirror_perspective) this.rotation_degree + 180
+    this.piece_type = (<any>PieceType)[pieceType] || "unknown"
   }
 
   draw(ctx: CanvasRenderingContext2D, coordinates: Coordinates){
@@ -21,12 +23,27 @@ export class Piece implements PieceInterface {
     this.piece_img.onload = () => {
       ctx.save()
       ctx.translate(coordinates.x, coordinates.y)
-      ctx.rotate(this.rotation_degree / 360 * Math.PI)
+      ctx.rotate(this.rotation_degree / 180 * Math.PI)
       ctx.drawImage(this.piece_img, -PIECE_SIZE / 2, -PIECE_SIZE / 2)
       ctx.restore()
     }
   }
 
-  getPossibleMoves(){}
+  getPossibleMoves(board: Board, cell: Cell): Array<Cell> {
+    return [
+      board.getCellByCoordinates(cell.coordinates.x + 1, cell.coordinates.y),
+      board.getCellByCoordinates(cell.coordinates.x - 1, cell.coordinates.y),
+      board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y + 1),
+      board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y - 1)
+    ].filter(c => this.cellFilterFunction(this.piece_type)(c)).map(c => c!)
+  }
+
+
+  private cellFilterFunction(type: string) {
+    if(type == PieceType.BLOCK) return (c: Cell | undefined) => c != undefined
+    else if (type == PieceType.HYPERCUBE || type == PieceType.KING) 
+      return (c: Cell | undefined) => c != undefined && (this.move_made && c.piece == null)
+    return (c: Cell | undefined) => c != undefined && c.piece == null
+  }
 
 }

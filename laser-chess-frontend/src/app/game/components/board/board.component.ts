@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { GameService } from '../../game.service';
-import { Board } from '../../src/board';
+import { Board } from '../../src/Board';
 
 @Component({
   selector: 'app-board',
@@ -8,8 +8,6 @@ import { Board } from '../../src/board';
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent implements AfterViewInit {
-  // Get reference to the canvas.
-
   @ViewChild('canvas', { static: true })
   canvas!: ElementRef<HTMLCanvasElement>
 

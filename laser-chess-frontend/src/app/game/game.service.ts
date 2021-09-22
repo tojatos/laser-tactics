@@ -11,8 +11,8 @@ export class GameService {
 
   async getGameState(): Promise<GameState> {
     const example_val = {
-      "player_one_id": "string",
-      "player_two_id": "string",
+      "player_one_id": "player1",
+      "player_two_id": "player2",
       "board": {
         "cells": [
           {

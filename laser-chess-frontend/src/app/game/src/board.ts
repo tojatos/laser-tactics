@@ -1,5 +1,5 @@
 import { BoardInterface, GameState } from "../game.models"
-import { Cell } from "./cell"
+import { Cell } from "./Cell"
 import { COLS, ROWS, BLOCK_SIZE } from "./constants"
 
 export class Board implements BoardInterface {
@@ -20,6 +20,10 @@ export class Board implements BoardInterface {
       this.ctx.drawImage(board_img, 0, 0);
       gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, this.ctx)))
     }
+  }
+
+  getCellByCoordinates(x: number, y: number): Cell | undefined {
+    return this.cells.find(c => c.coordinates == {x: x, y: y}) 
   }
 
 }
