@@ -18,7 +18,7 @@ export class Cell implements CellInterface {
   }
 
   get pieceDrawingOriginCoordinates(): Coordinates {
-    return {x: - PIECE_SIZE / 2, y: PIECE_SIZE / 2}
+    return {x: - PIECE_SIZE / 2, y: - PIECE_SIZE / 2}
   }
 
   get cellOnBoardCoordinates() : Coordinates {
