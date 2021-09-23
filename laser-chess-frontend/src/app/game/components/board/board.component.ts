@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { GameService } from '../../game.service';
 import { Board } from '../../src/Board';
+import { Canvas } from '../../src/Canvas/Canvas';
 
 @Component({
   selector: 'app-board',
@@ -9,18 +10,28 @@ import { Board } from '../../src/Board';
 })
 export class BoardComponent implements AfterViewInit {
   @ViewChild('canvas', { static: true })
-  canvas!: ElementRef<HTMLCanvasElement>
+  canvasHTML!: ElementRef<HTMLCanvasElement>
 
   board!: Board
+  canvas!: Canvas
 
   constructor(private gameService: GameService){}
 
   ngAfterViewInit() {
-    const canvasContext = this.canvas.nativeElement.getContext('2d')
+    const canvasContext = this.canvasHTML.nativeElement.getContext('2d')
     if(canvasContext == null)
       alert("xD")
-    this.board = new Board(canvasContext!)
-    this.gameService.getGameState().then(res => this.board.initBoard(res))
+      
+    this.board = new Board()
+    this.gameService.getGameState().then(
+      res => { 
+        this.board.initBoard(res)
+        this.canvas = new Canvas(canvasContext!, this.board)
+        this.canvas.drawGame()
+      }
+    )
+    
+    
   }
 
   play() {  }

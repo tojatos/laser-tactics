@@ -16,17 +16,7 @@ export class Piece implements PieceInterface {
     this.rotation_degree = rotation_degree
     if(mirror_perspective) this.rotation_degree + 180
     this.piece_type = (<any>PieceType)[pieceType] || "unknown"
-  }
-
-  draw(ctx: CanvasRenderingContext2D, coordinates: Coordinates){
     this.piece_img.src = `assets/${this.piece_type}.png`
-    this.piece_img.onload = () => {
-      ctx.save()
-      ctx.translate(coordinates.x, coordinates.y)
-      ctx.rotate(this.rotation_degree / 180 * Math.PI)
-      ctx.drawImage(this.piece_img, -PIECE_SIZE / 2, -PIECE_SIZE / 2)
-      ctx.restore()
-    }
   }
 
   getPossibleMoves(board: Board, cell: Cell): Array<Cell> {
