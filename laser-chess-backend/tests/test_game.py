@@ -122,3 +122,77 @@ def test_shoot_laser_mirror_pass_through():
 
     assert cells[(0, 0)] == Piece(PieceType.LASER, Player.PLAYER_ONE)
     assert cells[(0, 1)] == Piece(PieceType.MIRROR, Player.PLAYER_TWO, 90)
+
+
+def test_shoot_laser_beam_splitter_destroy_blocks():
+    board: Board = Board({
+        (1, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (1, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+        (2, 1): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    expected_board: Board = Board({
+        (1, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (1, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE),
+        (0, 1): None,
+        (2, 1): None,
+    })
+
+    assert game_state.board == expected_board
+
+
+def test_shoot_laser_beam_splitter_mirror():
+    board: Board = Board({
+        (1, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (1, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.MIRROR, Player.PLAYER_ONE, 90),
+        (2, 1): Piece(PieceType.MIRROR, Player.PLAYER_ONE, 90),
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    expected_board: Board = Board({
+        (1, 0): None,
+        (1, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.MIRROR, Player.PLAYER_ONE, 90),
+        (2, 1): Piece(PieceType.MIRROR, Player.PLAYER_ONE, 90),
+    })
+
+    assert game_state.board == expected_board
+
+
+def test_shoot_laser_beam_multiple_beam_splitters():
+    board: Board = Board({
+        (0, 0): None,
+        (1, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (2, 0): None,
+
+        (0, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 180),
+        (1, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 270),
+        (2, 1): Piece(PieceType.BLOCK, Player.PLAYER_ONE, 270),
+
+        (0, 2): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 270),
+        (1, 2): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE),
+        (2, 2): None
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    expected_board: Board = Board({
+        (0, 0): None,
+        (1, 0): None,
+        (2, 0): None,
+
+        (0, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 180),
+        (1, 1): None,
+        (2, 1): Piece(PieceType.BLOCK, Player.PLAYER_ONE, 270),
+
+        (0, 2): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 270),
+        (1, 2): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE),
+        (2, 2): None
+    })
+
+    assert game_state.board == expected_board
