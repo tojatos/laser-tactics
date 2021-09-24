@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Dict, List, Optional, Tuple, NewType
+from typing import Dict, List, Optional, Tuple
 
-CellCoordinates = NewType('CellCoordinates', Tuple[int, int])
+CellCoordinates = Tuple[int, int]
+
 
 class PieceType(str, Enum):
     BEAM_SPLITTER = auto()
@@ -74,7 +75,6 @@ class GameState:
             is_started=self.is_started,
             turn_number=self.turn_number,
         )
-
 
 
 def empty_game_state(player_one_id, player_two_id) -> GameState:

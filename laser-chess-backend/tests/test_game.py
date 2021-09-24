@@ -8,6 +8,12 @@ def get_initial_test_game_state() -> GameState:
     return empty_game_state(player_one_id, player_two_id)
 
 
+def get_test_game_state(board: Board) -> GameState:
+    player_one_id = "player1"
+    player_two_id = "player2"
+    return GameState(player_one_id, player_two_id, board, False, 0)
+
+
 def test_start_game():
     initial_state = get_initial_test_game_state()
     game = Game(initial_state)
@@ -20,8 +26,8 @@ def test_move_piece():
     initial_state = get_initial_test_game_state()
     game = Game(initial_state)
     game.start_game()
-    from_cell_coordinates = CellCoordinates((0, 1))
-    to_cell_coordinates = CellCoordinates((0, 2))
+    from_cell_coordinates = (0, 1)
+    to_cell_coordinates = (0, 2)
     cells = game.game_state.board.cells
     piece = cells[from_cell_coordinates]
     assert piece is not None
@@ -30,3 +36,89 @@ def test_move_piece():
     cells = game.game_state.board.cells
     assert cells[from_cell_coordinates] is None
     assert cells[to_cell_coordinates] is piece
+
+
+def get_shoot_laser_state(initial_board: Board) -> GameState:
+    initial_state = get_test_game_state(initial_board)
+    game = Game(initial_state)
+    game.start_game()
+    game.shoot_laser(Player.PLAYER_ONE)
+    return game.game_state
+
+
+def test_shoot_laser_block():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+    })
+
+    game_state = get_shoot_laser_state(board)
+    cells = game_state.board.cells
+
+    assert cells[(0, 0)] == Piece(PieceType.LASER, Player.PLAYER_ONE)
+    assert cells[(0, 1)] is None
+
+
+def test_shoot_laser_block_rotation_90():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO, 90)
+    })
+
+    game_state = get_shoot_laser_state(board)
+    cells = game_state.board.cells
+
+    assert cells[(0, 0)] == Piece(PieceType.LASER, Player.PLAYER_ONE)
+    assert cells[(0, 1)] is None
+
+
+def test_shoot_laser_block_rotation_180():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO, 180)
+    })
+
+    game_state = get_shoot_laser_state(board)
+    cells = game_state.board.cells
+
+    assert cells[(0, 0)] is None
+    assert cells[(0, 1)] == Piece(PieceType.BLOCK, Player.PLAYER_TWO, 180)
+
+
+def test_shoot_laser_block_rotation_270():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO, 270)
+    })
+
+    game_state = get_shoot_laser_state(board)
+    cells = game_state.board.cells
+
+    assert cells[(0, 0)] == Piece(PieceType.LASER, Player.PLAYER_ONE)
+    assert cells[(0, 1)] is None
+
+
+def test_shoot_laser_mirror_deflect():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.MIRROR, Player.PLAYER_TWO),
+    })
+
+    game_state = get_shoot_laser_state(board)
+    cells = game_state.board.cells
+
+    assert cells[(0, 0)] is None
+    assert cells[(0, 1)] == Piece(PieceType.MIRROR, Player.PLAYER_TWO)
+
+
+def test_shoot_laser_mirror_pass_through():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.MIRROR, Player.PLAYER_TWO, 90),
+    })
+
+    game_state = get_shoot_laser_state(board)
+    cells = game_state.board.cells
+
+    assert cells[(0, 0)] == Piece(PieceType.LASER, Player.PLAYER_ONE)
+    assert cells[(0, 1)] == Piece(PieceType.MIRROR, Player.PLAYER_TWO, 90)
