@@ -122,6 +122,12 @@ class Game:
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
+                    if piece_hit.piece_type is PieceType.HYPER_SQUARE:
+                        pass
+                    if piece_hit.piece_type is PieceType.HYPER_CUBE:
+                        laser_queue.put((current_coordinates, last_laser_direction, time + 1))
+                    if piece_hit.piece_type is PieceType.KING:
+                        cells_after_laser_hit[current_coordinates] = None
 
         print(laser_path)
         self.game_state.board.cells = cells_after_laser_hit

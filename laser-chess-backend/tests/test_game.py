@@ -196,3 +196,49 @@ def test_shoot_laser_beam_multiple_beam_splitters():
     })
 
     assert game_state.board == expected_board
+
+
+def test_shoot_laser_hyper_square():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.HYPER_SQUARE, Player.NONE),
+        (0, 2): Piece(PieceType.BLOCK, Player.PLAYER_ONE, 180),
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    assert game_state.board == board
+
+
+def test_shoot_laser_hyper_cube():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
+        (0, 2): Piece(PieceType.BLOCK, Player.PLAYER_ONE, 180),
+    })
+
+    expected_board: Board = Board({
+        (0, 0): None,
+        (0, 1): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
+        (0, 2): Piece(PieceType.BLOCK, Player.PLAYER_ONE, 180),
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    assert game_state.board == expected_board
+
+
+def test_shoot_laser_king():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.KING, Player.PLAYER_ONE, 180),
+    })
+
+    expected_board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): None
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    assert game_state.board == expected_board
