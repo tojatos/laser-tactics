@@ -75,6 +75,10 @@ class Game:
         while not laser_queue.empty():
             last_coordinates, last_laser_direction, time = laser_queue.get()
 
+            # TODO: detect loops and exit on loop instead
+            if time > 300:
+                break
+
             current_coordinates = get_next_laser_coordinates(last_coordinates, last_laser_direction)
 
             if current_coordinates not in cells:

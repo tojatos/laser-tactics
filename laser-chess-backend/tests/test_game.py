@@ -242,3 +242,20 @@ def test_shoot_laser_king():
     game_state = get_shoot_laser_state(board)
 
     assert game_state.board == expected_board
+
+
+def test_shoot_laser_infinite_laser_loop():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (1, 0): None,
+
+        (0, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 270),
+        (1, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 180),
+
+        (0, 2): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE),
+        (1, 2): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 90),
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    assert game_state.board == board
