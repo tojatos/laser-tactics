@@ -88,6 +88,7 @@ class Game:
                     laser_queue.put((current_coordinates, last_laser_direction, time + 1))
                 else:
                     piece_facing_direction = direction_from_rotation[piece_hit.rotation_degree]
+
                     if piece_hit.piece_type is PieceType.MIRROR:
                         x = {last_laser_direction, piece_facing_direction}
                         should_deflect = x.issubset(horizontal_directions) or x.issubset(vertical_directions)
@@ -98,7 +99,13 @@ class Game:
                             laser_queue.put((current_coordinates, last_laser_direction, time + 1))
                     if piece_hit.piece_type is PieceType.LASER:
                         cells_after_laser_hit[current_coordinates] = None
-                        pass
+                    if piece_hit.piece_type is PieceType.BLOCK:
+                        should_deflect = last_laser_direction == opposite_direction(piece_facing_direction)
+                        if should_deflect:
+                            next_laser_direction = opposite_direction(last_laser_direction)
+                            laser_queue.put((current_coordinates, next_laser_direction, time + 1))
+                        else:
+                            cells_after_laser_hit[current_coordinates] = None
 
         self.game_state.board.cells = cells_after_laser_hit
 
