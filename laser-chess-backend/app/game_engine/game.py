@@ -52,7 +52,18 @@ class Game:
         self.game_state.is_started = True
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):
-        if self.game_state.board.cells[from_cell].piece_type == PieceType.HYPER_CUBE:
+        if self.game_state.board.cells[to_cell] is not None and self.game_state.board.cells[to_cell].piece_type == PieceType.HYPER_SQUARE:
+            moved_piece = self.game_state.board.cells[from_cell]
+            self.game_state.board.cells[from_cell] = None
+
+            random_empty_cell_coordinates_list = random.choice(list(filter(lambda x: x.piece is None, self.game_state.board.to_serializable().cells))).coordinates
+            random_empty_cell_coordinates: Tuple[int, int] = tuple(random_empty_cell_coordinates_list)
+
+            self.game_state.board.cells[random_empty_cell_coordinates] = moved_piece
+            self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
+            self.game_state.game_events.append(TeleportEvent(to_cell, random_empty_cell_coordinates))
+
+        elif self.game_state.board.cells[from_cell].piece_type == PieceType.HYPER_CUBE:
             target_piece = self.game_state.board.cells[to_cell]
             self.game_state.board.cells[to_cell] = self.game_state.board.cells[from_cell]
             self.game_state.board.cells[from_cell] = None
@@ -61,10 +72,11 @@ class Game:
                 random_empty_cell_coordinates: Tuple[int, int] = tuple(random_empty_cell_coordinates_list)
                 self.game_state.board.cells[random_empty_cell_coordinates] = target_piece
                 self.game_state.game_events.append(TeleportEvent(from_cell, random_empty_cell_coordinates))
+                self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
         else:
             self.game_state.board.cells[to_cell] = self.game_state.board.cells[from_cell]
             self.game_state.board.cells[from_cell] = None
-        self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
+            self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
 
     def rotate(self, rotated_piece_at: CellCoordinates, rotation: int):
         self.game_state.board.cells[rotated_piece_at].rotation_degree = normalize_rotation(self.game_state.board.cells[rotated_piece_at].rotation_degree + rotation)

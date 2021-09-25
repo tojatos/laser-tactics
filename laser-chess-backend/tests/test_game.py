@@ -324,7 +324,7 @@ def test_shoot_laser_diagonal_mirror():
     assert game_state.game_events == [LaserShotEvent([(0, (1, 1)), (1, (2, 1)), (2, (2, 2)), (3, (1, 2)), (4, (1, 1)), (5, (0, 1)), (6, (0, 2)), (6, (0, 0))])]
 
 
-def test_move_hypercube():
+def test_move_hyper_cube():
     board: Board = Board({
         (0, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
         (1, 0): Piece(PieceType.LASER, Player.PLAYER_TWO),
@@ -343,6 +343,23 @@ def test_move_hypercube():
     game.move(from_cell_coordinates, to_cell_coordinates)
 
     assert game.game_state.board == expected_board
+
+
+def test_move_hyper_square():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+        (1, 0): Piece(PieceType.HYPER_SQUARE, Player.NONE),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+    from_cell_coordinates = (0, 0)
+    to_cell_coordinates = (1, 0)
+
+    game.move(from_cell_coordinates, to_cell_coordinates)
+
+    assert game.game_state.board == board
 
 
 def test_rotate_piece():
