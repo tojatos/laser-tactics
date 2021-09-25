@@ -150,6 +150,7 @@ class Game:
 
         print(laser_path)
         self.game_state.board.cells = cells_after_laser_hit
+        self.game_state.game_events.append(LaserShotEvent(laser_path))
 
         # TODO: add user and game events to game state
         # TODO: laser path game event and hit game event

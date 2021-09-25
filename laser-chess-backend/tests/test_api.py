@@ -29,6 +29,11 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
+def test_openapi():
+    response = client.get("/openapi.json")
+    assert response.status_code == 200, response.text
+
+
 def test_create_user():
     response = client.post(
         "/users/",
