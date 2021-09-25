@@ -259,3 +259,65 @@ def test_shoot_laser_infinite_laser_loop():
     game_state = get_shoot_laser_state(board)
 
     assert game_state.board == board
+
+
+def test_shoot_laser_triangular_mirror():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (1, 0): None,
+
+        (0, 1): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 90),
+        (1, 1): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 270),
+
+        (0, 2): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 90),
+        (1, 2): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 180),
+    })
+
+    expected_board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (1, 0): None,
+
+        (0, 1): None,
+        (1, 1): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 270),
+
+        (0, 2): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 90),
+        (1, 2): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE, 180),
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    assert game_state.board == expected_board
+
+
+def test_shoot_laser_diagonal_mirror():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.KING, Player.PLAYER_ONE),
+        (1, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (2, 0): None,
+
+        (0, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 270),
+        (1, 1): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE),
+        (2, 1): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE, 180),
+
+        (0, 2): Piece(PieceType.KING, Player.PLAYER_TWO),
+        (1, 2): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE),
+        (2, 2): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE, 90),
+    })
+
+    expected_board: Board = Board({
+        (0, 0): None,
+        (1, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (2, 0): None,
+
+        (0, 1): Piece(PieceType.BEAM_SPLITTER, Player.PLAYER_ONE, 270),
+        (1, 1): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE),
+        (2, 1): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE, 180),
+
+        (0, 2): None,
+        (1, 2): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE),
+        (2, 2): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_ONE, 90),
+    })
+
+    game_state = get_shoot_laser_state(board)
+
+    assert game_state.board == expected_board

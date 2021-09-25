@@ -132,6 +132,21 @@ class Game:
                         laser_queue.put((current_coordinates, last_laser_direction, time + 1))
                     if piece_hit.piece_type is PieceType.KING:
                         cells_after_laser_hit[current_coordinates] = None
+                    if piece_hit.piece_type is PieceType.TRIANGULAR_MIRROR:
+                        should_deflect_right = last_laser_direction == direction_from_rotation[normalize_rotation(piece_hit.rotation_degree + 270)]
+                        should_deflect_left = last_laser_direction == direction_from_rotation[normalize_rotation(piece_hit.rotation_degree + 180)]
+                        if should_deflect_right:
+                            next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + 90)]
+                            laser_queue.put((current_coordinates, next_laser_direction, time + 1))
+                        elif should_deflect_left:
+                            next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + 270)]
+                            laser_queue.put((current_coordinates, next_laser_direction, time + 1))
+                        else:
+                            cells_after_laser_hit[current_coordinates] = None
+                    if piece_hit.piece_type is PieceType.DIAGONAL_MIRROR:
+                        should_deflect_right = last_laser_direction in [piece_facing_direction, opposite_direction(piece_facing_direction)]
+                        next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + (90 if should_deflect_right else 270))]
+                        laser_queue.put((current_coordinates, next_laser_direction, time + 1))
 
         print(laser_path)
         self.game_state.board.cells = cells_after_laser_hit
