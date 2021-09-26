@@ -1,60 +1,30 @@
 import { Board } from "../Board"
-import { Cell } from "../Cell"
-import { BLOCK_SIZE, COLS, PIECE_SIZE, ROWS } from "../constants"
+import { BLOCK_SIZE, COLS, ROWS } from "../constants"
+import { Animations } from "./Animations"
+import { Drawings } from "./Drawings"
 
 export class Canvas {
 
     ctx: CanvasRenderingContext2D
     board: Board
+    animations: Animations
+    drawings: Drawings
 
     constructor(ctx: CanvasRenderingContext2D, board: Board) {
         this.ctx = ctx
         this.ctx.canvas.width = COLS * BLOCK_SIZE
         this.ctx.canvas.height = ROWS * BLOCK_SIZE
         this.board = board
+        this.drawings = new Drawings(ctx)
+        this.animations = new Animations(this.drawings)
         this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, this.board), false)
-    }
-
-
-    drawGame(board: Board = this.board, cells: Cell[] = this.board.cells){
-        this.drawBoard(board)
-        cells.forEach(c => this.drawCellWithPiece(c))
-    }
-
-    private drawBoard(board: Board){
-        board.board_img.onload = () => this.ctx.drawImage(board.board_img, 0, 0)
-    }
-
-    private drawCellWithPiece(cell: Cell){
-        if(cell.piece){
-            cell.piece.piece_img.onload = () => {
-                this.ctx.save()
-                this.ctx.translate(cell.cellOnBoardCoordinates.x, cell.cellOnBoardCoordinates.y)
-                this.ctx.rotate(cell.piece!.rotation_degree / 180 * Math.PI)
-                this.ctx.drawImage(cell.piece!.piece_img, cell.pieceDrawingOriginCoordinates.x, cell.pieceDrawingOriginCoordinates.y)
-                this.ctx.restore()
-            }
-        }
-    }
-
-    private highlightCell(cell: Cell | undefined){
-        console.log(cell)
-        if(cell) {
-            this.ctx.save()
-            this.ctx.globalAlpha = 0.5;
-            this.ctx.translate(cell.cellOnBoardCoordinates.x, cell.cellOnBoardCoordinates.y)
-            this.ctx.beginPath()
-            this.ctx.rect(cell.cellDrawingOriginCoordinates.x, cell.cellDrawingOriginCoordinates.y, BLOCK_SIZE, BLOCK_SIZE)
-            this.ctx.fillStyle = "yellow"
-            this.ctx.fill()
-            this.ctx.restore()
-        }
+        this.drawings.initBoard(this.board)        
     }
 
     private canvasOnclick(event: MouseEvent, board: Board) {
         const coor = this.getMousePos(event)
-        this.highlightCell(board.getSelectableCellByCoordinates(coor.x, coor.y, "1"))
-
+        this.drawings.highlightCell(board.getSelectableCellByCoordinates(coor.x, coor.y, "1"))
+        this.animations.movePiece(board, {x: 0, y: 0}, {x: 1, y: 1})
     }
 
     private getMousePos(event: MouseEvent){

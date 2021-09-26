@@ -27,7 +27,6 @@ export class BoardComponent implements AfterViewInit {
       res => { 
         this.board.initBoard(res)
         this.canvas = new Canvas(canvasContext!, this.board)
-        this.canvas.drawGame()
       }
     )
     

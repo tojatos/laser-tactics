@@ -20,7 +20,6 @@ export class Board implements BoardInterface {
   }
 
   getSelectableCellByCoordinates(x: number, y: number, owner: string): Cell | undefined {
-    
     return this.cells.find(c => c.coordinates.x == x && c.coordinates.y == y && c.piece?.piece_owner == owner) 
   }
 

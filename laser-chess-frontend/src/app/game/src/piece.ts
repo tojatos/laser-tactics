@@ -10,13 +10,15 @@ export class Piece implements PieceInterface {
   rotation_degree: number
   piece_img = new Image()
   move_made = false
+  currentCoordinates: Coordinates
 
-  constructor(owner: string, pieceType: string, rotation_degree: number, mirror_perspective: boolean = false){
+  constructor(owner: string, pieceType: string, rotation_degree: number, coordinates: Coordinates, mirror_perspective: boolean = false){
     this.piece_owner = owner
     this.rotation_degree = rotation_degree
     if(mirror_perspective) this.rotation_degree + 180
     this.piece_type = (<any>PieceType)[pieceType] || "unknown"
     this.piece_img.src = `assets/${this.piece_type}.png`
+    this.currentCoordinates = coordinates
   }
 
   getPossibleMoves(board: Board, cell: Cell): Array<Cell> {
