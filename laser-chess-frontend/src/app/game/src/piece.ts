@@ -1,7 +1,6 @@
 import { Coordinates, PieceInterface } from "../game.models"
-import { Board } from "./Board"
-import { Cell } from "./Cell"
-import { PIECE_SIZE } from "./constants"
+import { Board } from "./board"
+import { Cell } from "./cell"
 import { PieceType } from "./PieceType"
 
 export class Piece implements PieceInterface {
@@ -33,7 +32,7 @@ export class Piece implements PieceInterface {
 
   private cellFilterFunction(type: string) {
     if(type == PieceType.BLOCK) return (c: Cell | undefined) => c != undefined
-    else if (type == PieceType.HYPERCUBE || type == PieceType.KING) 
+    else if (type == PieceType.HYPERCUBE || type == PieceType.KING)
       return (c: Cell | undefined) => c != undefined && (this.move_made && c.piece == null)
     return (c: Cell | undefined) => c != undefined && c.piece == null
   }

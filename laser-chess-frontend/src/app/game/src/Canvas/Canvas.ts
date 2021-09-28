@@ -1,7 +1,7 @@
-import { Board } from "../Board"
+import { Board } from "../board"
 import { BLOCK_SIZE, COLS, ROWS } from "../constants"
-import { Animations } from "./Animations"
-import { Drawings } from "./Drawings"
+import { Animations } from "./animations"
+import { Drawings } from "./drawings"
 
 export class Canvas {
 
@@ -18,13 +18,16 @@ export class Canvas {
         this.drawings = new Drawings(ctx)
         this.animations = new Animations(this.drawings)
         this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, this.board), false)
-        this.drawings.initBoard(this.board)        
+        this.drawings.initBoard(this.board)
     }
 
     private canvasOnclick(event: MouseEvent, board: Board) {
         const coor = this.getMousePos(event)
-        this.drawings.highlightCell(board.getSelectableCellByCoordinates(coor.x, coor.y, "1"))
-        this.animations.movePiece(board, {x: 0, y: 0}, {x: 1, y: 1})
+        const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, "1")
+        board.selectCell(selectedCell)
+        this.drawings.highlightCell(selectedCell)
+
+        this.animations.movePiece(board, {x: 0, y: 0}, {x: 4, y: 4})
     }
 
     private getMousePos(event: MouseEvent){

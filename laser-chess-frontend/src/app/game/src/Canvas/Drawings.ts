@@ -1,8 +1,8 @@
 import { Coordinates } from "../../game.models"
-import { Board } from "../Board"
-import { Cell } from "../Cell"
+import { Board } from "../board"
+import { Cell } from "../cell"
 import { BLOCK_SIZE, PIECE_SIZE } from "../constants"
-import { Piece } from "../Piece"
+import { Piece } from "../piece"
 
 export class Drawings {
 

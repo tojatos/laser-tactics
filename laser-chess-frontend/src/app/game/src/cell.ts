@@ -1,6 +1,6 @@
 import { Coordinates, CellInterface, PieceInterface } from "../game.models";
-import { BLOCK_SIZE, PIECE_SIZE } from "./constants";
-import { Piece } from "./Piece";
+import { BLOCK_SIZE } from "./constants";
+import { Piece } from "./piece";
 
 export class Cell implements CellInterface {
   coordinates: Coordinates
