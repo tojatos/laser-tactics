@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { GameService } from '../../game.service';
 import { Board } from '../../src/board';
-import { Canvas } from '../../src/canvas/canvas';
+import { Canvas } from '../../src/Canvas/canvas';
 
 @Component({
   selector: 'app-board',
@@ -23,7 +23,7 @@ export class BoardComponent implements AfterViewInit {
       alert("xD")
 
     this.board = new Board()
-    this.gameService.getGameState().then(
+    this.gameService.getGameState("string").then(
       res => {
         this.board.initBoard(res)
         this.canvas = new Canvas(canvasContext!, this.board)
