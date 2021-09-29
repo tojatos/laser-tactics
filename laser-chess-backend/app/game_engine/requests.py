@@ -1,4 +1,6 @@
-from dataclasses import dataclass
+from pydantic.dataclasses import dataclass
+
+from app.game_engine.models import CellCoordinatesSerializable
 
 
 @dataclass
@@ -21,5 +23,5 @@ class ShootLaserRequest:
 @dataclass
 class MovePieceRequest:
     game_id: str
-    move_from: Tuple[int, int]
-    move_to: Tuple[int, int]
+    move_from: CellCoordinatesSerializable
+    move_to: CellCoordinatesSerializable

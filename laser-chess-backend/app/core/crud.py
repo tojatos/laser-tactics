@@ -63,3 +63,10 @@ def start_game(db: Session, game_state: GameState, request: StartGameRequest):
     db.commit()
     db.refresh(db_game_state)
     return db_game_state
+
+
+def update_game(db: Session, game_state: GameState, game_id: str):
+    game_state_json = json.dumps(dataclasses.asdict(game_state.to_serializable()))
+    db_game_state = get_game_state_table(db, game_id)
+    db_game_state.game_state_json = game_state_json
+    db.commit()
