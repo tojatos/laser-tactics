@@ -24,6 +24,7 @@ models.Base.metadata.create_all(bind=engine)
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+API_PREFIX = "/api/v1"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -177,7 +178,7 @@ async def read_own_items(current_user: schemas.User = Depends(get_current_active
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 
-@app.get("/get_game_state", response_model=GameStateSerializable, responses={
+@app.post("/get_game_state", response_model=GameStateSerializable, responses={
     404: {"detail": "Game with id {game_id} does not exist."}
 })
 async def get_game_state(request: GetGameStateRequest, db: Session = Depends(get_db)):

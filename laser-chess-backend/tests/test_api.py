@@ -80,7 +80,7 @@ def test_start_game():
     assert "access_token" in data
     token = data["access_token"]
 
-    response = client.get(
+    response = client.post(
         "/get_game_state",
         json={"game_id": "some_id"},
     )
@@ -93,7 +93,7 @@ def test_start_game():
     )
     assert response.status_code == 200
 
-    response = client.get(
+    response = client.post(
         "/get_game_state",
         json={"game_id": "some_id"},
     )
@@ -121,7 +121,7 @@ def test_shoot_laser():
     )
     response = client.post("/shoot_laser", json={"game_id": "some_id"}, headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
-    response = client.get("/get_game_state", json={"game_id": "some_id"})
+    response = client.post("/get_game_state", json={"game_id": "some_id"})
     assert response.status_code == 200, response.text
     game_state_dict = response.json()
 
