@@ -111,6 +111,18 @@ def test_shoot_laser_mirror_deflect():
     assert cells[(0, 1)] == Piece(PieceType.MIRROR, Player.PLAYER_TWO)
 
 
+def test_shoot_laser_mirror_deflect_vertical():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE, 90),
+        (1, 0): Piece(PieceType.MIRROR, Player.PLAYER_TWO, 90),
+    })
+
+    game_state = get_shoot_laser_state(board)
+    cells = game_state.board.cells
+
+    assert cells[(0, 0)] is None
+    assert cells[(1, 0)] == Piece(PieceType.MIRROR, Player.PLAYER_TWO, 90)
+
 def test_shoot_laser_mirror_pass_through():
     board: Board = Board({
         (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),

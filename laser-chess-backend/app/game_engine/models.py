@@ -1,8 +1,23 @@
-from dataclasses import dataclass
+import pprint
+
+from pydantic.dataclasses import dataclass
 from enum import Enum, auto
 from typing import Dict, List, Optional, Tuple, Union
 
 CellCoordinates = Tuple[int, int]
+
+
+@dataclass
+class CellCoordinatesSerializable:
+    x: int
+    y: int
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
+
+    # def __init__(self, coordinates: CellCoordinates):
+    #     self.x, self.y = coordinates
 
 
 class PieceType(str, Enum):
@@ -32,7 +47,7 @@ class Piece:
 
 @dataclass
 class Cell:
-    coordinates: List[int]
+    coordinates: CellCoordinatesSerializable
     piece: Optional[Piece] = None
 
 
@@ -40,13 +55,21 @@ class Cell:
 class BoardSerializable:
     cells: List[Cell]
 
+    def to_normal(self) -> "Board":
+        cells_transformed = {tuple(cell.coordinates): cell.piece for
+                             cell in
+                             self.cells}
+        return Board(cells_transformed)
+
 
 @dataclass
 class Board:
     cells: Dict[CellCoordinates, Optional[Piece]]
 
     def to_serializable(self) -> BoardSerializable:
-        cells_transformed = [Cell(list(coordinates), piece) for coordinates, piece in self.cells.items()]
+        cells_transformed = [Cell(CellCoordinatesSerializable(coordinates[0], coordinates[1]), piece) for
+                             coordinates, piece in
+                             self.cells.items()]
         return BoardSerializable(cells_transformed)
 
 
@@ -55,7 +78,7 @@ class LaserShotEvent:
     laser_path: List[Tuple[int, CellCoordinates]]
 
     def to_serializable(self):
-        return LaserShotEventSerializable(list(map(lambda x: str(x), self.laser_path)))
+        return LaserShotEventSerializable(list(map(lambda x: (x[0], CellCoordinatesSerializable(x[1][0], x[1][1])), self.laser_path)))
 
 
 @dataclass
@@ -87,29 +110,39 @@ class TeleportEvent:
 
 @dataclass
 class PieceMovedEventSerializable:
-    moved_from: str
-    moved_to: str
+    moved_from: CellCoordinatesSerializable
+    moved_to: CellCoordinatesSerializable
 
 
 @dataclass
 class PieceRotatedEventSerializable:
-    rotated_piece_at: str
+    rotated_piece_at: CellCoordinatesSerializable
     rotation: int
 
 
 @dataclass
 class TeleportEventSerializable:
-    teleported_from: str
-    teleported_to: str
+    teleported_from: CellCoordinatesSerializable
+    teleported_to: CellCoordinatesSerializable
+
+
+@dataclass
+class LaserShotEventSerializableEntity:
+    time: int
+    coordinates: CellCoordinatesSerializable
 
 
 @dataclass
 class LaserShotEventSerializable:
-    laser_path: List[str]
+    laser_path: List[LaserShotEventSerializableEntity]
+
+    def to_normal(self) -> LaserShotEvent:
+        return LaserShotEvent([(x.time, tuple(x.coordinates)) for x in self.laser_path])
 
 
 GameEvent = Union[PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent]
-GameEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable]
+GameEventSerializable = Union[
+    PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable]
 
 
 @dataclass
@@ -120,6 +153,16 @@ class GameStateSerializable:
     is_started: bool
     turn_number: int
     game_events: List[GameEventSerializable]
+
+    def to_normal(self) -> "GameState":
+        return GameState(
+            player_one_id=self.player_one_id,
+            player_two_id=self.player_two_id,
+            board=self.board.to_normal(),
+            is_started=self.is_started,
+            turn_number=self.turn_number,
+            game_events=list(map(lambda x: x.to_normal(), self.game_events)),
+        )
 
 
 @dataclass
@@ -141,6 +184,17 @@ class GameState:
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
             # game_events=self.game_events,
         )
+
+
+# def game_state_to_normal(gs: GameStateSerializable) -> GameState:
+#     return GameState(
+#         player_one_id=gs.player_one_id,
+#         player_two_id=gs.player_two_id,
+#         board=gs.board.to_normal(),
+#         is_started=gs.is_started,
+#         turn_number=gs.turn_number,
+#         game_events=list(map(lambda x: x.to_normal(), gs.game_events)),
+#     )
 
 
 def empty_game_state(player_one_id, player_two_id) -> GameState:

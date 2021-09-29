@@ -180,16 +180,30 @@ async def read_own_items(current_user: schemas.User = Depends(get_current_active
 @app.get("/get_game_state", response_model=GameStateSerializable, responses={
     404: {"detail": "Game with id {game_id} does not exist."}
 })
-def get_game_state(request: GetGameStateRequest, db: Session = Depends(get_db)):
+async def get_game_state(request: GetGameStateRequest, db: Session = Depends(get_db)):
     game_state = game_service.get_game_state(request, db)
     return game_state
 
 
 @app.post("/start_game")
-def start_game(request: StartGameRequest,
-               current_user: schemas.User = Depends(get_current_active_user),
-               db: Session = Depends(get_db)):
+async def start_game(request: StartGameRequest,
+                     current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
     game_service.start_game(current_user.username, request, db)
+
+
+@app.post("/move_piece")
+async def move_piece(request: MovePieceRequest,
+                     current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
+    game_service.move_piece(current_user.username, request, db)
+
+
+@app.post("/shoot_laser")
+async def shoot_laser(request: ShootLaserRequest,
+                      current_user: schemas.User = Depends(get_current_active_user),
+                      db: Session = Depends(get_db)):
+    game_service.shoot_laser(current_user.username, request, db)
 
 
 if __name__ == "__main__":

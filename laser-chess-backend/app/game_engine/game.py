@@ -121,7 +121,7 @@ class Game:
                         x = {last_laser_direction, piece_facing_direction}
                         should_deflect = x.issubset(horizontal_directions) or x.issubset(vertical_directions)
                         if should_deflect:
-                            next_laser_direction = opposite_direction(piece_facing_direction)
+                            next_laser_direction = opposite_direction(last_laser_direction)
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             laser_queue.put((current_coordinates, last_laser_direction, time + 1))
