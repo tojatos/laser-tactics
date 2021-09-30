@@ -25,3 +25,13 @@ class Item(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="items")
+
+
+class GameStateTable(Base):
+    __tablename__ = "game_state"
+
+    id = Column(Integer, primary_key=True, index=True)
+    player_one_id = Column(String)
+    player_two_id = Column(String)
+    game_id = Column(String)
+    game_state_json = Column(String)
