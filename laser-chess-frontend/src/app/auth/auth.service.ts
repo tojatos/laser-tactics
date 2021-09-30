@@ -8,10 +8,6 @@ import * as moment from "moment"
 })
 export class AuthService {
 
-  constructor(private http: HttpClient) {
-    http.get('/users').subscribe(res => console.log(res))
-   }
-
   idToken = 'id_token'
   expiresAt = 'expires_at'
 
@@ -20,13 +16,11 @@ export class AuthService {
       resolve({tokenID: "123", expiresIn: "222222"})
     })
     return promise.then(res => this.setSession(res))
-    //return this.http.post<UserToken>('/api/login', {login, pass}).toPromise().then(res => this.setSession(res))
+    //return this.http.post<UserToken>('/api/v1/login', {login, pass}).toPromise().then(res => this.setSession(res))
   }
 
 private setSession(authResult: UserToken) {
     const expiresAt = moment().add(authResult.expiresIn,'second')
-    console.log(expiresAt)
-
     localStorage.setItem('id_token', authResult.tokenID)
     localStorage.setItem("expires_at", JSON.stringify(expiresAt.valueOf()) )
     return authResult
