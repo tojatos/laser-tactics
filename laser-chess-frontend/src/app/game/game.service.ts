@@ -10,6 +10,6 @@ export class GameService {
   constructor(private http: HttpClient) { }
 
   async getGameState(gameId: string): Promise<GameState> {
-    return this.http.post<GameState>('http://localhost/get_game_state', gameId).toPromise()
+    return this.http.post<GameState>('api/v1/get_game_state', {"game_id" : gameId }).toPromise()
   }
 }
