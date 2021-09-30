@@ -58,7 +58,11 @@ def move_piece(user_id: string, request: MovePieceRequest, db: Session):
         raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
 
     game = Game(game_state)
-    # TODO: game move validation
+
+    can_move = game.validate_move(player, tuple(request.move_from), tuple(request.move_to))
+    if not can_move:
+        raise HTTPException(status_code=403, detail=f"Unable to make a move.")
+
     game.move(tuple(request.move_from), tuple(request.move_to))
     crud.update_game(db, game.game_state, request.game_id)
 
@@ -72,6 +76,10 @@ def rotate_piece(user_id: string, request: RotatePieceRequest, db: Session):
         raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
 
     game = Game(game_state)
-    # TODO: game move validation
+
+    can_rotate = game.validate_rotation(player, tuple(request.rotate_at), request.angle)
+    if not can_rotate:
+        raise HTTPException(status_code=403, detail=f"Unable to make a move.")
+
     game.rotate(tuple(request.rotate_at), request.angle)
     crud.update_game(db, game.game_state, request.game_id)
