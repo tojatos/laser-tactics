@@ -8,7 +8,9 @@ import * as moment from "moment"
 })
 export class AuthService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    http.get('/users').subscribe(res => console.log(res))
+   }
 
   idToken = 'id_token'
   expiresAt = 'expires_at'
