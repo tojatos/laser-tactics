@@ -14,22 +14,18 @@ export class Drawings {
         this.drawingQueue = []
     }
 
-    draw(){
-        this.ctx.save()
-        this.ctx.restore()
-    }
-
-
     initBoard(board: Board){
-        board.board_img.onload = () => this.drawBoard(board)
-        board.cells.forEach(c => this.initDrawCellWithPiece(c))
-    }
+      board.board_img.onload = () => this.drawBoard(board)
+      board.board_img.src = board.board_img_source
+      board.cells.forEach(c => this.initDrawCellWithPiece(c))
+  }
 
     initDrawCellWithPiece(cell?: Cell){
         if(cell?.piece){
             cell.piece.piece_img.onload = () => {
                 this.drawCellWithPiece(cell)
             }
+            cell.piece.piece_img.src = `assets/${cell.piece.piece_type}.png`
         }
     }
 

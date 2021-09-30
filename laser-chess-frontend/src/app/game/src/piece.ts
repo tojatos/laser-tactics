@@ -16,7 +16,6 @@ export class Piece implements PieceInterface {
     this.rotation_degree = rotation_degree
     if(mirror_perspective) this.rotation_degree + 180
     this.piece_type = (<any>PieceType)[pieceType] || "unknown"
-    this.piece_img.src = `assets/${this.piece_type}.png`
     this.currentCoordinates = coordinates
   }
 
