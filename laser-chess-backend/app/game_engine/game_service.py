@@ -28,20 +28,50 @@ def start_game(user_id: string, request: StartGameRequest, db: Session):
     crud.start_game(db, initial_state, request)
 
 
+def get_player_from_user_id(game_state: GameState, user_id: str):
+    return {
+        game_state.player_one_id: Player.PLAYER_ONE,
+        game_state.player_two_id: Player.PLAYER_TWO,
+    }.get(user_id, None)
+
+
 def shoot_laser(user_id: string, request: ShootLaserRequest, db: Session):
     game_state_serializable = get_game_state(GetGameStateRequest(request.game_id), db)
     game_state = game_state_serializable.to_normal()
-    game = Game(game_state)
-    player = Player.PLAYER_ONE if game_state.player_one_id == user_id else Player.PLAYER_TWO
-    print(game.game_state.board.cells[(5, 0)])
-    game.shoot_laser(player)
-    print(game.game_state.board.cells[(5, 0)])
-    crud.update_game(db, game.game_state, request.game_id)
+    player = get_player_from_user_id(game_state, user_id)
 
-    # GET GAME STATE FROM DB
-    # VALIDATE REQUEST
-    # MAKE A MOVE AND SAVE NEW GAME STATE
+    if player is None:
+        raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
+
+    game = Game(game_state)
+    # TODO: game move validation
+    game.shoot_laser(player)
+    crud.update_game(db, game.game_state, request.game_id)
 
 
 def move_piece(user_id: string, request: MovePieceRequest, db: Session):
-    pass
+    game_state_serializable = get_game_state(GetGameStateRequest(request.game_id), db)
+    game_state = game_state_serializable.to_normal()
+    player = get_player_from_user_id(game_state, user_id)
+
+    if player is None:
+        raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
+
+    game = Game(game_state)
+    # TODO: game move validation
+    game.move(tuple(request.move_from), tuple(request.move_to))
+    crud.update_game(db, game.game_state, request.game_id)
+
+
+def rotate_piece(user_id: string, request: RotatePieceRequest, db: Session):
+    game_state_serializable = get_game_state(GetGameStateRequest(request.game_id), db)
+    game_state = game_state_serializable.to_normal()
+    player = get_player_from_user_id(game_state, user_id)
+
+    if player is None:
+        raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
+
+    game = Game(game_state)
+    # TODO: game move validation
+    game.rotate(tuple(request.rotate_at), request.angle)
+    crud.update_game(db, game.game_state, request.game_id)

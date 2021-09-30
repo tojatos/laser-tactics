@@ -31,4 +31,4 @@ class MovePieceRequest:
 class RotatePieceRequest:
     game_id: str
     rotate_at: CellCoordinatesSerializable
-    angle: 90
+    angle: int

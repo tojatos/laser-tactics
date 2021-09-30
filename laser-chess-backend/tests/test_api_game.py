@@ -138,13 +138,25 @@ def test_rotate_block():
 
     game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
     game_state = game_state_serializable.to_normal()
-    assert game_state.board.cells[(1, 1)] is Piece(PieceType.BLOCK, Player.PLAYER_ONE, 90)
+    assert game_state.board.cells[(1, 1)] == Piece(PieceType.BLOCK, Player.PLAYER_ONE, 90)
 
 
 def test_rotate_empty():
     request = RotatePieceRequest(game_id, CellCoordinatesSerializable(3, 3), 90)
     response = post_data("/rotate_piece", tokens[0], json=asdict(request))
     assert response.status_code != 200
+
+
+def test_rotate_as_guest():
+    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(1, 1), 90)
+    response = post_data("/rotate_piece", json=asdict(request))
+    assert response.status_code == 401
+
+
+def test_rotate_as_other_player():
+    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(1, 1), 90)
+    response = post_data("/rotate_piece", tokens[1], json=asdict(request))
+    assert response.status_code == 403
 
 
 def test_rotate_hypercube():
