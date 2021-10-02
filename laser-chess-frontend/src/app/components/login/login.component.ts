@@ -1,4 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -7,9 +9,22 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginComponent implements OnInit {
 
-  constructor() { }
+  constructor(private authService: AuthService) {}
 
-  ngOnInit(): void {
+  async ngOnInit(){
+    await this.login()
   }
 
+  async login() {
+      const userData = {login: "login", pass: "pass"}
+
+      if (!this.authService.isLoggedIn()) {
+          this.authService.login(userData.login, userData.pass).then(
+                  res => {
+                      console.log(`User with token ${res.tokenID} is logged in`);
+                  }
+              )
+      }
+      else this.authService.clearJWT()
+  }
 }

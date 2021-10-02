@@ -8,21 +8,26 @@ import { MaterialModule } from './material/material.module';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
 import { LoginComponent } from './components/login/login.component';
 import { GameModule } from './game/game.module';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './auth/auth.interceptor';
+import { UserPageComponent } from './components/user-page/user-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainNavComponent,
-    LoginComponent
+    LoginComponent,
+    UserPageComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MaterialModule,
-    GameModule
+    GameModule,
+    HttpClientModule
     ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -4,11 +4,11 @@ import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 @Component({
-  selector: 'main-nav',
+  selector: 'app-main-nav',
   templateUrl: './main-nav.component.html',
   styleUrls: ['./main-nav.component.scss']
 })
-export class MainNavComponent implements OnInit {
+export class MainNavComponent {
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.HandsetPortrait, Breakpoints.Small])
     .pipe(
@@ -18,6 +18,5 @@ export class MainNavComponent implements OnInit {
 
   constructor(private breakpointObserver: BreakpointObserver) { }
 
-  ngOnInit(){}
 
 }
