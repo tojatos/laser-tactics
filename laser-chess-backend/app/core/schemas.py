@@ -46,3 +46,19 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class Lobby(BaseModel):
+    id: int
+    name: str
+    player_one_id: int
+    player_one_username: str
+    player_two_id: int
+    player_two_username: str
+    current_member_number: int
+    max_member_number: int
+    spectators: List[User]
+    game_id: int
+
+    class Config:
+        orm_mode = True

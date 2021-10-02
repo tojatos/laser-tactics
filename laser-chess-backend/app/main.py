@@ -219,6 +219,30 @@ async def shoot_laser(request: ShootLaserRequest,
     game_service.shoot_laser(current_user.username, request, db)
 
 
+@router.get("/lobbies")
+async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    lobbies = crud.get_lobbies(db, skip=skip, limit=limit)
+    return lobbies
+
+
+@router.get("/lobbies/{name}")
+async def get_lobby(current_user: schemas.User = Depends(get_current_active_user),
+                    db: Session = Depends(get_db)):
+    pass
+
+
+@router.post("/create_lobby")
+async def create_lobby(current_user: schemas.User = Depends(get_current_active_user),
+                       db: Session = Depends(get_db)):
+    pass
+
+
+@router.post("/join_lobby")
+async def join_lobby(current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
+    pass
+
+
 app.include_router(router)
 
 if __name__ == "__main__":

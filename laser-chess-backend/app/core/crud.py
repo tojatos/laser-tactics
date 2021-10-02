@@ -49,6 +49,19 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
     return db_item
 
 
+def create_lobby(db: Session, lobby: schemas.Lobby, user_id: int):
+    db_lobby = models.lobby(**lobby.dict(), owner_id=user_id)
+    db.add(db_lobby)
+    db.commit()
+    db.refresh(db_lobby)
+    return db_lobby
+
+
+def get_lobbies(db: Session, skip: int = 0, limit: int = 100):
+    lobbies = db.query(models.Lobby).offset(skip).limit(limit).all()
+    return lobbies
+
+
 def get_game_state_table(db: Session, game_id: str):
     return db.query(models.GameStateTable).filter(models.GameStateTable.game_id == game_id).first()
 

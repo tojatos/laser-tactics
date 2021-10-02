@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -35,3 +35,28 @@ class GameStateTable(Base):
     player_two_id = Column(String)
     game_id = Column(String)
     game_state_json = Column(String)
+
+
+class Lobby(Base):
+    __tablename__ = "lobby"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    player_one_id = Column(Integer)
+    player_two_id = Column(Integer)
+    game_id = Column(String)
+    current_member_number = Column(Integer)
+    max_members = Column(Integer, default=8)
+    is_private = Column(Boolean, default=False)
+
+
+class LobbySpectators(Base):
+    __tablename__ = "lobby_spectators"
+
+    lobby_id = Column(Integer)
+    spectator_username = Column(Integer)
+    __table_args__ = (
+        PrimaryKeyConstraint(lobby_id, spectator_username),
+        {},
+    )
+
