@@ -17,31 +17,22 @@ export class Drawings {
     initBoard(board: Board){
       board.board_img.onload = () => this.drawBoard(board)
       board.board_img.src = board.board_img_source
-      board.cells.forEach(c => this.initDrawCellWithPiece(c))
+      board.cells.forEach(c => this.initPieceDraw(c))
   }
 
-    initDrawCellWithPiece(cell?: Cell){
+    initPieceDraw(cell?: Cell){
         if(cell?.piece){
             cell.piece.piece_img.onload = () => {
-                this.drawCellWithPiece(cell)
+              if(cell.piece)
+                this.drawPiece(cell.piece)
             }
             cell.piece.piece_img.src = `assets/${cell.piece.piece_type}.png`
         }
     }
 
-    drawCellWithPiece(cell?: Cell){
-        if(cell?.piece){
-            this.ctx.save()
-            this.ctx.translate(this.cellOnBoardCoordinates(cell.coordinates.x), this.cellOnBoardCoordinates(cell.coordinates.y))
-            this.ctx.rotate(cell.piece!.rotation_degree / 180 * Math.PI)
-            this.ctx.drawImage(cell.piece!.piece_img, this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y)
-            this.ctx.restore()
-        }
-    }
-
     drawGame(board: Board, cells: Cell[]){
         this.drawBoard(board)
-        cells.forEach(c => this.drawCellWithPiece(c))
+        cells.forEach(c => { if(c.piece) this.drawPiece(c.piece) })
     }
 
     drawBoard(board: Board){
@@ -50,7 +41,8 @@ export class Drawings {
 
     drawPiece(piece: Piece){
         this.ctx.save()
-        this.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.x)
+        this.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.y)
+        this.ctx.rotate(piece.rotation_degree / 180 * Math.PI)
         this.ctx.drawImage(piece.piece_img, this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y)
         this.ctx.restore()
     }

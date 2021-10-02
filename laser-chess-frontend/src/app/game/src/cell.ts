@@ -10,7 +10,16 @@ export class Cell implements CellInterface {
   constructor(coordinates: Coordinates, piece: PieceInterface | null){
     this.coordinates = coordinates
     this.canvasCoordinates = {x: coordinates.x.valueOf() * BLOCK_SIZE + BLOCK_SIZE / 2, y: coordinates.y.valueOf() * BLOCK_SIZE + BLOCK_SIZE / 2}
-    this.piece = piece && new Piece(piece.piece_owner, piece.piece_type, piece.rotation_degree, this.canvasCoordinates)
+    this.piece = piece && new Piece(piece.piece_owner, piece.piece_type, piece.rotation_degree, this.cloneCoordinates(this.canvasCoordinates))
+  }
+
+  acceptNewPiece(piece: Piece){
+    piece.currentCoordinates = this.cloneCoordinates(this.canvasCoordinates)
+    this.piece = piece
+  }
+
+  private cloneCoordinates(coor: Coordinates){
+    return {x: coor.x, y: coor.y}
   }
 
 }

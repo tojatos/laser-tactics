@@ -10,6 +10,7 @@ export class Canvas {
     ctx: CanvasRenderingContext2D
     animations: Animations
     drawings: Drawings
+    interactable: boolean = true
 
     constructor(ctx: CanvasRenderingContext2D, board: Board) {
         this.ctx = ctx
@@ -21,19 +22,30 @@ export class Canvas {
         this.drawings.initBoard(board)
     }
 
-    private canvasOnclick(event: MouseEvent, board: Board) {
-        const coor = this.getMousePos(event)
-        const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, "1")
-        if(board.selectedCell){
-          if(selectedCell)
-            this.makeAMoveEvent(coor, board)
-          else
-            this.unselectCellEvent(board)
+    private async canvasOnclick(event: MouseEvent, board: Board) {
+
+      if(!this.interactable)
+        return
+
+      const coor = this.getMousePos(event)
+      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, "2")
+
+      this.interactable = false
+
+      if(board.selectedCell){
+        if(selectedCell){
+          await this.makeAMoveEvent(coor, board)
+          board.movePiece(board.selectedCell, selectedCell)
         }
-        else {
-          if(selectedCell)
-            this.selectCellEvent(selectedCell, board)
-        }
+        this.unselectCellEvent(board)
+      }
+      else {
+        if(selectedCell)
+          this.selectCellEvent(selectedCell, board)
+      }
+
+      this.interactable = true
+
     }
 
     private selectCellEvent(selectedCell: Cell, board: Board){
@@ -46,8 +58,8 @@ export class Canvas {
       this.drawings.drawGame(board, board.cells)
     }
 
-    private makeAMoveEvent(coor: Coordinates, board: Board){
-      this.animations.movePiece(board, board.selectedCell!.coordinates, coor)
+    private makeAMoveEvent(coor: Coordinates, board: Board): Promise<void>{
+      return this.animations.movePiece(board, board.selectedCell!.coordinates, coor)
     }
 
     private getMousePos(event: MouseEvent){

@@ -35,4 +35,11 @@ export class Board implements BoardInterface {
     return this.selectedCell.piece?.getPossibleMoves(this, this.selectedCell).find(c => c.coordinates.x == x && c.coordinates.y == y)
   }
 
+  movePiece(originCell: Cell, destinationCell: Cell){
+    if(originCell.piece){
+      destinationCell.acceptNewPiece(originCell.piece)
+      originCell.piece = null
+    }
+  }
+
 }
