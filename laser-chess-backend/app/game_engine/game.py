@@ -52,11 +52,13 @@ class Game:
         self.game_state.is_started = True
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):
-        if self.game_state.board.cells[to_cell] is not None and self.game_state.board.cells[to_cell].piece_type == PieceType.HYPER_SQUARE:
+        if self.game_state.board.cells[to_cell] is not None and self.game_state.board.cells[
+            to_cell].piece_type == PieceType.HYPER_SQUARE:
             moved_piece = self.game_state.board.cells[from_cell]
             self.game_state.board.cells[from_cell] = None
 
-            random_empty_cell_coordinates_list = random.choice(list(filter(lambda x: x.piece is None, self.game_state.board.to_serializable().cells))).coordinates
+            random_empty_cell_coordinates_list = random.choice(
+                list(filter(lambda x: x.piece is None, self.game_state.board.to_serializable().cells))).coordinates
             random_empty_cell_coordinates: Tuple[int, int] = tuple(random_empty_cell_coordinates_list)
 
             self.game_state.board.cells[random_empty_cell_coordinates] = moved_piece
@@ -68,7 +70,8 @@ class Game:
             self.game_state.board.cells[to_cell] = self.game_state.board.cells[from_cell]
             self.game_state.board.cells[from_cell] = None
             if target_piece is not None:
-                random_empty_cell_coordinates_list = random.choice(list(filter(lambda x: x.piece is None, self.game_state.board.to_serializable().cells))).coordinates
+                random_empty_cell_coordinates_list = random.choice(
+                    list(filter(lambda x: x.piece is None, self.game_state.board.to_serializable().cells))).coordinates
                 random_empty_cell_coordinates: Tuple[int, int] = tuple(random_empty_cell_coordinates_list)
                 self.game_state.board.cells[random_empty_cell_coordinates] = target_piece
                 self.game_state.game_events.append(TeleportEvent(from_cell, random_empty_cell_coordinates))
@@ -79,14 +82,16 @@ class Game:
             self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
 
     def rotate(self, rotated_piece_at: CellCoordinates, rotation: int):
-        self.game_state.board.cells[rotated_piece_at].rotation_degree = normalize_rotation(self.game_state.board.cells[rotated_piece_at].rotation_degree + rotation)
+        self.game_state.board.cells[rotated_piece_at].rotation_degree = normalize_rotation(
+            self.game_state.board.cells[rotated_piece_at].rotation_degree + rotation)
         self.game_state.game_events.append(PieceRotatedEvent(rotated_piece_at, rotation))
 
     def shoot_laser(self, player: Player):
         cells = self.game_state.board.cells
         cells_after_laser_hit = deepcopy(self.game_state.board.cells)
         cells_list = self.game_state.board.to_serializable().cells
-        laser_cell = next(x for x in cells_list if x.piece is not None and x.piece.piece_type == PieceType.LASER and x.piece.piece_owner == player)
+        laser_cell = next(x for x in cells_list if
+                          x.piece is not None and x.piece.piece_type == PieceType.LASER and x.piece.piece_owner == player)
         laser_coordinates = tuple(laser_cell.coordinates)
         laser_rotation = laser_cell.piece.rotation_degree
 
@@ -136,17 +141,21 @@ class Game:
                             cells_after_laser_hit[current_coordinates] = None
                     if piece_hit.piece_type is PieceType.BEAM_SPLITTER:
                         should_deflect_in_both_sides = last_laser_direction == piece_facing_direction
-                        should_deflect_right = last_laser_direction == direction_from_rotation[normalize_rotation(piece_hit.rotation_degree + 90)]
-                        should_deflect_left = last_laser_direction == direction_from_rotation[normalize_rotation(piece_hit.rotation_degree + 270)]
+                        should_deflect_right = last_laser_direction == direction_from_rotation[
+                            normalize_rotation(piece_hit.rotation_degree + 90)]
+                        should_deflect_left = last_laser_direction == direction_from_rotation[
+                            normalize_rotation(piece_hit.rotation_degree + 270)]
                         if should_deflect_in_both_sides:
                             next_laser_directions = horizontal_directions if last_laser_direction in vertical_directions else vertical_directions
                             for d in next_laser_directions:
                                 laser_queue.put((current_coordinates, d, time + 1))
                         elif should_deflect_right:
-                            next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + 90)]
+                            next_laser_direction = direction_from_rotation[
+                                normalize_rotation(rotation_from_direction[last_laser_direction] + 90)]
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         elif should_deflect_left:
-                            next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + 270)]
+                            next_laser_direction = direction_from_rotation[
+                                normalize_rotation(rotation_from_direction[last_laser_direction] + 270)]
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
@@ -157,24 +166,54 @@ class Game:
                     if piece_hit.piece_type is PieceType.KING:
                         cells_after_laser_hit[current_coordinates] = None
                     if piece_hit.piece_type is PieceType.TRIANGULAR_MIRROR:
-                        should_deflect_right = last_laser_direction == direction_from_rotation[normalize_rotation(piece_hit.rotation_degree + 270)]
-                        should_deflect_left = last_laser_direction == direction_from_rotation[normalize_rotation(piece_hit.rotation_degree + 180)]
+                        should_deflect_right = last_laser_direction == direction_from_rotation[
+                            normalize_rotation(piece_hit.rotation_degree + 270)]
+                        should_deflect_left = last_laser_direction == direction_from_rotation[
+                            normalize_rotation(piece_hit.rotation_degree + 180)]
                         if should_deflect_right:
-                            next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + 90)]
+                            next_laser_direction = direction_from_rotation[
+                                normalize_rotation(rotation_from_direction[last_laser_direction] + 90)]
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         elif should_deflect_left:
-                            next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + 270)]
+                            next_laser_direction = direction_from_rotation[
+                                normalize_rotation(rotation_from_direction[last_laser_direction] + 270)]
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
                     if piece_hit.piece_type is PieceType.DIAGONAL_MIRROR:
-                        should_deflect_right = last_laser_direction in [piece_facing_direction, opposite_direction(piece_facing_direction)]
-                        next_laser_direction = direction_from_rotation[normalize_rotation(rotation_from_direction[last_laser_direction] + (90 if should_deflect_right else 270))]
+                        should_deflect_right = last_laser_direction in [piece_facing_direction,
+                                                                        opposite_direction(piece_facing_direction)]
+                        next_laser_direction = direction_from_rotation[normalize_rotation(
+                            rotation_from_direction[last_laser_direction] + (90 if should_deflect_right else 270))]
                         laser_queue.put((current_coordinates, next_laser_direction, time + 1))
 
         print(laser_path)
         self.game_state.board.cells = cells_after_laser_hit
         self.game_state.game_events.append(LaserShotEvent(laser_path))
 
-        # TODO: add user and game events to game state
-        # TODO: laser path game event and hit game event
+    def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> bool:
+        if {abs(from_cell[0] - to_cell[0]), abs(from_cell[1] - to_cell[1])} != {0, 1}:
+            return False
+
+        moved_piece = self.game_state.board.cells[from_cell]
+        if moved_piece is None or moved_piece.piece_owner != player:
+            return False
+
+        target_piece = self.game_state.board.cells[to_cell]
+        if target_piece is not None and target_piece.piece_owner == player:
+            return False
+
+        return True
+
+    def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> bool:
+        if rotation not in [90, 180, 270]:
+            return False
+
+        piece = self.game_state.board.cells[rotated_piece_at]
+
+        if piece is None or piece.piece_owner != player:
+            return False
+
+        return True
+
+

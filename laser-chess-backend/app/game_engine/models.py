@@ -1,10 +1,12 @@
-import pprint
-
 from pydantic.dataclasses import dataclass
 from enum import Enum, auto
 from typing import Dict, List, Optional, Tuple, Union
 
 CellCoordinates = Tuple[int, int]
+
+
+def cell_coordinates_to_serializable(coordinates: CellCoordinates):
+    return CellCoordinatesSerializable(coordinates[0], coordinates[1])
 
 
 @dataclass
@@ -67,7 +69,7 @@ class Board:
     cells: Dict[CellCoordinates, Optional[Piece]]
 
     def to_serializable(self) -> BoardSerializable:
-        cells_transformed = [Cell(CellCoordinatesSerializable(coordinates[0], coordinates[1]), piece) for
+        cells_transformed = [Cell(cell_coordinates_to_serializable(coordinates), piece) for
                              coordinates, piece in
                              self.cells.items()]
         return BoardSerializable(cells_transformed)
@@ -78,7 +80,8 @@ class LaserShotEvent:
     laser_path: List[Tuple[int, CellCoordinates]]
 
     def to_serializable(self):
-        return LaserShotEventSerializable(list(map(lambda x: (x[0], CellCoordinatesSerializable(x[1][0], x[1][1])), self.laser_path)))
+        return LaserShotEventSerializable(
+            list(map(lambda x: (x[0], cell_coordinates_to_serializable(x[1])), self.laser_path)))
 
 
 @dataclass
@@ -87,7 +90,7 @@ class PieceMovedEvent:
     moved_to: CellCoordinates
 
     def to_serializable(self):
-        return PieceMovedEventSerializable(str(self.moved_from), str(self.moved_to))
+        return PieceMovedEventSerializable(cell_coordinates_to_serializable(self.moved_from), cell_coordinates_to_serializable(self.moved_to))
 
 
 @dataclass
@@ -96,7 +99,7 @@ class PieceRotatedEvent:
     rotation: int
 
     def to_serializable(self):
-        return PieceRotatedEventSerializable(str(self.rotated_piece_at), self.rotation)
+        return PieceRotatedEventSerializable(cell_coordinates_to_serializable(self.rotated_piece_at), self.rotation)
 
 
 @dataclass
@@ -113,11 +116,17 @@ class PieceMovedEventSerializable:
     moved_from: CellCoordinatesSerializable
     moved_to: CellCoordinatesSerializable
 
+    def to_normal(self) -> PieceMovedEvent:
+        return PieceMovedEvent(tuple(self.moved_from), tuple(self.moved_to))
+
 
 @dataclass
 class PieceRotatedEventSerializable:
     rotated_piece_at: CellCoordinatesSerializable
     rotation: int
+
+    def to_normal(self) -> PieceRotatedEvent:
+        return PieceRotatedEvent(tuple(self.rotated_piece_at), self.rotation)
 
 
 @dataclass
