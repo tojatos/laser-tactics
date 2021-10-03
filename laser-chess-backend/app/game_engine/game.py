@@ -217,3 +217,6 @@ class Game:
         return True
 
 
+    def validate_laser_shoot(self, player: Player) -> bool:
+        return True
+

@@ -357,6 +357,27 @@ def test_move_hyper_cube():
     assert game.game_state.board == expected_board
 
 
+def test_move_hyper_cube_king():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
+        (1, 0): Piece(PieceType.KING, Player.PLAYER_TWO),
+    })
+
+    expected_board: Board = Board({
+        (0, 0): Piece(PieceType.KING, Player.PLAYER_TWO),
+        (1, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
+    })
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+    from_cell_coordinates = (0, 0)
+    to_cell_coordinates = (1, 0)
+
+    game.move(from_cell_coordinates, to_cell_coordinates)
+
+    assert game.game_state.board == expected_board
+
+
 def test_move_hyper_square():
     board: Board = Board({
         (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
@@ -400,3 +421,124 @@ def test_rotate_piece():
 
     game.rotate((0, 0), 180)
     assert game.game_state.board.cells[(0, 0)].rotation_degree == 90
+
+
+def test_validate_shoot_laser_twice():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+    assert game.validate_laser_shoot(Player.PLAYER_ONE) is True
+    game.shoot_laser(Player.PLAYER_ONE)
+    assert game.validate_laser_shoot(Player.PLAYER_ONE) is False
+
+
+def test_validate_taking_three_actions():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_rotation(Player.PLAYER_ONE, (0, 0), 90) is True
+    assert game.validate_rotation(Player.PLAYER_TWO (0, 1), 90) is False
+
+    game.rotate((0, 0), 90)
+
+    assert game.validate_rotation(Player.PLAYER_ONE, (0, 0), 90) is True
+    assert game.validate_rotation(Player.PLAYER_TWO (0, 1), 90) is False
+
+    game.rotate((0, 0), 90)
+
+    assert game.validate_rotation(Player.PLAYER_ONE, (0, 0), 90) is False
+    assert game.validate_rotation(Player.PLAYER_TWO (0, 1), 90) is True
+
+
+def validate_piece_capture(piece_type: PieceType, can_capture: bool):
+    board: Board = Board({
+        (0, 0): Piece(piece_type, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.KING, Player.PLAYER_TWO),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (0, 1)) is can_capture
+
+
+def test_capture_beam_splitter():
+    validate_piece_capture(PieceType.BEAM_SPLITTER, False)
+
+
+def test_capture_block():
+    validate_piece_capture(PieceType.BLOCK, True)
+
+
+def test_capture_diagonal_mirror():
+    validate_piece_capture(PieceType.DIAGONAL_MIRROR, False)
+
+
+def test_capture_hyper_cube():
+    validate_piece_capture(PieceType.HYPER_CUBE, True)
+
+
+def test_capture_king():
+    validate_piece_capture(PieceType.KING, True)
+
+
+def test_capture_laser():
+    validate_piece_capture(PieceType.LASER, False)
+
+
+def test_capture_mirror():
+    validate_piece_capture(PieceType.MIRROR, False)
+
+
+def test_capture_king_twice():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.KING, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+        (0, 2): Piece(PieceType.KING, Player.PLAYER_TWO),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (0, 1)) is True
+    game.move((0, 0), (0, 1))
+    assert game.validate_move(Player.PLAYER_ONE, (0, 1), (0, 2)) is False
+
+
+def test_laser_move():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): None,
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (0, 1)) is False
+
+
+def test_capture_own_piece():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.KING, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (0, 1)) is False
