@@ -76,12 +76,30 @@ class Board:
 
 
 @dataclass
+class ShootLaserEvent:
+    laser_shot: bool = True
+
+    def to_serializable(self):
+        return self
+
+    def to_normal(self):
+        return self
+
+
+
+@dataclass
 class LaserShotEvent:
     laser_path: List[Tuple[int, CellCoordinates]]
 
     def to_serializable(self):
         return LaserShotEventSerializable(
-            list(map(lambda x: (x[0], cell_coordinates_to_serializable(x[1])), self.laser_path)))
+            list(
+                map(
+                    lambda x: LaserShotEventSerializableEntity(x[0], cell_coordinates_to_serializable(x[1])),
+                    self.laser_path,
+                )
+            )
+        )
 
 
 @dataclass
@@ -90,7 +108,10 @@ class PieceMovedEvent:
     moved_to: CellCoordinates
 
     def to_serializable(self):
-        return PieceMovedEventSerializable(cell_coordinates_to_serializable(self.moved_from), cell_coordinates_to_serializable(self.moved_to))
+        return PieceMovedEventSerializable(
+            cell_coordinates_to_serializable(self.moved_from),
+            cell_coordinates_to_serializable(self.moved_to)
+        )
 
 
 @dataclass
@@ -99,7 +120,10 @@ class PieceRotatedEvent:
     rotation: int
 
     def to_serializable(self):
-        return PieceRotatedEventSerializable(cell_coordinates_to_serializable(self.rotated_piece_at), self.rotation)
+        return PieceRotatedEventSerializable(
+            cell_coordinates_to_serializable(self.rotated_piece_at),
+            self.rotation
+        )
 
 
 @dataclass
@@ -108,7 +132,10 @@ class TeleportEvent:
     teleported_to: CellCoordinates
 
     def to_serializable(self):
-        return TeleportEventSerializable(str(self.teleported_from), str(self.teleported_to))
+        return TeleportEventSerializable(
+            cell_coordinates_to_serializable(self.teleported_from),
+            cell_coordinates_to_serializable(self.teleported_to)
+        )
 
 
 @dataclass
@@ -150,8 +177,12 @@ class LaserShotEventSerializable:
 
 
 GameEvent = Union[PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent]
+UserEvent = Union[PieceRotatedEvent, PieceMovedEvent, ShootLaserEvent]
+
 GameEventSerializable = Union[
     PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable]
+
+UserEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, ShootLaserEvent]
 
 
 @dataclass
@@ -162,6 +193,7 @@ class GameStateSerializable:
     is_started: bool
     turn_number: int
     game_events: List[GameEventSerializable]
+    user_events: List[UserEventSerializable]
 
     def to_normal(self) -> "GameState":
         return GameState(
@@ -171,6 +203,7 @@ class GameStateSerializable:
             is_started=self.is_started,
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
+            user_events=list(map(lambda x: x.to_normal(), self.user_events)),
         )
 
 
@@ -182,6 +215,7 @@ class GameState:
     is_started: bool
     turn_number: int
     game_events: List[GameEvent]
+    user_events: List[UserEvent]
 
     def to_serializable(self) -> GameStateSerializable:
         return GameStateSerializable(
@@ -191,19 +225,8 @@ class GameState:
             is_started=self.is_started,
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
-            # game_events=self.game_events,
+            user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
         )
-
-
-# def game_state_to_normal(gs: GameStateSerializable) -> GameState:
-#     return GameState(
-#         player_one_id=gs.player_one_id,
-#         player_two_id=gs.player_two_id,
-#         board=gs.board.to_normal(),
-#         is_started=gs.is_started,
-#         turn_number=gs.turn_number,
-#         game_events=list(map(lambda x: x.to_normal(), gs.game_events)),
-#     )
 
 
 def empty_game_state(player_one_id, player_two_id) -> GameState:
@@ -301,4 +324,4 @@ def empty_game_state(player_one_id, player_two_id) -> GameState:
     is_started: bool = False
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, is_started, turn_number, [])
+    return GameState(player_one_id, player_two_id, board, is_started, turn_number, [], [])

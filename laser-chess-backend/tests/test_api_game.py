@@ -80,6 +80,18 @@ def post_create_user(create_user_data):
     return token
 
 
+def test_start_game():
+    get_game_state_request = GetGameStateRequest(game_id)
+    response = post_data("/get_game_state", json=asdict(get_game_state_request))
+    assert response.status_code == 200, response.text
+    game_state_dict = response.json()
+
+    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+    game_state = game_state_serializable.to_normal()
+    assert game_state.is_started is True
+    assert game_state.turn_number is 1
+
+
 def test_shoot_laser():
     shoot_laser_request = ShootLaserRequest(game_id)
     get_game_state_request = GetGameStateRequest(game_id)

@@ -56,6 +56,7 @@ class Game:
         self.game_state.turn_number = 1
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):
+        self.game_state.user_events.append(PieceMovedEvent(from_cell, to_cell))
         if self.game_state.board.cells[to_cell] is not None \
                 and self.game_state.board.cells[to_cell].piece_type == PieceType.HYPER_SQUARE:
             moved_piece = self.game_state.board.cells[from_cell]
@@ -87,12 +88,14 @@ class Game:
         self.game_state.turn_number += 1
 
     def rotate(self, rotated_piece_at: CellCoordinates, rotation: int):
+        self.game_state.user_events.append(PieceRotatedEvent(rotated_piece_at, rotation))
         self.game_state.board.cells[rotated_piece_at].rotation_degree = normalize_rotation(
             self.game_state.board.cells[rotated_piece_at].rotation_degree + rotation)
         self.game_state.game_events.append(PieceRotatedEvent(rotated_piece_at, rotation))
         self.game_state.turn_number += 1
 
     def shoot_laser(self, player: Player):
+        self.game_state.user_events.append(ShootLaserEvent())
         cells = self.game_state.board.cells
         cells_after_laser_hit = deepcopy(self.game_state.board.cells)
         cells_list = self.game_state.board.to_serializable().cells

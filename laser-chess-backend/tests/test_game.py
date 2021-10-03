@@ -11,7 +11,7 @@ def get_initial_test_game_state() -> GameState:
 def get_test_game_state(board: Board) -> GameState:
     player_one_id = "player1"
     player_two_id = "player2"
-    return GameState(player_one_id, player_two_id, board, False, 0, [])
+    return GameState(player_one_id, player_two_id, board, False, 0, [], [])
 
 
 def test_start_game():

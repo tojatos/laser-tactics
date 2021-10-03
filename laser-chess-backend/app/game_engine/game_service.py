@@ -24,8 +24,14 @@ def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerial
 
 def start_game(user_id: string, request: StartGameRequest, db: Session):
     # TODO: validate request
+
+    # TODO: move this to lobby creation
     initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id)
     crud.start_game(db, initial_state, request)
+
+    game = Game(initial_state)
+    game.start_game()
+    crud.update_game(db, game.game_state, request.game_id)
 
 
 def get_player_from_user_id(game_state: GameState, user_id: str):
