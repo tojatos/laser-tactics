@@ -48,6 +48,9 @@ class Game:
     def __init__(self, game_state: GameState):
         self.game_state = game_state
 
+    def get_last_turn_player(self):
+        return Player.PLAYER_ONE if (self.game_state.turn_number + 3) % 4 in [1, 2] else Player.PLAYER_TWO
+
     def get_current_player(self):
         return Player.PLAYER_ONE if self.game_state.turn_number % 4 in [1, 2] else Player.PLAYER_TWO
 
@@ -238,4 +241,8 @@ class Game:
     def validate_laser_shoot(self, player: Player) -> bool:
         if self.get_current_player() is not player:
             return False
+
+        if self.get_last_turn_player() is player and self.game_state.user_events[-1] == ShootLaserEvent():
+            return False
+
         return True
