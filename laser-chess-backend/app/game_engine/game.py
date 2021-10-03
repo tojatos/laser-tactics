@@ -196,13 +196,17 @@ class Game:
             return False
 
         moved_piece = self.game_state.board.cells[from_cell]
-        if moved_piece is None or moved_piece.piece_owner != player:
+        if moved_piece is None or moved_piece.piece_type is PieceType.LASER or moved_piece.piece_owner != player:
             return False
 
         target_piece = self.game_state.board.cells[to_cell]
-        if target_piece is not None and target_piece.piece_owner == player:
-            return False
-
+        if target_piece is not None:
+            if moved_piece.piece_type is PieceType.HYPER_CUBE:
+                return True
+            if target_piece.piece_owner == player:
+                return False
+            if moved_piece.piece_type not in [PieceType.KING, PieceType.BLOCK]:
+                return False
         return True
 
     def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> bool:
@@ -216,7 +220,5 @@ class Game:
 
         return True
 
-
     def validate_laser_shoot(self, player: Player) -> bool:
         return True
-
