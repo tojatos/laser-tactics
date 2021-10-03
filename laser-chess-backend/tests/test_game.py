@@ -582,3 +582,39 @@ def test_move_on_own_turn():
     assert game.validate_move(Player.PLAYER_TWO, (1, 0), (1, 1)) is False
 
     game.move((0, 0), (0, 1))
+
+
+def test_teleport_with_hyper_cube_twice():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
+        (1, 0): Piece(PieceType.LASER, Player.PLAYER_TWO),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    game.move((0, 0), (1, 0))
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (1, 0)) is False
+    assert game.validate_move(Player.PLAYER_ONE, (1, 0), (0, 0)) is False
+
+
+def test_teleport_with_hyper_square_twice():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+        (1, 0): Piece(PieceType.HYPER_SQUARE, Player.NONE),
+        (2, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (1, 0)) is True
+    assert game.validate_move(Player.PLAYER_ONE, (2, 0), (1, 0)) is True
+
+    game.move((0, 0), (1, 0))
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (1, 0)) is False
+    assert game.validate_move(Player.PLAYER_ONE, (2, 0), (1, 0)) is False
