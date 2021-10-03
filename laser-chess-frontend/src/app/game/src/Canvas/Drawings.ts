@@ -1,7 +1,7 @@
 import { Coordinates } from "../../game.models"
 import { Board } from "../board"
 import { Cell } from "../cell"
-import { BLOCK_SIZE, PIECE_SIZE } from "../constants"
+import { BLOCK_SIZE, COLS, PIECE_SIZE, ROWS } from "../constants"
 import { Piece } from "../piece"
 
 export class Drawings {
@@ -26,7 +26,7 @@ export class Drawings {
               if(cell.piece)
                 this.drawPiece(cell.piece)
             }
-            cell.piece.piece_img.src = `assets/${cell.piece.piece_type}.png`
+            cell.piece.piece_img.src = `assets/${cell.piece.piece_type}.svg`
         }
     }
 
@@ -36,14 +36,14 @@ export class Drawings {
     }
 
     drawBoard(board: Board){
-        this.ctx.drawImage(board.board_img, 0, 0)
+        this.ctx.drawImage(board.board_img, 0, 0, BLOCK_SIZE * COLS, BLOCK_SIZE * ROWS)
     }
 
     drawPiece(piece: Piece){
         this.ctx.save()
         this.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.y)
         this.ctx.rotate(piece.rotation_degree / 180 * Math.PI)
-        this.ctx.drawImage(piece.piece_img, this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y)
+        this.ctx.drawImage(piece.piece_img, this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y, PIECE_SIZE, PIECE_SIZE)
         this.ctx.restore()
     }
 

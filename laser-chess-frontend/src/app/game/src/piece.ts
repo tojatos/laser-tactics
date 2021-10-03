@@ -15,7 +15,8 @@ export class Piece implements PieceInterface {
     this.piece_owner = owner
     this.rotation_degree = rotation_degree
     if(mirror_perspective) this.rotation_degree + 180
-    this.piece_type = (<any>PieceType)[pieceType] || "unknown"
+    // this.piece_type = (<any>PieceType)[pieceType] || "unknown"
+    this.piece_type = pieceType + (owner == "1" ? "-red" : owner == "2" ? "-blue" : "")
     this.currentCoordinates = coordinates
   }
 

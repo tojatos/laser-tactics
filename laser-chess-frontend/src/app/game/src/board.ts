@@ -9,7 +9,7 @@ export class Board implements BoardInterface {
   board_img = new Image()
 
   constructor(){
-    this.board_img_source = 'assets/board.jpg'
+    this.board_img_source = 'assets/board.svg'
   }
 
   initBoard(gameState: GameState) {
