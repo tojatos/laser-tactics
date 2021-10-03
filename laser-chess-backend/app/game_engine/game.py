@@ -48,12 +48,16 @@ class Game:
     def __init__(self, game_state: GameState):
         self.game_state = game_state
 
+    def get_current_player(self):
+        return Player.PLAYER_ONE if self.game_state.turn_number % 4 in [1, 2] else Player.PLAYER_TWO
+
     def start_game(self):
         self.game_state.is_started = True
+        self.game_state.turn_number = 1
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):
-        if self.game_state.board.cells[to_cell] is not None and self.game_state.board.cells[
-            to_cell].piece_type == PieceType.HYPER_SQUARE:
+        if self.game_state.board.cells[to_cell] is not None \
+                and self.game_state.board.cells[to_cell].piece_type == PieceType.HYPER_SQUARE:
             moved_piece = self.game_state.board.cells[from_cell]
             self.game_state.board.cells[from_cell] = None
 
@@ -80,11 +84,13 @@ class Game:
             self.game_state.board.cells[to_cell] = self.game_state.board.cells[from_cell]
             self.game_state.board.cells[from_cell] = None
             self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
+        self.game_state.turn_number += 1
 
     def rotate(self, rotated_piece_at: CellCoordinates, rotation: int):
         self.game_state.board.cells[rotated_piece_at].rotation_degree = normalize_rotation(
             self.game_state.board.cells[rotated_piece_at].rotation_degree + rotation)
         self.game_state.game_events.append(PieceRotatedEvent(rotated_piece_at, rotation))
+        self.game_state.turn_number += 1
 
     def shoot_laser(self, player: Player):
         cells = self.game_state.board.cells
@@ -187,11 +193,14 @@ class Game:
                             rotation_from_direction[last_laser_direction] + (90 if should_deflect_right else 270))]
                         laser_queue.put((current_coordinates, next_laser_direction, time + 1))
 
-        print(laser_path)
         self.game_state.board.cells = cells_after_laser_hit
         self.game_state.game_events.append(LaserShotEvent(laser_path))
+        self.game_state.turn_number += 1
 
     def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> bool:
+        if self.get_current_player() is not player:
+            return False
+
         if {abs(from_cell[0] - to_cell[0]), abs(from_cell[1] - to_cell[1])} != {0, 1}:
             return False
 
@@ -210,6 +219,9 @@ class Game:
         return True
 
     def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> bool:
+        if self.get_current_player() is not player:
+            return False
+
         if rotation not in [90, 180, 270]:
             return False
 
@@ -221,4 +233,6 @@ class Game:
         return True
 
     def validate_laser_shoot(self, player: Player) -> bool:
+        if self.get_current_player() is not player:
+            return False
         return True
