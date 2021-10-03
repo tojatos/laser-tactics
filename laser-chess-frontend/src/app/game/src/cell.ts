@@ -1,5 +1,4 @@
 import { Coordinates, CellInterface, PieceInterface } from "../game.models";
-import { BLOCK_SIZE } from "./constants";
 import { Piece } from "./piece";
 
 export class Cell implements CellInterface {
@@ -7,15 +6,25 @@ export class Cell implements CellInterface {
   canvasCoordinates: Coordinates
   piece: Piece | null
 
-  constructor(coordinates: Coordinates, piece: PieceInterface | null){
+  constructor(coordinates: Coordinates, piece: PieceInterface | null, blockSize: number){
     this.coordinates = coordinates
-    this.canvasCoordinates = {x: coordinates.x.valueOf() * BLOCK_SIZE + BLOCK_SIZE / 2, y: coordinates.y.valueOf() * BLOCK_SIZE + BLOCK_SIZE / 2}
+    this.canvasCoordinates = this.canvasCoordinatesSetter(blockSize)
     this.piece = piece && new Piece(piece.piece_owner, piece.piece_type, piece.rotation_degree, this.cloneCoordinates(this.canvasCoordinates))
   }
 
   acceptNewPiece(piece: Piece){
     piece.currentCoordinates = this.cloneCoordinates(this.canvasCoordinates)
     this.piece = piece
+  }
+
+  changeCanvasCoordinates(size: number){
+    this.canvasCoordinates = this.canvasCoordinatesSetter(size)
+    if(this.piece)
+      this.piece.currentCoordinates = this.cloneCoordinates(this.canvasCoordinates)
+  }
+
+  private canvasCoordinatesSetter(size: number){
+    return {x: this.coordinates.x.valueOf() * size + size / 2, y: this.coordinates.y.valueOf() * size + size / 2}
   }
 
   private cloneCoordinates(coor: Coordinates){

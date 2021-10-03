@@ -12,8 +12,8 @@ export class Board implements BoardInterface {
     this.board_img_source = 'assets/board.svg'
   }
 
-  initBoard(gameState: GameState) {
-      gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece)) )
+  initBoard(gameState: GameState, blockSize: number) {
+      gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, blockSize)) )
   }
 
   selectCell(cell: Cell | undefined) {
@@ -40,6 +40,10 @@ export class Board implements BoardInterface {
       destinationCell.acceptNewPiece(originCell.piece)
       originCell.piece = null
     }
+  }
+
+  changeCellCoordinates(newSize: number){
+    this.cells.forEach(c => c.changeCanvasCoordinates(newSize))
   }
 
 }

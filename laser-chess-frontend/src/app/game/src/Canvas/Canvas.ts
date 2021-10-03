@@ -1,7 +1,7 @@
 import { Coordinates } from "../../game.models"
 import { Board } from "../board"
 import { Cell } from "../cell"
-import { BLOCK_SIZE, COLS, ROWS } from "../constants"
+import { COLS, ROWS } from "../constants"
 import { Animations } from "./animations"
 import { Drawings } from "./drawings"
 
@@ -11,15 +11,25 @@ export class Canvas {
     animations: Animations
     drawings: Drawings
     interactable: boolean = true
+    block_size: number
 
-    constructor(ctx: CanvasRenderingContext2D, board: Board) {
+    constructor(ctx: CanvasRenderingContext2D, board: Board, size: number) {
+        this.block_size = size
         this.ctx = ctx
-        this.ctx.canvas.width = COLS * BLOCK_SIZE
-        this.ctx.canvas.height = ROWS * BLOCK_SIZE
-        this.drawings = new Drawings(ctx)
+        this.ctx.canvas.width = COLS * this.block_size
+        this.ctx.canvas.height = ROWS * this.block_size
+        this.drawings = new Drawings(ctx, this.block_size)
         this.animations = new Animations(this.drawings)
         this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
         this.drawings.initBoard(board)
+    }
+
+    changeBlockSize(newSize: number, board: Board){
+      this.block_size = newSize
+      this.drawings.blockSize = this.block_size
+      this.ctx.canvas.width = COLS * this.block_size
+      this.ctx.canvas.height = ROWS * this.block_size
+      this.drawings.drawGame(board, board.cells)
     }
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
@@ -65,8 +75,8 @@ export class Canvas {
     private getMousePos(event: MouseEvent){
         const rect = this.ctx.canvas.getBoundingClientRect();
         return {
-          x: Math.floor((event.clientX - rect.left) / BLOCK_SIZE),
-          y: Math.floor((event.clientY - rect.top) / BLOCK_SIZE)
+          x: Math.floor((event.clientX - rect.left) / this.block_size),
+          y: Math.floor((event.clientY - rect.top) / this.block_size)
         }
     }
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { GameService } from '../../game.service';
 import { Board } from '../../src/board';
 import { Canvas } from '../../src/Canvas/canvas';
@@ -19,19 +19,28 @@ export class BoardComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     const canvasContext = this.canvasHTML.nativeElement.getContext('2d')
-    if(canvasContext == null)
-      alert("xD")
+    if(canvasContext == null){
+      alert("Couldnt load context")
+      return
+    }
 
     this.board = new Board()
     this.gameService.getGameState("string").then(
       res => {
-        this.board.initBoard(res)
-        this.canvas = new Canvas(canvasContext!, this.board)
+        const blockSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+        this.board.initBoard(res, blockSize)
+        this.canvas = new Canvas(canvasContext!, this.board, blockSize)
       }
     )
-
-
   }
 
-  play() {  }
+  @HostListener('window:resize', ['$event'])
+  onResize(event: UIEvent) {
+    const newSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+    console.log(newSize)
+    this.board.changeCellCoordinates(newSize)
+    this.canvas.changeBlockSize(newSize, this.board)
+  }
+
+
 }

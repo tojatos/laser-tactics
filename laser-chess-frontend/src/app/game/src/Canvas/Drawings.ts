@@ -1,17 +1,19 @@
 import { Coordinates } from "../../game.models"
 import { Board } from "../board"
 import { Cell } from "../cell"
-import { BLOCK_SIZE, COLS, PIECE_SIZE, ROWS } from "../constants"
+import { PIECE_SIZE_SCALE } from "../constants"
 import { Piece } from "../piece"
 
 export class Drawings {
 
     ctx: CanvasRenderingContext2D
     drawingQueue: (() => void)[]
+    blockSize: number
 
-    constructor(ctx: CanvasRenderingContext2D){
+    constructor(ctx: CanvasRenderingContext2D, blockSize: number){
         this.ctx = ctx
         this.drawingQueue = []
+        this.blockSize = blockSize
     }
 
     initBoard(board: Board){
@@ -36,14 +38,14 @@ export class Drawings {
     }
 
     drawBoard(board: Board){
-        this.ctx.drawImage(board.board_img, 0, 0, BLOCK_SIZE * COLS, BLOCK_SIZE * ROWS)
+        this.ctx.drawImage(board.board_img, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
     }
 
     drawPiece(piece: Piece){
         this.ctx.save()
         this.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.y)
         this.ctx.rotate(piece.rotation_degree / 180 * Math.PI)
-        this.ctx.drawImage(piece.piece_img, this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y, PIECE_SIZE, PIECE_SIZE)
+        this.ctx.drawImage(piece.piece_img, this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y, this.blockSize * PIECE_SIZE_SCALE, this.blockSize * PIECE_SIZE_SCALE)
         this.ctx.restore()
     }
 
@@ -54,7 +56,7 @@ export class Drawings {
             this.ctx.globalAlpha = 0.5;
             this.ctx.translate(this.cellOnBoardCoordinates(cell.coordinates.x), this.cellOnBoardCoordinates(cell.coordinates.y))
             this.ctx.beginPath()
-            this.ctx.rect(this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y, BLOCK_SIZE, BLOCK_SIZE)
+            this.ctx.rect(this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y, this.blockSize, this.blockSize)
             this.ctx.fillStyle = "yellow"
             this.ctx.fill()
             this.ctx.restore()
@@ -63,14 +65,14 @@ export class Drawings {
 
 
     get cellDrawingOriginCoordinates(): Coordinates {
-        return {x: - BLOCK_SIZE / 2, y: - BLOCK_SIZE / 2}
+        return {x: - this.blockSize / 2, y: - this.blockSize / 2}
     }
 
     get pieceDrawingOriginCoordinates(): Coordinates {
-        return {x: - PIECE_SIZE / 2, y: - PIECE_SIZE / 2}
+        return {x: - this.blockSize * PIECE_SIZE_SCALE / 2, y: - this.blockSize * PIECE_SIZE_SCALE / 2}
     }
 
     cellOnBoardCoordinates(coor: number) : number {
-        return coor * BLOCK_SIZE + BLOCK_SIZE / 2
+        return coor * this.blockSize + this.blockSize / 2
     }
 }
