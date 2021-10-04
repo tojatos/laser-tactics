@@ -58,9 +58,22 @@ export class Canvas {
 
     }
 
+    async rotationButtonPressed(board: Board){
+      const selectedCell = board.selectedCell
+
+      if(selectedCell){
+        this.interactable = false
+        await this.animations.rotatePiece(board, selectedCell, 90)
+        this.unselectCellEvent(board)
+        this.interactable = true
+      }
+
+    }
+
     private selectCellEvent(selectedCell: Cell, board: Board){
       board.selectCell(selectedCell)
-      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.highlightCell(c))
+      this.drawings.highlightCell(selectedCell, "yellow")
+      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(c, "yellow"))
     }
 
     private unselectCellEvent(board: Board){

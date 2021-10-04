@@ -19,7 +19,7 @@ export class Animations {
 
         const piece = origin?.piece
 
-        if(piece == null || origin == null || destination == null)
+        if(!origin || !destination || !piece)
             return
 
         const speed = 20
@@ -47,6 +47,32 @@ export class Animations {
           }, 100 / speed )
         })
 
+    }
+
+    async rotatePiece(board: Board, atCell: Cell, byDegrees: number): Promise<void>{
+      const piece = atCell?.piece
+
+      if(!piece)
+        return
+
+      const speed = 20
+      const degreesPerFrame = 2
+
+      const validCellsArray = this.cellsExcludingPiece(board, atCell)
+      const desiredPiecePosition = piece.rotation_degree + byDegrees
+
+      return new Promise<void>((resolve) => {
+        const interval = setInterval(() => {
+            this.drawings.drawGame(board, validCellsArray)
+            piece.rotation_degree += degreesPerFrame
+            this.drawings.drawPiece(piece)
+            if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
+              piece.rotation_degree = desiredPiecePosition % 360
+              clearInterval(interval)
+              resolve()
+            }
+        }, 100 / speed )
+      })
 
     }
 
@@ -56,6 +82,10 @@ export class Animations {
 
     private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){
         return Math.abs(destination.x - currentPosX) < vicinity && Math.abs(destination.y - currentPosY) < vicinity
+    }
+
+    private inRotationVicinity(currentRotation: number, desiredRotation: number, deegresPerFrame: number){
+      return Math.abs(currentRotation - desiredRotation) <= deegresPerFrame
     }
 
     private designateLinearFunction(x1: number, y1: number, x2: number, y2: number){

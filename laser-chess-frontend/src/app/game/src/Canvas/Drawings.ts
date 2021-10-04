@@ -50,18 +50,31 @@ export class Drawings {
     }
 
 
-    highlightCell(cell: Cell | undefined){
+    highlightCell(cell: Cell | undefined, color: string){
         if(cell) {
             this.ctx.save()
             this.ctx.globalAlpha = 0.5;
             this.ctx.translate(this.cellOnBoardCoordinates(cell.coordinates.x), this.cellOnBoardCoordinates(cell.coordinates.y))
             this.ctx.beginPath()
             this.ctx.rect(this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y, this.blockSize, this.blockSize)
-            this.ctx.fillStyle = "yellow"
+            this.ctx.fillStyle = color
             this.ctx.fill()
             this.ctx.restore()
         }
     }
+
+    showPossibleMove(cell: Cell | undefined, color: string){
+      if(cell) {
+          this.ctx.save()
+          this.ctx.globalAlpha = 0.5;
+          this.ctx.translate(this.cellOnBoardCoordinates(cell.coordinates.x), this.cellOnBoardCoordinates(cell.coordinates.y))
+          this.ctx.beginPath()
+          this.ctx.arc(0, 0, this.blockSize / 10, 0, 2 * Math.PI, false);
+          this.ctx.fillStyle = color
+          this.ctx.fill()
+          this.ctx.restore()
+      }
+  }
 
 
     get cellDrawingOriginCoordinates(): Coordinates {

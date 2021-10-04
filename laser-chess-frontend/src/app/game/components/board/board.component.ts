@@ -42,5 +42,9 @@ export class BoardComponent implements AfterViewInit {
     this.canvas.changeBlockSize(newSize, this.board)
   }
 
+  onClick(){
+    this.canvas.rotationButtonPressed(this.board)
+  }
+
 
 }
