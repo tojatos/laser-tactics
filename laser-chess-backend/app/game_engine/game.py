@@ -60,9 +60,11 @@ class Game:
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):
         self.game_state.user_events.append(PieceMovedEvent(from_cell, to_cell))
-        if self.game_state.board.cells[to_cell] is not None \
-                and self.game_state.board.cells[to_cell].piece_type == PieceType.HYPER_SQUARE:
-            moved_piece = self.game_state.board.cells[from_cell]
+        moved_piece = self.game_state.board.cells[from_cell]
+        target_piece = self.game_state.board.cells[to_cell]
+
+        if target_piece is not None \
+                and target_piece.piece_type == PieceType.HYPER_SQUARE:
             self.game_state.board.cells[from_cell] = None
 
             random_empty_cell_coordinates_list = random.choice(
@@ -71,23 +73,24 @@ class Game:
 
             self.game_state.board.cells[random_empty_cell_coordinates] = moved_piece
             self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
-            self.game_state.game_events.append(TeleportEvent(to_cell, random_empty_cell_coordinates))
+            self.game_state.game_events.append(TeleportEvent(to_cell, random_empty_cell_coordinates, target_piece))
 
-        elif self.game_state.board.cells[from_cell].piece_type == PieceType.HYPER_CUBE:
-            target_piece = self.game_state.board.cells[to_cell]
-            self.game_state.board.cells[to_cell] = self.game_state.board.cells[from_cell]
+        elif moved_piece.piece_type == PieceType.HYPER_CUBE:
+            self.game_state.board.cells[to_cell] = moved_piece
             self.game_state.board.cells[from_cell] = None
             if target_piece is not None:
                 random_empty_cell_coordinates_list = random.choice(
                     list(filter(lambda x: x.piece is None, self.game_state.board.to_serializable().cells))).coordinates
                 random_empty_cell_coordinates: Tuple[int, int] = tuple(random_empty_cell_coordinates_list)
                 self.game_state.board.cells[random_empty_cell_coordinates] = target_piece
-                self.game_state.game_events.append(TeleportEvent(from_cell, random_empty_cell_coordinates))
                 self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
+                self.game_state.game_events.append(TeleportEvent(to_cell, random_empty_cell_coordinates, moved_piece))
         else:
-            self.game_state.board.cells[to_cell] = self.game_state.board.cells[from_cell]
+            self.game_state.board.cells[to_cell] = moved_piece
             self.game_state.board.cells[from_cell] = None
             self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
+            if target_piece is not None:
+                self.game_state.game_events.append(PieceTakenEvent(to_cell, moved_piece.piece_type, target_piece.piece_type))
         self.game_state.turn_number += 1
 
     def rotate(self, rotated_piece_at: CellCoordinates, rotation: int):
@@ -204,24 +207,38 @@ class Game:
         self.game_state.turn_number += 1
 
     def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> bool:
+        moved_piece = self.game_state.board.cells[from_cell]
+        target_piece = self.game_state.board.cells[to_cell]
+        last_game_event = self.game_state.game_events[-1] if self.game_state.game_events else None
+
         if self.get_current_player() is not player:
             return False
 
         if {abs(from_cell[0] - to_cell[0]), abs(from_cell[1] - to_cell[1])} != {0, 1}:
             return False
 
-        moved_piece = self.game_state.board.cells[from_cell]
         if moved_piece is None or moved_piece.piece_type is PieceType.LASER or moved_piece.piece_owner != player:
             return False
 
-        target_piece = self.game_state.board.cells[to_cell]
         if target_piece is not None:
+            if target_piece.piece_type is PieceType.HYPER_SQUARE:
+                if self.get_last_turn_player() is player and isinstance(last_game_event, TeleportEvent):
+                    if last_game_event.teleported_by == target_piece:
+                        return False
+
             if moved_piece.piece_type is PieceType.HYPER_CUBE:
+                if self.get_last_turn_player() is player and isinstance(last_game_event, TeleportEvent):
+                    if last_game_event.teleported_by == moved_piece:
+                        return False
                 return True
             if target_piece.piece_owner == player:
                 return False
             if moved_piece.piece_type not in [PieceType.KING, PieceType.BLOCK]:
                 return False
+            if self.get_last_turn_player() is player and isinstance(last_game_event, PieceTakenEvent):
+                if moved_piece.piece_type == last_game_event.piece_that_took_type == PieceType.KING:
+                    return False
+
         return True
 
     def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> bool:

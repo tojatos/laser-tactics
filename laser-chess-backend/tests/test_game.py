@@ -520,6 +520,22 @@ def test_capture_king_twice():
     assert game.validate_move(Player.PLAYER_ONE, (0, 1), (0, 2)) is False
 
 
+def test_capture_block_twice():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+        (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+        (0, 2): Piece(PieceType.KING, Player.PLAYER_TWO),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (0, 1)) is True
+    game.move((0, 0), (0, 1))
+    assert game.validate_move(Player.PLAYER_ONE, (0, 1), (0, 2)) is True
+
+
 def test_laser_move():
     board: Board = Board({
         (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
@@ -587,16 +603,17 @@ def test_move_on_own_turn():
 def test_teleport_with_hyper_cube_twice():
     board: Board = Board({
         (0, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
-        (1, 0): Piece(PieceType.LASER, Player.PLAYER_TWO),
+        (1, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
     })
 
     initial_state = get_test_game_state(board)
     game = Game(initial_state)
     game.start_game()
 
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (1, 0)) is True
+
     game.move((0, 0), (1, 0))
 
-    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (1, 0)) is False
     assert game.validate_move(Player.PLAYER_ONE, (1, 0), (0, 0)) is False
 
 
@@ -618,3 +635,22 @@ def test_teleport_with_hyper_square_twice():
 
     assert game.validate_move(Player.PLAYER_ONE, (0, 0), (1, 0)) is False
     assert game.validate_move(Player.PLAYER_ONE, (2, 0), (1, 0)) is False
+
+
+def test_take_hyper_cube():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+        (1, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
+        (2, 0): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+    })
+
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    assert game.validate_move(Player.PLAYER_ONE, (0, 0), (1, 0)) is False
+
+    game.move((1, 0), (0, 0))
+    game.move((0, 0), (1, 0))
+
+    assert game.validate_move(Player.PLAYER_TWO, (2, 0), (1, 0)) is True
