@@ -6,6 +6,8 @@ import { Piece } from "../piece"
 
 export class Drawings {
 
+  // make some queue for drawing
+
     ctx: CanvasRenderingContext2D
     drawingQueue: (() => void)[]
     blockSize: number
@@ -74,8 +76,7 @@ export class Drawings {
           this.ctx.fill()
           this.ctx.restore()
       }
-  }
-
+    }
 
     get cellDrawingOriginCoordinates(): Coordinates {
         return {x: - this.blockSize / 2, y: - this.blockSize / 2}

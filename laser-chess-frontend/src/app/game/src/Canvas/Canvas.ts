@@ -12,6 +12,8 @@ export class Canvas {
     drawings: Drawings
     interactable: boolean = true
     block_size: number
+    highlightColor: string = "yellow"
+    hoveredCell: Cell | undefined
 
     constructor(ctx: CanvasRenderingContext2D, board: Board, size: number) {
         this.block_size = size
@@ -21,6 +23,7 @@ export class Canvas {
         this.drawings = new Drawings(ctx, this.block_size)
         this.animations = new Animations(this.drawings)
         this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
+        this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
         this.drawings.initBoard(board)
     }
 
@@ -58,6 +61,22 @@ export class Canvas {
 
     }
 
+    private async canvasHover(event: MouseEvent, board: Board) {
+      if(board.selectedCell){
+        const coor = this.getMousePos(event)
+        const hoveredOver = board.getCellByCoordinates(coor.x, coor.y)
+        if(hoveredOver && hoveredOver != this.hoveredCell){
+          if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver))
+            this.drawings.highlightCell(hoveredOver, this.highlightColor)
+          else {
+            this.drawings.drawGame(board, board.cells) // kinda lazy but works, change it on "draw single cell"
+            this.selectCellEvent(board.selectedCell, board)
+          }
+          this.hoveredCell = hoveredOver
+        }
+      }
+    }
+
     async rotationButtonPressed(board: Board){
       const selectedCell = board.selectedCell
 
@@ -72,8 +91,8 @@ export class Canvas {
 
     private selectCellEvent(selectedCell: Cell, board: Board){
       board.selectCell(selectedCell)
-      this.drawings.highlightCell(selectedCell, "yellow")
-      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(c, "yellow"))
+      this.drawings.highlightCell(selectedCell, this.highlightColor)
+      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(c, this.highlightColor))
     }
 
     private unselectCellEvent(board: Board){

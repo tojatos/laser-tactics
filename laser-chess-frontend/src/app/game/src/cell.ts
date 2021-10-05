@@ -1,4 +1,5 @@
 import { Coordinates, CellInterface, PieceInterface } from "../game.models";
+import { Board } from "./board";
 import { Piece } from "./piece";
 
 export class Cell implements CellInterface {
@@ -21,6 +22,10 @@ export class Cell implements CellInterface {
     this.canvasCoordinates = this.canvasCoordinatesSetter(size)
     if(this.piece)
       this.piece.currentCoordinates = this.cloneCoordinates(this.canvasCoordinates)
+  }
+
+  possibleMoves(board: Board){
+    return this.piece?.getPossibleMoves(board, this)
   }
 
   private canvasCoordinatesSetter(size: number){
