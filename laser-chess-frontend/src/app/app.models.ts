@@ -1,4 +1,4 @@
 export interface UserToken{
-  tokenID: string,
-  expiresIn: string,
+  access_token: string,
+  token_type: string,
 }

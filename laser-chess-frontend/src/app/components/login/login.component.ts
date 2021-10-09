@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
@@ -9,19 +10,22 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private route: ActivatedRoute) {}
 
-  async ngOnInit(){
-    await this.login()
+  ngOnInit(){
+    this.route.queryParams.subscribe(
+      async res => {
+        this.login(res.user, res.pass)
+      }
+    )
   }
 
-  async login() {
-      const userData = {login: "login", pass: "pass"}
+  login(user: string | null, pass: string | null) {
 
-      if (!this.authService.isLoggedIn()) {
-          this.authService.login(userData.login, userData.pass).then(
+      if (!this.authService.isLoggedIn() && user && pass) {
+          this.authService.login(user, pass).then(
                   res => {
-                      console.log(`User with token ${res.tokenID} is logged in`);
+                      console.log(`User with token ${res.access_token} is logged in`);
                   }
               )
       }
