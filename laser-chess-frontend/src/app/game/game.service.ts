@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Coordinates, GameState } from './game.models';
-import { ErrorResponse, MovePieceRequest } from './game.request.models'
+import { MovePieceRequest } from './game.request.models'
 
 @Injectable({
   providedIn: 'root'

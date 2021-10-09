@@ -1,21 +1,27 @@
+import { Injectable } from "@angular/core"
 import { Coordinates } from "../../game.models"
+import { GameService } from "../../game.service"
 import { Board } from "../board"
 import { Cell } from "../cell"
 import { COLS, ROWS } from "../constants"
 import { Animations } from "./Animations"
 import { Drawings } from "./Drawings"
 
+@Injectable()
 export class Canvas {
 
-    ctx: CanvasRenderingContext2D
-    animations: Animations
-    drawings: Drawings
+    ctx!: CanvasRenderingContext2D
+    animations!: Animations
+    drawings!: Drawings
     interactable: boolean = true
-    block_size: number
+    block_size!: number
     highlightColor: string = "yellow"
     hoveredCell: Cell | undefined
+    gameId!: string
 
-    constructor(ctx: CanvasRenderingContext2D, board: Board, size: number) {
+    constructor(private gameService: GameService) {}
+
+    initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
         this.block_size = size
         this.ctx = ctx
         this.ctx.canvas.width = COLS * this.block_size
@@ -25,6 +31,7 @@ export class Canvas {
         this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
         this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
         this.drawings.initBoard(board)
+        this.gameId = gameId
     }
 
     changeBlockSize(newSize: number, board: Board){

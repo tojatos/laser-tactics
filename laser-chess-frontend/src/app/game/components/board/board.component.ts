@@ -12,10 +12,7 @@ export class BoardComponent implements AfterViewInit {
   @ViewChild('canvas', { static: true })
   canvasHTML!: ElementRef<HTMLCanvasElement>
 
-  board!: Board
-  canvas!: Canvas
-
-  constructor(private gameService: GameService){}
+  constructor(private gameService: GameService, private canvas: Canvas, private board: Board){}
 
   ngAfterViewInit() {
     const canvasContext = this.canvasHTML.nativeElement.getContext('2d')
@@ -24,13 +21,12 @@ export class BoardComponent implements AfterViewInit {
       return
     }
 
-    this.board = new Board()
     this.gameService.getGameState("string").then(
       res => {
         if(res.body) {
           const blockSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
           this.board.initBoard(res.body, blockSize)
-          this.canvas = new Canvas(canvasContext!, this.board, blockSize)
+          this.canvas.initCanvas(canvasContext!, this.board, blockSize, "string")
         }
       }
     )

@@ -1,6 +1,8 @@
+import { Injectable } from "@angular/core"
 import { BoardInterface, GameState } from "../game.models"
 import { Cell } from "./cell"
 
+@Injectable()
 export class Board implements BoardInterface {
 
   cells: Cell[] = []
