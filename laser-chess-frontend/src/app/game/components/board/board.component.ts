@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { GameService } from '../../game.service';
 import { Board } from '../../src/board';
-import { Canvas } from '../../src/Canvas/canvas';
+import { Canvas } from '../../src/Canvas/Canvas';
 
 @Component({
   selector: 'app-board',
@@ -37,7 +37,6 @@ export class BoardComponent implements AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
     const newSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
-    console.log(newSize)
     this.board.changeCellCoordinates(newSize)
     this.canvas.changeBlockSize(newSize, this.board)
   }

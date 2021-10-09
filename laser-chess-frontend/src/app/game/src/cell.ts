@@ -1,5 +1,6 @@
 import { Coordinates, CellInterface, PieceInterface } from "../game.models";
 import { Board } from "./board";
+import { ROWS } from "./constants";
 import { Piece } from "./piece";
 
 export class Cell implements CellInterface {
@@ -29,7 +30,7 @@ export class Cell implements CellInterface {
   }
 
   private canvasCoordinatesSetter(size: number){
-    return {x: this.coordinates.x.valueOf() * size + size / 2, y: this.coordinates.y.valueOf() * size + size / 2}
+    return {x: this.coordinates.x.valueOf() * size + size / 2, y: size * (ROWS - 1) - this.coordinates.y.valueOf() * size + size / 2}
   }
 
   private cloneCoordinates(coor: Coordinates){

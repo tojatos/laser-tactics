@@ -56,7 +56,7 @@ export class Drawings {
         if(cell) {
             this.ctx.save()
             this.ctx.globalAlpha = 0.5;
-            this.ctx.translate(this.cellOnBoardCoordinates(cell.coordinates.x), this.cellOnBoardCoordinates(cell.coordinates.y))
+            this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
             this.ctx.beginPath()
             this.ctx.rect(this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y, this.blockSize, this.blockSize)
             this.ctx.fillStyle = color
@@ -69,7 +69,7 @@ export class Drawings {
       if(cell) {
           this.ctx.save()
           this.ctx.globalAlpha = 0.5;
-          this.ctx.translate(this.cellOnBoardCoordinates(cell.coordinates.x), this.cellOnBoardCoordinates(cell.coordinates.y))
+          this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
           this.ctx.beginPath()
           this.ctx.arc(0, 0, this.blockSize / 10, 0, 2 * Math.PI, false);
           this.ctx.fillStyle = color
@@ -84,9 +84,5 @@ export class Drawings {
 
     get pieceDrawingOriginCoordinates(): Coordinates {
         return {x: - this.blockSize * PIECE_SIZE_SCALE / 2, y: - this.blockSize * PIECE_SIZE_SCALE / 2}
-    }
-
-    cellOnBoardCoordinates(coor: number) : number {
-        return coor * this.blockSize + this.blockSize / 2
     }
 }

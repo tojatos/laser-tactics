@@ -2,7 +2,7 @@ import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
 import { Piece } from "../piece";
-import { Drawings } from "./drawings";
+import { Drawings } from "./Drawings";
 
 export class Animations {
 
@@ -96,7 +96,7 @@ export class Animations {
         const translationValueX = this.getTranslationValue(originCooridantes.x, destinationCoordinates.x)
         const translationValueY = this.getTranslationValue(originCooridantes.y, destinationCoordinates.y)
 
-        piece.currentCoordinates.x = piece.currentCoordinates.x + redrawDistance * translationValueX
+        piece.currentCoordinates.x = piece.currentCoordinates.x - redrawDistance * translationValueX
 
         piece.currentCoordinates.y = translationValueX == 0
         ? piece.currentCoordinates.y + redrawDistance * translationValueY
@@ -104,7 +104,7 @@ export class Animations {
     }
 
     private getTranslationValue(n1: number, n2: number){
-      return n1 > n2 ? -1 : n1 < n2 ? 1 : 0
+      return n1 > n2 ? 1 : n1 < n2 ? -1 : 0
     }
 
     private getDistanceBetweenPoints(x1: number, y1: number, x2: number, y2: number){
