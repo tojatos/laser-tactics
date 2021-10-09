@@ -2,8 +2,8 @@ import { Coordinates } from "../../game.models"
 import { Board } from "../board"
 import { Cell } from "../cell"
 import { COLS, ROWS } from "../constants"
-import { Animations } from "./animations"
-import { Drawings } from "./drawings"
+import { Animations } from "./Animations"
+import { Drawings } from "./Drawings"
 
 export class Canvas {
 
@@ -41,7 +41,7 @@ export class Canvas {
         return
 
       const coor = this.getMousePos(event)
-      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, "2")
+      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, "1")
 
       this.interactable = false
 
@@ -108,7 +108,7 @@ export class Canvas {
         const rect = this.ctx.canvas.getBoundingClientRect();
         return {
           x: Math.floor((event.clientX - rect.left) / this.block_size),
-          y: Math.floor((event.clientY - rect.top) / this.block_size)
+          y: 8 - Math.floor((event.clientY - rect.top) / this.block_size)
         }
     }
 
