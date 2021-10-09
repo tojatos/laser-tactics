@@ -15,3 +15,7 @@ export interface MovePieceRequest {
 export interface ShootRequest {
   game_id: string
 }
+
+export interface ErrorResponse {
+  detail: string
+}

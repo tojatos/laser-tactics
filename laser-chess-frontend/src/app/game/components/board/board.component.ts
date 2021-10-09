@@ -27,9 +27,11 @@ export class BoardComponent implements AfterViewInit {
     this.board = new Board()
     this.gameService.getGameState("string").then(
       res => {
-        const blockSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
-        this.board.initBoard(res, blockSize)
-        this.canvas = new Canvas(canvasContext!, this.board, blockSize)
+        if(res.body) {
+          const blockSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+          this.board.initBoard(res.body, blockSize)
+          this.canvas = new Canvas(canvasContext!, this.board, blockSize)
+        }
       }
     )
   }
