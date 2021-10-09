@@ -1,6 +1,7 @@
 import dataclasses
 import json
 
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -21,7 +22,7 @@ def get_user(db: Session, username: str):
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+    return db.query(models.User).filter(models.User.email == EmailStr(email)).first()
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
