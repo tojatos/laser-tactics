@@ -1,7 +1,7 @@
 import { Coordinates } from "../../game.models"
 import { Board } from "../board"
 import { Cell } from "../cell"
-import { PIECE_SIZE_SCALE } from "../constants"
+import { PIECE_SIZE_SCALE, ROWS } from "../constants"
 import { Piece } from "../piece"
 
 export class Drawings {
@@ -40,7 +40,7 @@ export class Drawings {
     }
 
     drawBoard(board: Board){
-        this.ctx.drawImage(board.board_img, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+      this.ctx.drawImage(board.board_img, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
     }
 
     drawPiece(piece: Piece){
@@ -62,7 +62,24 @@ export class Drawings {
             this.ctx.fillStyle = color
             this.ctx.fill()
             this.ctx.restore()
+            if(cell.piece)
+              this.drawPiece(cell.piece)
         }
+    }
+
+    drawSingleCell(board: Board, cell: Cell){
+      const imgSize = board.board_img.width
+      const imageCellSize = Math.round(((imgSize / ROWS) + Number.EPSILON) * 100) / 100
+      console.log(imageCellSize)
+      this.ctx.save()
+      this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
+      this.ctx.drawImage(board.board_img, cell.coordinates.x * imageCellSize, cell.coordinates.y * imageCellSize,
+        imageCellSize, imageCellSize,
+        this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y,
+        this.blockSize, this.blockSize)
+      this.ctx.restore()
+      if(cell.piece)
+        this.drawPiece(cell.piece)
     }
 
     showPossibleMove(cell: Cell | undefined, color: string){

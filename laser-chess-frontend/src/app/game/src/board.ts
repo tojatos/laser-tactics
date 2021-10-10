@@ -16,7 +16,6 @@ export class Board implements BoardInterface {
 
   initBoard(gameState: GameState, blockSize: number) {
       gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, blockSize)) )
-      console.log(this.cells)
   }
 
   selectCell(cell: Cell | undefined) {

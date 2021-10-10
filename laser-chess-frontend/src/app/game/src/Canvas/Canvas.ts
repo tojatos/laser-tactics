@@ -43,7 +43,6 @@ export class Canvas {
     }
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
-
       if(!this.interactable)
         return
 
@@ -68,16 +67,20 @@ export class Canvas {
 
     }
 
-    private async canvasHover(event: MouseEvent, board: Board) {
-      if(board.selectedCell){
+    private canvasHover(event: MouseEvent, board: Board) {
+      if(board.selectedCell && this.interactable){
         const coor = this.getMousePos(event)
         const hoveredOver = board.getCellByCoordinates(coor.x, coor.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
-          if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver))
+          if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
+            this.drawings.drawSingleCell(board, hoveredOver)
             this.drawings.highlightCell(hoveredOver, this.highlightColor)
+          }
           else {
-            this.drawings.drawGame(board, board.cells) // kinda lazy but works, change it on "draw single cell"
-            this.selectCellEvent(board.selectedCell, board)
+            if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
+              this.drawings.drawSingleCell(board, this.hoveredCell)
+              this.drawings.showPossibleMove(this.hoveredCell, this.highlightColor)
+            }
           }
           this.hoveredCell = hoveredOver
         }
@@ -93,7 +96,6 @@ export class Canvas {
         this.unselectCellEvent(board)
         this.interactable = true
       }
-
     }
 
     private selectCellEvent(selectedCell: Cell, board: Board){
