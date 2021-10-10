@@ -183,3 +183,33 @@ def test_rotate_block_invalid_angle():
         request = RotatePieceRequest(game_id, CellCoordinatesSerializable(1, 1), angle)
         response = post_data("/rotate_piece", tokens[0], json=asdict(request))
         assert response.status_code != 200
+
+
+def test_play_the_game():
+    get_game_state_request = GetGameStateRequest(game_id)
+
+    response = post_data("/get_game_state", json=asdict(get_game_state_request))
+    assert response.status_code == 200, response.text
+    game_state_dict = response.json()
+
+    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+    game_state = game_state_serializable.to_normal()
+    assert game_state.is_started is True
+    assert game_state.turn_number is 1
+
+    request = MovePieceRequest(game_id, CellCoordinatesSerializable(0, 1), CellCoordinatesSerializable(0, 2))
+    response = post_data("/move_piece", tokens[0], json=asdict(request))
+    assert response.status_code == 200
+    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(0, 2), 90)
+    response = post_data("/rotate_piece", tokens[0], json=asdict(request))
+    assert response.status_code == 200
+    response = post_data("/get_game_state", json=asdict(get_game_state_request))
+    assert response.status_code == 200, response.text
+    game_state_dict = response.json()
+
+    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+    game_state = game_state_serializable.to_normal()
+    assert game_state.is_started is True
+    assert game_state.turn_number is 3
+    assert game_state.board.cells[(0, 1)] is None
+    assert game_state.board.cells[(0, 2)] is not None
