@@ -17,7 +17,6 @@ from app.game_engine import game_service
 from app.game_engine.models import *
 from app.game_engine.requests import *
 
-models.Base.metadata.create_all(bind=engine)
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -222,4 +221,5 @@ async def shoot_laser(request: ShootLaserRequest,
 app.include_router(router)
 
 if __name__ == "__main__":
+    models.Base.metadata.create_all(bind=engine)
     uvicorn.run(app, host="localhost", port=8000)
