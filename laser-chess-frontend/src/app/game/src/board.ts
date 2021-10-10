@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core"
 import { BoardInterface, GameState } from "../game.models"
 import { Cell } from "./cell"
+import { PieceType } from "./PieceType"
 
 @Injectable()
 export class Board implements BoardInterface {
@@ -46,6 +47,10 @@ export class Board implements BoardInterface {
 
   changeCellCoordinates(newSize: number){
     this.cells.forEach(c => c.changeCanvasCoordinates(newSize))
+  }
+
+  getLaserCell(player: string){
+    return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == player)
   }
 
 }

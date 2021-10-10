@@ -98,6 +98,16 @@ export class Canvas {
       }
     }
 
+    async laserButtonPressed(board: Board){
+      const laserCell = board.getLaserCell("1")
+      console.log(laserCell)
+      if(laserCell){
+        this.interactable = false
+        await this.animations.laserAnimation(board, laserCell?.coordinates, {x: laserCell.coordinates.x, y: laserCell.coordinates.y + 5})
+        this.interactable = true
+      }
+    }
+
     private selectCellEvent(selectedCell: Cell, board: Board){
       board.selectCell(selectedCell)
       this.drawings.highlightCell(selectedCell, this.highlightColor)

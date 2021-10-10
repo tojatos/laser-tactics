@@ -76,6 +76,46 @@ export class Animations {
 
     }
 
+    async laserAnimation(board: Board, from: Coordinates, to: Coordinates): Promise<void> {
+      const fromCell = board.getCellByCoordinates(from.x, from.y)
+      const toCell = board.getCellByCoordinates(to.x, to.y)
+
+      const speed = 20
+      const laserIncrementPerFrame = 10
+      let laserIncrement = 10
+
+      console.log(fromCell)
+      console.log(toCell)
+
+      if(fromCell && toCell){
+
+        const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.canvasCoordinates.x)
+        const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.canvasCoordinates.y)
+
+        console.log(xModifier)
+        console.log(yModifier)
+
+
+        return new Promise<void>((resolve) => {
+          const interval = setInterval(() => {
+
+            const currentCoordinates = {
+              x: fromCell.canvasCoordinates.x - laserIncrement * xModifier,
+              y: fromCell.canvasCoordinates.y - laserIncrement * yModifier
+            }
+            this.drawings.drawGame(board, board.cells)
+            this.drawings.drawLaserLine(fromCell.canvasCoordinates, currentCoordinates)
+            laserIncrement += laserIncrementPerFrame
+            if(this.inVicinity(toCell.canvasCoordinates, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
+              clearInterval(interval)
+              resolve()
+            }
+          }, 100 / speed )
+        })
+      }
+
+    }
+
     private cellsExcludingPiece(board: Board, cell: Cell){
         return board.cells.filter(c => c.piece != board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y)?.piece)
     }

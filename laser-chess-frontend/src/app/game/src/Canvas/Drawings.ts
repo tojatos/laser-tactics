@@ -30,7 +30,7 @@ export class Drawings {
               if(cell.piece)
                 this.drawPiece(cell.piece)
             }
-            cell.piece.piece_img.src = `assets/${cell.piece.piece_type}.svg`
+            cell.piece.piece_img.src = `assets/${cell.piece.piece_type + (cell.piece.piece_owner == "1" ? "-red" : cell.piece.piece_owner == "2" ? "-blue" : "")}.svg`
         }
     }
 
@@ -93,6 +93,16 @@ export class Drawings {
           this.ctx.fill()
           this.ctx.restore()
       }
+    }
+
+    drawLaserLine(from: Coordinates, to: Coordinates){
+      this.ctx.save()
+      this.ctx.lineWidth = 5
+      this.ctx.beginPath()
+      this.ctx.moveTo(from.x, from.y)
+      this.ctx.lineTo(to.x, to.y)
+      this.ctx.strokeStyle = "red"
+      this.ctx.stroke()
     }
 
     get cellDrawingOriginCoordinates(): Coordinates {

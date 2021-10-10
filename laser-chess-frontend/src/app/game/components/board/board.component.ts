@@ -43,5 +43,9 @@ export class BoardComponent implements AfterViewInit {
     this.canvas.rotationButtonPressed(this.board)
   }
 
+  laserShoot(){
+    this.canvas.laserButtonPressed(this.board)
+  }
+
 
 }
