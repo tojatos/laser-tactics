@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { GameService } from '../../game.service';
 import { Board } from '../../src/board';
 import { Canvas } from '../../src/Canvas/Canvas';
@@ -12,7 +13,7 @@ export class BoardComponent implements AfterViewInit {
   @ViewChild('canvas', { static: true })
   canvasHTML!: ElementRef<HTMLCanvasElement>
 
-  constructor(private gameService: GameService, private canvas: Canvas, private board: Board){}
+  constructor(private gameService: GameService, private route: ActivatedRoute, private canvas: Canvas, private board: Board){}
 
   ngAfterViewInit() {
     const canvasContext = this.canvasHTML.nativeElement.getContext('2d')
@@ -21,15 +22,19 @@ export class BoardComponent implements AfterViewInit {
       return
     }
 
-    this.gameService.getGameState("string").then(
-      res => {
-        if(res.body) {
-          const blockSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
-          this.board.initBoard(res.body, blockSize)
-          this.canvas.initCanvas(canvasContext!, this.board, blockSize, "string")
+    this.route.params.subscribe(params => {
+
+      this.gameService.getGameState(params.id).then(
+        res => {
+          if(res.body) {
+            const blockSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+            this.board.initBoard(res.body, blockSize)
+            this.canvas.initCanvas(canvasContext!, this.board, blockSize, params.id)
+          }
         }
-      }
-    )
+      )
+    })
+
   }
 
   @HostListener('window:resize', ['$event'])
