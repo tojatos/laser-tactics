@@ -341,7 +341,7 @@ def empty_game_state(player_one_id, player_two_id) -> GameState:
         (0, 8): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 90),
         (1, 8): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 90),
         (2, 8): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_TWO, 90),
-        (3, 8): Piece(PieceType.LASER, Player.PLAYER_TWO),
+        (3, 8): Piece(PieceType.LASER, Player.PLAYER_TWO, 180),
         (4, 8): Piece(PieceType.KING, Player.PLAYER_TWO),
         (5, 8): Piece(PieceType.HYPER_CUBE, Player.PLAYER_TWO),
         (6, 8): Piece(PieceType.DIAGONAL_MIRROR, Player.PLAYER_TWO),
