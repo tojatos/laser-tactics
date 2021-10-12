@@ -1,4 +1,4 @@
-from pydantic.dataclasses import dataclass
+from dataclasses import dataclass
 
 from app.game_engine.models import CellCoordinatesSerializable
 
@@ -25,3 +25,10 @@ class MovePieceRequest:
     game_id: str
     move_from: CellCoordinatesSerializable
     move_to: CellCoordinatesSerializable
+
+
+@dataclass
+class RotatePieceRequest:
+    game_id: str
+    rotate_at: CellCoordinatesSerializable
+    angle: int

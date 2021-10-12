@@ -1,10 +1,12 @@
-import pprint
-
 from pydantic.dataclasses import dataclass
 from enum import Enum, auto
 from typing import Dict, List, Optional, Tuple, Union
 
 CellCoordinates = Tuple[int, int]
+
+
+def cell_coordinates_to_serializable(coordinates: CellCoordinates):
+    return CellCoordinatesSerializable(coordinates[0], coordinates[1])
 
 
 @dataclass
@@ -67,10 +69,21 @@ class Board:
     cells: Dict[CellCoordinates, Optional[Piece]]
 
     def to_serializable(self) -> BoardSerializable:
-        cells_transformed = [Cell(CellCoordinatesSerializable(coordinates[0], coordinates[1]), piece) for
+        cells_transformed = [Cell(cell_coordinates_to_serializable(coordinates), piece) for
                              coordinates, piece in
                              self.cells.items()]
         return BoardSerializable(cells_transformed)
+
+
+@dataclass
+class ShootLaserEvent:
+    laser_shot: bool = True
+
+    def to_serializable(self):
+        return self
+
+    def to_normal(self):
+        return self
 
 
 @dataclass
@@ -78,7 +91,14 @@ class LaserShotEvent:
     laser_path: List[Tuple[int, CellCoordinates]]
 
     def to_serializable(self):
-        return LaserShotEventSerializable(list(map(lambda x: (x[0], CellCoordinatesSerializable(x[1][0], x[1][1])), self.laser_path)))
+        return LaserShotEventSerializable(
+            list(
+                map(
+                    lambda x: LaserShotEventSerializableEntity(x[0], cell_coordinates_to_serializable(x[1])),
+                    self.laser_path,
+                )
+            )
+        )
 
 
 @dataclass
@@ -87,7 +107,24 @@ class PieceMovedEvent:
     moved_to: CellCoordinates
 
     def to_serializable(self):
-        return PieceMovedEventSerializable(str(self.moved_from), str(self.moved_to))
+        return PieceMovedEventSerializable(
+            cell_coordinates_to_serializable(self.moved_from),
+            cell_coordinates_to_serializable(self.moved_to)
+        )
+
+
+@dataclass
+class PieceTakenEvent:
+    taken_on: CellCoordinates
+    piece_that_took_type: PieceType
+    piece_taken_type: PieceType
+
+    def to_serializable(self):
+        return PieceTakenEventSerializable(
+            cell_coordinates_to_serializable(self.taken_on),
+            self.piece_that_took_type,
+            self.piece_taken_type,
+        )
 
 
 @dataclass
@@ -96,16 +133,24 @@ class PieceRotatedEvent:
     rotation: int
 
     def to_serializable(self):
-        return PieceRotatedEventSerializable(str(self.rotated_piece_at), self.rotation)
+        return PieceRotatedEventSerializable(
+            cell_coordinates_to_serializable(self.rotated_piece_at),
+            self.rotation
+        )
 
 
 @dataclass
 class TeleportEvent:
     teleported_from: CellCoordinates
     teleported_to: CellCoordinates
+    teleported_by: Piece
 
     def to_serializable(self):
-        return TeleportEventSerializable(str(self.teleported_from), str(self.teleported_to))
+        return TeleportEventSerializable(
+            cell_coordinates_to_serializable(self.teleported_from),
+            cell_coordinates_to_serializable(self.teleported_to),
+            self.teleported_by,
+        )
 
 
 @dataclass
@@ -113,17 +158,37 @@ class PieceMovedEventSerializable:
     moved_from: CellCoordinatesSerializable
     moved_to: CellCoordinatesSerializable
 
+    def to_normal(self) -> PieceMovedEvent:
+        return PieceMovedEvent(tuple(self.moved_from), tuple(self.moved_to))
+
+
+@dataclass
+class PieceTakenEventSerializable:
+    taken_on: CellCoordinatesSerializable
+    piece_that_took_type: PieceType
+    piece_taken_type: PieceType
+
+    def to_normal(self) -> PieceTakenEvent:
+        return PieceTakenEvent(tuple(self.taken_on), self.piece_that_took_type, self.piece_taken_type)
+
 
 @dataclass
 class PieceRotatedEventSerializable:
     rotated_piece_at: CellCoordinatesSerializable
     rotation: int
 
+    def to_normal(self) -> PieceRotatedEvent:
+        return PieceRotatedEvent(tuple(self.rotated_piece_at), self.rotation)
+
 
 @dataclass
 class TeleportEventSerializable:
     teleported_from: CellCoordinatesSerializable
     teleported_to: CellCoordinatesSerializable
+    teleported_by: Piece
+
+    def to_normal(self) -> TeleportEvent:
+        return TeleportEvent(tuple(self.teleported_from), tuple(self.teleported_to), self.teleported_by)
 
 
 @dataclass
@@ -140,9 +205,11 @@ class LaserShotEventSerializable:
         return LaserShotEvent([(x.time, tuple(x.coordinates)) for x in self.laser_path])
 
 
-GameEvent = Union[PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent]
-GameEventSerializable = Union[
-    PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable]
+GameEvent = Union[PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent, PieceTakenEvent]
+UserEvent = Union[PieceRotatedEvent, PieceMovedEvent, ShootLaserEvent]
+
+GameEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable, PieceTakenEventSerializable]
+UserEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, ShootLaserEvent]
 
 
 @dataclass
@@ -153,6 +220,7 @@ class GameStateSerializable:
     is_started: bool
     turn_number: int
     game_events: List[GameEventSerializable]
+    user_events: List[UserEventSerializable]
 
     def to_normal(self) -> "GameState":
         return GameState(
@@ -162,6 +230,7 @@ class GameStateSerializable:
             is_started=self.is_started,
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
+            user_events=list(map(lambda x: x.to_normal(), self.user_events)),
         )
 
 
@@ -173,6 +242,7 @@ class GameState:
     is_started: bool
     turn_number: int
     game_events: List[GameEvent]
+    user_events: List[UserEvent]
 
     def to_serializable(self) -> GameStateSerializable:
         return GameStateSerializable(
@@ -182,19 +252,8 @@ class GameState:
             is_started=self.is_started,
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
-            # game_events=self.game_events,
+            user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
         )
-
-
-# def game_state_to_normal(gs: GameStateSerializable) -> GameState:
-#     return GameState(
-#         player_one_id=gs.player_one_id,
-#         player_two_id=gs.player_two_id,
-#         board=gs.board.to_normal(),
-#         is_started=gs.is_started,
-#         turn_number=gs.turn_number,
-#         game_events=list(map(lambda x: x.to_normal(), gs.game_events)),
-#     )
 
 
 def empty_game_state(player_one_id, player_two_id) -> GameState:
@@ -292,4 +351,4 @@ def empty_game_state(player_one_id, player_two_id) -> GameState:
     is_started: bool = False
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, is_started, turn_number, [])
+    return GameState(player_one_id, player_two_id, board, is_started, turn_number, [], [])

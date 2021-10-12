@@ -205,6 +205,13 @@ async def move_piece(request: MovePieceRequest,
     game_service.move_piece(current_user.username, request, db)
 
 
+@router.post("/rotate_piece")
+async def move_piece(request: RotatePieceRequest,
+                     current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
+    game_service.rotate_piece(current_user.username, request, db)
+
+
 @router.post("/shoot_laser")
 async def shoot_laser(request: ShootLaserRequest,
                       current_user: schemas.User = Depends(get_current_active_user),
