@@ -5,6 +5,11 @@ from typing import Dict, List, Optional, Tuple, Union
 CellCoordinates = Tuple[int, int]
 
 
+class AutoNameEnum(Enum):
+    def _generate_next_value_(self, start, count, last_values):
+        return self
+
+
 def cell_coordinates_to_serializable(coordinates: CellCoordinates):
     return CellCoordinatesSerializable(coordinates[0], coordinates[1])
 
@@ -22,7 +27,7 @@ class CellCoordinatesSerializable:
     #     self.x, self.y = coordinates
 
 
-class PieceType(str, Enum):
+class PieceType(str, AutoNameEnum):
     BEAM_SPLITTER = auto()
     BLOCK = auto()
     DIAGONAL_MIRROR = auto()
@@ -34,7 +39,7 @@ class PieceType(str, Enum):
     TRIANGULAR_MIRROR = auto()
 
 
-class Player(str, Enum):
+class Player(str, AutoNameEnum):
     PLAYER_ONE = auto()
     PLAYER_TWO = auto()
     NONE = auto()
