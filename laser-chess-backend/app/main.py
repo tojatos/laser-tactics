@@ -16,6 +16,7 @@ from app.core.database import SessionLocal, engine
 from app.game_engine import game_service
 from app.game_engine.models import *
 from app.game_engine.requests import *
+import uuid
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -225,16 +226,20 @@ async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get
     return lobbies
 
 
-@router.get("/lobbies/{name}")
-async def get_lobby(current_user: schemas.User = Depends(get_current_active_user),
+@router.get("/lobbies/{id}")
+async def get_lobby(lobby_id,
                     db: Session = Depends(get_db)):
-    pass
+    db_lobby = crud.get_lobby(db, lobby_id)
+    if db_lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    return db_lobby
 
 
-@router.post("/create_lobby")
-async def create_lobby(current_user: schemas.User = Depends(get_current_active_user),
-                       db: Session = Depends(get_db)):
-    pass
+@router.post("/create_lobby", response_model=schemas.Lobby)
+async def create_lobby(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    lobby = schemas.Lobby(name=f"{current_user.username}'s game", game_id=uuid.uuid4(), player_one_id=current_user.id,
+                          player_one_username=None, player_two_id=None, player_two_username=None, )
+    return crud.create_lobby(db=db, lobby=lobby, user=current_user)
 
 
 @router.post("/join_lobby")

@@ -45,18 +45,6 @@ class Lobby(Base):
     player_one_id = Column(Integer)
     player_two_id = Column(Integer)
     game_id = Column(String)
-    current_member_number = Column(Integer)
-    max_members = Column(Integer, default=8)
+    is_ranked = Column(Boolean, default=False)
     is_private = Column(Boolean, default=False)
-
-
-class LobbySpectators(Base):
-    __tablename__ = "lobby_spectators"
-
-    lobby_id = Column(Integer)
-    spectator_username = Column(Integer)
-    __table_args__ = (
-        PrimaryKeyConstraint(lobby_id, spectator_username),
-        {},
-    )
 

@@ -55,10 +55,12 @@ class Lobby(BaseModel):
     player_one_username: str
     player_two_id: int
     player_two_username: str
-    current_member_number: int
-    max_member_number: int
-    spectators: List[User]
     game_id: int
+    is_ranked: bool
+    is_private: bool
 
     class Config:
         orm_mode = True
+
+
+
