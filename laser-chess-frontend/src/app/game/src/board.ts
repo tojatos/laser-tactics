@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core"
 import { BoardInterface, GameState } from "../game.models"
 import { Cell } from "./cell"
-import { PieceType } from "./PieceType"
+import { PieceType } from "./enums"
 
 @Injectable()
 export class Board implements BoardInterface {

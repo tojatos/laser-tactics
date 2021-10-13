@@ -1,0 +1,23 @@
+export enum PieceType {
+  BEAM_SPLITTER = "BEAM_SPLITTER",
+  BLOCK = "BLOCK",
+  DIAGONAL_MIRROR = "DIAGONAL_MIRROR",
+  HYPER_CUBE = "HYPER_CUBE",
+  HYPER_SQUARE = "HYPER_SQUARE",
+  KING = "KING",
+  LASER = "LASER",
+  MIRROR = "MIRROR",
+  TRIANGULAR_MIRROR = "TRIANGULAR_MIRROR",
+  UNKNOWN = "UNKNOWN"
+}
+
+export enum PlayerType {
+  PLAYER_ONE = "PLAYER_ONE",
+  PLAYER_TWO = "PLAYER_TWO",
+  NONE = "NONE"
+}
+
+export enum PieceColors {
+  BLUE = "_BLUE",
+  RED = "_RED"
+}
