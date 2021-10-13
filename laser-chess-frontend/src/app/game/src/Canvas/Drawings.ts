@@ -70,7 +70,6 @@ export class Drawings {
     drawSingleCell(board: Board, cell: Cell){
       const imgSize = board.board_img.width
       const imageCellSize = Math.round(((imgSize / ROWS) + Number.EPSILON) * 100) / 100
-      console.log(imageCellSize)
       this.ctx.save()
       this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
       this.ctx.drawImage(board.board_img, cell.coordinates.x * imageCellSize, cell.coordinates.y * imageCellSize,

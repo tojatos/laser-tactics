@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Coordinates, GameState } from './game.models';
-import { MovePieceRequest } from './game.request.models'
+import { MovePieceRequest, RotatePieceRequest } from './game.request.models'
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,25 @@ export class GameService {
     }
 
     return this.http.post<void>('/api/v1/move_piece', movePieceRequest, { observe: 'response' }).pipe(
+      catchError(this.handleError)
+    ).toPromise()
+  }
+
+  async rotatePiece(gameId: string, at: Coordinates, angle: number){
+
+    const rotatePieceRequest: RotatePieceRequest = {
+      game_id: gameId,
+      rotate_at: at,
+      angle: angle
+    }
+
+    return this.http.post<void>('/api/v1/rotate_piece', rotatePieceRequest, { observe: 'response' }).pipe(
+      catchError(this.handleError)
+    ).toPromise()
+  }
+
+  async shootLaser(gameId: string){
+    return this.http.post<void>('/api/v1/shoot_laser', { game_id: gameId }, { observe: 'response' }).pipe(
       catchError(this.handleError)
     ).toPromise()
   }

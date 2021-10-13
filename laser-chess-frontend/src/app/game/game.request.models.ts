@@ -12,6 +12,12 @@ export interface MovePieceRequest {
   move_to: Coordinates
 }
 
+export interface RotatePieceRequest {
+  game_id: string,
+  rotate_at: Coordinates,
+  angle: number
+}
+
 export interface ShootRequest {
   game_id: string
 }

@@ -34,7 +34,8 @@ export class Board implements BoardInterface {
 
   getSelectableCellByCoordinates(x: number, y: number, owner: string): Cell | undefined {
     if(!this.selectedCell)
-      return this.cells.find(c => c.coordinates.x == x && c.coordinates.y == y && c.piece?.piece_owner == owner)
+      //return this.cells.find(c => c.coordinates.x == x && c.coordinates.y == y && c.piece?.piece_owner == owner)
+      return this.cells.find(c => c.coordinates.x == x && c.coordinates.y == y)
     return this.selectedCell.piece?.getPossibleMoves(this, this.selectedCell).find(c => c.coordinates.x == x && c.coordinates.y == y)
   }
 
@@ -50,6 +51,7 @@ export class Board implements BoardInterface {
   }
 
   getLaserCell(player: string){
+    //return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == player)
     return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == player)
   }
 

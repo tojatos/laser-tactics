@@ -53,6 +53,7 @@ export class Canvas {
 
       if(board.selectedCell){
         if(selectedCell){
+          this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
           await this.makeAMoveEvent(coor, board)
           board.movePiece(board.selectedCell, selectedCell)
         }
@@ -91,6 +92,7 @@ export class Canvas {
       const selectedCell = board.selectedCell
 
       if(selectedCell){
+        this.gameService.rotatePiece(this.gameId,selectedCell.coordinates, 90)
         this.interactable = false
         await this.animations.rotatePiece(board, selectedCell, 90)
         this.unselectCellEvent(board)
@@ -100,8 +102,8 @@ export class Canvas {
 
     async laserButtonPressed(board: Board){
       const laserCell = board.getLaserCell("1")
-      console.log(laserCell)
       if(laserCell){
+        this.gameService.shootLaser(this.gameId)
         this.interactable = false
         await this.animations.laserAnimation(board, laserCell?.coordinates, {x: laserCell.coordinates.x, y: laserCell.coordinates.y + 5})
         this.interactable = true
