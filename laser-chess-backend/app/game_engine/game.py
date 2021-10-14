@@ -206,60 +206,60 @@ class Game:
         self.game_state.game_events.append(LaserShotEvent(laser_path))
         self.game_state.turn_number += 1
 
-    def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> bool:
+    def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> Tuple[bool, Optional[str]]:
         moved_piece = self.game_state.board.cells[from_cell]
         target_piece = self.game_state.board.cells[to_cell]
         last_game_event = self.game_state.game_events[-1] if self.game_state.game_events else None
 
         if self.get_current_player() is not player:
-            return False
-
+            return False, "This is not your turn."
+        if moved_piece is None:
+            return False, "There is no piece to move."
+        if moved_piece.piece_type is PieceType.LASER:
+            return False, "You cannot move laser pieces."
+        if moved_piece.piece_owner != player:
+            return False, "This is not your piece."
         if {abs(from_cell[0] - to_cell[0]), abs(from_cell[1] - to_cell[1])} != {0, 1}:
-            return False
-
-        if moved_piece is None or moved_piece.piece_type is PieceType.LASER or moved_piece.piece_owner != player:
-            return False
-
+            return False, "Target cell is too far away from piece, or you are trying to move to the same cell you started from."
         if target_piece is not None:
             if target_piece.piece_type is PieceType.HYPER_SQUARE:
                 if self.get_last_turn_player() is player and isinstance(last_game_event, TeleportEvent):
                     if last_game_event.teleported_by == target_piece:
-                        return False
-
+                        return False, "You can use hyper square only once per turn."
             if moved_piece.piece_type is PieceType.HYPER_CUBE:
                 if self.get_last_turn_player() is player and isinstance(last_game_event, TeleportEvent):
                     if last_game_event.teleported_by == moved_piece:
-                        return False
-                return True
+                        return False, "You can use hypercube only once per turn."
+                return True, None
             if target_piece.piece_owner == player:
-                return False
+                return False, "You cannot take your own pieces."
             if moved_piece.piece_type not in [PieceType.KING, PieceType.BLOCK]:
-                return False
+                return False, "Only blocks and kings can take pieces."
             if self.get_last_turn_player() is player and isinstance(last_game_event, PieceTakenEvent):
                 if moved_piece.piece_type == last_game_event.piece_that_took_type == PieceType.KING:
-                    return False
+                    return False, "King can take only once per turn."
+        return True, None
 
-        return True
-
-    def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> bool:
+    def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> Tuple[bool, Optional[str]]:
         if self.get_current_player() is not player:
-            return False
+            return False, "This is not your turn."
 
-        if rotation not in [90, 180, 270]:
-            return False
+        allowed_rotations = [90, 180, 270]
+        if rotation not in allowed_rotations:
+            return False, f"You can only rotate in degrees: {allowed_rotations}."
 
         piece = self.game_state.board.cells[rotated_piece_at]
+        if piece is None:
+            return False, "There is no piece to rotate."
+        if piece.piece_owner != player:
+            return False, "You cannot rotate other player's pieces."
+        return True, None
 
-        if piece is None or piece.piece_owner != player:
-            return False
-
-        return True
-
-    def validate_laser_shoot(self, player: Player) -> bool:
+    def validate_laser_shoot(self, player: Player) -> Tuple[bool, Optional[str]]:
         if self.get_current_player() is not player:
-            return False
+            return False, "This is not your turn."
 
         if self.get_last_turn_player() is player and self.game_state.user_events[-1] == ShootLaserEvent():
-            return False
+            return False, "You can shoot only once per turn."
 
-        return True
+        return True, None
