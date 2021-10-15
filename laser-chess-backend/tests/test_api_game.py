@@ -185,6 +185,26 @@ def test_rotate_block_invalid_angle():
         assert response.status_code != 200
 
 
+def test_use_hyper_square():
+    request = MovePieceRequest(game_id, CellCoordinatesSerializable(4, 1), CellCoordinatesSerializable(4, 2))
+    response = post_data("/move_piece", tokens[0], json=asdict(request))
+    assert response.status_code == 200
+
+    request = MovePieceRequest(game_id, CellCoordinatesSerializable(4, 2), CellCoordinatesSerializable(4, 3))
+    response = post_data("/move_piece", tokens[0], json=asdict(request))
+    assert response.status_code == 200
+
+    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(4, 7), 90)
+    response = post_data("/rotate_piece", tokens[1], json=asdict(request))
+    assert response.status_code == 200
+    response = post_data("/rotate_piece", tokens[1], json=asdict(request))
+    assert response.status_code == 200
+
+    request = MovePieceRequest(game_id, CellCoordinatesSerializable(4, 3), CellCoordinatesSerializable(4, 4))
+    response = post_data("/move_piece", tokens[0], json=asdict(request))
+    assert response.status_code == 200
+
+
 def test_play_the_game():
     get_game_state_request = GetGameStateRequest(game_id)
 

@@ -226,6 +226,7 @@ class Game:
                 if self.get_last_turn_player() is player and isinstance(last_game_event, TeleportEvent):
                     if last_game_event.teleported_by == target_piece:
                         return False, "You can use hyper square only once per turn."
+                return True, None
             if moved_piece.piece_type is PieceType.HYPER_CUBE:
                 if self.get_last_turn_player() is player and isinstance(last_game_event, TeleportEvent):
                     if last_game_event.teleported_by == moved_piece:
