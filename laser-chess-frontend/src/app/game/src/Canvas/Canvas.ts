@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core"
+import { AuthService } from "src/app/auth/auth.service"
 import { Coordinates } from "../../game.models"
 import { GameService } from "../../game.service"
 import { Board } from "../board"
@@ -20,11 +21,10 @@ export class Canvas {
     hoveredCell: Cell | undefined
     gameId!: string
 
-    constructor(private gameService: GameService, public resources: Resources) {}
+    constructor(private gameService: GameService, public resources: Resources, private authService: AuthService) {}
 
     async initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
       await this.resources.loadAssets()
-      console.log("xD")
       this.block_size = size
       this.ctx = ctx
       this.ctx.canvas.width = COLS * this.block_size
@@ -50,7 +50,7 @@ export class Canvas {
         return
 
       const coor = this.getMousePos(event)
-      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, "1")
+      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, this.authService.getCurrentJwtInfo().sub)
 
       this.interactable = false
 

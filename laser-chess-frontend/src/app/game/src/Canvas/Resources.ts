@@ -54,9 +54,7 @@ export class Resources {
     const image = new Image()
 
     await this.loadImage(image, `assets/${name + color}.svg`)
-
     this.pieceImages.set(JSON.stringify(newImage), image)
-    //this.pieceImages.get(newImage)!.src = `assets/${name + color}.svg`
   }
 
   loadImage(image: HTMLImageElement, source: string){

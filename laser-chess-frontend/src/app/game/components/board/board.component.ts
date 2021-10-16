@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/auth/auth.service';
 import { GameService } from '../../game.service';
 import { Board } from '../../src/board';
 import { Canvas } from '../../src/Canvas/Canvas';
@@ -16,7 +17,7 @@ export class BoardComponent implements AfterViewInit {
   gameId: string | undefined
   currentSize: number | undefined
 
-  constructor(private gameService: GameService, private route: ActivatedRoute, private canvas: Canvas, private board: Board){}
+  constructor(private gameService: GameService, private authService: AuthService, private route: ActivatedRoute, private canvas: Canvas, private board: Board){}
 
   ngAfterViewInit() {
     const canvasContext = this.canvasHTML.nativeElement.getContext('2d')
@@ -34,13 +35,11 @@ export class BoardComponent implements AfterViewInit {
             this.currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
             this.board.initBoard(res.body, this.currentSize)
             this.canvas.initCanvas(canvasContext!, this.board, this.currentSize, params.id)
+            this.canvas.interactable = this.board.isMyTurn(this.authService.getCurrentJwtInfo().sub)
           }
         }
       )
     })
-
-    console.log(localStorage.getItem("board"))
-
   }
 
   @HostListener('window:resize', ['$event'])
@@ -62,8 +61,9 @@ export class BoardComponent implements AfterViewInit {
     if(this.gameId)
       this.gameService.getGameState(this.gameId).then(res => {
         if(res.body && this.currentSize){
-          this.board.fetchBoardState(res.body, this.currentSize)
+          this.board.initBoard(res.body, this.currentSize)
           this.canvas.drawings.drawGame(this.board.cells)
+          this.canvas.interactable = this.board.isMyTurn(this.authService.getCurrentJwtInfo().sub)
         }
       })
   }
