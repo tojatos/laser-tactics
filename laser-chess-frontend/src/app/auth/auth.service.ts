@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserToken } from '../app.models';
+import { tokenPayload, UserToken } from '../app.models';
+import { JwtHelperService } from '@auth0/angular-jwt';
 // import * as moment from "moment"
 
 @Injectable({
@@ -10,7 +11,7 @@ export class AuthService {
 
   idToken = 'access_token'
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {}
 
   async login(login:string, pass:string): Promise<UserToken> {
     let options = {
@@ -29,6 +30,15 @@ private setSession(authResult: UserToken) {
     localStorage.setItem(this.idToken, authResult.access_token)
     // localStorage.setItem("expires_at", JSON.stringify(expiresAt.valueOf()) )
     return authResult
+}
+
+parseJWT(jwt: string | undefined){
+  return this.jwtHelper.decodeToken<tokenPayload>(jwt)
+}
+
+getCurrentJwtInfo(){
+  const jwt = localStorage.getItem('access_token')
+  return this.parseJWT(jwt || undefined)
 }
 
 clearJWT(){
