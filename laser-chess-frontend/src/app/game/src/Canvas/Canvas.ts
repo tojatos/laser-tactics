@@ -22,16 +22,16 @@ export class Canvas {
     constructor(private gameService: GameService) {}
 
     initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
-        this.block_size = size
-        this.ctx = ctx
-        this.ctx.canvas.width = COLS * this.block_size
-        this.ctx.canvas.height = ROWS * this.block_size
-        this.drawings = new Drawings(ctx, this.block_size)
-        this.animations = new Animations(this.drawings)
-        this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
-        this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
-        this.drawings.initBoard(board)
-        this.gameId = gameId
+      this.block_size = size
+      this.ctx = ctx
+      this.ctx.canvas.width = COLS * this.block_size
+      this.ctx.canvas.height = ROWS * this.block_size
+      this.drawings = new Drawings(ctx, this.block_size)
+      this.animations = new Animations(this.drawings)
+      this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
+      this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
+      this.drawings.initBoard(board)
+      this.gameId = gameId
     }
 
     changeBlockSize(newSize: number, board: Board){
@@ -41,6 +41,7 @@ export class Canvas {
       this.ctx.canvas.height = ROWS * this.block_size
       this.drawings.drawGame(board, board.cells)
     }
+
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
       if(!this.interactable)

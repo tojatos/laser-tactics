@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core"
-import { BoardInterface, GameState } from "../game.models"
+import { BoardInterface, Coordinates, GameState } from "../game.models"
 import { Cell } from "./cell"
 import { PieceType } from "./enums"
 
@@ -10,13 +10,19 @@ export class Board implements BoardInterface {
   board_img_source: string
   selectedCell: Cell | undefined
   board_img = new Image()
+  boardStorageId: string
 
   constructor(){
     this.board_img_source = 'assets/board.svg'
+    this.boardStorageId = 'game'
   }
 
   initBoard(gameState: GameState, blockSize: number) {
-      gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, blockSize)) )
+    gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, blockSize)) )
+  }
+
+  fetchBoardState(gameState: GameState, blockSize: number){
+    gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, blockSize)) )
   }
 
   selectCell(cell: Cell | undefined) {
@@ -46,8 +52,18 @@ export class Board implements BoardInterface {
     }
   }
 
+  rotatePiece(at: Coordinates, angle: number){
+    const cell = this.cells.find(c => c.coordinates == at)
+    if(cell?.piece)
+      cell.piece.rotation_degree = angle
+  }
+
   changeCellCoordinates(newSize: number){
     this.cells.forEach(c => c.changeCanvasCoordinates(newSize))
+  }
+
+  saveBoardState(){
+    localStorage.setItem(this.boardStorageId, JSON.stringify(this))
   }
 
   getLaserCell(player: string){

@@ -12,10 +12,21 @@ export class GameService {
 
   constructor(private http: HttpClient) { }
 
-  getGameState(gameId: string): Promise<HttpResponse<GameState>> {
-    return this.http.post<GameState>('api/v1/get_game_state', {"game_id" : gameId }, {observe: 'response'}).pipe(
+  async getGameState(gameId: string): Promise<HttpResponse<GameState>> {
+    const res = await this.http.post<GameState>('api/v1/get_game_state', { "game_id": gameId }, { observe: 'response' }).pipe(
       catchError(this.handleError)
     ).toPromise()
+
+    localStorage.removeItem("board")
+    localStorage.removeItem("gameEventsSize")
+
+    if (res.body){
+      localStorage.setItem("board", JSON.stringify(res.body.board))
+      localStorage.setItem("gameEventsSize", JSON.stringify(res.body.game_events.length))
+    }
+
+    return res
+
   }
 
   async movePiece(gameId: string, from: Coordinates, to: Coordinates){
