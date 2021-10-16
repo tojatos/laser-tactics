@@ -6,6 +6,7 @@ import { Cell } from "../cell"
 import { COLS, ROWS } from "../constants"
 import { Animations } from "./Animations"
 import { Drawings } from "./Drawings"
+import { Resources } from "./Resources"
 
 @Injectable()
 export class Canvas {
@@ -19,18 +20,20 @@ export class Canvas {
     hoveredCell: Cell | undefined
     gameId!: string
 
-    constructor(private gameService: GameService) {}
+    constructor(private gameService: GameService, public resources: Resources) {}
 
-    initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
+    async initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
+      await this.resources.loadAssets()
+      console.log("xD")
       this.block_size = size
       this.ctx = ctx
       this.ctx.canvas.width = COLS * this.block_size
       this.ctx.canvas.height = ROWS * this.block_size
-      this.drawings = new Drawings(ctx, this.block_size)
+      this.drawings = new Drawings(ctx, this.block_size, this.resources)
       this.animations = new Animations(this.drawings)
       this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
-      this.drawings.initBoard(board)
+      this.drawings.drawGame(board.cells)
       this.gameId = gameId
     }
 
@@ -39,9 +42,8 @@ export class Canvas {
       this.drawings.blockSize = this.block_size
       this.ctx.canvas.width = COLS * this.block_size
       this.ctx.canvas.height = ROWS * this.block_size
-      this.drawings.drawGame(board, board.cells)
+      this.drawings.drawGame(board.cells)
     }
-
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
       if(!this.interactable)
@@ -75,12 +77,12 @@ export class Canvas {
         const hoveredOver = board.getCellByCoordinates(coor.x, coor.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
-            this.drawings.drawSingleCell(board, hoveredOver)
+            this.drawings.drawSingleCell(hoveredOver, this.resources.boardImage)
             this.drawings.highlightCell(hoveredOver, this.highlightColor)
           }
           else {
             if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
-              this.drawings.drawSingleCell(board, this.hoveredCell)
+              this.drawings.drawSingleCell(this.hoveredCell, this.resources.boardImage)
               this.drawings.showPossibleMove(this.hoveredCell, this.highlightColor)
             }
           }
@@ -119,7 +121,7 @@ export class Canvas {
 
     private unselectCellEvent(board: Board){
       board.unselectCell()
-      this.drawings.drawGame(board, board.cells)
+      this.drawings.drawGame(board.cells)
     }
 
     private makeAMoveEvent(coor: Coordinates, board: Board): Promise<void>{

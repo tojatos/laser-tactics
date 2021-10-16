@@ -6,9 +6,7 @@ import { PieceColors, PieceType, PlayerType } from "./enums"
 export class Piece implements PieceInterface {
   piece_type: string
   piece_owner: string
-  piece_color: string
   rotation_degree: number
-  piece_img = new Image()
   move_made = false
   currentCoordinates: Coordinates
 
@@ -17,7 +15,6 @@ export class Piece implements PieceInterface {
     this.rotation_degree = rotation_degree
     if(mirror_perspective) this.rotation_degree + 180
     this.piece_type = pieceType in PieceType ? (<any>PieceType)[pieceType] : PieceType.UNKNOWN
-    this.piece_color = this.piece_type == PieceType.UNKNOWN ? "" : owner == PlayerType.PLAYER_ONE ? PieceColors.RED : owner == PlayerType.PLAYER_TWO ? PieceColors.BLUE : ""
     this.currentCoordinates = coordinates
   }
 

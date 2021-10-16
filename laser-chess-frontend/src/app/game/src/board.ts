@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core"
 import { BoardInterface, Coordinates, GameState } from "../game.models"
+import { Resources } from "./Canvas/Resources"
 import { Cell } from "./cell"
 import { PieceType } from "./enums"
 
@@ -7,13 +8,10 @@ import { PieceType } from "./enums"
 export class Board implements BoardInterface {
 
   cells: Cell[] = []
-  board_img_source: string
   selectedCell: Cell | undefined
-  board_img = new Image()
   boardStorageId: string
 
   constructor(){
-    this.board_img_source = 'assets/board.svg'
     this.boardStorageId = 'game'
   }
 

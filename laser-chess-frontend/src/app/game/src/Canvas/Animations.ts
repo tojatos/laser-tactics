@@ -36,7 +36,7 @@ export class Animations {
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
-              this.drawings.drawGame(board, validCellsArray)
+              this.drawings.drawGame(validCellsArray)
               this.changePosition(piece, originCooridantes, destinationCoordinates, redrawDistance, fun)
               this.drawings.drawPiece(piece)
               if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
@@ -63,7 +63,7 @@ export class Animations {
 
       return new Promise<void>((resolve) => {
         const interval = setInterval(() => {
-            this.drawings.drawGame(board, validCellsArray)
+            this.drawings.drawGame(validCellsArray)
             piece.rotation_degree += degreesPerFrame
             this.drawings.drawPiece(piece)
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
@@ -103,7 +103,7 @@ export class Animations {
               x: fromCell.canvasCoordinates.x - laserIncrement * xModifier,
               y: fromCell.canvasCoordinates.y - laserIncrement * yModifier
             }
-            this.drawings.drawGame(board, board.cells)
+            this.drawings.drawGame(board.cells)
             this.drawings.drawLaserLine(fromCell.canvasCoordinates, currentCoordinates)
             laserIncrement += laserIncrementPerFrame
             if(this.inVicinity(toCell.canvasCoordinates, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){

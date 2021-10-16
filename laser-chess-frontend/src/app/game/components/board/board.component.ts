@@ -63,7 +63,7 @@ export class BoardComponent implements AfterViewInit {
       this.gameService.getGameState(this.gameId).then(res => {
         if(res.body && this.currentSize){
           this.board.fetchBoardState(res.body, this.currentSize)
-          this.canvas.drawings.drawGame(this.board, this.board.cells)
+          this.canvas.drawings.drawGame(this.board.cells)
         }
       })
   }
