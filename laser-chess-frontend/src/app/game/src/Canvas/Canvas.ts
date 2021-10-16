@@ -22,16 +22,16 @@ export class Canvas {
     constructor(private gameService: GameService) {}
 
     initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
-        this.block_size = size
-        this.ctx = ctx
-        this.ctx.canvas.width = COLS * this.block_size
-        this.ctx.canvas.height = ROWS * this.block_size
-        this.drawings = new Drawings(ctx, this.block_size)
-        this.animations = new Animations(this.drawings)
-        this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
-        this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
-        this.drawings.initBoard(board)
-        this.gameId = gameId
+      this.block_size = size
+      this.ctx = ctx
+      this.ctx.canvas.width = COLS * this.block_size
+      this.ctx.canvas.height = ROWS * this.block_size
+      this.drawings = new Drawings(ctx, this.block_size)
+      this.animations = new Animations(this.drawings)
+      this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
+      this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
+      this.drawings.initBoard(board)
+      this.gameId = gameId
     }
 
     changeBlockSize(newSize: number, board: Board){
@@ -41,6 +41,7 @@ export class Canvas {
       this.ctx.canvas.height = ROWS * this.block_size
       this.drawings.drawGame(board, board.cells)
     }
+
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
       if(!this.interactable)
@@ -53,6 +54,7 @@ export class Canvas {
 
       if(board.selectedCell){
         if(selectedCell){
+          this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
           await this.makeAMoveEvent(coor, board)
           board.movePiece(board.selectedCell, selectedCell)
         }
@@ -91,6 +93,7 @@ export class Canvas {
       const selectedCell = board.selectedCell
 
       if(selectedCell){
+        this.gameService.rotatePiece(this.gameId,selectedCell.coordinates, 90)
         this.interactable = false
         await this.animations.rotatePiece(board, selectedCell, 90)
         this.unselectCellEvent(board)
@@ -100,8 +103,8 @@ export class Canvas {
 
     async laserButtonPressed(board: Board){
       const laserCell = board.getLaserCell("1")
-      console.log(laserCell)
       if(laserCell){
+        this.gameService.shootLaser(this.gameId)
         this.interactable = false
         await this.animations.laserAnimation(board, laserCell?.coordinates, {x: laserCell.coordinates.x, y: laserCell.coordinates.y + 5})
         this.interactable = true

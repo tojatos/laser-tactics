@@ -2,6 +2,7 @@ import { Coordinates } from "../../game.models"
 import { Board } from "../board"
 import { Cell } from "../cell"
 import { PIECE_SIZE_SCALE, ROWS } from "../constants"
+import { PieceColors, PlayerType } from "../enums"
 import { Piece } from "../piece"
 
 export class Drawings {
@@ -30,7 +31,7 @@ export class Drawings {
               if(cell.piece)
                 this.drawPiece(cell.piece)
             }
-            cell.piece.piece_img.src = `assets/${cell.piece.piece_type + (cell.piece.piece_owner == "1" ? "-red" : cell.piece.piece_owner == "2" ? "-blue" : "")}.svg`
+            cell.piece.piece_img.src = `assets/${cell.piece.piece_type + cell.piece.piece_color}.svg`
         }
     }
 
@@ -70,7 +71,6 @@ export class Drawings {
     drawSingleCell(board: Board, cell: Cell){
       const imgSize = board.board_img.width
       const imageCellSize = Math.round(((imgSize / ROWS) + Number.EPSILON) * 100) / 100
-      console.log(imageCellSize)
       this.ctx.save()
       this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
       this.ctx.drawImage(board.board_img, cell.coordinates.x * imageCellSize, cell.coordinates.y * imageCellSize,

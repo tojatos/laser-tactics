@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { GameService } from '../../game.service';
 import { Board } from '../../src/board';
 import { Canvas } from '../../src/Canvas/Canvas';
@@ -12,7 +13,10 @@ export class BoardComponent implements AfterViewInit {
   @ViewChild('canvas', { static: true })
   canvasHTML!: ElementRef<HTMLCanvasElement>
 
-  constructor(private gameService: GameService, private canvas: Canvas, private board: Board){}
+  gameId: string | undefined
+  currentSize: number | undefined
+
+  constructor(private gameService: GameService, private route: ActivatedRoute, private canvas: Canvas, private board: Board){}
 
   ngAfterViewInit() {
     const canvasContext = this.canvasHTML.nativeElement.getContext('2d')
@@ -21,22 +25,29 @@ export class BoardComponent implements AfterViewInit {
       return
     }
 
-    this.gameService.getGameState("string").then(
-      res => {
-        if(res.body) {
-          const blockSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
-          this.board.initBoard(res.body, blockSize)
-          this.canvas.initCanvas(canvasContext!, this.board, blockSize, "string")
+    this.route.params.subscribe(params => {
+
+      this.gameId = params.id
+      this.gameService.getGameState(params.id).then(
+        res => {
+          if(res.body) {
+            this.currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+            this.board.initBoard(res.body, this.currentSize)
+            this.canvas.initCanvas(canvasContext!, this.board, this.currentSize, params.id)
+          }
         }
-      }
-    )
+      )
+    })
+
+    console.log(localStorage.getItem("board"))
+
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
-    const newSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
-    this.board.changeCellCoordinates(newSize)
-    this.canvas.changeBlockSize(newSize, this.board)
+    this.currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+    this.board.changeCellCoordinates(this.currentSize)
+    this.canvas.changeBlockSize(this.currentSize, this.board)
   }
 
   onClick(){
@@ -45,6 +56,16 @@ export class BoardComponent implements AfterViewInit {
 
   laserShoot(){
     this.canvas.laserButtonPressed(this.board)
+  }
+
+  refreshGameState(){
+    if(this.gameId)
+      this.gameService.getGameState(this.gameId).then(res => {
+        if(res.body && this.currentSize){
+          this.board.fetchBoardState(res.body, this.currentSize)
+          this.canvas.drawings.drawGame(this.board, this.board.cells)
+        }
+      })
   }
 
 

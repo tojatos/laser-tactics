@@ -7,7 +7,7 @@
    viewBox="0 0 200 200"
    version="1.1"
    id="svg5"
-   sodipodi:docname="triangle-blue.svg"
+   sodipodi:docname="TRIANGULAR_MIRROR_BLUE.svg"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="2"
-     inkscape:cx="657.75"
-     inkscape:cy="248.75"
+     inkscape:zoom="1"
+     inkscape:cx="751"
+     inkscape:cy="327.5"
      inkscape:window-width="2560"
      inkscape:window-height="1377"
      inkscape:window-x="-8"
@@ -40,13 +40,11 @@
      id="layer1">
     <path
        id="rect277"
-       style="fill:#0000ff;fill-rule:evenodd;stroke-width:5.39743"
-       d="M 757.06055 67.150391 L 68.78125 755.42773 L 757.06055 755.42773 L 757.06055 67.150391 z "
-       transform="scale(0.26458333)" />
+       style="fill:#0000ff;fill-rule:evenodd;stroke-width:1.42807"
+       d="M 182.04924,200.09181 -0.0574502,17.98459 l -7.1e-6,182.10721 z" />
     <path
        id="path5449"
-       style="fill:#b3b3b3;fill-rule:evenodd;stroke-width:5.39743"
-       d="M 757.06055 -0.91210938 L 0.4609375 755.42773 L 68.78125 755.42773 L 757.06055 67.150391 L 757.06055 -0.91210938 z "
-       transform="scale(0.26458333)" />
+       style="fill:#b3b3b3;fill-rule:evenodd;stroke-width:1.42807"
+       d="M 200.05746,200.09182 -0.05745485,-0.0918195 -0.05745875,17.984598 182.04924,200.09181 Z" />
   </g>
 </svg>

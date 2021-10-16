@@ -11,7 +11,7 @@ const routes: Routes = [
     component: LoginComponent
   },
   {
-    path: 'game',
+    path: 'game/:id',
     component: GameComponent
   },
   {
