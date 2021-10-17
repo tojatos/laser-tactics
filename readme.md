@@ -1,3 +1,5 @@
+![Python tests status](https://github.com/tojatos/ZPI/actions/workflows/ci.yml/badge.svg)
+
 # Laser tactics
 We are implementing a game inspired by laser chess (http://www.public.asu.edu/~checkma/laserchess/).
 Our target is to create a web version of this game with similiar functionality to [Lichess](http://lichess.org).
