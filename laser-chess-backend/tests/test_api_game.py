@@ -48,7 +48,7 @@ def test_start_game(tu):
 
     game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
     game_state = game_state_serializable.to_normal()
-    assert game_state.is_started is True
+    assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 1
 
 
@@ -173,7 +173,7 @@ def test_play_the_game(tu):
 
     game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
     game_state = game_state_serializable.to_normal()
-    assert game_state.is_started is True
+    assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 1
 
     request = MovePieceRequest(game_id, CellCoordinatesSerializable(0, 1), CellCoordinatesSerializable(0, 2))
@@ -188,7 +188,7 @@ def test_play_the_game(tu):
 
     game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
     game_state = game_state_serializable.to_normal()
-    assert game_state.is_started is True
+    assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 3
     assert game_state.board.cells[(0, 1)] is None
     assert game_state.board.cells[(0, 2)] is not None

@@ -55,7 +55,7 @@ class Game:
         return Player.PLAYER_ONE if self.game_state.turn_number % 4 in [1, 2] else Player.PLAYER_TWO
 
     def start_game(self):
-        self.game_state.is_started = True
+        self.game_state.game_phase = GamePhase.STARTED
         self.game_state.turn_number = 1
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):

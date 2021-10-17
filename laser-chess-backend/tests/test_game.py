@@ -11,15 +11,15 @@ def get_initial_test_game_state() -> GameState:
 def get_test_game_state(board: Board) -> GameState:
     player_one_id = "player1"
     player_two_id = "player2"
-    return GameState(player_one_id, player_two_id, board, False, 0, [], [])
+    return GameState(player_one_id, player_two_id, board, GamePhase.NOT_STARTED, 0, [], [])
 
 
 def test_start_game():
     initial_state = get_initial_test_game_state()
     game = Game(initial_state)
-    assert game.game_state.is_started is False
+    assert game.game_state.game_phase is GamePhase.NOT_STARTED
     game.start_game()
-    assert game.game_state.is_started is True
+    assert game.game_state.game_phase is GamePhase.STARTED
 
 
 def test_move_piece():
