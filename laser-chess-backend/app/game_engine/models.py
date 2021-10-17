@@ -45,6 +45,15 @@ class Player(str, AutoNameEnum):
     NONE = auto()
 
 
+class EventType(str, AutoNameEnum):
+    PIECE_ROTATED_EVENT = auto()
+    PIECE_MOVED_EVENT = auto()
+    TELEPORT_EVENT = auto()
+    LASER_SHOT_EVENT = auto()
+    PIECE_TAKEN_EVENT = auto()
+    SHOOT_LASER_EVENT = auto()
+
+
 @dataclass
 class Piece:
     piece_type: PieceType
@@ -83,6 +92,7 @@ class Board:
 @dataclass
 class ShootLaserEvent:
     laser_shot: bool = True
+    event_type: str = EventType.SHOOT_LASER_EVENT
 
     def to_serializable(self):
         return self
@@ -94,6 +104,7 @@ class ShootLaserEvent:
 @dataclass
 class LaserShotEvent:
     laser_path: List[Tuple[int, CellCoordinates]]
+    event_type: str = EventType.LASER_SHOT_EVENT
 
     def to_serializable(self):
         return LaserShotEventSerializable(
@@ -110,6 +121,7 @@ class LaserShotEvent:
 class PieceMovedEvent:
     moved_from: CellCoordinates
     moved_to: CellCoordinates
+    event_type: str = EventType.PIECE_MOVED_EVENT
 
     def to_serializable(self):
         return PieceMovedEventSerializable(
@@ -123,6 +135,7 @@ class PieceTakenEvent:
     taken_on: CellCoordinates
     piece_that_took_type: PieceType
     piece_taken_type: PieceType
+    event_type: str = EventType.PIECE_TAKEN_EVENT
 
     def to_serializable(self):
         return PieceTakenEventSerializable(
@@ -136,6 +149,7 @@ class PieceTakenEvent:
 class PieceRotatedEvent:
     rotated_piece_at: CellCoordinates
     rotation: int
+    event_type: str = EventType.PIECE_ROTATED_EVENT
 
     def to_serializable(self):
         return PieceRotatedEventSerializable(
@@ -149,6 +163,7 @@ class TeleportEvent:
     teleported_from: CellCoordinates
     teleported_to: CellCoordinates
     teleported_by: Piece
+    event_type: str = EventType.TELEPORT_EVENT
 
     def to_serializable(self):
         return TeleportEventSerializable(
@@ -162,6 +177,7 @@ class TeleportEvent:
 class PieceMovedEventSerializable:
     moved_from: CellCoordinatesSerializable
     moved_to: CellCoordinatesSerializable
+    event_type: str = EventType.PIECE_MOVED_EVENT
 
     def to_normal(self) -> PieceMovedEvent:
         return PieceMovedEvent(tuple(self.moved_from), tuple(self.moved_to))
@@ -172,6 +188,7 @@ class PieceTakenEventSerializable:
     taken_on: CellCoordinatesSerializable
     piece_that_took_type: PieceType
     piece_taken_type: PieceType
+    event_type: str = EventType.PIECE_TAKEN_EVENT
 
     def to_normal(self) -> PieceTakenEvent:
         return PieceTakenEvent(tuple(self.taken_on), self.piece_that_took_type, self.piece_taken_type)
@@ -181,6 +198,7 @@ class PieceTakenEventSerializable:
 class PieceRotatedEventSerializable:
     rotated_piece_at: CellCoordinatesSerializable
     rotation: int
+    event_type: str = EventType.PIECE_ROTATED_EVENT
 
     def to_normal(self) -> PieceRotatedEvent:
         return PieceRotatedEvent(tuple(self.rotated_piece_at), self.rotation)
@@ -191,6 +209,7 @@ class TeleportEventSerializable:
     teleported_from: CellCoordinatesSerializable
     teleported_to: CellCoordinatesSerializable
     teleported_by: Piece
+    event_type: str = EventType.TELEPORT_EVENT
 
     def to_normal(self) -> TeleportEvent:
         return TeleportEvent(tuple(self.teleported_from), tuple(self.teleported_to), self.teleported_by)
@@ -200,11 +219,13 @@ class TeleportEventSerializable:
 class LaserShotEventSerializableEntity:
     time: int
     coordinates: CellCoordinatesSerializable
+    event_type: str = EventType.LASER_SHOT_EVENT
 
 
 @dataclass
 class LaserShotEventSerializable:
     laser_path: List[LaserShotEventSerializableEntity]
+    event_type: str = EventType.LASER_SHOT_EVENT
 
     def to_normal(self) -> LaserShotEvent:
         return LaserShotEvent([(x.time, tuple(x.coordinates)) for x in self.laser_path])
