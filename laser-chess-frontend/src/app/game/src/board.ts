@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core"
-import { AuthService } from "src/app/auth/auth.service"
-import { BoardInterface, Coordinates, GameState } from "../game.models"
+import { BoardInterface, Coordinates, GameEvent, GameState, PieceMovedEvent } from "../game.models"
 import { Cell } from "./cell"
 import { PieceType, PlayerType } from "./enums"
 
@@ -9,14 +8,11 @@ export class Board implements BoardInterface {
 
   cells: Cell[] = []
   selectedCell: Cell | undefined
-  boardStorageId: string
   currentTurn = 0
   playerOne: string | undefined
   playerTwo: string | undefined
 
-  constructor(){
-    this.boardStorageId = 'game'
-  }
+  constructor(){}
 
   initBoard(gameState: GameState, blockSize: number) {
     this.cells = []
@@ -62,13 +58,19 @@ export class Board implements BoardInterface {
     this.cells.forEach(c => c.changeCanvasCoordinates(newSize))
   }
 
-  saveBoardState(){
-    localStorage.setItem(this.boardStorageId, JSON.stringify(this))
-  }
-
   getLaserCell(player: string){
     return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == player)
   }
+
+  executeEvent(gameEvent: GameEvent){
+    if(this.isMove(gameEvent))
+      this.movePiece(this.getCellByCoordinates(gameEvent.moved_from.x, gameEvent.moved_from.y)!, this.getCellByCoordinates(gameEvent.moved_to.x, gameEvent.moved_to.y)!)
+  }
+
+  isMove(object: any): object is PieceMovedEvent {
+  return 'moved_from' in object;
+  }
+
 
   isMyTurn(player: string | null) {
     const turnOfPlayer = Math.round(this.currentTurn / 2) % 2 == 0 ? this.playerTwo : this.playerOne

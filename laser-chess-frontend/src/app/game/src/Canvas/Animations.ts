@@ -36,7 +36,7 @@ export class Animations {
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
-              this.drawings.drawGame(validCellsArray)
+              this.drawings.drawGame(validCellsArray) // change on draw two single cells
               this.changePosition(piece, originCooridantes, destinationCoordinates, redrawDistance, fun)
               this.drawings.drawPiece(piece)
               if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
@@ -49,10 +49,10 @@ export class Animations {
 
     }
 
-    async rotatePiece(board: Board, atCell: Cell, byDegrees: number): Promise<void>{
+    async rotatePiece(board: Board, atCell: Cell | undefined, byDegrees: number): Promise<void>{
       const piece = atCell?.piece
 
-      if(!piece)
+      if(!piece || !atCell)
         return
 
       const speed = 20

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
-import { Coordinates } from "../../game.models"
+import { Coordinates, GameEvent, LaserShotEvent, PieceMovedEvent, PieceRotatedEvent, TakeEvent, TeleportEvent } from "../../game.models"
 import { GameService } from "../../game.service"
 import { Board } from "../board"
 import { Cell } from "../cell"
@@ -45,6 +45,21 @@ export class Canvas {
       this.drawings.drawGame(board.cells)
     }
 
+    executeAnimation(board: Board, gameEvent: GameEvent){
+        if(this.isMove(gameEvent))
+          return this.animations.movePiece(board, gameEvent.moved_from, gameEvent.moved_to)
+        return undefined
+        // switch(e.kind){
+        //   case "rotation" : await this.animations.rotatePiece(board, board.getCellByCoordinates(e.rotated_piece_at.x, e.rotated_piece_at.y), e.rotation); break
+        //   case "move" : await this.animations.movePiece(board, e.moved_from, e.moved_to); break
+        // }
+    }
+
+    isMove(object: any): object is PieceMovedEvent {
+      return 'moved_from' in object;
+   }
+
+
     private async canvasOnclick(event: MouseEvent, board: Board) {
       if(!this.interactable)
         return
@@ -58,6 +73,7 @@ export class Canvas {
         if(selectedCell){
           this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
           await this.makeAMoveEvent(coor, board)
+          this.gameService.increaseAnimationEvents()
           board.movePiece(board.selectedCell, selectedCell)
         }
         this.unselectCellEvent(board)
