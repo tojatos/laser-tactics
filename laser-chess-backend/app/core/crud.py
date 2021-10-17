@@ -68,10 +68,7 @@ def get_lobby(db: Session, lobby_id: int):
 
 
 def join_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
-    if lobby.player_one_username is None:
-        lobby.player_one_username = user.username
-    elif lobby.player_two_username is None:
-        lobby.player_two_username = user.username
+    lobby.player_two_username = user.username
     db.commit()
     db.refresh(lobby)
     return lobby
@@ -79,7 +76,8 @@ def join_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
 
 def leave_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
     if lobby.player_one_username == user.username:
-        lobby.player_one_username = None
+        lobby.player_one_username = lobby.player_two_username
+        lobby.player_two_username = None
     elif lobby.player_two_username == user.username:
         lobby.player_two_username = None
     if lobby.player_two_username is None and lobby.player_one_username is None:
@@ -89,6 +87,13 @@ def leave_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
     db.commit()
     db.refresh(lobby)
     return lobby
+
+
+def update_lobby(db: Session, lobby: schemas.Lobby):
+    db_lobby = lobby
+    db.commit()
+    db.refresh(db_lobby)
+    return db_lobby
 
 
 def get_game_state_table(db: Session, game_id: str):
