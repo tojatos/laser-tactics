@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core"
+import { AuthService } from "src/app/auth/auth.service"
 import { BoardInterface, Coordinates, GameEvent, GameState, PieceMovedEvent } from "../game.models"
 import { Cell } from "./cell"
-import { PieceType, PlayerType } from "./enums"
+import { GameEvents, PieceType, PlayerType } from "./enums"
 
 @Injectable()
 export class Board implements BoardInterface {
@@ -12,7 +13,7 @@ export class Board implements BoardInterface {
   playerOne: string | undefined
   playerTwo: string | undefined
 
-  constructor(){}
+  constructor(private authService: AuthService){}
 
   initBoard(gameState: GameState, blockSize: number) {
     this.cells = []
@@ -41,8 +42,10 @@ export class Board implements BoardInterface {
     return this.selectedCell.piece?.getPossibleMoves(this, this.selectedCell).find(c => c.coordinates.x == x && c.coordinates.y == y)
   }
 
-  movePiece(originCell: Cell, destinationCell: Cell){
-    if(originCell.piece){
+  movePiece(origin: Coordinates, destination: Coordinates){
+    const originCell = this.getCellByCoordinates(origin.x, origin.y)
+    const destinationCell = this.getCellByCoordinates(destination.x, destination.y)
+    if(originCell && destinationCell && originCell.piece){
       destinationCell.acceptNewPiece(originCell.piece)
       originCell.piece = null
     }
@@ -54,6 +57,7 @@ export class Board implements BoardInterface {
       cell.piece.rotation_degree = angle
   }
 
+
   changeCellCoordinates(newSize: number){
     this.cells.forEach(c => c.changeCanvasCoordinates(newSize))
   }
@@ -63,16 +67,15 @@ export class Board implements BoardInterface {
   }
 
   executeEvent(gameEvent: GameEvent){
-    if(this.isMove(gameEvent))
-      this.movePiece(this.getCellByCoordinates(gameEvent.moved_from.x, gameEvent.moved_from.y)!, this.getCellByCoordinates(gameEvent.moved_to.x, gameEvent.moved_to.y)!)
+    switch(gameEvent.event_type){
+      case GameEvents.PIECE_ROTATED_EVENT : this.rotatePiece(gameEvent.rotated_piece_at, gameEvent.rotation); break
+      case GameEvents.PIECE_MOVED_EVENT : this.movePiece(gameEvent.moved_from, gameEvent.moved_to); break
+      case GameEvents.TELEPORT_EVENT : this.movePiece(gameEvent.teleported_from, gameEvent.teleported_to); break
+    }
   }
 
-  isMove(object: any): object is PieceMovedEvent {
-  return 'moved_from' in object;
-  }
-
-
-  isMyTurn(player: string | null) {
+  isMyTurn() {
+    const player = this.authService.getCurrentJwtInfo().sub
     const turnOfPlayer = Math.round(this.currentTurn / 2) % 2 == 0 ? this.playerTwo : this.playerOne
     return player != null && turnOfPlayer != null && player == turnOfPlayer
   }

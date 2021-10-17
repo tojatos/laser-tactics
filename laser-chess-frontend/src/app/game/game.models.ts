@@ -1,13 +1,13 @@
-import { PieceType } from "./src/enums";
+import { GameEvents, PieceType } from "./src/enums";
 
 export type GameEvent = PieceRotatedEvent | PieceMovedEvent | TeleportEvent | LaserShotEvent | TakeEvent
 
 export interface GameState {
-  player_one_id: string,
-  player_two_id: string,
-  board: BoardInterface,
-  is_started: boolean,
-  turn_number: number,
+  player_one_id: string
+  player_two_id: string
+  board: BoardInterface
+  is_started: boolean
+  turn_number: number
   game_events: GameEvent[]
 }
 
@@ -16,48 +16,48 @@ export interface BoardInterface {
 }
 
 export interface CellInterface {
-  coordinates: Coordinates,
+  coordinates: Coordinates
   piece: PieceInterface | null
 }
 
 export interface Coordinates {
-  x: number,
+  x: number
   y: number
 }
 
 export interface PieceInterface {
-  piece_type: string,
-  piece_owner: string,
+  piece_type: PieceType
+  piece_owner: string
   rotation_degree: number
 }
 
 export interface PieceRotatedEvent {
-  kind: "rotation"
+  event_type: GameEvents.PIECE_ROTATED_EVENT
   rotated_piece_at: Coordinates
   rotation: number
 }
 
 export interface PieceMovedEvent {
-  kind: "move"
+  event_type: GameEvents.PIECE_MOVED_EVENT
   moved_from: Coordinates
   moved_to: Coordinates
 }
 
 export interface TeleportEvent {
-  kind: "teleportation"
+  event_type: GameEvents.TELEPORT_EVENT
   teleported_from: Coordinates
   teleported_to: Coordinates
 }
 
 export interface LaserShotEvent {
-  kind: "laser"
+  event_type: GameEvents.LASER_SHOT_EVENT
   laser_path: LaserShotEventEntity[]
 }
 
 export interface TakeEvent {
-  kind: "take"
-  taken_on: Coordinates,
-  piece_that_took_type: PieceType,
+  event_type: GameEvents.LASER_SHOT_EVENT
+  taken_on: Coordinates
+  piece_that_took_type: PieceType
   piece_taken_type: PieceType
 }
 

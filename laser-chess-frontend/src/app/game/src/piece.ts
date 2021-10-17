@@ -1,10 +1,10 @@
 import { Coordinates, PieceInterface } from "../game.models"
 import { Board } from "./board"
 import { Cell } from "./cell"
-import { PieceColors, PieceType, PlayerType } from "./enums"
+import { PieceType } from "./enums"
 
 export class Piece implements PieceInterface {
-  piece_type: string
+  piece_type: PieceType
   piece_owner: string
   rotation_degree: number
   move_made = false

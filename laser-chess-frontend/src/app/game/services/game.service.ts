@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { BoardInterface, Coordinates, GameState } from './game.models';
-import { MovePieceRequest, RotatePieceRequest } from './game.request.models'
+import { BoardInterface, Coordinates, GameState } from '../game.models';
+import { MovePieceRequest, RotatePieceRequest } from '../game.request.models'
 
 @Injectable({
   providedIn: 'root'
@@ -55,6 +55,12 @@ export class GameService {
     ).toPromise()
   }
 
+  async shootLaser(gameId: string){
+    return this.http.post<void>('/api/v1/shoot_laser', { game_id: gameId }, { observe: 'response' }).pipe(
+      catchError(this.handleError)
+    ).toPromise()
+  }
+
   increaseAnimationEvents(){
     const num = parseInt(localStorage.getItem("animationEvents") || "0") + 1
     localStorage.setItem("animationEvents", num.toString())
@@ -81,13 +87,6 @@ export class GameService {
     return undefined
 
   }
-
-  async shootLaser(gameId: string){
-    return this.http.post<void>('/api/v1/shoot_laser', { game_id: gameId }, { observe: 'response' }).pipe(
-      catchError(this.handleError)
-    ).toPromise()
-  }
-
 
   private handleError(error: HttpErrorResponse) {
     if (error.status === 0) {

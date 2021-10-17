@@ -1,10 +1,12 @@
 import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
-import { Coordinates, GameEvent, LaserShotEvent, PieceMovedEvent, PieceRotatedEvent, TakeEvent, TeleportEvent } from "../../game.models"
-import { GameService } from "../../game.service"
+import { EventEmitterService } from "../../services/event-emitter.service"
+import { Coordinates, GameEvent } from "../../game.models"
+import { GameService } from "../../services/game.service"
 import { Board } from "../board"
 import { Cell } from "../cell"
 import { COLS, ROWS } from "../constants"
+import { GameEvents } from "../enums"
 import { Animations } from "./Animations"
 import { Drawings } from "./Drawings"
 import { Resources } from "./Resources"
@@ -21,7 +23,7 @@ export class Canvas {
     hoveredCell: Cell | undefined
     gameId!: string
 
-    constructor(private gameService: GameService, public resources: Resources, private authService: AuthService) {}
+    constructor(private gameService: GameService, public resources: Resources, private authService: AuthService, private eventEmitter: EventEmitterService) {}
 
     async initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
       await this.resources.loadAssets()
@@ -46,18 +48,13 @@ export class Canvas {
     }
 
     executeAnimation(board: Board, gameEvent: GameEvent){
-        if(this.isMove(gameEvent))
-          return this.animations.movePiece(board, gameEvent.moved_from, gameEvent.moved_to)
-        return undefined
-        // switch(e.kind){
-        //   case "rotation" : await this.animations.rotatePiece(board, board.getCellByCoordinates(e.rotated_piece_at.x, e.rotated_piece_at.y), e.rotation); break
-        //   case "move" : await this.animations.movePiece(board, e.moved_from, e.moved_to); break
-        // }
+      switch(gameEvent.event_type){
+        case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(board, board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y), gameEvent.rotation)
+        case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(board, gameEvent.moved_from, gameEvent.moved_to)
+        case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(board, gameEvent.teleported_from, gameEvent.teleported_to)
+        default: return undefined
+      }
     }
-
-    isMove(object: any): object is PieceMovedEvent {
-      return 'moved_from' in object;
-   }
 
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
@@ -74,7 +71,8 @@ export class Canvas {
           this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
           await this.makeAMoveEvent(coor, board)
           this.gameService.increaseAnimationEvents()
-          board.movePiece(board.selectedCell, selectedCell)
+          board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
+          board.currentTurn++
         }
         this.unselectCellEvent(board)
       }
@@ -83,7 +81,12 @@ export class Canvas {
           this.selectCellEvent(selectedCell, board)
       }
 
-      this.interactable = true
+      const myTurn = board.isMyTurn()
+      console.log(myTurn)
+      this.interactable = myTurn
+
+      if(!myTurn)
+        this.eventEmitter.invokeIntervalStart()
 
     }
 
@@ -114,8 +117,14 @@ export class Canvas {
         this.gameService.rotatePiece(this.gameId,selectedCell.coordinates, 90)
         this.interactable = false
         await this.animations.rotatePiece(board, selectedCell, 90)
+        this.gameService.increaseAnimationEvents()
         this.unselectCellEvent(board)
-        this.interactable = true
+
+        const myTurn = board.isMyTurn()
+        this.interactable = myTurn
+
+        if(!myTurn)
+          this.eventEmitter.invokeIntervalStart()
       }
     }
 
