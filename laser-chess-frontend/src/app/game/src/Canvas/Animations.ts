@@ -17,10 +17,12 @@ export class Animations {
         const origin = board.getCellByCoordinates(originCooridantes.x, originCooridantes.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
 
-        const piece = origin?.piece
+        const piece = origin?.auxiliaryPiece || origin?.piece
 
-        if(!origin || !destination || !piece)
+        if(!origin || !destination || !piece){
+            console.error("Cannot move a piece. Wrong cell selected or piece is not in selected origin")
             return
+        }
 
         const speed = 20
         const redrawDistance = 5
@@ -84,17 +86,10 @@ export class Animations {
       const laserIncrementPerFrame = 10
       let laserIncrement = 10
 
-      console.log(fromCell)
-      console.log(toCell)
-
       if(fromCell && toCell){
 
         const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.canvasCoordinates.x)
         const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.canvasCoordinates.y)
-
-        console.log(xModifier)
-        console.log(yModifier)
-
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
@@ -113,6 +108,10 @@ export class Animations {
           }, 100 / speed )
         })
       }
+
+    }
+
+    private promiseBuilder(funToExecute: (resolve: (value: void | PromiseLike<void>) => void) => void){
 
     }
 
