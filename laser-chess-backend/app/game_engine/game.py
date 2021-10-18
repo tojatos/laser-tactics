@@ -78,12 +78,12 @@ class Game:
         elif moved_piece.piece_type == PieceType.HYPER_CUBE:
             self.game_state.board.cells[to_cell] = moved_piece
             self.game_state.board.cells[from_cell] = None
+            self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
             if target_piece is not None:
                 random_empty_cell_coordinates_list = random.choice(
                     list(filter(lambda x: x.piece is None, self.game_state.board.to_serializable().cells))).coordinates
                 random_empty_cell_coordinates: Tuple[int, int] = tuple(random_empty_cell_coordinates_list)
                 self.game_state.board.cells[random_empty_cell_coordinates] = target_piece
-                self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
                 self.game_state.game_events.append(TeleportEvent(to_cell, random_empty_cell_coordinates, moved_piece))
         else:
             self.game_state.board.cells[to_cell] = moved_piece
