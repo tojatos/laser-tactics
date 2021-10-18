@@ -127,7 +127,7 @@ def test_join_lobby_mulitiple():
 
 
 def test_join_lobby_notexisting():
-    response = patch_data("/lobby/join", tokens[1], json={"lobby_id" : "999999999999999"})
+    response = patch_data("/lobby/join", tokens[1], json={"lobby_id" : "9999999"})
     assert response.status_code == 403
 
 """

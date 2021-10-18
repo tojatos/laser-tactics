@@ -28,7 +28,7 @@ def get_env(key, fallback):
 
 SECRET_KEY = get_env('SECRET_KEY', "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
 ALGORITHM = get_env('ALGORITHM', "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 30)
+ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 10080)
 API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
 PORT = get_env('PORT', 8000)
@@ -72,8 +72,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    user = crud.get_user(db, username=user.username)
-    if user:
+    db_user_1 = crud.get_user(db, username=user.username)
+    if db_user_1:
         raise HTTPException(status_code=400, detail="This name is taken")
     return crud.create_user(db=db, user=user)
 
