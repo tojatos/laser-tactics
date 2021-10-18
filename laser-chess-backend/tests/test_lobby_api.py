@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -28,6 +29,21 @@ app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
+tokens = []
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    global tokens
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    create_user_datas = list(
+        map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 3)))
+    tokens = list(map(lambda create_user_data: post_create_user(create_user_data), create_user_datas))
+    yield
+    pass
+
 
 def make_request(method: str, path: str, token: str = None, **kwargs):
     if token is None:
@@ -44,47 +60,77 @@ def get_data(path: str, token: str = None, **kwargs):
     return make_request('GET', path, token, **kwargs)
 
 
-def test_create_lobby_happy():
-    response = post_data("/users/", json={"username": "test", "email": "test@example.com", "password": "admin123"})
-    assert response.status_code == 200
-    response = post_data(
-        "/token",
-        data={"username": "test", "password": "admin123"},
-    )
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert "access_token" in data
-    token = data["access_token"]
+def patch_data(path: str, token: str = None, **kwargs):
+    return make_request('PATCH', path, token, **kwargs)
 
-    response = post_data("/lobby/create", token)
+
+def get_token_data(create_user_data):
+    return dict(username=create_user_data['username'], password=create_user_data['password'])
+
+
+def post_create_user(create_user_data):
+    post_data("/users/", json=create_user_data)
+    response = post_data("/token", data=get_token_data(create_user_data))
+    token = response.json()["access_token"]
+    return token
+
+
+def test_create_lobby_happy():
+    response = post_data("/lobby/create", tokens[0])
     assert response.status_code == 200
 
 
 def test_create_lobby_unauthorized():
     response = post_data("/lobby/create", "1234")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_join_lobby_happy():
-    pass
+    response = post_data("/lobby/create", tokens[0])
+    assert response.status_code == 200
+
+    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    assert response.status_code == 200
 
 
 def test_join_lobby_unauthorized():
-    pass
+    response = post_data("/lobby/create", tokens[0])
+    assert response.status_code == 200
+
+    response = post_data("/lobby/join", "1234", json=response.json().lobby_id)
+    assert response.status_code == 200
 
 
 def test_join_lobby_full():
-    pass
+    response = post_data("/lobby/create", tokens[0])
+    assert response.status_code == 200
+
+    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    assert response.status_code == 200
+
+    response = patch_data("/lobby/join", tokens[2], json=response.json().lobby_id)
+    assert response.status_code == 403
 
 
 def test_join_lobby_mulitiple():
-    pass
+    response = post_data("/lobby/create", tokens[0])
+    assert response.status_code == 200
+
+    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    assert response.status_code == 200
+
+    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    assert response.status_code == 403
+
+    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    assert response.status_code == 403
 
 
 def test_join_lobby_notexisting():
-    pass
+    response = patch_data("/lobby/join", tokens[1], json={"lobby_id" : "999999999999999"})
+    assert response.status_code == 403
 
-
+"""
 def test_leave_lobby_happy():
     pass
 
@@ -123,3 +169,4 @@ def test_update_lobby_mulitiple():
 
 def test_update_lobby_notexisting():
     pass
+"""
