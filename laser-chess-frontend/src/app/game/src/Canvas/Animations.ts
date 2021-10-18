@@ -1,6 +1,7 @@
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
+import { PieceType } from "../enums";
 import { Piece } from "../piece";
 import { Drawings } from "./Drawings";
 
@@ -17,10 +18,12 @@ export class Animations {
         const origin = board.getCellByCoordinates(originCooridantes.x, originCooridantes.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
 
-        const piece = origin?.piece
+        const piece = origin?.auxiliaryPiece || origin?.piece
 
-        if(!origin || !destination || !piece)
+        if(!origin || !destination || !piece){
+            console.error("Cannot move a piece. Wrong cell selected or piece is not in selected origin")
             return
+        }
 
         const speed = 20
         const redrawDistance = 5
@@ -32,11 +35,11 @@ export class Animations {
             destination.canvasCoordinates.y
             )
 
-        const validCellsArray = this.cellsExcludingPiece(board, origin)
+        const validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPiece(board, origin)
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
-              this.drawings.drawGame(board, validCellsArray)
+              this.drawings.drawGame(validCellsArray)
               this.changePosition(piece, originCooridantes, destinationCoordinates, redrawDistance, fun)
               this.drawings.drawPiece(piece)
               if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
@@ -49,10 +52,10 @@ export class Animations {
 
     }
 
-    async rotatePiece(board: Board, atCell: Cell, byDegrees: number): Promise<void>{
+    async rotatePiece(board: Board, atCell: Cell | undefined, byDegrees: number): Promise<void>{
       const piece = atCell?.piece
 
-      if(!piece)
+      if(!piece || !atCell)
         return
 
       const speed = 20
@@ -63,7 +66,7 @@ export class Animations {
 
       return new Promise<void>((resolve) => {
         const interval = setInterval(() => {
-            this.drawings.drawGame(board, validCellsArray)
+            this.drawings.drawGame(validCellsArray)
             piece.rotation_degree += degreesPerFrame
             this.drawings.drawPiece(piece)
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
@@ -84,17 +87,10 @@ export class Animations {
       const laserIncrementPerFrame = 10
       let laserIncrement = 10
 
-      console.log(fromCell)
-      console.log(toCell)
-
       if(fromCell && toCell){
 
         const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.canvasCoordinates.x)
         const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.canvasCoordinates.y)
-
-        console.log(xModifier)
-        console.log(yModifier)
-
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
@@ -103,7 +99,7 @@ export class Animations {
               x: fromCell.canvasCoordinates.x - laserIncrement * xModifier,
               y: fromCell.canvasCoordinates.y - laserIncrement * yModifier
             }
-            this.drawings.drawGame(board, board.cells)
+            this.drawings.drawGame(board.cells)
             this.drawings.drawLaserLine(fromCell.canvasCoordinates, currentCoordinates)
             laserIncrement += laserIncrementPerFrame
             if(this.inVicinity(toCell.canvasCoordinates, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
@@ -121,11 +117,11 @@ export class Animations {
     }
 
     private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){
-        return Math.abs(destination.x - currentPosX) < vicinity && Math.abs(destination.y - currentPosY) < vicinity
+        return Math.abs(destination.x - currentPosX) < vicinity * 2 && Math.abs(destination.y - currentPosY) < vicinity * 2
     }
 
     private inRotationVicinity(currentRotation: number, desiredRotation: number, deegresPerFrame: number){
-      return Math.abs(currentRotation - desiredRotation) <= deegresPerFrame
+      return Math.abs(currentRotation - desiredRotation) <= deegresPerFrame * 2
     }
 
     private designateLinearFunction(x1: number, y1: number, x2: number, y2: number){

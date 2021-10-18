@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Coordinates, GameState } from './game.models';
-import { MovePieceRequest, RotatePieceRequest } from './game.request.models'
+import { BoardInterface, Coordinates, GameState } from '../game.models';
+import { MovePieceRequest, RotatePieceRequest } from '../game.request.models'
 
 @Injectable({
   providedIn: 'root'
@@ -61,6 +61,32 @@ export class GameService {
     ).toPromise()
   }
 
+  increaseAnimationEvents(){
+    const num = parseInt(localStorage.getItem("animationEvents") || "0") + 1
+    localStorage.setItem("animationEvents", num.toString())
+  }
+
+  setAnimationEventsNum(num: number){
+    localStorage.setItem("animationEvents", num.toString())
+  }
+
+  get numOfAnimationEvents(){
+    return parseInt(localStorage.getItem("animationEvents") || "0")
+  }
+
+  setGameState(game: BoardInterface){
+    localStorage.setItem("board", JSON.stringify(game))
+  }
+
+  get lastGameState(){
+
+    const gameState = localStorage.getItem("board")
+    if(gameState)
+      return JSON.parse(gameState) as BoardInterface
+
+    return undefined
+
+  }
 
   private handleError(error: HttpErrorResponse) {
     if (error.status === 0) {

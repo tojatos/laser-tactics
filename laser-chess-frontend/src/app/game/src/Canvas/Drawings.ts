@@ -1,9 +1,8 @@
 import { Coordinates } from "../../game.models"
-import { Board } from "../board"
 import { Cell } from "../cell"
 import { PIECE_SIZE_SCALE, ROWS } from "../constants"
-import { PieceColors, PlayerType } from "../enums"
 import { Piece } from "../piece"
+import { Resources } from "./Resources"
 
 export class Drawings {
 
@@ -12,43 +11,29 @@ export class Drawings {
     ctx: CanvasRenderingContext2D
     drawingQueue: (() => void)[]
     blockSize: number
+    resources: Resources
 
-    constructor(ctx: CanvasRenderingContext2D, blockSize: number){
+    constructor(ctx: CanvasRenderingContext2D, blockSize: number, resources: Resources){
         this.ctx = ctx
         this.drawingQueue = []
         this.blockSize = blockSize
+        this.resources = resources
     }
 
-    initBoard(board: Board){
-      board.board_img.onload = () => this.drawBoard(board)
-      board.board_img.src = board.board_img_source
-      board.cells.forEach(c => this.initPieceDraw(c))
-  }
-
-    initPieceDraw(cell?: Cell){
-        if(cell?.piece){
-            cell.piece.piece_img.onload = () => {
-              if(cell.piece)
-                this.drawPiece(cell.piece)
-            }
-            cell.piece.piece_img.src = `assets/${cell.piece.piece_type + cell.piece.piece_color}.svg`
-        }
-    }
-
-    drawGame(board: Board, cells: Cell[]){
-        this.drawBoard(board)
+    drawGame(cells: Cell[]){
+        this.drawBoard(this.resources.boardImage)
         cells.forEach(c => { if(c.piece) this.drawPiece(c.piece) })
     }
 
-    drawBoard(board: Board){
-      this.ctx.drawImage(board.board_img, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+    drawBoard(boardImage: HTMLImageElement){
+      this.ctx.drawImage(boardImage, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
     }
 
     drawPiece(piece: Piece){
         this.ctx.save()
         this.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.y)
         this.ctx.rotate(piece.rotation_degree / 180 * Math.PI)
-        this.ctx.drawImage(piece.piece_img, this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y, this.blockSize * PIECE_SIZE_SCALE, this.blockSize * PIECE_SIZE_SCALE)
+        this.ctx.drawImage(this.resources.getPieceFromMap(piece), this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y, this.blockSize * PIECE_SIZE_SCALE, this.blockSize * PIECE_SIZE_SCALE)
         this.ctx.restore()
     }
 
@@ -68,12 +53,12 @@ export class Drawings {
         }
     }
 
-    drawSingleCell(board: Board, cell: Cell){
-      const imgSize = board.board_img.width
+    drawSingleCell(cell: Cell, boardImage: HTMLImageElement){
+      const imgSize = boardImage.width
       const imageCellSize = Math.round(((imgSize / ROWS) + Number.EPSILON) * 100) / 100
       this.ctx.save()
       this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
-      this.ctx.drawImage(board.board_img, cell.coordinates.x * imageCellSize, cell.coordinates.y * imageCellSize,
+      this.ctx.drawImage(boardImage, cell.coordinates.x * imageCellSize, cell.coordinates.y * imageCellSize,
         imageCellSize, imageCellSize,
         this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y,
         this.blockSize, this.blockSize)
@@ -112,4 +97,5 @@ export class Drawings {
     get pieceDrawingOriginCoordinates(): Coordinates {
         return {x: - this.blockSize * PIECE_SIZE_SCALE / 2, y: - this.blockSize * PIECE_SIZE_SCALE / 2}
     }
+
 }

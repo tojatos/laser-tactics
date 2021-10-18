@@ -1,12 +1,14 @@
 import { Coordinates, CellInterface, PieceInterface } from "../game.models";
 import { Board } from "./board";
 import { ROWS } from "./constants";
+import { PieceType } from "./enums";
 import { Piece } from "./piece";
 
 export class Cell implements CellInterface {
   coordinates: Coordinates
   canvasCoordinates: Coordinates
   piece: Piece | null
+  auxiliaryPiece: Piece | null = null
 
   constructor(coordinates: Coordinates, piece: PieceInterface | null, blockSize: number){
     this.coordinates = coordinates
@@ -16,7 +18,15 @@ export class Cell implements CellInterface {
 
   acceptNewPiece(piece: Piece){
     piece.currentCoordinates = this.cloneCoordinates(this.canvasCoordinates)
-    this.piece = piece
+    if(this.piece?.piece_type == PieceType.HYPER_SQUARE)
+      this.auxiliaryPiece = piece
+    else if (piece.piece_type == PieceType.HYPER_CUBE && this.piece != null){
+      this.auxiliaryPiece = this.piece
+      this.piece = piece
+
+    }
+    else
+      this.piece = piece
   }
 
   changeCanvasCoordinates(size: number){

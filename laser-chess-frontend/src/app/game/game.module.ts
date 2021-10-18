@@ -5,6 +5,8 @@ import { BoardComponent } from './components/board/board.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { Canvas } from './src/Canvas/Canvas';
 import { Board } from './src/board';
+import { Resources } from './src/Canvas/Resources';
+
 
 @NgModule({
   declarations: [GameComponent, BoardComponent, ChatComponent],
@@ -12,6 +14,6 @@ import { Board } from './src/board';
     CommonModule
   ],
   exports: [GameComponent],
-  providers: [Canvas, Board]
+  providers: [Canvas, Board, Resources]
 })
 export class GameModule { }
