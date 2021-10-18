@@ -47,7 +47,7 @@ export class Canvas {
       this.drawings.drawGame(board.cells)
     }
 
-    executeAnimation(board: Board, gameEvent: GameEvent){
+    getAnimationToExecute(board: Board, gameEvent: GameEvent){
       switch(gameEvent.event_type){
         case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(board, board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y), gameEvent.rotation)
         case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(board, gameEvent.moved_from, gameEvent.moved_to)
@@ -58,6 +58,7 @@ export class Canvas {
 
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
+
       if(!this.interactable)
         return
 
@@ -69,10 +70,13 @@ export class Canvas {
       if(board.selectedCell){
         if(selectedCell){
           this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
+          this.eventEmitter.toggleRefreshPause()
           await this.makeAMoveEvent(coor, board)
           this.gameService.increaseAnimationEvents()
           board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
           board.currentTurn++
+          this.eventEmitter.toggleRefreshPause()
+          this.eventEmitter.invokeRefresh()
         }
         this.unselectCellEvent(board)
       }
@@ -82,7 +86,6 @@ export class Canvas {
       }
 
       const myTurn = board.isMyTurn()
-      console.log(myTurn)
       this.interactable = myTurn
 
       if(!myTurn)
@@ -119,6 +122,7 @@ export class Canvas {
         await this.animations.rotatePiece(board, selectedCell, 90)
         this.gameService.increaseAnimationEvents()
         this.unselectCellEvent(board)
+        board.currentTurn++
 
         const myTurn = board.isMyTurn()
         this.interactable = myTurn

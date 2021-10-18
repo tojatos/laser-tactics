@@ -8,11 +8,23 @@ import { EventEmitter } from '@angular/core';
 export class EventEmitterService {
 
   invokeRefreshIntervalStart = new EventEmitter()
-  subsVar: Subscription | undefined
+  invokeRefreshGameState = new EventEmitter()
+  invokeIntervalPause = new EventEmitter()
+  subsIntervalStart: Subscription | undefined
+  subsRefresh: Subscription | undefined
+  subsPause: Subscription | undefined
 
   constructor() { }
 
   invokeIntervalStart(){
     this.invokeRefreshIntervalStart.emit()
+  }
+
+  invokeRefresh(){
+    this.invokeRefreshGameState.emit()
+  }
+
+  toggleRefreshPause(){
+    this.invokeIntervalPause.emit()
   }
 }

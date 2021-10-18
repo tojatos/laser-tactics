@@ -46,8 +46,16 @@ export class Board implements BoardInterface {
     const originCell = this.getCellByCoordinates(origin.x, origin.y)
     const destinationCell = this.getCellByCoordinates(destination.x, destination.y)
     if(originCell && destinationCell && originCell.piece){
-      destinationCell.acceptNewPiece(originCell.piece)
-      originCell.piece = null
+
+      if((originCell.piece.piece_type == PieceType.HYPER_SQUARE || originCell.piece.piece_type == PieceType.HYPER_CUBE) && originCell.auxiliaryPiece){
+        destinationCell.acceptNewPiece(originCell.auxiliaryPiece)
+        originCell.auxiliaryPiece = null
+      }
+      else{
+        destinationCell.acceptNewPiece(originCell.piece)
+        originCell.piece = originCell.auxiliaryPiece
+      }
+
     }
   }
 

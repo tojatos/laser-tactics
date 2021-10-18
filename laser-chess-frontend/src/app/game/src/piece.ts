@@ -7,7 +7,7 @@ export class Piece implements PieceInterface {
   piece_type: PieceType
   piece_owner: string
   rotation_degree: number
-  move_made = false
+  special_move_made = false
   currentCoordinates: Coordinates
 
   constructor(owner: string, pieceType: string, rotation_degree: number, coordinates: Coordinates, mirror_perspective: boolean = false){
@@ -24,14 +24,17 @@ export class Piece implements PieceInterface {
       board.getCellByCoordinates(cell.coordinates.x - 1, cell.coordinates.y),
       board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y + 1),
       board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y - 1)
-    ].filter(c => this.cellFilterFunction(this.piece_type)(c)).map(c => c!)
+    ].filter(c => (this.cellFilterFunction(this.piece_type)(c) || c?.piece?.piece_type == PieceType.HYPER_SQUARE) && this.piece_type != PieceType.LASER).map(c => c!)
   }
 
 
   private cellFilterFunction(type: string) {
-    if(type == PieceType.BLOCK) return (c: Cell | undefined) => c != undefined
-    else if (type == PieceType.HYPER_CUBE || type == PieceType.KING)
-      return (c: Cell | undefined) => c != undefined && (this.move_made && c.piece == null)
+    if(type == PieceType.BLOCK)
+      return (c: Cell | undefined) => c != undefined && c.piece?.piece_owner != this.piece_owner
+    else if (type == PieceType.HYPER_CUBE)
+      return (c: Cell | undefined) => c != undefined && (!this.special_move_made || c.piece == null)
+    else if (type == PieceType.KING)
+      return (c: Cell | undefined) => c != undefined && ((!this.special_move_made && c.piece?.piece_owner != this.piece_owner) || c.piece == null)
     return (c: Cell | undefined) => c != undefined && c.piece == null
   }
 
