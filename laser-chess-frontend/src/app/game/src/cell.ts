@@ -23,6 +23,7 @@ export class Cell implements CellInterface {
     else if (piece.piece_type == PieceType.HYPER_CUBE && this.piece != null){
       this.auxiliaryPiece = this.piece
       this.piece = piece
+
     }
     else
       this.piece = piece

@@ -1,6 +1,7 @@
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
+import { PieceType } from "../enums";
 import { Piece } from "../piece";
 import { Drawings } from "./Drawings";
 
@@ -34,11 +35,11 @@ export class Animations {
             destination.canvasCoordinates.y
             )
 
-        const validCellsArray = this.cellsExcludingPiece(board, origin)
+        const validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPiece(board, origin)
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
-              this.drawings.drawGame(validCellsArray) // change on draw two single cells
+              this.drawings.drawGame(validCellsArray)
               this.changePosition(piece, originCooridantes, destinationCoordinates, redrawDistance, fun)
               this.drawings.drawPiece(piece)
               if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
@@ -111,20 +112,16 @@ export class Animations {
 
     }
 
-    private promiseBuilder(funToExecute: (resolve: (value: void | PromiseLike<void>) => void) => void){
-
-    }
-
     private cellsExcludingPiece(board: Board, cell: Cell){
         return board.cells.filter(c => c.piece != board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y)?.piece)
     }
 
     private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){
-        return Math.abs(destination.x - currentPosX) < vicinity && Math.abs(destination.y - currentPosY) < vicinity
+        return Math.abs(destination.x - currentPosX) < vicinity * 2 && Math.abs(destination.y - currentPosY) < vicinity * 2
     }
 
     private inRotationVicinity(currentRotation: number, desiredRotation: number, deegresPerFrame: number){
-      return Math.abs(currentRotation - desiredRotation) <= deegresPerFrame
+      return Math.abs(currentRotation - desiredRotation) <= deegresPerFrame * 2
     }
 
     private designateLinearFunction(x1: number, y1: number, x2: number, y2: number){
