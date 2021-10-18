@@ -70,9 +70,11 @@ def get_db():
 @router.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
-    # TODO add username validation
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+    user = crud.get_user(db, username=user.username)
+    if user:
+        raise HTTPException(status_code=400, detail="This name is taken")
     return crud.create_user(db=db, user=user)
 
 
@@ -91,9 +93,7 @@ def read_user(username: str, db: Session = Depends(get_db)):
 
 
 @router.post("/users/{user_id}/items/", response_model=schemas.Item)
-def create_item_for_user(
-        user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)
-):
+def create_item_for_user(user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)):
     return crud.create_user_item(db=db, item=item, user_id=user_id)
 
 
@@ -224,6 +224,65 @@ async def shoot_laser(request: ShootLaserRequest,
                       current_user: schemas.User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):
     game_service.shoot_laser(current_user.username, request, db)
+
+
+@router.get("/lobby")
+async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    lobbies = crud.get_lobbies(db, skip=skip, limit=limit)
+    return lobbies
+
+
+@router.get("/lobby/{id}")
+async def get_lobby(lobby_id,
+                    db: Session = Depends(get_db)):
+    db_lobby = crud.get_lobby(db, lobby_id)
+    if db_lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    return db_lobby
+
+
+@router.post("/lobby/create", response_model=schemas.Lobby)
+async def create_lobby(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return crud.create_lobby(db=db, user=current_user)
+
+
+@router.patch("/lobby/join")
+async def join_lobby(lobby_id: int, current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
+    lobby = crud.get_lobby(db, lobby_id)
+    if lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    if lobby.player_one_username == current_user.username or lobby.player_two_username == current_user.username:
+        raise HTTPException(status_code=403, detail="cannot join own lobby")
+    if lobby.player_one_username and lobby.player_two_username:
+        raise HTTPException(status_code=403, detail="lobby already is full")
+    return crud.join_lobby(db=db, user=current_user, lobby=lobby)
+
+
+@router.patch("/lobby/leave")
+async def leave_lobby(lobby_id: int, current_user: schemas.User = Depends(get_current_active_user),
+                      db: Session = Depends(get_db)):
+    lobby = crud.get_lobby(db, lobby_id)
+    if lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    if lobby.player_one_username != current_user.username and lobby.player_two_username != current_user.username:
+        raise HTTPException(status_code=403, detail="user already not in the lobby")
+    lobby = crud.leave_lobby(db=db, user=current_user, lobby=lobby)
+    return lobby
+
+
+@router.patch("/lobby/update")
+async def update_lobby(lobby: schemas.Lobby, current_user: schemas.User = Depends(get_current_active_user),
+                       db: Session = Depends(get_db)):
+    db_lobby = crud.get_lobby(db, lobby.id)
+    if db_lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    if db_lobby.game_id != lobby.game_id:
+        raise HTTPException(status_code=404, detail="Game id does not match")
+    if db_lobby.player_one_username != current_user.username:
+        raise HTTPException(status_code=403, detail="only player 1 can change game settings")
+    lobby = crud.update_lobby(db=db, lobby=lobby)
+    return lobby
 
 
 app.include_router(router)
