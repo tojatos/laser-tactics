@@ -51,7 +51,7 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
 
 
 def create_lobby(db: Session, user: schemas.User):
-    db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=uuid4(), player_one_username=user.username)
+    db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username)
     db.add(db_lobby)
     db.commit()
     db.refresh(db_lobby)
@@ -77,7 +77,7 @@ def join_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
 def leave_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
     if lobby.player_one_username == user.username:
         lobby.player_one_username = lobby.player_two_username
-        lobby.player_two_username = None
+        lobby.player_two_username = sql.null()
     elif lobby.player_two_username == user.username:
         lobby.player_two_username = None
     if lobby.player_two_username is None and lobby.player_one_username is None:

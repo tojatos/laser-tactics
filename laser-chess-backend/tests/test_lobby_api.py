@@ -88,8 +88,7 @@ def test_create_lobby_unauthorized():
 def test_join_lobby_happy():
     response = post_data("/lobby/create", tokens[0])
     assert response.status_code == 200
-
-    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 200
 
 
@@ -97,7 +96,7 @@ def test_join_lobby_unauthorized():
     response = post_data("/lobby/create", tokens[0])
     assert response.status_code == 200
 
-    response = post_data("/lobby/join", "1234", json=response.json().lobby_id)
+    response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 200
 
 
@@ -105,30 +104,31 @@ def test_join_lobby_full():
     response = post_data("/lobby/create", tokens[0])
     assert response.status_code == 200
 
-    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 200
 
-    response = patch_data("/lobby/join", tokens[2], json=response.json().lobby_id)
+    response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 403
 
 
 def test_join_lobby_mulitiple():
-    response = post_data("/lobby/create", tokens[0])
+    response_create = post_data("/lobby/create", tokens[0])
+    assert response_create.status_code == 200
+
+    response = patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
     assert response.status_code == 200
 
-    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
-    assert response.status_code == 200
-
-    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    response = patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
     assert response.status_code == 403
 
-    response = patch_data("/lobby/join", tokens[1], json=response.json().lobby_id)
+    response = patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
     assert response.status_code == 403
 
 
 def test_join_lobby_notexisting():
-    response = patch_data("/lobby/join", tokens[1], json={"lobby_id" : "9999999"})
-    assert response.status_code == 403
+    response = patch_data(f"/lobby/join?lobby_id=9999999", tokens[1])
+    assert response.status_code == 404
+
 
 """
 def test_leave_lobby_happy():
