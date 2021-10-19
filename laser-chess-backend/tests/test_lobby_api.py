@@ -132,7 +132,6 @@ def test_join_lobby_notexisting():
     assert response.status_code == 404
 
 
-
 def test_leave_lobby_happy():
     response_create = post_data("/lobby/create", tokens[0])
     assert response_create.status_code == 200
@@ -165,8 +164,6 @@ def test_leave_lobby_happy_withswap():
     assert response.status_code == 200
     assert response.json()["player_one_username"] == response_join_1.json()["player_two_username"]
     assert response.json()["player_two_username"] is None
-
-
 
 
 def test_leave_lobby_unauthorized():
@@ -232,9 +229,16 @@ def test_leave_lobby_notexisting():
 def test_update_lobby_happy():
     response_create = post_data("/lobby/create", tokens[0])
     assert response_create.status_code == 200
+    assert response_create.json()["is_private"] is False
+    assert response_create.json()["is_ranked"] is False
+    json = response_create.json()
+    json["is_private"] = True
+    json["is_ranked"] = True
 
-    response = patch_data(f"/lobby/update", token=tokens[0], json=response_create.json())
+    response = patch_data(f"/lobby/update", token=tokens[0], json=json)
     assert response.status_code == 200
+    assert response.json()["is_private"] is True
+    assert response.json()["is_ranked"] is True
 
 
 def test_update_lobby_unauthorized():
@@ -245,9 +249,14 @@ def test_update_lobby_unauthorized():
     assert response.status_code == 401
 
 
-def test_update_lobby_mulitiple():
-    pass
-
-
 def test_update_lobby_notexisting():
-    pass
+    json = {
+            "id": -1,
+            "game_id": "string",
+            "name": "string",
+            "player_one_username": "string",
+            "is_ranked": True,
+            "is_private": True
+        }
+    response = patch_data(f"/lobby/update", tokens[1], json=json)
+    assert response.status_code == 404
