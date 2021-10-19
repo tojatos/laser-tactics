@@ -77,7 +77,7 @@ def join_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
 def leave_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
     if lobby.player_one_username == user.username:
         lobby.player_one_username = lobby.player_two_username
-        lobby.player_two_username = sql.null()
+        lobby.player_two_username = None
     elif lobby.player_two_username == user.username:
         lobby.player_two_username = None
     if lobby.player_two_username is None and lobby.player_one_username is None:
