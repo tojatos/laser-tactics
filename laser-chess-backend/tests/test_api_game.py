@@ -45,10 +45,14 @@ def run_around_tests():
 
     create_user_datas = list(map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password="test{x}"), range(0,2)))
     tokens = list(map(lambda create_user_data: post_create_user(create_user_data), create_user_datas))
+    response = post_data(
+        "/lobby/create",
+        tokens[0]
+    )
     post_data(
         "/start_game",
         tokens[0],
-        json=dict(game_id=game_id, player_one_id=create_user_datas[0]['username'], player_two_id=create_user_datas[1]['username']),
+        json=dict(game_id=game_id, player_one_id=create_user_datas[0]['username'], player_two_id=create_user_datas[1]['username'], lobby_id=response.json()["id"]),
     )
     yield
     pass

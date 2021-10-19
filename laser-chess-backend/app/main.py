@@ -232,7 +232,7 @@ async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get
     return lobbies
 
 
-@router.get("/lobby/{id}")
+@router.get("/lobby/{lobby_id}", response_model=schemas.Lobby)
 async def get_lobby(lobby_id,
                     db: Session = Depends(get_db)):
     db_lobby = crud.get_lobby(db, lobby_id)

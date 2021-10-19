@@ -13,6 +13,7 @@ class StartGameRequest:
     game_id: str
     player_one_id: str
     player_two_id: str
+    lobby_id: int
 
 
 @dataclass

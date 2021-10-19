@@ -96,8 +96,8 @@ def test_join_lobby_unauthorized():
     response = post_data("/lobby/create", tokens[0])
     assert response.status_code == 200
 
-    response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
-    assert response.status_code == 200
+    response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", "1234")
+    assert response.status_code == 401
 
 
 def test_join_lobby_full():
@@ -106,6 +106,8 @@ def test_join_lobby_full():
 
     response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 200
+    assert response.json()["player_one_username"] is not None
+    assert response.json()["player_two_username"] is not None
 
     response = patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 403
@@ -130,37 +132,117 @@ def test_join_lobby_notexisting():
     assert response.status_code == 404
 
 
-"""
+
 def test_leave_lobby_happy():
-    pass
+    response_create = post_data("/lobby/create", tokens[0])
+    assert response_create.status_code == 200
+    assert response_create.json()["player_one_username"] is not None
+    assert response_create.json()["player_two_username"] is None
+
+    response = patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    assert response.status_code == 200
+    assert response.json()["player_one_username"] is not None
+    assert response.json()["player_two_username"] is not None
+
+    response = patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[1])
+    assert response.status_code == 200
+    assert response.json()["player_one_username"] is not None
+    assert response.json()["player_two_username"] is None
+
+
+def test_leave_lobby_happy_withswap():
+    response_create = post_data("/lobby/create", tokens[0])
+    assert response_create.status_code == 200
+    assert response_create.json()["player_one_username"] is not None
+    assert response_create.json()["player_two_username"] is None
+
+    response_join_1 = patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    assert response_join_1.status_code == 200
+    assert response_join_1.json()["player_one_username"] is not None
+    assert response_join_1.json()["player_two_username"] is not None
+
+    response = patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    assert response.status_code == 200
+    assert response.json()["player_one_username"] == response_join_1.json()["player_two_username"]
+    assert response.json()["player_two_username"] is None
+
+
 
 
 def test_leave_lobby_unauthorized():
-    pass
+    response = post_data("/lobby/create", tokens[0])
+    assert response.status_code == 200
+
+    response = patch_data(f"/lobby/leave?lobby_id={response.json()['id']}", "1234")
+    assert response.status_code == 401
 
 
-def test_leave_lobby_full():
-    pass
+def test_leave_lobby_with_delet():
+    response_create = post_data("/lobby/create", tokens[0])
+    assert response_create.status_code == 200
+    assert response_create.json()["player_one_username"] is not None
+    assert response_create.json()["player_two_username"] is None
+
+    response_join_1 = patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    assert response_join_1.status_code == 200
+    assert response_join_1.json()["player_one_username"] is not None
+    assert response_join_1.json()["player_two_username"] is not None
+
+    response = patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    assert response.status_code == 200
+    assert response.json()["player_one_username"] == response_join_1.json()["player_two_username"]
+    assert response.json()["player_two_username"] is None
+
+    response = patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[1])
+    assert response.status_code == 200
+    assert response.json()["msg"] == "All players left. Lobby successfully deleted"
+
+    response = get_data(f"/lobby/{response_create.json()['id']}")
+    assert response.status_code == 404
 
 
 def test_leave_lobby_mulitiple():
-    pass
+    response_create = post_data("/lobby/create", tokens[0])
+    assert response_create.status_code == 200
+    assert response_create.json()["player_one_username"] is not None
+    assert response_create.json()["player_two_username"] is None
+
+    response_join_1 = patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    assert response_join_1.status_code == 200
+    assert response_join_1.json()["player_one_username"] is not None
+    assert response_join_1.json()["player_two_username"] is not None
+
+    response = patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    assert response.status_code == 200
+    assert response.json()["player_one_username"] == response_join_1.json()["player_two_username"]
+    assert response.json()["player_two_username"] is None
+
+    response = patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    assert response.status_code == 403
+
+    response = patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    assert response.status_code == 403
 
 
 def test_leave_lobby_notexisting():
-    pass
+    response = patch_data(f"/lobby/leave?lobby_id=999999", tokens[1])
+    assert response.status_code == 404
 
 
 def test_update_lobby_happy():
-    pass
+    response_create = post_data("/lobby/create", tokens[0])
+    assert response_create.status_code == 200
+
+    response = patch_data(f"/lobby/update", token=tokens[0], json=response_create.json())
+    assert response.status_code == 200
 
 
 def test_update_lobby_unauthorized():
-    pass
+    response = post_data("/lobby/create", tokens[0])
+    assert response.status_code == 200
 
-
-def test_update_lobby_full():
-    pass
+    response = patch_data(f"/lobby/update", token="1234")
+    assert response.status_code == 401
 
 
 def test_update_lobby_mulitiple():
@@ -169,4 +251,3 @@ def test_update_lobby_mulitiple():
 
 def test_update_lobby_notexisting():
     pass
-"""
