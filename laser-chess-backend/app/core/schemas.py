@@ -48,6 +48,15 @@ class User(UserBase):
         orm_mode = True
 
 
+class LobbyEditData(BaseModel):
+    id: int
+    game_id: str
+    name: str
+    player_one_username: str
+    is_ranked: bool
+    is_private: bool
+
+
 class Lobby(BaseModel):
     id: int
     game_id: str

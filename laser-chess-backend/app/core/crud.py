@@ -89,11 +89,13 @@ def leave_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
     return lobby
 
 
-def update_lobby(db: Session, lobby: schemas.Lobby):
-    db_lobby = lobby
+def update_lobby(db: Session, lobby: schemas.Lobby, lobby_new_data: schemas.LobbyEditData):
+    lobby.name = lobby_new_data.name
+    lobby.is_ranked = lobby_new_data.is_ranked
+    lobby.is_private = lobby_new_data.is_private
     db.commit()
-    db.refresh(db_lobby)
-    return db_lobby
+    db.refresh(lobby)
+    return lobby
 
 
 def get_game_state_table(db: Session, game_id: str):
