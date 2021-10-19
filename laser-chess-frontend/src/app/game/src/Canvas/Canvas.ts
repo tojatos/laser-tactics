@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
 import { EventEmitterService } from "../../services/event-emitter.service"
-import { Coordinates, GameEvent } from "../../game.models"
+import { Coordinates, GameEvent, PieceMovedEvent, PieceRotatedEvent } from "../../game.models"
 import { GameService } from "../../services/game.service"
 import { Board } from "../board"
 import { Cell } from "../cell"
@@ -17,7 +17,7 @@ export class Canvas {
     ctx!: CanvasRenderingContext2D
     animations!: Animations
     drawings!: Drawings
-    interactable: boolean = true
+    interactable: boolean = false
     block_size!: number
     highlightColor: string = "yellow"
     hoveredCell: Cell | undefined
@@ -56,7 +56,6 @@ export class Canvas {
       }
     }
 
-
     private async canvasOnclick(event: MouseEvent, board: Board) {
 
       if(!this.interactable)
@@ -70,15 +69,17 @@ export class Canvas {
       if(board.selectedCell){
         if(selectedCell){
           this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
-          this.eventEmitter.toggleRefreshPause()
-          await this.makeAMoveEvent(coor, board)
+          await this.makeAMoveEvent(selectedCell.coordinates, board)
           this.gameService.increaseAnimationEvents()
           board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
+          this.gameService.setLocalGameState(board.serialize())
+          this.drawings.drawGame(board.cells)
           board.currentTurn++
-          this.eventEmitter.toggleRefreshPause()
           this.eventEmitter.invokeRefresh()
+
         }
         this.unselectCellEvent(board)
+
       }
       else {
         if(selectedCell)
@@ -87,9 +88,6 @@ export class Canvas {
 
       const myTurn = board.isMyTurn()
       this.interactable = myTurn
-
-      if(!myTurn)
-        this.eventEmitter.invokeIntervalStart()
 
     }
 
@@ -124,11 +122,7 @@ export class Canvas {
         this.unselectCellEvent(board)
         board.currentTurn++
 
-        const myTurn = board.isMyTurn()
-        this.interactable = myTurn
-
-        if(!myTurn)
-          this.eventEmitter.invokeIntervalStart()
+        this.eventEmitter.invokeRefresh()
       }
     }
 

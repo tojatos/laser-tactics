@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
-import { BoardInterface, Coordinates, GameEvent, GameState, PieceMovedEvent } from "../game.models"
+import { BoardInterface, CellInterface, Coordinates, GameEvent, GameState, PieceInterface, PieceMovedEvent } from "../game.models"
 import { Cell } from "./cell"
 import { GameEvents, PieceType, PlayerType } from "./enums"
 
@@ -20,7 +20,7 @@ export class Board implements BoardInterface {
     this.currentTurn = gameState.turn_number
     this.playerOne = gameState.player_one_id
     this.playerTwo = gameState.player_two_id
-    gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, blockSize)) )
+    gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, c.auxiliaryPiece, blockSize)) )
   }
 
   selectCell(cell: Cell | undefined) {
@@ -96,6 +96,28 @@ export class Board implements BoardInterface {
       return PlayerType.PLAYER_TWO
 
     return undefined
+  }
+
+  serialize(): GameState{
+    const boardInterface: BoardInterface = {cells: new Array<CellInterface>()}
+
+    for (const cell of this.cells){
+      const piece: PieceInterface | null = cell.piece?.serialize() || null
+      const auxiliaryPiece: PieceInterface | null = cell.auxiliaryPiece?.serialize() || null
+      boardInterface.cells.push({coordinates: cell.coordinates, piece: piece, auxiliaryPiece: auxiliaryPiece})
+    }
+
+    const gameStateSerialized: GameState = {
+      player_one_id: this.playerOne || PlayerType.NONE,
+      player_two_id: this.playerTwo || PlayerType.NONE,
+      board: boardInterface,
+      is_started: false, //
+      turn_number: this.currentTurn,
+      game_events: []
+    }
+
+    return gameStateSerialized
+    
   }
 
 }

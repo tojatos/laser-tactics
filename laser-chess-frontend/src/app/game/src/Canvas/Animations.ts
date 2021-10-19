@@ -1,7 +1,6 @@
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
-import { PieceType } from "../enums";
 import { Piece } from "../piece";
 import { Drawings } from "./Drawings";
 
@@ -117,7 +116,7 @@ export class Animations {
     }
 
     private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){
-        return Math.abs(destination.x - currentPosX) < vicinity * 2 && Math.abs(destination.y - currentPosY) < vicinity * 2
+        return Math.abs(destination.x - currentPosX) < vicinity * 3 && Math.abs(destination.y - currentPosY) < vicinity * 3
     }
 
     private inRotationVicinity(currentRotation: number, desiredRotation: number, deegresPerFrame: number){

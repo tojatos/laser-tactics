@@ -17,14 +17,6 @@ export class GameService {
       catchError(this.handleError)
     ).toPromise()
 
-    localStorage.removeItem("board")
-    localStorage.removeItem("gameEventsSize")
-
-    if (res.body){
-      localStorage.setItem("board", JSON.stringify(res.body.board))
-      localStorage.setItem("gameEventsSize", JSON.stringify(res.body.game_events.length))
-    }
-
     return res
 
   }
@@ -74,8 +66,18 @@ export class GameService {
     return parseInt(localStorage.getItem("animationEvents") || "0")
   }
 
-  setGameState(game: BoardInterface){
+  animationsToShow(totalNumOfAnimations: number){
+    return totalNumOfAnimations - this.numOfAnimationEvents
+  }
+
+  setLocalGameState(game: GameState){
+    game.game_events = []
     localStorage.setItem("board", JSON.stringify(game))
+  }
+
+  getLocalGameState(): GameState | null{
+    const board = localStorage.getItem("board")
+    return board && JSON.parse(board)
   }
 
   get lastGameState(){

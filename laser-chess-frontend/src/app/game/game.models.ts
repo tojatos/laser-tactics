@@ -18,6 +18,7 @@ export interface BoardInterface {
 export interface CellInterface {
   coordinates: Coordinates
   piece: PieceInterface | null
+  auxiliaryPiece: PieceInterface | null
 }
 
 export interface Coordinates {

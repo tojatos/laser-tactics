@@ -1,16 +1,18 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { GameState } from '../../game.models';
 import { EventEmitterService } from '../../services/event-emitter.service';
 import { GameService } from '../../services/game.service';
 import { Board } from '../../src/board';
 import { Canvas } from '../../src/Canvas/Canvas';
+import { EventsExecutor } from '../../src/eventsExecutor';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss']
 })
-export class BoardComponent implements AfterViewInit, OnInit, OnDestroy {
+export class BoardComponent implements AfterViewInit, OnInit {
   @ViewChild('canvas', { static: true })
   canvasHTML!: ElementRef<HTMLCanvasElement>
 
@@ -18,28 +20,16 @@ export class BoardComponent implements AfterViewInit, OnInit, OnDestroy {
   currentSize: number | undefined
   refreshInterval: number | undefined
   intervalIsPaused: boolean = false
+  refreshingGameState: boolean = false
 
-  constructor(private gameService: GameService, private route: ActivatedRoute, private eventEmitterService: EventEmitterService, private canvas: Canvas, private board: Board){}
+  constructor(private gameService: GameService, private route: ActivatedRoute, private eventEmitterService: EventEmitterService, private canvas: Canvas, private board: Board, private eventsExecutor: EventsExecutor){}
 
   ngOnInit() {
-    if (this.eventEmitterService.subsIntervalStart == undefined) {
-      this.eventEmitterService.subsIntervalStart = this.eventEmitterService.
-      invokeRefreshIntervalStart.subscribe(() => {
-        this.refreshIntervalStart();
-      });
-    }
-
     if (this.eventEmitterService.subsRefresh == undefined) {
       this.eventEmitterService.subsRefresh = this.eventEmitterService.
       invokeRefreshGameState.subscribe(() => {
+        this.refreshingGameState = false
         this.refreshGameState();
-      });
-    }
-
-    if (this.eventEmitterService.subsPause == undefined) {
-      this.eventEmitterService.subsPause = this.eventEmitterService.
-      invokeIntervalPause.subscribe(() => {
-        this.toggleRefreshInterval();
       });
     }
   }
@@ -54,12 +44,21 @@ export class BoardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.route.params.subscribe(params => {
 
       this.gameId = params.id
+
       this.gameService.getGameState(params.id).then(
         res => {
           if(res.body) {
+            let gameState = this.gameService.getLocalGameState() || res.body
+            const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
+            console.log(animationsToShow)
+            if(gameState != res.body && animationsToShow <= 0)
+              gameState = res.body
             this.currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
-            this.board.initBoard(res.body, this.currentSize)
+            this.board.initBoard(gameState, this.currentSize)
             this.canvas.initCanvas(canvasContext!, this.board, this.currentSize, params.id)
+            if(animationsToShow > 0)
+              this.executePendingActions(res.body, animationsToShow)
+            this.board.currentTurn = res.body.turn_number
             const myTurn = this.board.isMyTurn()
             this.canvas.interactable = myTurn
             if(!myTurn)
@@ -70,10 +69,6 @@ export class BoardComponent implements AfterViewInit, OnInit, OnDestroy {
       )
     })
 
-  }
-
-  ngOnDestroy() {
-    this.refreshIntervalStop()
   }
 
   @HostListener('window:resize', ['$event'])
@@ -92,52 +87,40 @@ export class BoardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   refreshGameState(){
-    if(this.gameId && !this.intervalIsPaused){
+    if(this.gameId){
       this.gameService.getGameState(this.gameId).then(async res => {
         if(res.body && this.currentSize){
           //this.gameService.setAnimationEventsNum(res.body.game_events.length)
-
-          this.canvas.interactable = false
-          const animationsToShow =  this.gameService.numOfAnimationEvents - res.body.game_events.length
+          const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
           console.log(animationsToShow)
-          if(animationsToShow < 0) {
-            this.intervalIsPaused = true
-            for (const e of res.body.game_events.slice(animationsToShow)){
-              await new Promise(resolve => setTimeout(resolve, 500))
-              await this.canvas.getAnimationToExecute(this.board, e)
-              this.board.executeEvent(e)
-              this.canvas.drawings.drawGame(this.board.cells)
-            }
-            this.intervalIsPaused = false
-          }
-          this.gameService.setAnimationEventsNum(res.body.game_events.length)
-          this.gameService.setGameState(res.body.board)
+          if(animationsToShow > 0)
+            await this.executePendingActions(res.body, animationsToShow)
+
           this.board.currentTurn = res.body.turn_number
+
           const myTurn = this.board.isMyTurn()
           this.canvas.interactable = myTurn
 
           if(myTurn)
-            this.refreshIntervalStop()
+            return
+
+          this.refreshIntervalStart()
 
         }
+        else
+          console.error("Board not properly initialized")
       })
     }
   }
 
+  private async executePendingActions(game: GameState, animationsToShow: number){
+    this.canvas.interactable = false
+    this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
+    await this.eventsExecutor.executeEvents(500, this.board)
+  }
+
   refreshIntervalStart(){
-    if(!this.refreshInterval || this.intervalIsPaused){
-      this.refreshInterval = window.setInterval(() => { this.refreshGameState() }, 500)
-      this.intervalIsPaused = false
-    }
-  }
-
-  refreshIntervalStop(){
-    window.clearInterval(this.refreshInterval)
-    this.refreshInterval = undefined
-  }
-
-  toggleRefreshInterval(){
-    this.intervalIsPaused = !this.intervalIsPaused
+      window.setTimeout(() => this.refreshGameState(), 500)
   }
 
 }

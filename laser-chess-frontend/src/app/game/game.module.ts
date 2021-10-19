@@ -6,6 +6,8 @@ import { ChatComponent } from './components/chat/chat.component';
 import { Canvas } from './src/Canvas/Canvas';
 import { Board } from './src/board';
 import { Resources } from './src/Canvas/Resources';
+import { EventsExecutor } from './src/eventsExecutor';
+
 
 
 @NgModule({
@@ -14,6 +16,6 @@ import { Resources } from './src/Canvas/Resources';
     CommonModule
   ],
   exports: [GameComponent],
-  providers: [Canvas, Board, Resources]
+  providers: [Canvas, Board, Resources, EventsExecutor]
 })
 export class GameModule { }

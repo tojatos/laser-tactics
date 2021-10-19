@@ -6,8 +6,6 @@ import { Resources } from "./Resources"
 
 export class Drawings {
 
-  // make some queue for drawing
-
     ctx: CanvasRenderingContext2D
     drawingQueue: (() => void)[]
     blockSize: number

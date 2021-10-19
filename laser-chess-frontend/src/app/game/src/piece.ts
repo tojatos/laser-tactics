@@ -38,4 +38,12 @@ export class Piece implements PieceInterface {
     return (c: Cell | undefined) => c != undefined && c.piece == null
   }
 
+  serialize(){
+    return {
+      piece_type: this.piece_type,
+      piece_owner: this.piece_owner,
+      rotation_degree: this.rotation_degree
+    }
+  }
+
 }

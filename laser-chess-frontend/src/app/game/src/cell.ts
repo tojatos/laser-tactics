@@ -10,10 +10,11 @@ export class Cell implements CellInterface {
   piece: Piece | null
   auxiliaryPiece: Piece | null = null
 
-  constructor(coordinates: Coordinates, piece: PieceInterface | null, blockSize: number){
+  constructor(coordinates: Coordinates, piece: PieceInterface | null, auxiliaryPiece: PieceInterface | null, blockSize: number){
     this.coordinates = coordinates
     this.canvasCoordinates = this.canvasCoordinatesSetter(blockSize)
     this.piece = piece && new Piece(piece.piece_owner, piece.piece_type, piece.rotation_degree, this.cloneCoordinates(this.canvasCoordinates))
+    this.auxiliaryPiece = auxiliaryPiece && new Piece(auxiliaryPiece.piece_owner, auxiliaryPiece.piece_type, auxiliaryPiece.rotation_degree, this.cloneCoordinates(this.canvasCoordinates))
   }
 
   acceptNewPiece(piece: Piece){
