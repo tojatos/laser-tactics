@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GameState } from '../../game.models';
 import { EventEmitterService } from '../../services/event-emitter.service';
@@ -48,11 +48,14 @@ export class BoardComponent implements AfterViewInit, OnInit {
       this.gameService.getGameState(params.id).then(
         res => {
           if(res.body) {
+            res.body.game_id = params.id
             let gameState = this.gameService.getLocalGameState() || res.body
             const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
             console.log(animationsToShow)
-            if(gameState != res.body && animationsToShow <= 0)
+            if((gameState != res.body && animationsToShow <= 0) || gameState.game_id != res.body.game_id){
               gameState = res.body
+              this.gameService.setAnimationEventsNum(gameState.game_events.length)
+            }
             this.currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
             this.board.initBoard(gameState, this.currentSize)
             this.canvas.initCanvas(canvasContext!, this.board, this.currentSize, params.id)

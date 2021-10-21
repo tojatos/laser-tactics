@@ -17,6 +17,9 @@ export class GameService {
       catchError(this.handleError)
     ).toPromise()
 
+    if(res.body)
+      res.body.game_id = gameId
+
     return res
 
   }

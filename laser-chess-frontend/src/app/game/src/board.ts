@@ -12,10 +12,12 @@ export class Board implements BoardInterface {
   currentTurn = 0
   playerOne: string | undefined
   playerTwo: string | undefined
+  gameId: string | undefined
 
   constructor(private authService: AuthService){}
 
   initBoard(gameState: GameState, blockSize: number) {
+    this.gameId = gameState.game_id
     this.cells = []
     this.currentTurn = gameState.turn_number
     this.playerOne = gameState.player_one_id
@@ -108,16 +110,17 @@ export class Board implements BoardInterface {
     }
 
     const gameStateSerialized: GameState = {
+      game_id: this.gameId || "unknown",
       player_one_id: this.playerOne || PlayerType.NONE,
       player_two_id: this.playerTwo || PlayerType.NONE,
       board: boardInterface,
-      is_started: false, //
+      is_started: false,
       turn_number: this.currentTurn,
       game_events: []
     }
 
     return gameStateSerialized
-    
+
   }
 
 }

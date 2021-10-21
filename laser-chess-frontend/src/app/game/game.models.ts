@@ -3,6 +3,7 @@ import { GameEvents, PieceType } from "./src/enums";
 export type GameEvent = PieceRotatedEvent | PieceMovedEvent | TeleportEvent | LaserShotEvent | TakeEvent
 
 export interface GameState {
+  game_id: string
   player_one_id: string
   player_two_id: string
   board: BoardInterface
