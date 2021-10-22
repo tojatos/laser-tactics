@@ -10,7 +10,7 @@ from app.game_engine.models import *
 from app.game_engine.requests import *
 from app.main import app, get_db, API_PREFIX
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
