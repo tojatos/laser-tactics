@@ -40,8 +40,13 @@ def before_all():
     session.commit()
 
 
+get_game_state_request = GetGameStateRequest(game_id)
+shoot_laser_request = ShootLaserRequest(game_id)
+p1_laser_coordinates = CellCoordinatesSerializable(5, 0)
+p1_king_coordinates = CellCoordinatesSerializable(4, 0)
+
+
 def test_start_game(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
     response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
     assert response.status_code == 200, response.text
     game_state_dict = response.json()
@@ -53,9 +58,6 @@ def test_start_game(tu):
 
 
 def test_shoot_laser(tu):
-    shoot_laser_request = ShootLaserRequest(game_id)
-    get_game_state_request = GetGameStateRequest(game_id)
-
     response = tu.post_data("/shoot_laser", tokens[0], json=asdict(shoot_laser_request))
     assert response.status_code == 200
     response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
@@ -69,7 +71,6 @@ def test_shoot_laser(tu):
 
 
 def test_move_block(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
     request = MovePieceRequest(game_id, CellCoordinatesSerializable(1, 1), CellCoordinatesSerializable(1, 2))
     response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
     assert response.status_code == 200
@@ -84,7 +85,6 @@ def test_move_block(tu):
 
 
 def test_move_block_on_own_piece(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
     request = MovePieceRequest(game_id, CellCoordinatesSerializable(1, 1), CellCoordinatesSerializable(2, 1))
     response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
     assert response.status_code != 200
@@ -99,7 +99,6 @@ def test_move_block_on_own_piece(tu):
 
 
 def test_rotate_block(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
     request = RotatePieceRequest(game_id, CellCoordinatesSerializable(1, 1), 90)
     response = tu.post_data("/rotate_piece", tokens[0], json=asdict(request))
     assert response.status_code == 200
@@ -162,6 +161,25 @@ def test_use_hyper_square(tu):
     request = MovePieceRequest(game_id, CellCoordinatesSerializable(4, 3), CellCoordinatesSerializable(4, 4))
     response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
     assert response.status_code == 200
+
+
+def test_p2_victory(tu):
+    request = RotatePieceRequest(game_id, p1_laser_coordinates, 270)
+    response = tu.post_data("/rotate_piece", tokens[0], json=asdict(request))
+    assert response.status_code == 200
+
+    request = ShootLaserRequest(game_id)
+    response = tu.post_data("/shoot_laser", tokens[0], json=asdict(request))
+    assert response.status_code == 200
+
+    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
+    assert response.status_code == 200, response.text
+    game_state_dict = response.json()
+
+    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+    game_state = game_state_serializable.to_normal()
+    assert game_state.board.cells[tuple(p1_king_coordinates)] is None
+    assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
 
 
 def test_play_the_game(tu):
