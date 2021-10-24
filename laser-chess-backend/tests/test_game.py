@@ -538,6 +538,7 @@ def test_capture_block_twice():
         (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
         (0, 1): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
         (0, 2): Piece(PieceType.KING, Player.PLAYER_TWO),
+        (0, 3): Piece(PieceType.KING, Player.PLAYER_ONE),
     })
 
     initial_state = get_test_game_state(board)
@@ -655,6 +656,8 @@ def test_take_hyper_cube():
         (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
         (1, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
         (2, 0): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+        (3, 0): Piece(PieceType.KING, Player.PLAYER_ONE),
+        (4, 0): Piece(PieceType.KING, Player.PLAYER_TWO),
     })
 
     initial_state = get_test_game_state(board)
