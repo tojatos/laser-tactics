@@ -1,6 +1,13 @@
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
+
+
+class FriendRequestStatus(Enum):
+    PENDING = 0
+    ACCEPTED = 1
+    REJECTED = 2
 
 
 class ItemBase(BaseModel):
@@ -59,3 +66,13 @@ class Lobby(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class FriendRequestCreate(BaseModel):
+    user_two_username: str
+
+
+class FriendRequest(FriendRequestCreate):
+    id: int
+    user_one_username: str
+    status: FriendRequestStatus

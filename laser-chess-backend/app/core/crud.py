@@ -2,6 +2,7 @@ import dataclasses
 import json
 
 from sqlalchemy.orm import Session
+from sqlalchemy import and_, or_
 
 from . import models, schemas
 from passlib.context import CryptContext
@@ -94,6 +95,54 @@ def update_lobby(db: Session, lobby: schemas.Lobby):
     db.commit()
     db.refresh(db_lobby)
     return db_lobby
+
+
+def get_users_friends(user: schemas.User, db: Session):
+    friends_right = [d['user_two_username'] for d in db.query(models.FriendRequests.user_two_username).filter(and_(
+        user.username == models.FriendRequests.user_one_username,
+        models.FriendRequests.status == schemas.FriendRequestStatus.ACCEPTED))]
+    friends_left = [d['user_one_username'] for d in db.query(models.FriendRequests.user_one_username).filter(and_(
+        user.username == models.FriendRequests.user_two_username,
+        models.FriendRequests.status == schemas.FriendRequestStatus.ACCEPTED))]
+    return friends_left + friends_right
+
+
+def get_friend_request(id: int, db: Session):
+    return db.query(models.FriendRequests).filter(models.FriendRequests.id == id).first()
+
+
+def get_pending_friend_request(id: int, db: Session):
+    return db.query(models.FriendRequests).filter(and_(
+        models.FriendRequests.id == id, models.FriendRequests.status == schemas.FriendRequestStatus.PENDING)).first()
+
+
+def get_users_pending_friend_requests(user: schemas.User, db: Session):
+    return list(db.query(models.FriendRequests).filter(
+        and_(models.FriendRequests.user_two_username == user.username,
+             models.FriendRequests.status == schemas.FriendRequestStatus.PENDING)))
+
+
+def create_friend_request(user_sending: schemas.User, user_sent_to: schemas.User, db: Session):
+    request = models.FriendRequests(user_one_username=user_sending.username, user_two_username=user_sent_to.username,
+                                    status=schemas.FriendRequestStatus.PENDING)
+    db.add(request)
+    db.commit()
+    db.refresh(request)
+    return request
+
+
+def accept_friend_request(friend_request: schemas.FriendRequest, db: Session):
+    friend_request.status = schemas.FriendRequestStatus.ACCEPTED
+    db.commit()
+    db.refresh(friend_request)
+    return friend_request
+
+
+def decline_friend_request(friend_request: schemas.FriendRequest, db: Session):
+    friend_request.status = schemas.FriendRequestStatus.REJECTED
+    db.commit()
+    db.refresh(friend_request)
+    return friend_request
 
 
 def get_game_state_table(db: Session, game_id: str):
