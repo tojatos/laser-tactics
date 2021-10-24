@@ -7,7 +7,7 @@
    viewBox="0 0 200 200"
    version="1.1"
    id="svg5"
-   sodipodi:docname="horizontal-mirror-red.svg"
+   sodipodi:docname="MIRROR_RED.svg"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -24,12 +24,12 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.70710678"
-     inkscape:cx="362.03867"
+     inkscape:cx="583.3631"
      inkscape:cy="348.60364"
      inkscape:window-width="1280"
      inkscape:window-height="1377"
-     inkscape:window-x="1272"
-     inkscape:window-y="-8"
+     inkscape:window-x="1264"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
@@ -44,6 +44,7 @@
        width="18.708866"
        height="223.38388"
        x="90.645569"
-       y="-11.69194" />
+       y="-211.69196"
+       transform="rotate(90)" />
   </g>
 </svg>

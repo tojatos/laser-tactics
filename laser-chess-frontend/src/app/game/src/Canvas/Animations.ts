@@ -84,8 +84,7 @@ export class Animations {
 
       const speed = 20
       const laserIncrementPerFrame = 10
-      let laserIncrement = 10
-
+      let laserIncrement = laserIncrementPerFrame
       if(fromCell && toCell){
 
         const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.canvasCoordinates.x)
@@ -98,10 +97,13 @@ export class Animations {
               x: fromCell.canvasCoordinates.x - laserIncrement * xModifier,
               y: fromCell.canvasCoordinates.y - laserIncrement * yModifier
             }
-            this.drawings.drawGame(board.cells)
+
             this.drawings.drawLaserLine(fromCell.canvasCoordinates, currentCoordinates)
+
             laserIncrement += laserIncrementPerFrame
             if(this.inVicinity(toCell.canvasCoordinates, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
+              this.drawings.drawLaserLine(fromCell.canvasCoordinates, toCell.canvasCoordinates)
+              // draw a small square at the middle of field
               clearInterval(interval)
               resolve()
             }

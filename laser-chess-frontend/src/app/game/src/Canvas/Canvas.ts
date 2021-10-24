@@ -1,15 +1,15 @@
 import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
 import { EventEmitterService } from "../../services/event-emitter.service"
-import { Coordinates, GameEvent, PieceMovedEvent, PieceRotatedEvent } from "../../game.models"
+import { Coordinates } from "../../game.models"
 import { GameService } from "../../services/game.service"
 import { Board } from "../board"
 import { Cell } from "../cell"
 import { COLS, ROWS } from "../constants"
-import { GameEvents } from "../enums"
 import { Animations } from "./Animations"
 import { Drawings } from "./Drawings"
 import { Resources } from "./Resources"
+import { EventsExecutor } from "../eventsExecutor"
 
 @Injectable()
 export class Canvas {
@@ -22,6 +22,8 @@ export class Canvas {
     highlightColor: string = "yellow"
     hoveredCell: Cell | undefined
     gameId!: string
+    currentPlayer = this.authService.getCurrentJwtInfo().sub
+    eventsExecutor = new EventsExecutor(this, this.gameService)
 
     constructor(private gameService: GameService, public resources: Resources, private authService: AuthService, private eventEmitter: EventEmitterService) {}
 
@@ -47,13 +49,8 @@ export class Canvas {
       this.drawings.drawGame(board.cells)
     }
 
-    getAnimationToExecute(board: Board, gameEvent: GameEvent){
-      switch(gameEvent.event_type){
-        case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(board, board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y), gameEvent.rotation)
-        case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(board, gameEvent.moved_from, gameEvent.moved_to)
-        case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(board, gameEvent.teleported_from, gameEvent.teleported_to)
-        default: return undefined
-      }
+    getLaserPathAnimation(board: Board, from: Coordinates, to: Coordinates){
+      return this.animations.laserAnimation(board, from, to)
     }
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
@@ -62,7 +59,7 @@ export class Canvas {
         return
 
       const coor = this.getMousePos(event)
-      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, this.authService.getCurrentJwtInfo().sub)
+      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, this.currentPlayer)
 
       this.interactable = false
 
@@ -114,7 +111,7 @@ export class Canvas {
     async rotationButtonPressed(board: Board){
       const selectedCell = board.selectedCell
 
-      if(selectedCell){
+      if(selectedCell && this.interactable){
         this.gameService.rotatePiece(this.gameId,selectedCell.coordinates, 90)
         this.interactable = false
         await this.animations.rotatePiece(board, selectedCell, 90)
@@ -126,14 +123,20 @@ export class Canvas {
       }
     }
 
-    async laserButtonPressed(board: Board){
-      const laserCell = board.getLaserCell("1")
-      if(laserCell){
-        this.gameService.shootLaser(this.gameId)
+    laserButtonPressed(board: Board){
+      console.log("LazorShoot2")
+      const laserCell = board.getMyLaser()
+      if(laserCell && this.interactable){
         this.interactable = false
-        await this.animations.laserAnimation(board, laserCell?.coordinates, {x: laserCell.coordinates.x, y: laserCell.coordinates.y + 5})
-        this.interactable = true
+        board.currentTurn++
+        console.log("Sending request")
+        this.gameService.shootLaser(this.gameId).then(res => {
+          console.log("Request received! Invoking refresh")
+          this.eventEmitter.invokeRefresh()
+        })
       }
+      else
+        alert("You dont have a laser!")
     }
 
     private selectCellEvent(selectedCell: Cell, board: Board){

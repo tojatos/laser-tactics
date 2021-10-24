@@ -28,6 +28,7 @@ export class BoardComponent implements AfterViewInit, OnInit {
     if (this.eventEmitterService.subsRefresh == undefined) {
       this.eventEmitterService.subsRefresh = this.eventEmitterService.
       invokeRefreshGameState.subscribe(() => {
+        console.log("refresh invoked!")
         this.refreshingGameState = false
         this.refreshGameState();
       });
@@ -48,11 +49,11 @@ export class BoardComponent implements AfterViewInit, OnInit {
       this.gameService.getGameState(params.id).then(
         res => {
           if(res.body) {
+            //this.gameService.setAnimationEventsNum(res.body.game_events.length)
             res.body.game_id = params.id
             let gameState = this.gameService.getLocalGameState() || res.body
             const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
-            console.log(animationsToShow)
-            if((gameState != res.body && animationsToShow <= 0) || gameState.game_id != res.body.game_id){
+            if((gameState != res.body && animationsToShow <= 0) || gameState.game_events.length == res.body.game_events.length || gameState.game_id != res.body.game_id){
               gameState = res.body
               this.gameService.setAnimationEventsNum(gameState.game_events.length)
             }
@@ -65,7 +66,7 @@ export class BoardComponent implements AfterViewInit, OnInit {
             const myTurn = this.board.isMyTurn()
             this.canvas.interactable = myTurn
             if(!myTurn)
-              this.refreshIntervalStart()
+              this.refreshGameState()
           }
 
         }
@@ -86,18 +87,21 @@ export class BoardComponent implements AfterViewInit, OnInit {
   }
 
   laserShoot(){
+    console.log("lazorShoot")
     this.canvas.laserButtonPressed(this.board)
   }
 
   refreshGameState(){
     if(this.gameId){
       this.gameService.getGameState(this.gameId).then(async res => {
+        console.log("request recveived!")
         if(res.body && this.currentSize){
           //this.gameService.setAnimationEventsNum(res.body.game_events.length)
           const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
-          console.log(animationsToShow)
-          if(animationsToShow > 0)
+          if(animationsToShow > 0){
+            console.log("new actions to execute! Proceeding...")
             await this.executePendingActions(res.body, animationsToShow)
+          }
 
           this.board.currentTurn = res.body.turn_number
 
@@ -106,8 +110,7 @@ export class BoardComponent implements AfterViewInit, OnInit {
 
           if(myTurn)
             return
-
-          this.refreshIntervalStart()
+            this.refreshGameState()
 
         }
         else
@@ -117,13 +120,10 @@ export class BoardComponent implements AfterViewInit, OnInit {
   }
 
   private async executePendingActions(game: GameState, animationsToShow: number){
+    console.log("executing actions")
     this.canvas.interactable = false
     this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
-    await this.eventsExecutor.executeEvents(500, this.board)
-  }
-
-  refreshIntervalStart(){
-      window.setTimeout(() => this.refreshGameState(), 500)
+    await this.eventsExecutor.executeEventsQueue(this.board)
   }
 
 }

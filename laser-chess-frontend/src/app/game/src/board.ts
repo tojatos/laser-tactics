@@ -72,8 +72,16 @@ export class Board implements BoardInterface {
     this.cells.forEach(c => c.changeCanvasCoordinates(newSize))
   }
 
-  getLaserCell(player: string){
-    return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == player)
+  getMyLaser(){
+    const player = this.authService.getCurrentJwtInfo().sub
+    return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
+  }
+
+  getLaserCell(){ // needs to be changed - source info from backend
+    const player = this.authService.getCurrentJwtInfo().sub
+    if(this.isMyTurn())
+      return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
+    return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner != this.parsePlayerIdToPlayerNumber(player))
   }
 
   executeEvent(gameEvent: GameEvent){

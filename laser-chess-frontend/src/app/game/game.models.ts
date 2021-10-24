@@ -57,7 +57,7 @@ export interface LaserShotEvent {
 }
 
 export interface TakeEvent {
-  event_type: GameEvents.LASER_SHOT_EVENT
+  event_type: GameEvents.PIECE_TAKEN_EVENT
   taken_on: Coordinates
   piece_that_took_type: PieceType
   piece_taken_type: PieceType
