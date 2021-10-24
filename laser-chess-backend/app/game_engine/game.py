@@ -48,6 +48,25 @@ class Game:
     def __init__(self, game_state: GameState):
         self.game_state = game_state
 
+    def is_game_over(self):
+        return self.game_state.game_phase in [GamePhase.DRAW, GamePhase.PLAYER_ONE_VICTORY, GamePhase.PLAYER_TWO_VICTORY]
+
+    def check_victory(self):
+        is_p1_king_alive = len([c for c in self.game_state.board.cells.values()
+                                if c is not None
+                                and c.piece_owner is Player.PLAYER_ONE
+                                and c.piece_type is PieceType.KING]) == 1
+        is_p2_king_alive = len([c for c in self.game_state.board.cells.values()
+                                if c is not None
+                                and c.piece_owner is Player.PLAYER_TWO
+                                and c.piece_type is PieceType.KING]) == 1
+        if not is_p1_king_alive and not is_p2_king_alive:
+            self.game_state.game_phase = GamePhase.DRAW
+        elif not is_p1_king_alive:
+            self.game_state.game_phase = GamePhase.PLAYER_TWO_VICTORY
+        elif not is_p2_king_alive:
+            self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY
+
     def get_last_turn_player(self):
         return Player.PLAYER_ONE if (self.game_state.turn_number + 3) % 4 in [1, 2] else Player.PLAYER_TWO
 
@@ -92,6 +111,7 @@ class Game:
             if target_piece is not None:
                 self.game_state.game_events.append(PieceTakenEvent(to_cell, moved_piece.piece_type, target_piece.piece_type))
         self.game_state.turn_number += 1
+        self.check_victory()
 
     def rotate(self, rotated_piece_at: CellCoordinates, rotation: int):
         self.game_state.user_events.append(PieceRotatedEvent(rotated_piece_at, rotation))
@@ -205,8 +225,12 @@ class Game:
         self.game_state.board.cells = cells_after_laser_hit
         self.game_state.game_events.append(LaserShotEvent(laser_path))
         self.game_state.turn_number += 1
+        self.check_victory()
 
     def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> Tuple[bool, Optional[str]]:
+        if self.is_game_over():
+            return False, "The game is over."
+
         moved_piece = self.game_state.board.cells[from_cell]
         target_piece = self.game_state.board.cells[to_cell]
         last_game_event = self.game_state.game_events[-1] if self.game_state.game_events else None
@@ -242,6 +266,9 @@ class Game:
         return True, None
 
     def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> Tuple[bool, Optional[str]]:
+        if self.is_game_over():
+            return False, "The game is over."
+
         if self.get_current_player() is not player:
             return False, "This is not your turn."
 
@@ -257,6 +284,9 @@ class Game:
         return True, None
 
     def validate_laser_shoot(self, player: Player) -> Tuple[bool, Optional[str]]:
+        if self.is_game_over():
+            return False, "The game is over."
+
         if self.get_current_player() is not player:
             return False, "This is not your turn."
 
