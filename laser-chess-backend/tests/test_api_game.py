@@ -40,81 +40,84 @@ def before_all():
     session.commit()
 
 
-def test_start_game(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
-    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
+get_game_state_request = GetGameStateRequest(game_id)
+shoot_laser_request = ShootLaserRequest(game_id)
+p1_laser_coordinates = (5, 0)
+p2_laser_coordinates = (3, 8)
+p1_king_coordinates = (4, 0)
+p2_king_coordinates = (4, 8)
+
+
+def post_get_game_state(tu):
+    return tu.post_data("/get_game_state", json=asdict(get_game_state_request))
+
+
+def game_state_from_response(response):
     assert response.status_code == 200, response.text
     game_state_dict = response.json()
 
     game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
     game_state = game_state_serializable.to_normal()
-    assert game_state.is_started is True
+    return game_state
+
+
+def post_shoot_laser(tu, token_num: int):
+    return tu.post_data("/shoot_laser", tokens[token_num], json=asdict(shoot_laser_request))
+
+
+def post_move_piece(tu, token_num: int, coordinates_from: CellCoordinates, coordinates_to: CellCoordinates):
+    request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from), cell_coordinates_to_serializable(coordinates_to))
+    return tu.post_data("/move_piece", tokens[token_num], json=asdict(request))
+
+
+def post_rotate_piece(tu, token_num: int, coordinates: CellCoordinates, degrees: int):
+    request = RotatePieceRequest(game_id, cell_coordinates_to_serializable(coordinates), degrees)
+    return tu.post_data("/rotate_piece", tokens[token_num], json=asdict(request))
+
+
+def test_start_game(tu):
+    game_state = game_state_from_response(post_get_game_state(tu))
+    assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 1
 
 
 def test_shoot_laser(tu):
-    shoot_laser_request = ShootLaserRequest(game_id)
-    get_game_state_request = GetGameStateRequest(game_id)
-
-    response = tu.post_data("/shoot_laser", tokens[0], json=asdict(shoot_laser_request))
+    response = post_shoot_laser(tu, 0)
     assert response.status_code == 200
-    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
-    assert response.status_code == 200, response.text
-    game_state_dict = response.json()
 
-    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-    game_state = game_state_serializable.to_normal()
+    game_state = game_state_from_response(post_get_game_state(tu))
     assert game_state.board.cells[(5, 0)] is None
     assert game_state.board.cells[(6, 1)] is None
 
 
 def test_move_block(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
-    request = MovePieceRequest(game_id, CellCoordinatesSerializable(1, 1), CellCoordinatesSerializable(1, 2))
-    response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
+    response = post_move_piece(tu, 0, (1, 1), (1, 2))
     assert response.status_code == 200
-    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
-    assert response.status_code == 200, response.text
-    game_state_dict = response.json()
 
-    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-    game_state = game_state_serializable.to_normal()
+    game_state = game_state_from_response(post_get_game_state(tu))
     assert game_state.board.cells[(1, 1)] is None
     assert game_state.board.cells[(1, 2)] is not None
 
 
 def test_move_block_on_own_piece(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
-    request = MovePieceRequest(game_id, CellCoordinatesSerializable(1, 1), CellCoordinatesSerializable(2, 1))
-    response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
+    response = post_move_piece(tu, 0, (1, 1), (2, 1))
     assert response.status_code != 200
-    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
-    assert response.status_code == 200, response.text
-    game_state_dict = response.json()
 
-    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-    game_state = game_state_serializable.to_normal()
+    game_state = game_state_from_response(post_get_game_state(tu))
     assert game_state.board.cells[(1, 1)] is not None
     assert game_state.board.cells[(2, 1)] is not None
 
 
 def test_rotate_block(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
-    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(1, 1), 90)
-    response = tu.post_data("/rotate_piece", tokens[0], json=asdict(request))
+    response = post_rotate_piece(tu, 0, (1, 1), 90)
     assert response.status_code == 200
-    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
-    assert response.status_code == 200, response.text
-    game_state_dict = response.json()
 
-    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-    game_state = game_state_serializable.to_normal()
+    game_state = game_state_from_response(post_get_game_state(tu))
     assert game_state.board.cells[(1, 1)] == Piece(PieceType.BLOCK, Player.PLAYER_ONE, 90)
 
 
 def test_rotate_empty(tu):
-    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(3, 3), 90)
-    response = tu.post_data("/rotate_piece", tokens[0], json=asdict(request))
+    response = post_rotate_piece(tu, 0, (3, 3), 90)
     assert response.status_code != 200
 
 
@@ -125,70 +128,112 @@ def test_rotate_as_guest(tu):
 
 
 def test_rotate_as_other_player(tu):
-    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(1, 1), 90)
-    response = tu.post_data("/rotate_piece", tokens[1], json=asdict(request))
+    response = post_rotate_piece(tu, 0, (1, 1), 90)
+    assert response.status_code == 200
+    response = post_rotate_piece(tu, 0, (1, 1), 90)
+    assert response.status_code == 200
+    response = post_rotate_piece(tu, 1, (1, 1), 90)
     assert response.status_code == 403
 
 
 def test_rotate_hypercube(tu):
-    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(4, 4), 90)
-    response = tu.post_data("/rotate_piece", tokens[0], json=asdict(request))
+    response = post_rotate_piece(tu, 0, (4, 4), 90)
     assert response.status_code != 200
 
 
 def test_rotate_block_invalid_angle(tu):
     invalid_angles = [89, 324, -1, 360, 34, 91, 271]
     for angle in invalid_angles:
-        request = RotatePieceRequest(game_id, CellCoordinatesSerializable(1, 1), angle)
-        response = tu.post_data("/rotate_piece", tokens[0], json=asdict(request))
+        response = post_rotate_piece(tu, 0, (1, 1), angle)
         assert response.status_code != 200
 
 
 def test_use_hyper_square(tu):
-    request = MovePieceRequest(game_id, CellCoordinatesSerializable(4, 1), CellCoordinatesSerializable(4, 2))
-    response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
+    post_move_piece(tu, 0, (4, 1), (4, 2))
+    post_move_piece(tu, 0, (4, 2), (4, 3))
+    post_rotate_piece(tu, 1, (4, 7), 90)
+    post_rotate_piece(tu, 1, (4, 7), 90)
+    response = post_move_piece(tu, 0, (4, 3), (4, 4))
     assert response.status_code == 200
 
-    request = MovePieceRequest(game_id, CellCoordinatesSerializable(4, 2), CellCoordinatesSerializable(4, 3))
-    response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
-    assert response.status_code == 200
 
-    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(4, 7), 90)
-    response = tu.post_data("/rotate_piece", tokens[1], json=asdict(request))
-    assert response.status_code == 200
-    response = tu.post_data("/rotate_piece", tokens[1], json=asdict(request))
-    assert response.status_code == 200
+def test_p2_victory(tu):
+    post_rotate_piece(tu, 0, p1_laser_coordinates, 270)
+    post_shoot_laser(tu, 0)
 
-    request = MovePieceRequest(game_id, CellCoordinatesSerializable(4, 3), CellCoordinatesSerializable(4, 4))
-    response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
-    assert response.status_code == 200
+    game_state = game_state_from_response(post_get_game_state(tu))
+    assert game_state.board.cells[p1_king_coordinates] is None
+    assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
+
+    response = post_rotate_piece(tu, 1, p2_laser_coordinates, 270)
+    assert response.status_code == 403
+
+
+def test_p1_victory(tu):
+    post_rotate_piece(tu, 0, p1_laser_coordinates, 270)
+    post_rotate_piece(tu, 0, p1_laser_coordinates, 270)
+    post_rotate_piece(tu, 1, p2_laser_coordinates, 270)
+    post_shoot_laser(tu, 1)
+
+    game_state = game_state_from_response(post_get_game_state(tu))
+    assert game_state.board.cells[p2_king_coordinates] is None
+    assert game_state.game_phase is GamePhase.PLAYER_ONE_VICTORY
+
+    response = post_rotate_piece(tu, 0, p1_laser_coordinates, 270)
+    assert response.status_code == 403
+
+
+def test_draw(tu):
+    post_rotate_piece(tu, 0, (6, 0), 90)
+    post_rotate_piece(tu, 0, (0, 1), 180)
+    post_rotate_piece(tu, 1, (6, 8), 90)
+    post_move_piece(tu, 1, (6, 7), (6, 6))
+    post_rotate_piece(tu, 0, (4, 1), 90)
+    post_move_piece(tu, 0, (5, 1), (5, 2))
+    post_move_piece(tu, 1, (6, 6), (7, 6))
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_move_piece(tu, 0, (6, 1), (6, 2))
+    post_move_piece(tu, 0, (6, 2), (7, 2))
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_move_piece(tu, 0, (6, 0), (6, 1))
+    post_move_piece(tu, 0, (6, 1), (6, 2))
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_move_piece(tu, 0, (0, 1), (0, 2))
+    post_move_piece(tu, 0, (0, 2), (1, 2))
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_move_piece(tu, 0, (1, 2), (2, 2))
+    post_move_piece(tu, 0, (2, 2), (3, 2))
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_rotate_piece(tu, 1, (8, 8), 90)  # fill move
+    post_move_piece(tu, 0, (3, 2), (4, 2))
+    post_shoot_laser(tu, 0)
+
+    game_state = game_state_from_response(post_get_game_state(tu))
+
+    assert game_state.board.cells[p1_king_coordinates] is None
+    assert game_state.board.cells[p2_king_coordinates] is None
+    assert game_state.game_phase is GamePhase.DRAW
+
+    response = post_rotate_piece(tu, 1, p2_laser_coordinates, 270)
+    assert response.status_code == 403
 
 
 def test_play_the_game(tu):
-    get_game_state_request = GetGameStateRequest(game_id)
-
-    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
-    assert response.status_code == 200, response.text
-    game_state_dict = response.json()
-
-    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-    game_state = game_state_serializable.to_normal()
-    assert game_state.is_started is True
+    game_state = game_state_from_response(post_get_game_state(tu))
+    assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 1
 
-    request = MovePieceRequest(game_id, CellCoordinatesSerializable(0, 1), CellCoordinatesSerializable(0, 2))
-    response = tu.post_data("/move_piece", tokens[0], json=asdict(request))
+    response = post_move_piece(tu, 0, (0, 1), (0, 2))
     assert response.status_code == 200
-    request = RotatePieceRequest(game_id, CellCoordinatesSerializable(0, 2), 90)
-    response = tu.post_data("/rotate_piece", tokens[0], json=asdict(request))
-    assert response.status_code == 200
-    response = tu.post_data("/get_game_state", json=asdict(get_game_state_request))
-    assert response.status_code == 200, response.text
-    game_state_dict = response.json()
 
-    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-    game_state = game_state_serializable.to_normal()
-    assert game_state.is_started is True
+    response = post_rotate_piece(tu, 0, (0, 2), 90)
+    assert response.status_code == 200
+
+    game_state = game_state_from_response(post_get_game_state(tu))
+    assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 3
     assert game_state.board.cells[(0, 1)] is None
     assert game_state.board.cells[(0, 2)] is not None

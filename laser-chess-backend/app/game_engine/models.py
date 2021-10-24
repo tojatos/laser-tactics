@@ -23,8 +23,13 @@ class CellCoordinatesSerializable:
         yield self.x
         yield self.y
 
-    # def __init__(self, coordinates: CellCoordinates):
-    #     self.x, self.y = coordinates
+
+class GamePhase(str, AutoNameEnum):
+    NOT_STARTED = auto()
+    STARTED = auto()
+    PLAYER_ONE_VICTORY = auto()
+    PLAYER_TWO_VICTORY = auto()
+    DRAW = auto()
 
 
 class PieceType(str, AutoNameEnum):
@@ -243,7 +248,7 @@ class GameStateSerializable:
     player_one_id: str
     player_two_id: str
     board: BoardSerializable
-    is_started: bool
+    game_phase: GamePhase
     turn_number: int
     game_events: List[GameEventSerializable]
     user_events: List[UserEventSerializable]
@@ -253,7 +258,7 @@ class GameStateSerializable:
             player_one_id=self.player_one_id,
             player_two_id=self.player_two_id,
             board=self.board.to_normal(),
-            is_started=self.is_started,
+            game_phase=self.game_phase,
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
             user_events=list(map(lambda x: x.to_normal(), self.user_events)),
@@ -265,7 +270,7 @@ class GameState:
     player_one_id: str
     player_two_id: str
     board: Board
-    is_started: bool
+    game_phase: GamePhase
     turn_number: int
     game_events: List[GameEvent]
     user_events: List[UserEvent]
@@ -275,7 +280,7 @@ class GameState:
             player_one_id=self.player_one_id,
             player_two_id=self.player_two_id,
             board=self.board.to_serializable(),
-            is_started=self.is_started,
+            game_phase=self.game_phase,
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
             user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
@@ -374,7 +379,7 @@ def empty_game_state(player_one_id, player_two_id) -> GameState:
         (7, 8): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 180),
         (8, 8): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_TWO, 180),
     })
-    is_started: bool = False
+    game_phase: GamePhase = GamePhase.NOT_STARTED
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, is_started, turn_number, [], [])
+    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [])
