@@ -7,13 +7,13 @@ import { Canvas } from './src/Canvas/Canvas';
 import { Board } from './src/board';
 import { Resources } from './src/Canvas/Resources';
 import { EventsExecutor } from './src/eventsExecutor';
-
-
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [GameComponent, BoardComponent, ChatComponent],
   imports: [
-    CommonModule
+    CommonModule,
+    HttpClientModule
   ],
   exports: [GameComponent],
   providers: [Canvas, Board, Resources, EventsExecutor]
