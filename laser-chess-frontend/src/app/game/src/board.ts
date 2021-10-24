@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
 import { BoardInterface, CellInterface, Coordinates, GameEvent, GameState, PieceInterface, PieceMovedEvent } from "../game.models"
 import { Cell } from "./cell"
-import { GameEvents, PieceType, PlayerType } from "./enums"
+import { GameEvents, GamePhase, PieceType, PlayerType } from "./enums"
 
 @Injectable()
 export class Board implements BoardInterface {
@@ -122,7 +122,7 @@ export class Board implements BoardInterface {
       player_one_id: this.playerOne || PlayerType.NONE,
       player_two_id: this.playerTwo || PlayerType.NONE,
       board: boardInterface,
-      is_started: false,
+      game_phase: GamePhase.STARTED,
       turn_number: this.currentTurn,
       game_events: []
     }

@@ -110,7 +110,7 @@ export class BoardComponent implements AfterViewInit, OnInit {
 
           if(myTurn)
             return
-            this.refreshGameState()
+            setTimeout(() => this.refreshGameState(), 500)
 
         }
         else
