@@ -23,24 +23,27 @@ def test_get_friends_of_user():
 
 
 def test_send_friend_request():
-    response = post_data("/users/me/friends/requests/send", tokens[0], json={"username": "test2"})
-    assert response.status_code == 200
+    response = post_data("/users/me/friends/requests/send?friend_username=test2", tokens[0])
+    assert response.status_code == 201
 
 
 def test_get_pending_requests():
-    response = get_data("/users/me/friends")
+    response = post_data("/users/me/friends/requests/send?friend_username=test2", tokens[0])
+    assert response.status_code == 201
+
+    response = get_data("/users/me/friends", tokens[2])
     assert response.status_code == 200
 
 
 def test_accept_friend_request():
-    response = post_data("/users/me/friends/requests/send", tokens[0], json={"username": "test2"})
-    assert response.status_code == 200
+    response = post_data("/users/me/friends/requests/send?friend_username=test2", tokens[0])
+    assert response.status_code == 201
 
     response = get_data("/users/me/friends/requests", tokens[2])
     assert response.status_code == 200
 
-    # ???????
-    response = post_data(f"/users/me/friends/requests/send", tokens[2], json=list(response.json())[0].id)
+    # thats wack
+    response = post_data(f"/users/me/friends/requests/accept?request_id={response.json()[0]['id']}", tokens[2])
     assert response.status_code == 200
 
     response = get_data("/users/me/friends", tokens[0])
@@ -50,4 +53,4 @@ def test_accept_friend_request():
     user_2_friends = list(response.json())
 
     assert "test0" in user_2_friends
-    assert "test3" in user_1_friends
+    assert "test2" in user_1_friends

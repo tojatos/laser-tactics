@@ -76,3 +76,9 @@ class FriendRequest(FriendRequestCreate):
     id: int
     user_one_username: str
     status: FriendRequestStatus
+
+
+class BlockedUsers(BaseModel):
+    id: int
+    user: str
+    blocked_user: str

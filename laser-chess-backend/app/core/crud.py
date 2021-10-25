@@ -111,6 +111,13 @@ def get_friend_request(id: int, db: Session):
     return db.query(models.FriendRequests).filter(models.FriendRequests.id == id).first()
 
 
+def get_friend_record(user: schemas.User, friend: schemas.User, db: Session):
+    return db.query(models.FriendRequests).filter(or_(and_(models.FriendRequests.user_two_username == friend.username,
+                                                           models.FriendRequests.user_one_username == user.username),
+                                                      and_((models.FriendRequests.user_two_username == user.username,
+                                                            models.FriendRequests.user_one_username == friend.username)))).first()
+
+
 def get_pending_friend_request(id: int, db: Session):
     return db.query(models.FriendRequests).filter(and_(
         models.FriendRequests.id == id, models.FriendRequests.status == schemas.FriendRequestStatus.PENDING)).first()
@@ -143,6 +150,41 @@ def decline_friend_request(friend_request: schemas.FriendRequest, db: Session):
     db.commit()
     db.refresh(friend_request)
     return friend_request
+
+
+def delete_friend_record(user: schemas.User, friend: schemas.User, db: Session):
+    record = get_friend_record(user, friend, db)
+    if record:
+        db.delete(record)
+        db.commit()
+        return {f"msg": f"Friend {friend.username} of user {user.username} removed"}
+    return {"msg": "No friend record to delete found"}
+
+
+def get_blocked_users(user: schemas.User, db: Session):
+    return [d.blocked_user for d in db.query(models.BlockedUsers).filter(models.BlockedUsers.user == user.username)]
+
+
+def get_block_record(user: schemas.User, blocked: schemas.User, db: Session):
+    return db.query(models.BlockedUsers).filter(and_(models.BlockedUsers.user == user.username,
+                                                     models.BlockedUsers.blocked_user == blocked.username)).first()
+
+
+def create_block_record(user: schemas.User, user_to_block: schemas.User, db: Session):
+    record = models.BlockedUsers(user=user.username, blocked_user=user_to_block.username)
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+def remove_block_record(user: schemas.User, blocked_user: schemas.User, db: Session):
+    record = get_block_record(user=user, blocked=blocked_user, db=db)
+    if record:
+        db.delete(record)
+        db.commit()
+        return {f"msg": f"Blocked user {blocked_user.username} of user {user.username} removed"}
+    return {"msg": "No blocked record to delete found"}
 
 
 def get_game_state_table(db: Session, game_id: str):
