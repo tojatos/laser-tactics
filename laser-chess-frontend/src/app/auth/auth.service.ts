@@ -24,6 +24,10 @@ export class AuthService {
     return this.http.post<UserToken>('/api/v1/token', body.toString(), options).toPromise().then(res => this.setSession(res))
   }
 
+  register(login:string, email:string, pass:string){
+    return this.http.post<any>('/api/v1/users/', {'username': login, 'email': email, 'password': pass}).subscribe(res => this.setSession(res));
+  }
+
 private setSession(authResult: UserToken) {
     // const expiresAt = moment().add(authResult.expiresIn,'second')
     localStorage.setItem(this.idToken, authResult.access_token)
