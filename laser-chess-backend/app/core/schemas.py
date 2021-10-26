@@ -1,13 +1,18 @@
-from enum import Enum
+from enum import Enum, auto
 from typing import List, Optional
 
 from pydantic import BaseModel
 
 
-class FriendRequestStatus(Enum):
-    PENDING = 0
-    ACCEPTED = 1
-    REJECTED = 2
+class AutoNameEnum(Enum):
+    def _generate_next_value_(self, start, count, last_values):
+        return self
+
+
+class FriendRequestStatus(AutoNameEnum):
+    PENDING = auto()
+    ACCEPTED = auto()
+    REJECTED = auto()
 
 
 class ItemBase(BaseModel):
