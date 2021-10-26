@@ -46,3 +46,16 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class Lobby(BaseModel):
+    id: int
+    game_id: str
+    name: str
+    player_one_username: str
+    player_two_username: Optional[str] = None
+    is_ranked: bool = False
+    is_private: bool = False
+
+    class Config:
+        orm_mode = True

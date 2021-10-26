@@ -98,32 +98,3 @@ def test_start_game():
     assert data["player_one_id"] == "test"
     assert data["player_two_id"] == "test2"
 
-
-def test_shoot_laser():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-    response = post_data("/users/", json={"username": "test", "email": "test@example.com", "password": "admin123"})
-    assert response.status_code == 200
-    response = post_data("/token", data={"username": "test", "password": "admin123"})
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert "access_token" in data
-    token = data["access_token"]
-    post_data(
-        "/start_game",
-        json={"game_id": "some_id", "player_one_id": "test", "player_two_id": "test2"},
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    response = post_data("/shoot_laser", json={"game_id": "some_id"}, headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 200
-    response = post_data("/get_game_state", json={"game_id": "some_id"})
-    assert response.status_code == 200, response.text
-    game_state_dict = response.json()
-
-    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-    game_state = game_state_serializable.to_normal()
-    assert game_state.board.cells[(5, 0)] is None
-    assert game_state.board.cells[(6, 1)] is None
-
-

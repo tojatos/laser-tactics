@@ -4,13 +4,15 @@ services:
   fastapi:
     build: .
     restart: always
-    command: uvicorn app.main:app --host 0.0.0.0 --port 80
+    command: python -m app.main
     ports:
       - 80:80
     depends_on:
       - db
     environment:
       - SQLALCHEMY_DATABASE_URL=postgresql://postgres:admin@db:5432/laserchess
+      - HOST=0.0.0.0
+      - PORT=80
 
   db:
     image: postgres:13.0-alpine
