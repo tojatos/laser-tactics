@@ -4,7 +4,7 @@ import { GameState } from '../../game.models';
 import { EventEmitterService } from '../../services/event-emitter.service';
 import { GameService } from '../../services/game.service';
 import { Board } from '../../src/board';
-import { Canvas } from '../../src/Canvas/Canvas';
+import { GameCanvas } from '../../src/Display/Canvas/GameCanvas';
 import { EventsExecutor } from '../../src/eventsExecutor';
 
 @Component({
@@ -22,7 +22,7 @@ export class BoardComponent implements AfterViewInit, OnInit {
   intervalIsPaused: boolean = false
   refreshingGameState: boolean = false
 
-  constructor(private gameService: GameService, private route: ActivatedRoute, private eventEmitterService: EventEmitterService, private canvas: Canvas, private board: Board, private eventsExecutor: EventsExecutor){}
+  constructor(private gameService: GameService, private route: ActivatedRoute, private eventEmitterService: EventEmitterService, private canvas: GameCanvas, private board: Board, private eventsExecutor: EventsExecutor){}
 
   ngOnInit() {
     if (this.eventEmitterService.subsRefresh == undefined) {

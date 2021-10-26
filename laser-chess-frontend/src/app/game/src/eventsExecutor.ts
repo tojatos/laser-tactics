@@ -3,7 +3,7 @@ import { cloneDeep, curry, groupBy, values } from "lodash";
 import { Coordinates, GameEvent, LaserShotEventEntity } from "../game.models";
 import { GameService } from "../services/game.service";
 import { Board } from "./board";
-import { Canvas } from "./Canvas/Canvas";
+import { GameCanvas } from "./Display/Canvas/GameCanvas";
 import { GameEvents } from "./enums";
 
 type PathInfo = {
@@ -15,7 +15,7 @@ type PathInfo = {
 @Injectable()
 export class EventsExecutor{
 
-    constructor(private canvas: Canvas, private gameService: GameService) {}
+    constructor(private canvas: GameCanvas, private gameService: GameService) {}
 
     eventsQueue : GameEvent[] = []
     eventsExecutionTimeout = 500

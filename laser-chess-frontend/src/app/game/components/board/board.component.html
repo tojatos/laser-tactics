@@ -1,4 +1,7 @@
 <p>board works!</p>
-<canvas #canvas class="game-board"></canvas>
+<div class="game-container">
+<canvas #canvas class="gameCanvas"></canvas>
+<canvas #gui class="guiCanvas"></canvas>
+</div>
 <button mat-button (click)="onClick()">Rotato</button>
 <button mat-button (click)="laserShoot()">Laser</button>

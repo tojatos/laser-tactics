@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { GameComponent } from './game.component';
 import { BoardComponent } from './components/board/board.component';
 import { ChatComponent } from './components/chat/chat.component';
-import { Canvas } from './src/Canvas/Canvas';
+import { GameCanvas } from './src/Display/Canvas/GameCanvas';
 import { Board } from './src/board';
-import { Resources } from './src/Canvas/Resources';
+import { Resources } from './src/Display/Resources';
 import { EventsExecutor } from './src/eventsExecutor';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -16,6 +16,6 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule
   ],
   exports: [GameComponent],
-  providers: [Canvas, Board, Resources, EventsExecutor]
+  providers: [GameCanvas, Board, Resources, EventsExecutor]
 })
 export class GameModule { }

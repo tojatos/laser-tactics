@@ -1,6 +1,6 @@
 import { Coordinates } from "../../game.models"
 import { Cell } from "../cell"
-import { PIECE_SIZE_SCALE, ROWS } from "../constants"
+import { PIECE_SIZE_SCALE } from "../constants"
 import { Piece } from "../piece"
 import { Resources } from "./Resources"
 
@@ -19,12 +19,15 @@ export class Drawings {
     }
 
     drawGame(cells: Cell[]){
-        this.drawBoard(this.resources.boardImage)
+        this.clearBoard()
         cells.forEach(c => { if(c.piece) this.drawPiece(c.piece) })
     }
 
-    drawBoard(boardImage: HTMLImageElement){
-      this.ctx.drawImage(boardImage, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+    clearBoard(){
+        this.ctx.save()
+        this.ctx.translate(0, 0)
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.ctx.restore()
     }
 
     drawPiece(piece: Piece){
@@ -51,15 +54,10 @@ export class Drawings {
         }
     }
 
-    drawSingleCell(cell: Cell, boardImage: HTMLImageElement){
-      const imgSize = boardImage.width
-      const imageCellSize = Math.round(((imgSize / ROWS) + Number.EPSILON) * 100) / 100
+    drawSingleCell(cell: Cell){
       this.ctx.save()
       this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
-      this.ctx.drawImage(boardImage, cell.coordinates.x * imageCellSize, cell.coordinates.y * imageCellSize,
-        imageCellSize, imageCellSize,
-        this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y,
-        this.blockSize, this.blockSize)
+      this.ctx.clearRect(this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y, this.blockSize, this.blockSize);
       this.ctx.restore()
       if(cell.piece)
         this.drawPiece(cell.piece)
@@ -86,6 +84,22 @@ export class Drawings {
       this.ctx.lineTo(to.x, to.y)
       this.ctx.strokeStyle = "red"
       this.ctx.stroke()
+    }
+
+    drawLaserButton(){
+      const coordinates = {x: this.ctx.canvas.width / 2, y: this.ctx.canvas.height - this.ctx.canvas.height / 5}
+      this.drawButton(coordinates, this.resources.laserShotButton)
+    }
+
+    drawButton(at: Coordinates, image: HTMLImageElement){
+      this.ctx.save()
+      this.ctx.globalAlpha = 0.8;
+      this.ctx.translate(at.x, at.y)
+      const ratio = image.width / image.height
+      const height = this.blockSize * 3 / ratio
+      const width = this.blockSize * 3 * ratio
+      this.ctx.drawImage(image, - width / 2, - height / 2, width, height)
+      this.ctx.restore()
     }
 
     get cellDrawingOriginCoordinates(): Coordinates {

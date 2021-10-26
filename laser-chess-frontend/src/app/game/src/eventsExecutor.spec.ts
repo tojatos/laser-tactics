@@ -1,10 +1,10 @@
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
-import { Canvas } from "./Canvas/Canvas";
-import { Resources } from "./Canvas/Resources";
+import { GameCanvas } from "./Display/Canvas/GameCanvas";
+import { Resources } from "./Display/Resources";
 import { EventsExecutor } from "./eventsExecutor";
 
-class MockCanvas extends Canvas {
+class MockCanvas extends GameCanvas {
   currentPlayer = "user"
 }
 
@@ -14,7 +14,7 @@ describe('EventsExecutor', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EventsExecutor, {provide: Canvas, useValue: MockCanvas}, Resources]
+      providers: [EventsExecutor, {provide: GameCanvas, useValue: MockCanvas}, Resources]
     }).compileComponents()
     eventsExecutor = TestBed.inject(EventsExecutor)
   })

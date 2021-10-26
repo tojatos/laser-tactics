@@ -1,22 +1,22 @@
-import { Injectable } from "@angular/core"
+import { Inject, Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
-import { EventEmitterService } from "../../services/event-emitter.service"
-import { Coordinates } from "../../game.models"
-import { GameService } from "../../services/game.service"
-import { Board } from "../board"
-import { Cell } from "../cell"
-import { COLS, ROWS } from "../constants"
-import { Animations } from "./Animations"
-import { Drawings } from "./Drawings"
-import { Resources } from "./Resources"
-import { EventsExecutor } from "../eventsExecutor"
+import { EventEmitterService } from "../../../services/event-emitter.service"
+import { Coordinates } from "../../../game.models"
+import { GameService } from "../../../services/game.service"
+import { Board } from "../../board"
+import { Cell } from "../../cell"
+import { COLS, ROWS } from "../../constants"
+import { Animations } from "../Animations"
+import { Drawings } from "../Drawings"
+import { Resources } from "../Resources"
+import { EventsExecutor } from "../../eventsExecutor"
+import { PieceType } from "../../enums"
+import { Canvas } from "./AbstractCanvas"
 
 @Injectable()
-export class Canvas {
+export class GameCanvas extends Canvas {
 
-    ctx!: CanvasRenderingContext2D
     animations!: Animations
-    drawings!: Drawings
     interactable: boolean = false
     block_size!: number
     highlightColor: string = "yellow"
@@ -25,7 +25,9 @@ export class Canvas {
     currentPlayer = this.authService.getCurrentJwtInfo().sub
     eventsExecutor = new EventsExecutor(this, this.gameService)
 
-    constructor(private gameService: GameService, public resources: Resources, private authService: AuthService, private eventEmitter: EventEmitterService) {}
+    constructor(private gameService: GameService, @Inject(Resources) resources: Resources, private authService: AuthService, private eventEmitter: EventEmitterService) {
+      super(resources)
+    }
 
     async initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
       await this.resources.loadAssets()
@@ -79,8 +81,11 @@ export class Canvas {
 
       }
       else {
-        if(selectedCell)
+        if(selectedCell){
           this.selectCellEvent(selectedCell, board)
+          if(selectedCell.piece?.piece_type == PieceType.LASER)
+            this.drawings.drawLaserButton()
+        }
       }
 
       const myTurn = board.isMyTurn()
@@ -94,12 +99,12 @@ export class Canvas {
         const hoveredOver = board.getCellByCoordinates(coor.x, coor.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
-            this.drawings.drawSingleCell(hoveredOver, this.resources.boardImage)
+            this.drawings.drawSingleCell(hoveredOver)
             this.drawings.highlightCell(hoveredOver, this.highlightColor)
           }
           else {
             if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
-              this.drawings.drawSingleCell(this.hoveredCell, this.resources.boardImage)
+              this.drawings.drawSingleCell(this.hoveredCell)
               this.drawings.showPossibleMove(this.hoveredCell, this.highlightColor)
             }
           }

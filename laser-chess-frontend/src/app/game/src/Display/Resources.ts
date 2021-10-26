@@ -12,16 +12,26 @@ export class Resources {
 
   boardImage: HTMLImageElement = new Image()
   pieceImages: Map<string, HTMLImageElement> = new Map()
+  laserShotButton: HTMLImageElement = new Image()
+  leftButton: HTMLImageElement = new Image()
+  rightButton: HTMLImageElement = new Image()
 
   constructor(){ }
 
   async loadAssets(){
     await this.loadBoardImage()
     await this.loadPiecesImages()
+    await this.loadButtonImages()
   }
 
   private async loadBoardImage(){
     await this.loadImage(this.boardImage, "assets/board.svg")
+  }
+
+  private async loadButtonImages(){
+    await this.loadImage(this.laserShotButton, "assets/laser_shot_button.svg")
+    await this.loadImage(this.rightButton, "assets/right_arrow.svg")
+    await this.loadImage(this.leftButton, "assets/left_arrow.svg")
   }
 
   private async loadPiecesImages(){

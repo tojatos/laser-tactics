@@ -1,6 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Canvas } from '../src/Canvas/Canvas';
+import { GameCanvas } from '../src/Display/Canvas/GameCanvas';
 
 import { GameService } from './game.service';
 
