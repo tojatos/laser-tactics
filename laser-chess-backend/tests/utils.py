@@ -22,6 +22,15 @@ class TestUtils:
     def post_data(self, path: str, token: str = None, **kwargs):
         return self.make_request('POST', path, token, **kwargs)
 
+    def patch_data(self, path: str, token: str = None, **kwargs):
+        return self.make_request('PATCH', path, token, **kwargs)
+
+    def put_data(self, path: str, token: str = None, **kwargs):
+        return self.make_request('PUT', path, token, **kwargs)
+
+    def delete_data(self, path: str, token: str = None, **kwargs):
+        return self.make_request('DELETE', path, token, **kwargs)
+
     def get_data(self, path: str, token: str = None, **kwargs):
         return self.make_request('GET', path, token, **kwargs)
 
