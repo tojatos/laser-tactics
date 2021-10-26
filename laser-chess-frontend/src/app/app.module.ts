@@ -15,6 +15,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegisterComponent } from './components/register/register.component';
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
+import { MainPageComponent } from './components/main-page/main-page.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
     MainNavComponent,
     LoginComponent,
     UserPageComponent,
-    RegisterComponent
+    RegisterComponent,
+    MainPageComponent
   ],
   imports: [
     BrowserModule,

@@ -7,7 +7,7 @@
       <span>Laser Tactics</span>
       <span class="spacer"></span>
       <div fxShow="true" fxHide.lt-md="true">
-        <a href="/" mat-button>Home</a>
+        <a href="#" mat-button routerLink="">Home</a>
         <a href="/game" mat-button>New game</a>
         <a href="/puzzle" mat-button>Puzzles</a>
         <a href="/settings" mat-button>Settings</a>
@@ -20,7 +20,7 @@
   <mat-sidenav-container fxFlexFill>
     <mat-sidenav #sidenav fxLayout="column">
       <mat-nav-list>
-        <a href="#" mat-list-item routerLink="/"(click)="sidenav.toggle()">Home</a>
+        <a href="#" mat-list-item routerLink=""(click)="sidenav.toggle()">Home</a>
         <a href="#" mat-list-item routerLink="/game"(click)="sidenav.toggle()">New game</a>
         <a href="#" mat-list-item routerLink="/puzzles" (click)="sidenav.toggle()">Puzzles</a>
         <a href="#" mat-list-item routerLink="/settings" (click)="sidenav.toggle()">Settings</a>
