@@ -13,6 +13,7 @@ tokens = []
 game_id = "some_id"
 
 
+# TODO: create lobby before starting the game
 @pytest.fixture(scope="session", autouse=True)
 def before_all():
     global tokens
@@ -66,7 +67,8 @@ def post_shoot_laser(tu, token_num: int):
 
 
 def post_move_piece(tu, token_num: int, coordinates_from: CellCoordinates, coordinates_to: CellCoordinates):
-    request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from), cell_coordinates_to_serializable(coordinates_to))
+    request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from),
+                               cell_coordinates_to_serializable(coordinates_to))
     return tu.post_data("/move_piece", tokens[token_num], json=asdict(request))
 
 
