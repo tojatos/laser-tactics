@@ -347,8 +347,8 @@ def test_shoot_laser_diagonal_mirror():
     game_state = get_shoot_laser_state(board)
 
     assert game_state.board == expected_board
-    assert game_state.game_events == [LaserShotEvent(
-        [(0, (1, 1)), (1, (2, 1)), (2, (2, 2)), (3, (1, 2)), (4, (1, 1)), (5, (0, 1)), (6, (0, 2)), (6, (0, 0))])]
+    assert game_state.game_events[0] == LaserShotEvent(
+        [(0, (1, 1)), (1, (2, 1)), (2, (2, 2)), (3, (1, 2)), (4, (1, 1)), (5, (0, 1)), (6, (0, 2)), (6, (0, 0))])
 
 
 def test_move_hyper_cube():
