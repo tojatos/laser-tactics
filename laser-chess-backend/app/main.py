@@ -353,7 +353,6 @@ async def remove_friend(friend_username: str, current_user: schemas.User = Depen
     return crud.delete_friend_record(user=current_user, friend=friend, db=db)
 
 
-# TODO: blocklist
 @router.get("/users/me/blocked")
 async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
