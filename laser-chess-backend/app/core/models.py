@@ -47,4 +47,5 @@ class Lobby(Base):
     game_id = Column(String)
     is_ranked = Column(Boolean, default=False)
     is_private = Column(Boolean, default=False)
+    starting_position_reversed = Column(Boolean, default=False)
 

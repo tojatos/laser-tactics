@@ -55,6 +55,7 @@ class LobbyEditData(BaseModel):
     player_one_username: str
     is_ranked: bool
     is_private: bool
+    starting_position_reversed: bool
 
 
 class Lobby(BaseModel):
@@ -65,6 +66,7 @@ class Lobby(BaseModel):
     player_two_username: Optional[str] = None
     is_ranked: bool = False
     is_private: bool = False
+    starting_position_reversed: bool = False
 
     class Config:
         orm_mode = True
