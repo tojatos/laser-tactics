@@ -134,8 +134,10 @@ class Game:
         pieces_destroyed_by_laser_events = []
         initial_laser_direction = direction_from_rotation[laser_rotation]
 
+        laser_path.append((0, laser_coordinates))
+
         laser_queue: Queue[(CellCoordinates, Direction, int)] = Queue()
-        laser_queue.put((laser_coordinates, initial_laser_direction, 0))
+        laser_queue.put((laser_coordinates, initial_laser_direction, 1))
 
         while not laser_queue.empty():
             last_coordinates, last_laser_direction, time = laser_queue.get()
@@ -146,10 +148,10 @@ class Game:
 
             current_coordinates = get_next_laser_coordinates(last_coordinates, last_laser_direction)
 
+            laser_path.append((time, current_coordinates))
+
             if current_coordinates not in cells:
                 continue
-
-            laser_path.append((time, current_coordinates))
 
             if current_coordinates in cells:
                 piece_hit = cells[current_coordinates]
