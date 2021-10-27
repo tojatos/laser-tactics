@@ -24,15 +24,14 @@ export class GameCanvas extends Canvas {
     gameId!: string
     currentPlayer = this.authService.getCurrentJwtInfo().sub
     eventsExecutor = new EventsExecutor(this, this.gameService)
+    resources!: Resources
 
-    constructor(private gameService: GameService, @Inject(Resources) resources: Resources, private authService: AuthService, private eventEmitter: EventEmitterService) {
-      super(resources)
-    }
+    constructor(private gameService: GameService, private authService: AuthService, private eventEmitter: EventEmitterService) { super() }
 
-    async initCanvas(ctx: CanvasRenderingContext2D, board: Board, size: number, gameId: string){
-      await this.resources.loadAssets()
+    async initCanvas(ctx: CanvasRenderingContext2D, board: Board, resources: Resources, size: number, gameId: string){
       this.block_size = size
       this.ctx = ctx
+      this.resources = resources
       this.ctx.canvas.width = COLS * this.block_size
       this.ctx.canvas.height = ROWS * this.block_size
       this.drawings = new Drawings(ctx, this.block_size, this.resources)

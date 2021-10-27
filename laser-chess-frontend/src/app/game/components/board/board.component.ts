@@ -5,6 +5,8 @@ import { EventEmitterService } from '../../services/event-emitter.service';
 import { GameService } from '../../services/game.service';
 import { Board } from '../../src/board';
 import { GameCanvas } from '../../src/Display/Canvas/GameCanvas';
+import { GUICanvas } from '../../src/Display/Canvas/GUICanvas';
+import { Resources } from '../../src/Display/Resources';
 import { EventsExecutor } from '../../src/eventsExecutor';
 
 @Component({
@@ -14,7 +16,10 @@ import { EventsExecutor } from '../../src/eventsExecutor';
 })
 export class BoardComponent implements AfterViewInit, OnInit {
   @ViewChild('canvas', { static: true })
-  canvasHTML!: ElementRef<HTMLCanvasElement>
+  canvasGame!: ElementRef<HTMLCanvasElement>
+
+  @ViewChild('gui', { static: true })
+  canvasGUI!: ElementRef<HTMLCanvasElement>
 
   gameId: string | undefined
   currentSize: number | undefined
@@ -22,7 +27,10 @@ export class BoardComponent implements AfterViewInit, OnInit {
   intervalIsPaused: boolean = false
   refreshingGameState: boolean = false
 
-  constructor(private gameService: GameService, private route: ActivatedRoute, private eventEmitterService: EventEmitterService, private canvas: GameCanvas, private board: Board, private eventsExecutor: EventsExecutor){}
+  constructor(private gameService: GameService, private route: ActivatedRoute, 
+    private eventEmitterService: EventEmitterService, private gameCanvas: GameCanvas, private guiCanvas: GUICanvas, 
+    private resources: Resources,
+    private board: Board, private eventsExecutor: EventsExecutor){}
 
   ngOnInit() {
     if (this.eventEmitterService.subsRefresh == undefined) {
@@ -35,12 +43,20 @@ export class BoardComponent implements AfterViewInit, OnInit {
     }
   }
 
-  ngAfterViewInit() {
-    const canvasContext = this.canvasHTML.nativeElement.getContext('2d')
-    if(canvasContext == null){
+  async ngAfterViewInit() {
+    const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
+    if(!gameCanvasContext){
       alert("Couldnt load context")
       return
     }
+
+    const guiCanvasContext = this.canvasGUI.nativeElement.getContext('2d')
+    if(!guiCanvasContext){
+      alert("Couldnt load context")
+      return
+    }
+
+    await this.resources.loadAssets()
 
     this.route.params.subscribe(params => {
 
@@ -59,12 +75,13 @@ export class BoardComponent implements AfterViewInit, OnInit {
             }
             this.currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
             this.board.initBoard(gameState, this.currentSize)
-            this.canvas.initCanvas(canvasContext!, this.board, this.currentSize, params.id)
+            this.gameCanvas.initCanvas(gameCanvasContext!, this.board, this.resources, this.currentSize, params.id)
+            //this.guiCanvas.initCanvas(guiCanvasContext!, this.resources)
             if(animationsToShow > 0)
               this.executePendingActions(res.body, animationsToShow)
             this.board.currentTurn = res.body.turn_number
             const myTurn = this.board.isMyTurn()
-            this.canvas.interactable = myTurn
+            this.gameCanvas.interactable = myTurn
             if(!myTurn)
               this.refreshGameState()
           }
@@ -79,16 +96,16 @@ export class BoardComponent implements AfterViewInit, OnInit {
   onResize(event: UIEvent) {
     this.currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
     this.board.changeCellCoordinates(this.currentSize)
-    this.canvas.changeBlockSize(this.currentSize, this.board)
+    this.gameCanvas.changeBlockSize(this.currentSize, this.board)
   }
 
   onClick(){
-    this.canvas.rotationButtonPressed(this.board)
+    this.gameCanvas.rotationButtonPressed(this.board)
   }
 
   laserShoot(){
     console.log("lazorShoot")
-    this.canvas.laserButtonPressed(this.board)
+    this.gameCanvas.laserButtonPressed(this.board)
   }
 
   refreshGameState(){
@@ -106,7 +123,7 @@ export class BoardComponent implements AfterViewInit, OnInit {
           this.board.currentTurn = res.body.turn_number
 
           const myTurn = this.board.isMyTurn()
-          this.canvas.interactable = myTurn
+          this.gameCanvas.interactable = myTurn
 
           if(myTurn)
             return
@@ -121,7 +138,7 @@ export class BoardComponent implements AfterViewInit, OnInit {
 
   private async executePendingActions(game: GameState, animationsToShow: number){
     console.log("executing actions")
-    this.canvas.interactable = false
+    this.gameCanvas.interactable = false
     this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
     await this.eventsExecutor.executeEventsQueue(this.board)
   }

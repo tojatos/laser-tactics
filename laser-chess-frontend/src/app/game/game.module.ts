@@ -8,6 +8,7 @@ import { Board } from './src/board';
 import { Resources } from './src/Display/Resources';
 import { EventsExecutor } from './src/eventsExecutor';
 import { HttpClientModule } from '@angular/common/http';
+import { GUICanvas } from './src/Display/Canvas/GUICanvas';
 
 @NgModule({
   declarations: [GameComponent, BoardComponent, ChatComponent],
@@ -16,6 +17,6 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule
   ],
   exports: [GameComponent],
-  providers: [GameCanvas, Board, Resources, EventsExecutor]
+  providers: [GameCanvas, GUICanvas, Board, Resources, EventsExecutor]
 })
 export class GameModule { }
