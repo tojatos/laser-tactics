@@ -80,15 +80,24 @@ export class Animations {
 
     async laserAnimation(board: Board, from: Coordinates, to: Coordinates): Promise<void> {
       const fromCell = board.getCellByCoordinates(from.x, from.y)
-      const toCell = board.getCellByCoordinates(to.x, to.y)
+      let toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, to.x)), Math.min(8, Math.max(0, to.y)))?.canvasCoordinates
+
+      if(to.x > 8)
+        toCell = {x: toCell!.x + board.blockSize!, y: toCell!.y}
+      else if(to.x < 0)
+        toCell = {x: toCell!.x - board.blockSize!, y: toCell!.y}
+      if(to.y > 8)
+        toCell = {x: toCell!.x, y: toCell!.y + board.blockSize!}
+      else if(to.y < 0)
+        toCell = {x: toCell!.x, y: toCell!.y - board.blockSize!}
 
       const speed = 20
       const laserIncrementPerFrame = 10
       let laserIncrement = laserIncrementPerFrame
       if(fromCell && toCell){
 
-        const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.canvasCoordinates.x)
-        const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.canvasCoordinates.y)
+        const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.x)
+        const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.y)
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
@@ -99,10 +108,11 @@ export class Animations {
             }
 
             this.drawings.drawLaserLine(fromCell.canvasCoordinates, currentCoordinates)
+            this.drawings.drawPiece(board.getLaserCell()!.piece!)
 
             laserIncrement += laserIncrementPerFrame
-            if(this.inVicinity(toCell.canvasCoordinates, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
-              this.drawings.drawLaserLine(fromCell.canvasCoordinates, toCell.canvasCoordinates)
+            if(this.inVicinity(toCell!, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
+              this.drawings.drawLaserLine(fromCell.canvasCoordinates, toCell!)
               // draw a small square at the middle of field
               clearInterval(interval)
               resolve()

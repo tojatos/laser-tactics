@@ -13,10 +13,12 @@ export class Board implements BoardInterface {
   playerOne: string | undefined
   playerTwo: string | undefined
   gameId: string | undefined
+  blockSize: number | undefined
 
   constructor(private authService: AuthService){}
 
   initBoard(gameState: GameState, blockSize: number) {
+    this.blockSize = blockSize
     this.gameId = gameState.game_id
     this.cells = []
     this.currentTurn = gameState.turn_number

@@ -27,8 +27,8 @@ export class BoardComponent implements AfterViewInit, OnInit {
   intervalIsPaused: boolean = false
   refreshingGameState: boolean = false
 
-  constructor(private gameService: GameService, private route: ActivatedRoute, 
-    private eventEmitterService: EventEmitterService, private gameCanvas: GameCanvas, private guiCanvas: GUICanvas, 
+  constructor(private gameService: GameService, private route: ActivatedRoute,
+    private eventEmitterService: EventEmitterService, private gameCanvas: GameCanvas, private guiCanvas: GUICanvas,
     private resources: Resources,
     private board: Board, private eventsExecutor: EventsExecutor){}
 
