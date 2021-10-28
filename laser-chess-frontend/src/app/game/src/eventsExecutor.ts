@@ -9,7 +9,7 @@ import { GameEvents } from "./enums";
 type PathInfo = {
   from: Coordinates,
   to: Coordinates,
-  order: number
+  time: number
 }
 
 @Injectable()
@@ -50,15 +50,12 @@ export class EventsExecutor{
 
       //if(laserCellCoor){
 
-        console.log("Recursvie fun now firing")
-        this.startPath(res[1], res.flat(), res[0][0], allPathsToDraw, 0)
-        console.log("Recursvie fun done!")
+        this.startPath(res[1], res.flat(), res[0][0], allPathsToDraw)
+        const allPaths = values(groupBy(allPathsToDraw, 'time'))
 
         return new Promise<void>(async resolve => {
-          const groupedPaths = values(groupBy(allPathsToDraw, "order"))
-          for (const path of groupedPaths){
+          for (const path of allPaths)
             await Promise.all(path.map(p => this.canvas.getLaserPathAnimation(board, p.from, p.to)))
-          }
           console.log("shot all lazor paths! Awaiting for 1 second to disappear")
         await new Promise(resolve => setTimeout(resolve, 1000))
         console.log("anim i done!")
@@ -78,28 +75,34 @@ export class EventsExecutor{
       }
     }
 
-    private startPath(nextTime: LaserShotEventEntity[] | undefined, allEvents: LaserShotEventEntity[], firstElem: LaserShotEventEntity, savePlace: PathInfo[], order: number){
+    private startPath(nextTime: LaserShotEventEntity[] | undefined, allEvents: LaserShotEventEntity[], firstElem: LaserShotEventEntity, savePlace: PathInfo[]){
       if(!nextTime)
         return
 
       for (const t of nextTime){
         if(this.checkIfCoordinatesAreRightAngle(firstElem.coordinates, t.coordinates)){
-          const nextElemToAdd = this.buildPath(allEvents.filter(ae => ae.time == t.time + 1), allEvents, [firstElem, t], undefined) || t
-          savePlace.push({ from: firstElem.coordinates, to: nextElemToAdd.coordinates, order: order })
-          this.startPath(allEvents.filter(ae => ae.time == nextElemToAdd.time + 1), allEvents, nextElemToAdd, savePlace, order + 1)
+          savePlace.push({ from: firstElem.coordinates, to: t.coordinates, time: t.time })
+          const newPath = this.buildPath(allEvents.filter(ae => ae.time == t.time + 1), allEvents, [firstElem, t], savePlace)
+          if(newPath)
+            this.startPath(allEvents.filter(ae => ae.time == newPath.time + 1), allEvents, newPath, savePlace)
         }
       }
     }
 
-    private buildPath(nextTime: LaserShotEventEntity[] | undefined, allEvents: LaserShotEventEntity[], currentPath: LaserShotEventEntity[], elemToAdd: LaserShotEventEntity | undefined): LaserShotEventEntity | undefined {
+    private buildPath(nextTime: LaserShotEventEntity[] | undefined,
+      allEvents: LaserShotEventEntity[],
+      currentPath: LaserShotEventEntity[],
+      savePlace: PathInfo[]): LaserShotEventEntity {
 
       if(!nextTime)
-        return elemToAdd
+        return currentPath.slice(-1)[0]
 
       const newElem = this.getPathContinuation(currentPath, nextTime)
       if(!newElem)
-        return elemToAdd
-      return this.buildPath(allEvents.filter(ae => ae.time == newElem.time + 1), allEvents, [...currentPath, newElem], newElem)
+        return currentPath.slice(-1)[0]
+
+      savePlace.push({ from: currentPath.slice(-1)[0].coordinates, to: newElem.coordinates, time: newElem.time })
+      return this.buildPath(allEvents.filter(ae => ae.time == newElem.time + 1), allEvents, [...currentPath, newElem], savePlace)
 
     }
 
