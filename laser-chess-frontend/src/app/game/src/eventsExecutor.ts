@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
-import { cloneDeep, curry, groupBy, values } from "lodash";
+import { groupBy, values } from "lodash";
 import { Coordinates, GameEvent, LaserShotEventEntity } from "../game.models";
 import { GameService } from "../services/game.service";
 import { Board } from "./board";
-import { GameCanvas } from "./Display/Canvas/GameCanvas";
+import { Animations } from "./Display/Animations";
+import { Canvas } from "./Display/Canvas/AbstractCanvas";
+import { Drawings } from "./Display/Drawings";
 import { GameEvents } from "./enums";
 
 type PathInfo = {
@@ -15,7 +17,7 @@ type PathInfo = {
 @Injectable()
 export class EventsExecutor{
 
-    constructor(private canvas: GameCanvas, private gameService: GameService) {}
+    constructor(private gameService: GameService, private drawings: Drawings, private animations: Animations) {}
 
     eventsQueue : GameEvent[] = []
     eventsExecutionTimeout = 500
@@ -24,53 +26,48 @@ export class EventsExecutor{
         this.eventsQueue.push(...events)
     }
 
-    async executeEventsQueue(board: Board, timeout: number = this.eventsExecutionTimeout){
+    async executeEventsQueue(canvas: Canvas, board: Board, timeout: number = this.eventsExecutionTimeout){
       for (const event of this.eventsQueue){
         if(event){
           console.log("executing a single action")
           await new Promise(resolve => setTimeout(resolve, timeout))
-          await this.getAnimationToExecute(board, event)
+          await this.getAnimationToExecute(canvas, board, event)
           console.log("single action executed!")
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
           this.gameService.setLocalGameState(board.serialize())
-          this.canvas.drawings.drawGame(board.cells)
+          this.drawings.drawGame(canvas, board.cells)
         }
       }
       console.log("all actions executed!")
       this.eventsQueue = []
     }
 
-    async executeLaserAnimations(board: Board, laserPath: LaserShotEventEntity[]){
-
+    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[]){
       const res = values(groupBy(laserPath, 'time'))
       const allPathsToDraw: PathInfo[] = []
-      const laserCellCoor = board.getLaserCell()?.coordinates // wont be shown if no laser is present, shouldnt be dependant on that
-      // should get other player laser / itd better to get that info from backend
-
-      //if(laserCellCoor){
 
         this.startPath(res[1], res.flat(), res[0][0], allPathsToDraw)
         const allPaths = values(groupBy(allPathsToDraw, 'time'))
 
         return new Promise<void>(async resolve => {
           for (const path of allPaths)
-            await Promise.all(path.map(p => this.canvas.getLaserPathAnimation(board, p.from, p.to)))
+            await Promise.all(path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to)
+            ))
           console.log("shot all lazor paths! Awaiting for 1 second to disappear")
         await new Promise(resolve => setTimeout(resolve, 1000))
         console.log("anim i done!")
         resolve()
         })
-      //}
 
     }
 
-    getAnimationToExecute(board: Board, gameEvent: GameEvent){
+    getAnimationToExecute(canvas: Canvas, board: Board, gameEvent: GameEvent){
       switch(gameEvent.event_type){
-        case GameEvents.PIECE_ROTATED_EVENT : return this.canvas.animations.rotatePiece(board, board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y), gameEvent.rotation)
-        case GameEvents.PIECE_MOVED_EVENT : return this.canvas.animations.movePiece(board, gameEvent.moved_from, gameEvent.moved_to)
-        case GameEvents.TELEPORT_EVENT : return this.canvas.animations.movePiece(board, gameEvent.teleported_from, gameEvent.teleported_to)
-        case GameEvents.LASER_SHOT_EVENT : return this.executeLaserAnimations(board, gameEvent.laser_path)
+        case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(canvas, board, board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y), gameEvent.rotation)
+        case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(canvas, board, gameEvent.moved_from, gameEvent.moved_to)
+        case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(canvas, board, gameEvent.teleported_from, gameEvent.teleported_to)
+        case GameEvents.LASER_SHOT_EVENT : return this.executeLaserAnimations(canvas, board, gameEvent.laser_path)
         default: return undefined
       }
     }

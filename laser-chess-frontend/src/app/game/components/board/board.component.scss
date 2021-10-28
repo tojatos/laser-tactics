@@ -2,9 +2,11 @@
   background-image: url("/assets/board.svg");
   background-size: cover;
   z-index: 0;
+  position: absolute;
 }
 
 .guiCanvas {
+  position: absolute;
   z-index: 1;
 }
 

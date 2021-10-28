@@ -1,60 +1,45 @@
-import { Inject, Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
 import { EventEmitterService } from "../../../services/event-emitter.service"
 import { Coordinates } from "../../../game.models"
 import { GameService } from "../../../services/game.service"
 import { Board } from "../../board"
 import { Cell } from "../../cell"
-import { COLS, ROWS } from "../../constants"
 import { Animations } from "../Animations"
 import { Drawings } from "../Drawings"
 import { Resources } from "../Resources"
-import { EventsExecutor } from "../../eventsExecutor"
-import { PieceType } from "../../enums"
 import { Canvas } from "./AbstractCanvas"
+import { GUICanvas } from "./GUICanvas"
 
-@Injectable()
 export class GameCanvas extends Canvas {
 
-    animations!: Animations
-    interactable: boolean = false
-    block_size!: number
     highlightColor: string = "yellow"
     hoveredCell: Cell | undefined
-    gameId!: string
     currentPlayer = this.authService.getCurrentJwtInfo().sub
-    eventsExecutor = new EventsExecutor(this, this.gameService)
-    resources!: Resources
 
-    constructor(private gameService: GameService, private authService: AuthService, private eventEmitter: EventEmitterService) { super() }
+    constructor(private gameService: GameService,
+      private authService: AuthService,
+      private eventEmitter: EventEmitterService,
+      private animations: Animations,
+      drawings: Drawings,
+      ctx: CanvasRenderingContext2D,
+       blockSize: number,
+       resources: Resources,
+       gameId: string) {
+        super(ctx, blockSize, drawings, resources, gameId)
+    }
 
-    async initCanvas(ctx: CanvasRenderingContext2D, board: Board, resources: Resources, size: number, gameId: string){
-      this.block_size = size
-      this.ctx = ctx
-      this.resources = resources
-      this.ctx.canvas.width = COLS * this.block_size
-      this.ctx.canvas.height = ROWS * this.block_size
-      this.drawings = new Drawings(ctx, this.block_size, this.resources)
-      this.animations = new Animations(this.drawings)
+    initCanvas(board: Board, guiCanvas: GUICanvas){
       this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
-      this.drawings.drawGame(board.cells)
-      this.gameId = gameId
-    }
-
-    changeBlockSize(newSize: number, board: Board){
-      this.block_size = newSize
-      this.drawings.blockSize = this.block_size
-      this.ctx.canvas.width = COLS * this.block_size
-      this.ctx.canvas.height = ROWS * this.block_size
-      this.drawings.drawGame(board.cells)
-    }
-
-    getLaserPathAnimation(board: Board, from: Coordinates, to: Coordinates){
-      return this.animations.laserAnimation(board, from, to)
+      this.drawings.drawGame(this, board.cells)
+      this.interactable = board.isMyTurn()
     }
 
     private async canvasOnclick(event: MouseEvent, board: Board) {
+
+      console.log("click!")
+      console.log(this.getMousePos(event))
+      console.log(this.interactable)
 
       if(!this.interactable)
         return
@@ -71,7 +56,7 @@ export class GameCanvas extends Canvas {
           this.gameService.increaseAnimationEvents()
           board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
           this.gameService.setLocalGameState(board.serialize())
-          this.drawings.drawGame(board.cells)
+          this.drawings.drawGame(this, board.cells)
           board.currentTurn++
           this.eventEmitter.invokeRefresh()
 
@@ -82,8 +67,8 @@ export class GameCanvas extends Canvas {
       else {
         if(selectedCell){
           this.selectCellEvent(selectedCell, board)
-          if(selectedCell.piece?.piece_type == PieceType.LASER)
-            this.drawings.drawLaserButton()
+          //if(selectedCell.piece?.piece_type == PieceType.LASER)
+            //this.drawings.drawLaserButton(this)
         }
       }
 
@@ -98,13 +83,13 @@ export class GameCanvas extends Canvas {
         const hoveredOver = board.getCellByCoordinates(coor.x, coor.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
-            this.drawings.drawSingleCell(hoveredOver)
-            this.drawings.highlightCell(hoveredOver, this.highlightColor)
+            this.drawings.drawSingleCell(this, hoveredOver)
+            this.drawings.highlightCell(this, hoveredOver, this.highlightColor)
           }
           else {
             if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
-              this.drawings.drawSingleCell(this.hoveredCell)
-              this.drawings.showPossibleMove(this.hoveredCell, this.highlightColor)
+              this.drawings.drawSingleCell(this, this.hoveredCell)
+              this.drawings.showPossibleMove(this, this.hoveredCell, this.highlightColor)
             }
           }
           this.hoveredCell = hoveredOver
@@ -116,9 +101,9 @@ export class GameCanvas extends Canvas {
       const selectedCell = board.selectedCell
 
       if(selectedCell && this.interactable){
-        this.gameService.rotatePiece(this.gameId,selectedCell.coordinates, 90)
+        this.gameService.rotatePiece(this.gameId, selectedCell.coordinates, 90)
         this.interactable = false
-        await this.animations.rotatePiece(board, selectedCell, 90)
+        await this.animations.rotatePiece(this, board, selectedCell, 90)
         this.gameService.increaseAnimationEvents()
         this.unselectCellEvent(board)
         board.currentTurn++
@@ -134,7 +119,7 @@ export class GameCanvas extends Canvas {
         this.interactable = false
         board.currentTurn++
         console.log("Sending request")
-        this.gameService.shootLaser(this.gameId).then(res => {
+        this.gameService.shootLaser(this.gameId).then(_ => {
           console.log("Request received! Invoking refresh")
           this.eventEmitter.invokeRefresh()
         })
@@ -145,24 +130,25 @@ export class GameCanvas extends Canvas {
 
     private selectCellEvent(selectedCell: Cell, board: Board){
       board.selectCell(selectedCell)
-      this.drawings.highlightCell(selectedCell, this.highlightColor)
-      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(c, this.highlightColor))
+      this.drawings.highlightCell(this, selectedCell, this.highlightColor)
+      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.highlightColor))
     }
 
     private unselectCellEvent(board: Board){
       board.unselectCell()
-      this.drawings.drawGame(board.cells)
+      this.drawings.drawGame(this, board.cells)
     }
 
     private makeAMoveEvent(coor: Coordinates, board: Board): Promise<void>{
-      return this.animations.movePiece(board, board.selectedCell!.coordinates, coor)
+      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor)
     }
 
     private getMousePos(event: MouseEvent){
         const rect = this.ctx.canvas.getBoundingClientRect();
+
         return {
-          x: Math.floor((event.clientX - rect.left) / this.block_size),
-          y: 8 - Math.floor((event.clientY - rect.top) / this.block_size)
+          x: Math.floor((event.clientX - rect.left) / this.blockSize),
+          y: 8 - Math.floor((event.clientY - rect.top) / this.blockSize)
         }
     }
 

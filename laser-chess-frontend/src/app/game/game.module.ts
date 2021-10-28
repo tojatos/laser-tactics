@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { GameComponent } from './game.component';
 import { BoardComponent } from './components/board/board.component';
 import { ChatComponent } from './components/chat/chat.component';
-import { GameCanvas } from './src/Display/Canvas/GameCanvas';
 import { Board } from './src/board';
 import { Resources } from './src/Display/Resources';
 import { EventsExecutor } from './src/eventsExecutor';
 import { HttpClientModule } from '@angular/common/http';
-import { GUICanvas } from './src/Display/Canvas/GUICanvas';
+import { Game } from './src/Game';
+import { Animations } from './src/Display/Animations';
+import { Drawings } from './src/Display/Drawings';
 
 @NgModule({
   declarations: [GameComponent, BoardComponent, ChatComponent],
@@ -17,6 +18,6 @@ import { GUICanvas } from './src/Display/Canvas/GUICanvas';
     HttpClientModule
   ],
   exports: [GameComponent],
-  providers: [GameCanvas, GUICanvas, Board, Resources, EventsExecutor]
+  providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor]
 })
 export class GameModule { }

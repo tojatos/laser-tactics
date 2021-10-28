@@ -1,23 +1,34 @@
-import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
 import { EventEmitterService } from "src/app/game/services/event-emitter.service"
 import { GameService } from "src/app/game/services/game.service"
+import { Board } from "../../board"
+import { Drawings } from "../Drawings"
 import { Resources } from "../Resources"
 import { Canvas } from "./AbstractCanvas"
+import { GameCanvas } from "./GameCanvas"
 
-@Injectable()
 export class GUICanvas extends Canvas {
 
   interactable: boolean = false
-  gameId!: string
+  gameCanvas!: GameCanvas
   currentPlayer = this.authService.getCurrentJwtInfo().sub
 
-  constructor(private gameService: GameService, private authService: AuthService, private eventEmitter: EventEmitterService) {
-    super()
+  constructor(private gameService: GameService,
+    private authService: AuthService,
+    private eventEmitter: EventEmitterService,
+    drawings: Drawings,
+    ctx: CanvasRenderingContext2D,
+    blockSize: number,
+    resources: Resources,
+    gameId: string) {
+    super(ctx, blockSize, drawings, resources, gameId)
   }
 
-  initCanvas(ctx: CanvasRenderingContext2D, resources: Resources){
-    this.ctx = ctx
+  initCanvas(board: Board, gameCanvas: GameCanvas){
+    this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
+    this.ctx.canvas.hidden = true
   }
+
+  private async canvasOnclick(event: MouseEvent, board: Board) { }
 
 }

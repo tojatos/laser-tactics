@@ -1,18 +1,17 @@
+import { Injectable } from "@angular/core";
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
 import { Piece } from "../piece";
+import { Canvas } from "./Canvas/AbstractCanvas";
 import { Drawings } from "./Drawings";
 
+@Injectable()
 export class Animations {
 
-    drawings: Drawings
+    constructor(private drawings: Drawings){}
 
-    constructor(drawings: Drawings){
-        this.drawings = drawings
-    }
-
-    async movePiece(board: Board, originCooridantes: Coordinates, destinationCoordinates: Coordinates): Promise<void>{
+    async movePiece(canvas: Canvas, board: Board, originCooridantes: Coordinates, destinationCoordinates: Coordinates): Promise<void>{
 
         const origin = board.getCellByCoordinates(originCooridantes.x, originCooridantes.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
@@ -38,9 +37,9 @@ export class Animations {
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
-              this.drawings.drawGame(validCellsArray)
+              this.drawings.drawGame(canvas, validCellsArray)
               this.changePosition(piece, originCooridantes, destinationCoordinates, redrawDistance, fun)
-              this.drawings.drawPiece(piece)
+              this.drawings.drawPiece(canvas, piece)
               if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
                 piece.currentCoordinates = destination.canvasCoordinates
                 clearInterval(interval)
@@ -51,7 +50,7 @@ export class Animations {
 
     }
 
-    async rotatePiece(board: Board, atCell: Cell | undefined, byDegrees: number): Promise<void>{
+    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number): Promise<void>{
       const piece = atCell?.piece
 
       if(!piece || !atCell)
@@ -65,9 +64,9 @@ export class Animations {
 
       return new Promise<void>((resolve) => {
         const interval = setInterval(() => {
-            this.drawings.drawGame(validCellsArray)
+            this.drawings.drawGame(canvas, validCellsArray)
             piece.rotation_degree += degreesPerFrame
-            this.drawings.drawPiece(piece)
+            this.drawings.drawPiece(canvas, piece)
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
               piece.rotation_degree = desiredPiecePosition % 360
               clearInterval(interval)
@@ -78,7 +77,7 @@ export class Animations {
 
     }
 
-    async laserAnimation(board: Board, from: Coordinates, to: Coordinates): Promise<void> {
+    async laserAnimation(canvas: Canvas, board: Board, from: Coordinates, to: Coordinates): Promise<void> {
       const fromCell = board.getCellByCoordinates(from.x, from.y)
       let toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, to.x)), Math.min(8, Math.max(0, to.y)))?.canvasCoordinates
 
@@ -107,12 +106,12 @@ export class Animations {
               y: fromCell.canvasCoordinates.y - laserIncrement * yModifier
             }
 
-            this.drawings.drawLaserLine(fromCell.canvasCoordinates, currentCoordinates)
-            this.drawings.drawPiece(board.getLaserCell()!.piece!)
+            this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, currentCoordinates)
+            this.drawings.drawPiece(canvas, board.getLaserCell()!.piece!)
 
             laserIncrement += laserIncrementPerFrame
             if(this.inVicinity(toCell!, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
-              this.drawings.drawLaserLine(fromCell.canvasCoordinates, toCell!)
+              this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell!)
               // draw a small square at the middle of field
               clearInterval(interval)
               resolve()

@@ -1,113 +1,96 @@
+import { Injectable } from "@angular/core"
 import { Coordinates } from "../../game.models"
 import { Cell } from "../cell"
 import { PIECE_SIZE_SCALE } from "../constants"
 import { Piece } from "../piece"
-import { Resources } from "./Resources"
+import { Canvas } from "./Canvas/AbstractCanvas"
 
+@Injectable()
 export class Drawings {
 
-    ctx: CanvasRenderingContext2D
-    drawingQueue: (() => void)[]
-    blockSize: number
-    resources: Resources
-
-    constructor(ctx: CanvasRenderingContext2D, blockSize: number, resources: Resources){
-        this.ctx = ctx
-        this.drawingQueue = []
-        this.blockSize = blockSize
-        this.resources = resources
+    drawGame(canvas: Canvas, cells: Cell[]){
+        this.clearBoard(canvas)
+        cells.forEach(c => { if(c.piece) this.drawPiece(canvas, c.piece) })
     }
 
-    drawGame(cells: Cell[]){
-        this.clearBoard()
-        cells.forEach(c => { if(c.piece) this.drawPiece(c.piece) })
+    clearBoard(canvas: Canvas){
+        canvas.ctx.save()
+        canvas.ctx.translate(0, 0)
+        canvas.ctx.clearRect(0, 0, canvas.ctx.canvas.width, canvas.ctx.canvas.height);
+        canvas.ctx.restore()
     }
 
-    clearBoard(){
-        this.ctx.save()
-        this.ctx.translate(0, 0)
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        this.ctx.restore()
-    }
-
-    drawPiece(piece: Piece){
-        this.ctx.save()
-        this.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.y)
-        this.ctx.rotate(piece.rotation_degree / 180 * Math.PI)
-        this.ctx.drawImage(this.resources.getPieceFromMap(piece), this.pieceDrawingOriginCoordinates.x, this.pieceDrawingOriginCoordinates.y, this.blockSize * PIECE_SIZE_SCALE, this.blockSize * PIECE_SIZE_SCALE)
-        this.ctx.restore()
+    drawPiece(canvas: Canvas, piece: Piece){
+      canvas.ctx.save()
+      canvas.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.y)
+      canvas.ctx.rotate(piece.rotation_degree / 180 * Math.PI)
+      canvas.ctx.drawImage(canvas.resources.getPieceFromMap(piece), this.pieceDrawingOriginCoordinates(canvas.blockSize).x, this.pieceDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize * PIECE_SIZE_SCALE, canvas.blockSize * PIECE_SIZE_SCALE)
+      canvas.ctx.restore()
     }
 
 
-    highlightCell(cell: Cell | undefined, color: string){
+    highlightCell(canvas: Canvas, cell: Cell | undefined, color: string){
         if(cell) {
-            this.ctx.save()
-            this.ctx.globalAlpha = 0.5;
-            this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
-            this.ctx.beginPath()
-            this.ctx.rect(this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y, this.blockSize, this.blockSize)
-            this.ctx.fillStyle = color
-            this.ctx.fill()
-            this.ctx.restore()
+          canvas.ctx.save()
+          canvas.ctx.globalAlpha = 0.5;
+          canvas.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
+          canvas.ctx.beginPath()
+          canvas.ctx.rect(this.cellDrawingOriginCoordinates(canvas.blockSize).x, this.cellDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize, canvas.blockSize)
+          canvas.ctx.fillStyle = color
+          canvas.ctx.fill()
+          canvas.ctx.restore()
             if(cell.piece)
-              this.drawPiece(cell.piece)
+              this.drawPiece(canvas, cell.piece)
         }
     }
 
-    drawSingleCell(cell: Cell){
-      this.ctx.save()
-      this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
-      this.ctx.clearRect(this.cellDrawingOriginCoordinates.x, this.cellDrawingOriginCoordinates.y, this.blockSize, this.blockSize);
-      this.ctx.restore()
+    drawSingleCell(canvas: Canvas, cell: Cell){
+      canvas.ctx.save()
+      canvas.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
+      canvas.ctx.clearRect(this.cellDrawingOriginCoordinates(canvas.blockSize).x, this.cellDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize, canvas.blockSize);
+      canvas.ctx.restore()
       if(cell.piece)
-        this.drawPiece(cell.piece)
+        this.drawPiece(canvas, cell.piece)
     }
 
-    showPossibleMove(cell: Cell | undefined, color: string){
+    showPossibleMove(canvas: Canvas, cell: Cell | undefined, color: string){
       if(cell) {
-          this.ctx.save()
-          this.ctx.globalAlpha = 0.5;
-          this.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
-          this.ctx.beginPath()
-          this.ctx.arc(0, 0, this.blockSize / 10, 0, 2 * Math.PI, false);
-          this.ctx.fillStyle = color
-          this.ctx.fill()
-          this.ctx.restore()
+          canvas.ctx.save()
+          canvas.ctx.globalAlpha = 0.5;
+          canvas.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
+          canvas.ctx.beginPath()
+          canvas.ctx.arc(0, 0, canvas.blockSize / 10, 0, 2 * Math.PI, false);
+          canvas.ctx.fillStyle = color
+          canvas.ctx.fill()
+          canvas.ctx.restore()
       }
     }
 
-    drawLaserLine(from: Coordinates, to: Coordinates){
-      this.ctx.save()
-      this.ctx.lineWidth = 5
-      this.ctx.beginPath()
-      this.ctx.moveTo(from.x, from.y)
-      this.ctx.lineTo(to.x, to.y)
-      this.ctx.strokeStyle = "red"
-      this.ctx.stroke()
+    drawLaserLine(canvas: Canvas, from: Coordinates, to: Coordinates){
+      canvas.ctx.save()
+      canvas.ctx.lineWidth = 5
+      canvas.ctx.beginPath()
+      canvas.ctx.moveTo(from.x, from.y)
+      canvas.ctx.lineTo(to.x, to.y)
+      canvas.ctx.strokeStyle = "red"
+      canvas.ctx.stroke()
     }
 
-    drawLaserButton(){
-      const coordinates = {x: this.ctx.canvas.width / 2, y: this.ctx.canvas.height - this.ctx.canvas.height / 5}
-      this.drawButton(coordinates, this.resources.laserShotButton)
-    }
-
-    drawButton(at: Coordinates, image: HTMLImageElement){
-      this.ctx.save()
-      this.ctx.globalAlpha = 0.8;
-      this.ctx.translate(at.x, at.y)
+    drawButton(canvas: Canvas, at: Coordinates, width: number, height: number, image: HTMLImageElement){
+      canvas.ctx.save()
+      canvas.ctx.globalAlpha = 0.8;
+      canvas.ctx.translate(at.x, at.y)
       const ratio = image.width / image.height
-      const height = this.blockSize * 3 / ratio
-      const width = this.blockSize * 3 * ratio
-      this.ctx.drawImage(image, - width / 2, - height / 2, width, height)
-      this.ctx.restore()
+      canvas.ctx.drawImage(image, - width / 2, - height / 2, width, height)
+      canvas.ctx.restore()
     }
 
-    get cellDrawingOriginCoordinates(): Coordinates {
-        return {x: - this.blockSize / 2, y: - this.blockSize / 2}
+    cellDrawingOriginCoordinates(blockSize: number): Coordinates {
+        return {x: - blockSize / 2, y: - blockSize / 2}
     }
 
-    get pieceDrawingOriginCoordinates(): Coordinates {
-        return {x: - this.blockSize * PIECE_SIZE_SCALE / 2, y: - this.blockSize * PIECE_SIZE_SCALE / 2}
+    pieceDrawingOriginCoordinates(blockSize: number): Coordinates {
+        return {x: - blockSize * PIECE_SIZE_SCALE / 2, y: - blockSize * PIECE_SIZE_SCALE / 2}
     }
 
 }

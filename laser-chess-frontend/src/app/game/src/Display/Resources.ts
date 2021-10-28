@@ -19,9 +19,11 @@ export class Resources {
   constructor(){ }
 
   async loadAssets(){
+    console.log("initiating...")
     await this.loadBoardImage()
     await this.loadPiecesImages()
     await this.loadButtonImages()
+    console.log("done!")
   }
 
   private async loadBoardImage(){
