@@ -348,7 +348,35 @@ def test_shoot_laser_diagonal_mirror():
 
     assert game_state.board == expected_board
     assert game_state.game_events[0] == LaserShotEvent(
-        [(0, (1, 1)), (1, (2, 1)), (2, (2, 2)), (3, (1, 2)), (4, (1, 1)), (5, (0, 1)), (6, (0, 2)), (6, (0, 0))])
+        [
+            (0, (1, 0)),
+            (1, (1, 1)),
+            (2, (2, 1)),
+            (3, (2, 2)),
+            (4, (1, 2)),
+            (5, (1, 1)),
+            (6, (0, 1)),
+            (7, (0, 2)),
+            (7, (0, 0)),
+        ])
+
+
+def test_shoot_laser_path():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.LASER, Player.PLAYER_ONE),
+        (0, 1): None,
+        (0, 2): None,
+    })
+    game_state = get_shoot_laser_state(board)
+
+    assert game_state.board == board
+    assert game_state.game_events[0] == LaserShotEvent(
+        [
+            (0, (0, 0)),
+            (1, (0, 1)),
+            (2, (0, 2)),
+            (3, (0, 3)),
+        ])
 
 
 def test_move_hyper_cube():
