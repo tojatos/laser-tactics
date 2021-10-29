@@ -36,7 +36,7 @@ def before_all():
 
 def test_create_lobby_happy(tu):
     response = tu.post_data("/lobby/create", tokens[0])
-    assert response.status_code == 200
+    assert response.status_code == 201
 
 
 def test_create_lobby_unauthorized(tu):
@@ -46,14 +46,14 @@ def test_create_lobby_unauthorized(tu):
 
 def test_join_lobby_happy(tu):
     response = tu.post_data("/lobby/create", tokens[0])
-    assert response.status_code == 200
+    assert response.status_code == 201
     response = tu.patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 200
 
 
 def test_join_lobby_unauthorized(tu):
     response = tu.post_data("/lobby/create", tokens[0])
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     response = tu.patch_data(f"/lobby/join?lobby_id={response.json()['id']}", "1234")
     assert response.status_code == 401
@@ -61,7 +61,7 @@ def test_join_lobby_unauthorized(tu):
 
 def test_join_lobby_full(tu):
     response = tu.post_data("/lobby/create", tokens[0])
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     response = tu.patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
     assert response.status_code == 200
@@ -74,9 +74,10 @@ def test_join_lobby_full(tu):
 
 def test_join_lobby_mulitiple(tu):
     response_create = tu.post_data("/lobby/create", tokens[0])
-    assert response_create.status_code == 200
+    assert response_create.status_code == 201
 
     response = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+
     assert response.status_code == 200
 
     response = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
@@ -93,7 +94,7 @@ def test_join_lobby_notexisting(tu):
 
 def test_leave_lobby_happy(tu):
     response_create = tu.post_data("/lobby/create", tokens[0])
-    assert response_create.status_code == 200
+    assert response_create.status_code == 201
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
@@ -110,7 +111,7 @@ def test_leave_lobby_happy(tu):
 
 def test_leave_lobby_happy_withswap(tu):
     response_create = tu.post_data("/lobby/create", tokens[0])
-    assert response_create.status_code == 200
+    assert response_create.status_code == 201
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
@@ -127,7 +128,7 @@ def test_leave_lobby_happy_withswap(tu):
 
 def test_leave_lobby_unauthorized(tu):
     response = tu.post_data("/lobby/create", tokens[0])
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     response = tu.patch_data(f"/lobby/leave?lobby_id={response.json()['id']}", "1234")
     assert response.status_code == 401
@@ -135,7 +136,7 @@ def test_leave_lobby_unauthorized(tu):
 
 def test_leave_lobby_with_delet(tu):
     response_create = tu.post_data("/lobby/create", tokens[0])
-    assert response_create.status_code == 200
+    assert response_create.status_code == 201
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
@@ -159,7 +160,7 @@ def test_leave_lobby_with_delet(tu):
 
 def test_leave_lobby_mulitiple(tu):
     response_create = tu.post_data("/lobby/create", tokens[0])
-    assert response_create.status_code == 200
+    assert response_create.status_code == 201
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
@@ -187,7 +188,7 @@ def test_leave_lobby_notexisting(tu):
 
 def test_update_lobby_happy(tu):
     response_create = tu.post_data("/lobby/create", tokens[0])
-    assert response_create.status_code == 200
+    assert response_create.status_code == 201
     assert response_create.json()["is_private"] is False
     assert response_create.json()["is_ranked"] is False
     json = response_create.json()
@@ -204,7 +205,7 @@ def test_update_lobby_happy(tu):
 
 def test_update_lobby_unauthorized(tu):
     response = tu.post_data("/lobby/create", tokens[0])
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     response = tu.patch_data(f"/lobby/update", token="1234")
     assert response.status_code == 401
@@ -212,13 +213,13 @@ def test_update_lobby_unauthorized(tu):
 
 def test_update_lobby_notexisting(tu):
     json = {
-            "id": -1,
-            "game_id": "string",
-            "name": "string",
-            "player_one_username": "string",
-            "is_ranked": True,
-            "is_private": True,
-            "starting_position_reversed": True
-        }
+        "id": -1,
+        "game_id": "string",
+        "name": "string",
+        "player_one_username": "string",
+        "is_ranked": True,
+        "is_private": True,
+        "starting_position_reversed": True
+    }
     response = tu.patch_data(f"/lobby/update", tokens[1], json=json)
     assert response.status_code == 404

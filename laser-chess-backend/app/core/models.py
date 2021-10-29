@@ -1,7 +1,8 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, PrimaryKeyConstraint
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, PrimaryKeyConstraint, Enum
 from sqlalchemy.orm import relationship
 
 from .database import Base
+from .schemas import FriendRequestStatus
 
 
 class User(Base):
@@ -49,3 +50,19 @@ class Lobby(Base):
     is_private = Column(Boolean, default=False)
     starting_position_reversed = Column(Boolean, default=False)
 
+
+class FriendRequests(Base):
+    __tablename__ = "friend_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_one_username = Column(String)
+    user_two_username = Column(String)
+    status = Column(Enum(FriendRequestStatus))
+
+
+class BlockedUsers(Base):
+    __tablename__ = "blocked_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user = Column(String)
+    blocked_user = Column(String)
