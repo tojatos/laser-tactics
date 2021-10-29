@@ -232,7 +232,7 @@ async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get
     return lobbies
 
 
-@router.get("/lobby/{id}")
+@router.get("/lobby/{lobby_id}", response_model=schemas.Lobby)
 async def get_lobby(lobby_id,
                     db: Session = Depends(get_db)):
     db_lobby = crud.get_lobby(db, lobby_id)
@@ -272,7 +272,7 @@ async def leave_lobby(lobby_id: int, current_user: schemas.User = Depends(get_cu
 
 
 @router.patch("/lobby/update")
-async def update_lobby(lobby: schemas.Lobby, current_user: schemas.User = Depends(get_current_active_user),
+async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
     db_lobby = crud.get_lobby(db, lobby.id)
     if db_lobby is None:
@@ -280,8 +280,8 @@ async def update_lobby(lobby: schemas.Lobby, current_user: schemas.User = Depend
     if db_lobby.game_id != lobby.game_id:
         raise HTTPException(status_code=404, detail="Game id does not match")
     if db_lobby.player_one_username != current_user.username:
-        raise HTTPException(status_code=403, detail="only player 1 can change game settings")
-    lobby = crud.update_lobby(db=db, lobby=lobby)
+        raise HTTPException(status_code=403, detail="only player 1 of the game can change game settings")
+    lobby = crud.update_lobby(db=db, lobby=db_lobby, lobby_new_data=lobby)
     return lobby
 
 

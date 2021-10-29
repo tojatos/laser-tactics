@@ -86,6 +86,9 @@ def test_start_game():
     response = post_data("/get_game_state", json={"game_id": "some_id"})
     assert response.status_code == 404
 
+    response = post_data("/lobby/create", token)
+    assert response.status_code == 200
+
     response = post_data("/start_game", token,  json={"game_id": "some_id", "player_one_id": "test", "player_two_id": "test2"})
     assert response.status_code == 200
 

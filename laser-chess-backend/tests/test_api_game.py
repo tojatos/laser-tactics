@@ -7,7 +7,6 @@ from app.game_engine.requests import *
 from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
-import sqlalchemy as sa
 
 tokens = []
 game_id = "some_id"
@@ -66,7 +65,8 @@ def post_shoot_laser(tu, token_num: int):
 
 
 def post_move_piece(tu, token_num: int, coordinates_from: CellCoordinates, coordinates_to: CellCoordinates):
-    request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from), cell_coordinates_to_serializable(coordinates_to))
+    request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from),
+                               cell_coordinates_to_serializable(coordinates_to))
     return tu.post_data("/move_piece", tokens[token_num], json=asdict(request))
 
 
