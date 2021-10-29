@@ -1,4 +1,3 @@
-
 import pytest
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
@@ -52,15 +51,53 @@ def test_accept_friend_request(tu):
     response = tu.get_data("/users/me/friends/requests", tokens[2])
     assert response.status_code == 200
 
+    pending_requests = list(response.json())
+    assert len(pending_requests) > 0
+
     # thats wack
     response = tu.post_data(f"/users/me/friends/requests/accept?request_id={response.json()[0]['id']}", tokens[2])
     assert response.status_code == 200
 
+    response = tu.get_data("/users/me/friends/requests", tokens[2])
+    assert response.status_code == 200
+
+    pending_requests = list(response.json())
+    assert len(pending_requests) == 0
+
     response = tu.get_data("/users/me/friends", tokens[0])
     user_1_friends = list(response.json())
 
-    response =tu.get_data("/users/me/friends", tokens[2])
+    response = tu.get_data("/users/me/friends", tokens[2])
     user_2_friends = list(response.json())
 
     assert "test0" in user_2_friends
     assert "test2" in user_1_friends
+
+
+def test_decline_friend_request(tu):
+    response = tu.post_data("/users/me/friends/requests/send?friend_username=test2", tokens[0])
+    assert response.status_code == 201
+
+    response = tu.get_data("/users/me/friends/requests", tokens[2])
+    assert response.status_code == 200
+
+    pending_requests = list(response.json())
+    assert len(pending_requests) > 0
+
+    response = tu.post_data(f"/users/me/friends/requests/decline?request_id={response.json()[0]['id']}", tokens[2])
+    assert response.status_code == 200
+
+    response = tu.get_data("/users/me/friends/requests", tokens[2])
+    assert response.status_code == 200
+
+    pending_requests = list(response.json())
+    assert len(pending_requests) == 0
+
+    response = tu.get_data("/users/me/friends", tokens[0])
+    user_1_friends = list(response.json())
+
+    response = tu.get_data("/users/me/friends", tokens[2])
+    user_2_friends = list(response.json())
+
+    assert "test0" not in user_2_friends
+    assert "test2" not in user_1_friends
