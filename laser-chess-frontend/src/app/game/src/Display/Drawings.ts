@@ -4,9 +4,12 @@ import { Cell } from "../cell"
 import { PIECE_SIZE_SCALE } from "../constants"
 import { Piece } from "../piece"
 import { Canvas } from "./Canvas/AbstractCanvas"
+import { Button } from "./Canvas/Button"
 
 @Injectable()
 export class Drawings {
+
+    highlightColor: string = "yellow"
 
     drawGame(canvas: Canvas, cells: Cell[]){
         this.clearBoard(canvas)
@@ -29,7 +32,7 @@ export class Drawings {
     }
 
 
-    highlightCell(canvas: Canvas, cell: Cell | undefined, color: string){
+    highlightCell(canvas: Canvas, cell: Cell | undefined, color: string = this.highlightColor){
         if(cell) {
           canvas.ctx.save()
           canvas.ctx.globalAlpha = 0.5;
@@ -53,7 +56,7 @@ export class Drawings {
         this.drawPiece(canvas, cell.piece)
     }
 
-    showPossibleMove(canvas: Canvas, cell: Cell | undefined, color: string){
+    showPossibleMove(canvas: Canvas, cell: Cell | undefined, color: string = this.highlightColor){
       if(cell) {
           canvas.ctx.save()
           canvas.ctx.globalAlpha = 0.5;
@@ -76,12 +79,10 @@ export class Drawings {
       canvas.ctx.stroke()
     }
 
-    drawButton(canvas: Canvas, at: Coordinates, width: number, height: number, image: HTMLImageElement){
+    drawButton(canvas: Canvas, button: Button){
       canvas.ctx.save()
       canvas.ctx.globalAlpha = 0.8;
-      canvas.ctx.translate(at.x, at.y)
-      const ratio = image.width / image.height
-      canvas.ctx.drawImage(image, - width / 2, - height / 2, width, height)
+      canvas.ctx.drawImage(button.image, button.originPosition.x, button.originPosition.y, button.width, button.height)
       canvas.ctx.restore()
     }
 

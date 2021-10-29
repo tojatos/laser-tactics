@@ -9,23 +9,26 @@ import { Drawings } from "../Drawings"
 import { Resources } from "../Resources"
 import { Canvas } from "./AbstractCanvas"
 import { GUICanvas } from "./GUICanvas"
+import { CanvasMediator } from "./CanvasMediator"
+import { COLS, ROWS } from "../../constants"
+import { PieceType } from "../../enums"
 
 export class GameCanvas extends Canvas {
 
-    highlightColor: string = "yellow"
     hoveredCell: Cell | undefined
     currentPlayer = this.authService.getCurrentJwtInfo().sub
+    mediator: CanvasMediator | undefined
 
     constructor(private gameService: GameService,
-      private authService: AuthService,
+      authService: AuthService,
       private eventEmitter: EventEmitterService,
-      private animations: Animations,
+      animations: Animations,
       drawings: Drawings,
       ctx: CanvasRenderingContext2D,
        blockSize: number,
        resources: Resources,
        gameId: string) {
-        super(ctx, blockSize, drawings, resources, gameId)
+        super(authService, ctx, blockSize, animations, drawings, resources, gameId)
     }
 
     initCanvas(board: Board, guiCanvas: GUICanvas){
@@ -33,63 +36,76 @@ export class GameCanvas extends Canvas {
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
       this.drawings.drawGame(this, board.cells)
       this.interactable = board.isMyTurn()
+      this.mediator = new CanvasMediator(this, guiCanvas)
     }
 
-    private async canvasOnclick(event: MouseEvent, board: Board) {
+    private canvasOnclick(event: MouseEvent, board: Board) {
+      this.onClickEvent(this.getMousePos(event), board)
+    }
 
-      console.log("click!")
-      console.log(this.getMousePos(event))
-      console.log(this.interactable)
-
+    async onClickEvent(mousePos: Coordinates, board: Board){
       if(!this.interactable)
         return
 
-      const coor = this.getMousePos(event)
-      const selectedCell = board.getSelectableCellByCoordinates(coor.x, coor.y, this.currentPlayer)
-
+      const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
       this.interactable = false
 
       if(board.selectedCell){
-        if(selectedCell){
-          this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
-          await this.makeAMoveEvent(selectedCell.coordinates, board)
-          this.gameService.increaseAnimationEvents()
-          board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
-          this.gameService.setLocalGameState(board.serialize())
-          this.drawings.drawGame(this, board.cells)
-          board.currentTurn++
-          this.eventEmitter.invokeRefresh()
-
-        }
-        this.unselectCellEvent(board)
-
+        this.selectableCellEvent(selectedCell, board)
       }
       else {
         if(selectedCell){
           this.selectCellEvent(selectedCell, board)
-          //if(selectedCell.piece?.piece_type == PieceType.LASER)
-            //this.drawings.drawLaserButton(this)
+          this.mediator?.sendSelectionInfoToGuiCanvas(board)
         }
       }
 
       const myTurn = board.isMyTurn()
       this.interactable = myTurn
+    }
+
+    mouseEventFromGui(mousePos: Coordinates, board: Board){
+      const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
+
+      if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
+        this.unselectCellEvent(board)
+
+      else if(selectedCell)
+        this.selectableCellEvent(selectedCell, board)
 
     }
 
+    private async selectableCellEvent(selectedCell: Cell | undefined, board: Board){
+      if(board.selectedCell && selectedCell){
+        this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
+        await this.makeAMoveEvent(selectedCell.coordinates, board)
+        this.gameService.increaseAnimationEvents()
+        board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
+        this.gameService.setLocalGameState(board.serialize())
+        this.drawings.drawGame(this, board.cells)
+        board.currentTurn++
+        this.eventEmitter.invokeRefresh()
+
+      }
+      this.unselectCellEvent(board)
+    }
+
     private canvasHover(event: MouseEvent, board: Board) {
+      this.hoverEvent(this.getMousePos(event), board)
+    }
+
+    hoverEvent(mousePos: Coordinates, board: Board){
       if(board.selectedCell && this.interactable){
-        const coor = this.getMousePos(event)
-        const hoveredOver = board.getCellByCoordinates(coor.x, coor.y)
+        const hoveredOver = board.getCellByCoordinates(mousePos.x, mousePos.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
             this.drawings.drawSingleCell(this, hoveredOver)
-            this.drawings.highlightCell(this, hoveredOver, this.highlightColor)
+            this.drawings.highlightCell(this, hoveredOver)
           }
           else {
             if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
               this.drawings.drawSingleCell(this, this.hoveredCell)
-              this.drawings.showPossibleMove(this, this.hoveredCell, this.highlightColor)
+              this.drawings.showPossibleMove(this, this.hoveredCell)
             }
           }
           this.hoveredCell = hoveredOver
@@ -97,41 +113,38 @@ export class GameCanvas extends Canvas {
       }
     }
 
-    async rotationButtonPressed(board: Board){
+    async rotationButtonPressed(board: Board, degree: number){
       const selectedCell = board.selectedCell
 
-      if(selectedCell && this.interactable){
-        this.gameService.rotatePiece(this.gameId, selectedCell.coordinates, 90)
+      if(selectedCell){
         this.interactable = false
-        await this.animations.rotatePiece(this, board, selectedCell, 90)
-        this.gameService.increaseAnimationEvents()
-        this.unselectCellEvent(board)
-        board.currentTurn++
-
-        this.eventEmitter.invokeRefresh()
+        await this.animations.rotatePiece(this, board, selectedCell, degree)
+        this.redrawGame(board)
+        this.drawings.highlightCell(this, selectedCell)
       }
     }
 
-    laserButtonPressed(board: Board){
-      console.log("LazorShoot2")
-      const laserCell = board.getMyLaser()
-      if(laserCell && this.interactable){
-        this.interactable = false
-        board.currentTurn++
-        console.log("Sending request")
-        this.gameService.shootLaser(this.gameId).then(_ => {
-          console.log("Request received! Invoking refresh")
-          this.eventEmitter.invokeRefresh()
-        })
-      }
-      else
-        alert("You dont have a laser!")
+    changeBlockSize(newSize: number, board: Board){
+      this.blockSize = newSize
+      this.ctx.canvas.width = COLS * this.blockSize
+      this.ctx.canvas.height = ROWS * this.blockSize
+      this.drawings.drawGame(this, board.cells)
+    }
+
+    redrawGame(board: Board){
+      this.drawings.drawGame(this, board.cells)
+      this.interactable = true
     }
 
     private selectCellEvent(selectedCell: Cell, board: Board){
       board.selectCell(selectedCell)
-      this.drawings.highlightCell(this, selectedCell, this.highlightColor)
-      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.highlightColor))
+      this.drawings.highlightCell(this, selectedCell)
+      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c))
+    }
+
+    highlightPossibleMoves(board: Board){
+      if(board.selectedCell)
+        board.selectedCell.piece?.getPossibleMoves(board, board.selectedCell).forEach(c => this.drawings.showPossibleMove(this, c))
     }
 
     private unselectCellEvent(board: Board){
@@ -141,15 +154,6 @@ export class GameCanvas extends Canvas {
 
     private makeAMoveEvent(coor: Coordinates, board: Board): Promise<void>{
       return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor)
-    }
-
-    private getMousePos(event: MouseEvent){
-        const rect = this.ctx.canvas.getBoundingClientRect();
-
-        return {
-          x: Math.floor((event.clientX - rect.left) / this.blockSize),
-          y: 8 - Math.floor((event.clientY - rect.top) / this.blockSize)
-        }
     }
 
 }

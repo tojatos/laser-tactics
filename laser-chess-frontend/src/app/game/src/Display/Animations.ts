@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { cloneDeep } from "lodash";
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
@@ -57,7 +58,7 @@ export class Animations {
         return
 
       const speed = 20
-      const degreesPerFrame = 2
+      const degreesPerFrame = byDegrees > 0 ? 2 : -2
 
       const validCellsArray = this.cellsExcludingPiece(board, atCell)
       const desiredPiecePosition = piece.rotation_degree + byDegrees
@@ -66,8 +67,11 @@ export class Animations {
         const interval = setInterval(() => {
             this.drawings.drawGame(canvas, validCellsArray)
             piece.rotation_degree += degreesPerFrame
+            this.drawings.highlightCell(canvas, atCell)
             this.drawings.drawPiece(canvas, piece)
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
+              if(piece.rotation_degree < 0)
+                piece.rotation_degree = 360 + piece.rotation_degree
               piece.rotation_degree = desiredPiecePosition % 360
               clearInterval(interval)
               resolve()
@@ -131,7 +135,14 @@ export class Animations {
     }
 
     private inRotationVicinity(currentRotation: number, desiredRotation: number, deegresPerFrame: number){
-      return Math.abs(currentRotation - desiredRotation) <= deegresPerFrame * 2
+
+      if(currentRotation < 0)
+        currentRotation = 360 + currentRotation
+
+      if(desiredRotation < 0)
+        desiredRotation = 360 + desiredRotation
+
+      return Math.abs(currentRotation - desiredRotation) <= Math.abs(deegresPerFrame) * 2
     }
 
     private designateLinearFunction(x1: number, y1: number, x2: number, y2: number){

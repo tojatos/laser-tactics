@@ -14,7 +14,7 @@ export class BoardComponent implements AfterViewInit {
   @ViewChild('gui', { static: true })
   canvasGUI!: ElementRef<HTMLCanvasElement>
 
-  sizeScale = 0.07
+  readonly sizeScale = 0.07
 
   constructor(private route: ActivatedRoute, private game: Game) {}
 

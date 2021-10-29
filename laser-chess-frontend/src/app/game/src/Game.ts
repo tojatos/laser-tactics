@@ -32,7 +32,7 @@ export class Game{
     await this.resources.loadAssets()
     console.log("initiated")
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
-    this.guiCanvas = new GUICanvas(this.gameService, this.authService, this.eventEmitter, this.drawings, guiCanvasContext, blockSize, this.resources, gameId)
+    this.guiCanvas = new GUICanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, guiCanvasContext, blockSize, this.resources, gameId)
     this.loadDisplay(gameId, (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07)
   }
 
@@ -70,7 +70,7 @@ export class Game{
   changeCurrentSize(newSize: number){
     this.board.changeCellCoordinates(newSize)
     this.gameCanvas.changeBlockSize(newSize, this.board)
-    this.guiCanvas.changeBlockSize(newSize, this.board)
+    this.guiCanvas.changeBlockSize(newSize)
   }
 
   refreshGameState(){
