@@ -7,13 +7,11 @@ from app.game_engine.requests import *
 from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
-import sqlalchemy as sa
 
 tokens = []
 game_id = "some_id"
 
 
-# TODO: create lobby before starting the game
 @pytest.fixture(scope="session", autouse=True)
 def before_all():
     global tokens

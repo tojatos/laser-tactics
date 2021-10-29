@@ -104,15 +104,15 @@ def get_game_state_table(db: Session, game_id: str):
 
 
 def start_game(db: Session, game_state: GameState, request: StartGameRequest):
-    lobby = get_lobby(db, request.lobby_id)
+    # lobby = get_lobby(db, request.lobby_id)
     game_state_json = json.dumps(dataclasses.asdict(game_state.to_serializable()))
     db_game_state = models.GameStateTable(player_one_id=request.player_one_id,
                                           player_two_id=request.player_two_id,
                                           game_id=request.game_id,
                                           game_state_json=game_state_json)
     db.add(db_game_state)
-    if lobby is not None:
-        db.delete(lobby)
+    # if lobby is not None:
+    #    db.delete(lobby)
     db.commit()
     db.refresh(db_game_state)
     return db_game_state
