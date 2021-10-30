@@ -8,7 +8,7 @@ def get_token_data(create_user_data):
 
 
 @dataclasses.dataclass
-class TestUtils:
+class TUtils:
     client: TestClient
     api_prefix: str
 

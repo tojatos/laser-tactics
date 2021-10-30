@@ -7,7 +7,7 @@ import sqlalchemy as sa
 
 from app.core.database import Base
 from app.main import app, get_db, API_PREFIX
-from tests.utils import TestUtils
+from tests.utils import TUtils
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -69,7 +69,7 @@ def client(session):
 
 @pytest.fixture(autouse=True)
 def tu(client):
-    yield TestUtils(client, API_PREFIX)
+    yield TUtils(client, API_PREFIX)
 
 
 def pytest_sessionstart(session):

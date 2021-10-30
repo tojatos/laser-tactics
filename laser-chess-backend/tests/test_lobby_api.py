@@ -25,7 +25,7 @@ def before_all():
 
     app.dependency_overrides[get_db] = override_get_db
     client = TestClient(app)
-    tu = TestUtils(client, API_PREFIX)
+    tu = TUtils(client, API_PREFIX)
 
     create_user_datas = list(
         map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 2)))
