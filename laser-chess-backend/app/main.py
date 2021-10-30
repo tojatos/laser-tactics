@@ -1,3 +1,4 @@
+import dataclasses
 import os
 from datetime import datetime, timedelta
 
@@ -10,6 +11,7 @@ from passlib.context import CryptContext
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from starlette.websockets import WebSocket
 
 from app.core import schemas
 from app.core import crud, models
@@ -380,7 +382,22 @@ async def unblock_user(username, current_user: schemas.User = Depends(get_curren
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
 
+# router method is not working with websockets
+# @app.websocket_route("/ws")
+async def websocket_endpoint(websocket: WebSocket, db: Session = Depends(get_db)):
+    await websocket.accept()
+
+    game_state_dict = await websocket.receive_json()
+    request: GetGameStateRequest = GetGameStateRequest(**game_state_dict)
+
+    game_state = game_service.get_game_state(request, db)
+
+    await websocket.send_json(dataclasses.asdict(game_state))
+    await websocket.close()
+
 app.include_router(router)
+app.add_api_websocket_route("/ws", websocket_endpoint)
+
 
 if __name__ == "__main__":
     # models.Base.metadata.drop_all(bind=engine)

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from pydantic.dataclasses import dataclass
 
 from app.game_engine.models import CellCoordinatesSerializable
 
