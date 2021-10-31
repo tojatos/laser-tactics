@@ -65,19 +65,26 @@ def auth(ws: WebSocket, token_num: int):
     return WebsocketResponse(**response_json)
 
 
-def shoot_laser(ws: WebSocket):
+def shoot_laser(ws: WebSocket, token_num: int):
+    auth(ws, token_num)
     request = WebsocketRequest(GameApiRequestPath.ShootLaser, shoot_laser_request)
     ws.send_json(dataclasses.asdict(request))
     response_json = ws.receive_json()
     return WebsocketResponse(**response_json)
 
-#
-# def post_move_piece(tu, token_num: int, coordinates_from: CellCoordinates, coordinates_to: CellCoordinates):
-#     request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from),
-#                                cell_coordinates_to_serializable(coordinates_to))
-#     return tu.post_data("/move_piece", tokens[token_num], json=asdict(request))
-#
-#
+
+def move_piece(ws: WebSocket, token_num: int, coordinates_from: CellCoordinates, coordinates_to: CellCoordinates):
+    auth(ws, token_num)
+
+    move_piece_request = MovePieceRequest(game_id,
+                                          cell_coordinates_to_serializable(coordinates_from),
+                                          cell_coordinates_to_serializable(coordinates_to))
+    request = WebsocketRequest(GameApiRequestPath.MovePiece, move_piece_request)
+    ws.send_json(dataclasses.asdict(request))
+    response_json = ws.receive_json()
+    return WebsocketResponse(**response_json)
+
+
 # def post_rotate_piece(tu, token_num: int, coordinates: CellCoordinates, degrees: int):
 #     request = RotatePieceRequest(game_id, cell_coordinates_to_serializable(coordinates), degrees)
 #     return tu.post_data("/rotate_piece", tokens[token_num], json=asdict(request))
@@ -101,33 +108,36 @@ def test_auth(client: TestClient):
 def test_shoot_laser(client: TestClient):
     with client.websocket_connect("/ws") as ws:
         ws: WebSocket
-        auth(ws, 0)
-        response = shoot_laser(ws)
+        response = shoot_laser(ws, 0)
         assert response.status_code == 200
-#
+
         game_state = get_game_state(ws)
         assert game_state.board.cells[(5, 0)] is None
         assert game_state.board.cells[(6, 1)] is None
-#
-#
-# def test_move_block(tu):
-#     response = post_move_piece(tu, 0, (1, 1), (1, 2))
-#     assert response.status_code == 200
-#
-#     game_state = game_state_from_response(post_get_game_state(tu))
-#     assert game_state.board.cells[(1, 1)] is None
-#     assert game_state.board.cells[(1, 2)] is not None
-#
-#
-# def test_move_block_on_own_piece(tu):
-#     response = post_move_piece(tu, 0, (1, 1), (2, 1))
-#     assert response.status_code != 200
-#
-#     game_state = game_state_from_response(post_get_game_state(tu))
-#     assert game_state.board.cells[(1, 1)] is not None
-#     assert game_state.board.cells[(2, 1)] is not None
-#
-#
+
+
+def test_move_block(client):
+    with client.websocket_connect("/ws") as ws:
+        ws: WebSocket
+        response = move_piece(ws, 0, (1, 1), (1, 2))
+        assert response.status_code == 200
+
+        game_state = get_game_state(ws)
+        assert game_state.board.cells[(1, 1)] is None
+        assert game_state.board.cells[(1, 2)] is not None
+
+
+def test_move_block_on_own_piece(client):
+    with client.websocket_connect("/ws") as ws:
+        ws: WebSocket
+        response = move_piece(ws, 0, (1, 1), (2, 1))
+        assert response.status_code != 200
+
+        game_state = get_game_state(ws)
+        assert game_state.board.cells[(1, 1)] is not None
+        assert game_state.board.cells[(2, 1)] is not None
+
+
 # def test_rotate_block(tu):
 #     response = post_rotate_piece(tu, 0, (1, 1), 90)
 #     assert response.status_code == 200

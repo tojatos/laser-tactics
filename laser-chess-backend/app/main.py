@@ -391,11 +391,13 @@ async def unblock_user(username, current_user: schemas.User = Depends(get_curren
         raise HTTPException(status_code=404, detail="User not blocked")
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
-
 async def websocket_endpoint(websocket: WebSocket,
                              # current_user: schemas.User = Depends(get_current_active_user),
                              db: Session = Depends(get_db)
                              ):
+    async def send_websocket_response(status_code: int):
+        await websocket.send_json(dataclasses.asdict(WebsocketResponse(status_code)))
+
     current_user: schemas.User = None
     await websocket.accept()
     try:
@@ -407,26 +409,40 @@ async def websocket_endpoint(websocket: WebSocket,
                 token = request.token
                 try:
                     current_user = await get_current_user(token, db)
-                    response = WebsocketResponse(200)
-                    await websocket.send_json(dataclasses.asdict(response))
+                    await send_websocket_response(200)
                 except HTTPException:
-                    response = WebsocketResponse(401)
-                    await websocket.send_json(dataclasses.asdict(response))
-
-            if websocket_request.request_path is GameApiRequestPath.GetGameState:
+                    await send_websocket_response(401)
+            elif websocket_request.request_path is GameApiRequestPath.GetGameState:
                 request: GetGameStateRequest = websocket_request.request
                 game_state = game_service.get_game_state(request, db)
                 await websocket.send_json(dataclasses.asdict(game_state))
 
-            if websocket_request.request_path is GameApiRequestPath.ShootLaser:
+            elif websocket_request.request_path is GameApiRequestPath.ShootLaser:
                 request: ShootLaserRequest = websocket_request.request
                 if current_user is None:
-                    response = WebsocketResponse(400)
-                    await websocket.send_json(dataclasses.asdict(response))
+                    await send_websocket_response(400)
                 else:
                     game_service.shoot_laser(current_user.username, request, db)
-                    response = WebsocketResponse(200)
-                    await websocket.send_json(dataclasses.asdict(response))
+                    await send_websocket_response(200)
+            elif websocket_request.request_path is GameApiRequestPath.MovePiece:
+                try:
+                    request: MovePieceRequest = websocket_request.request
+                    if current_user is None:
+                        await send_websocket_response(400)
+                    else:
+                        game_service.move_piece(current_user.username, request, db)
+                        await send_websocket_response(200)
+                except HTTPException as e:
+                    await send_websocket_response(e.status_code)
+            elif websocket_request.request_path is GameApiRequestPath.RotatePiece:
+                request: RotatePieceRequest = websocket_request.request
+                if current_user is None:
+                    await send_websocket_response(400)
+                else:
+                    game_service.rotate_piece(current_user.username, request, db)
+                    await send_websocket_response(200)
+            else:
+                await send_websocket_response(404)
     except WebSocketDisconnect:
         pass
 
