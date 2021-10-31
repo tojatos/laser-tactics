@@ -10,6 +10,7 @@ import { Button } from "./Button"
 export class Drawings {
 
     highlightColor: string = "yellow"
+    laserThickness = 5
 
     drawGame(canvas: Canvas, cells: Cell[]){
         this.clearBoard(canvas)
@@ -72,12 +73,20 @@ export class Drawings {
 
     drawLaserLine(canvas: Canvas, from: Coordinates, to: Coordinates){
       canvas.ctx.save()
-      canvas.ctx.lineWidth = 5
+      canvas.ctx.lineWidth = this.laserThickness
       canvas.ctx.beginPath()
       canvas.ctx.moveTo(from.x, from.y)
       canvas.ctx.lineTo(to.x, to.y)
       canvas.ctx.strokeStyle = "red"
       canvas.ctx.stroke()
+    }
+
+    drawLaserCorner(canvas: Canvas, at: Coordinates){
+      canvas.ctx.save()
+      canvas.ctx.translate(at.x, at.y)
+      canvas.ctx.fillStyle = "red";
+      canvas.ctx.fillRect(-this.laserThickness / 2, -this.laserThickness / 2, this.laserThickness, this.laserThickness)
+      canvas.ctx.restore()
     }
 
     drawButton(canvas: Canvas, button: Button){

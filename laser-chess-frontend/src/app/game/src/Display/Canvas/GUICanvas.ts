@@ -191,7 +191,9 @@ export class GUICanvas extends Canvas {
       this.hideCanvas()
       this.mediator.sendLaserShotInfo(board)
       board.currentTurn++
-      this.gameService.shootLaser(this.gameId).then(_ => {
+      this.unselectCellEvent(board)
+      this.gameService.shootLaser(this.gameId)
+      .finally(() => {
         this.eventEmitter.invokeRefresh()
       })
     }

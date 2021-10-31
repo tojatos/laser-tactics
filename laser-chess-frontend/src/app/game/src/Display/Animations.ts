@@ -142,7 +142,7 @@ export class Animations {
 
         const lastAction = () => {
           this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell!)
-          // draw a small square at the middle of field
+          this.drawings.drawLaserCorner(canvas, toCell!)
         }
 
         if(!showAnimations)
@@ -157,7 +157,7 @@ export class Animations {
             }
 
             this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, currentCoordinates)
-            this.drawings.drawPiece(canvas, board.getLaserCell()!.piece!)
+            // this.drawings.drawPiece(canvas, board.getLaserCell()!.piece!) - will crash app if laser cell is not present
 
             laserIncrement += laserIncrementPerFrame
             if(this.inVicinity(toCell!, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
