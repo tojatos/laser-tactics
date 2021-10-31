@@ -128,9 +128,9 @@ export class Animations {
       else if(to.x < 0)
         toCell = {x: toCell!.x - board.blockSize!, y: toCell!.y}
       if(to.y > 8)
-        toCell = {x: toCell!.x, y: toCell!.y + board.blockSize!}
-      else if(to.y < 0)
         toCell = {x: toCell!.x, y: toCell!.y - board.blockSize!}
+      else if(to.y < 0)
+        toCell = {x: toCell!.x, y: toCell!.y + board.blockSize!}
 
       const speed = 20
       const laserIncrementPerFrame = 10
