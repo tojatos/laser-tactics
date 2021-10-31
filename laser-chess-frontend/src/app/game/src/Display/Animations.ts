@@ -13,7 +13,7 @@ export class Animations {
 
     constructor(private drawings: Drawings){}
 
-    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates): Promise<void>{
+    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates, showAnimations: boolean): Promise<void>{
 
         const origin = board.getCellByCoordinates(originCoordinates.x, originCoordinates.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
@@ -40,25 +40,39 @@ export class Animations {
         if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
           validCellsArray = this.cellsExcludingPiece(board, validCellsArray, destination)
 
+        const intervalAction = () => {
+          this.drawings.drawGame(canvas, validCellsArray)
+          this.changePosition(piece, originCoordinates, destinationCoordinates, redrawDistance, fun)
+          this.drawings.drawPiece(canvas, piece)
+        }
+
+        const lastAction = () => {
+          this.drawings.drawGame(canvas, validCellsArray)
+          piece.currentCoordinates = destination.canvasCoordinates
+          if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+            this.drawings.drawPiece(canvas, piece)
+        }
+
+        if(!showAnimations)
+        return new Promise<void>((resolve) => {
+          lastAction()
+          resolve()
+        })
+
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
-              this.drawings.drawGame(canvas, validCellsArray)
-              this.changePosition(piece, originCoordinates, destinationCoordinates, redrawDistance, fun)
-              this.drawings.drawPiece(canvas, piece)
-              if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
-                this.drawings.drawGame(canvas, validCellsArray)
-                piece.currentCoordinates = destination.canvasCoordinates
-                if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
-                  this.drawings.drawPiece(canvas, piece)
-                clearInterval(interval)
-                resolve()
-              }
+            intervalAction()
+            if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
+              lastAction()
+              clearInterval(interval)
+              resolve()
+            }
           }, 100 / speed )
         })
 
     }
 
-    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, initialRotationDifference: number = 0): Promise<void>{
+    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, showAnimations: boolean, initialRotationDifference: number = 0): Promise<void>{
       const piece = cloneDeep(atCell?.piece)
 
       if(!piece || !atCell)
@@ -71,18 +85,32 @@ export class Animations {
       const validCellsArray = this.cellsExcludingPiece(board, board.cells, atCell)
       const desiredPiecePosition = piece.rotation_degree + byDegrees
 
+      const intervalAction = () => {
+        this.drawings.drawGame(canvas, validCellsArray)
+        piece.rotation_degree += degreesPerFrame
+        this.drawings.highlightCell(canvas, atCell, piece)
+        this.drawings.drawPiece(canvas, piece)
+      }
+
+      const lastAction = () => {
+        if(piece.rotation_degree < 0)
+          piece.rotation_degree = 360 + piece.rotation_degree
+        piece.rotation_degree = desiredPiecePosition % 360
+        this.drawings.drawGame(canvas, validCellsArray)
+        this.drawings.highlightCell(canvas, atCell, piece)
+      }
+
+      if(!showAnimations)
+        return new Promise<void>((resolve) => {
+          lastAction()
+          resolve()
+        })
+
       return new Promise<void>((resolve) => {
         const interval = setInterval(() => {
-            this.drawings.drawGame(canvas, validCellsArray)
-            piece.rotation_degree += degreesPerFrame
-            this.drawings.highlightCell(canvas, atCell, piece)
-            this.drawings.drawPiece(canvas, piece)
+            intervalAction()
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
-              if(piece.rotation_degree < 0)
-                piece.rotation_degree = 360 + piece.rotation_degree
-              piece.rotation_degree = desiredPiecePosition % 360
-              this.drawings.drawGame(canvas, validCellsArray)
-              this.drawings.highlightCell(canvas, atCell, piece)
+              lastAction()
               clearInterval(interval)
               resolve()
             }
@@ -91,7 +119,7 @@ export class Animations {
 
     }
 
-    async laserAnimation(canvas: Canvas, board: Board, from: Coordinates, to: Coordinates): Promise<void> {
+    async laserAnimation(canvas: Canvas, board: Board, from: Coordinates, to: Coordinates, showAnimations: boolean): Promise<void> {
       const fromCell = board.getCellByCoordinates(from.x, from.y)
       let toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, to.x)), Math.min(8, Math.max(0, to.y)))?.canvasCoordinates
 
@@ -112,6 +140,14 @@ export class Animations {
         const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.x)
         const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.y)
 
+        const lastAction = () => {
+          this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell!)
+          // draw a small square at the middle of field
+        }
+
+        if(!showAnimations)
+          return new Promise<void>((resolve) => { lastAction(); resolve() })
+
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
 
@@ -125,8 +161,7 @@ export class Animations {
 
             laserIncrement += laserIncrementPerFrame
             if(this.inVicinity(toCell!, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
-              this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell!)
-              // draw a small square at the middle of field
+              lastAction()
               clearInterval(interval)
               resolve()
             }

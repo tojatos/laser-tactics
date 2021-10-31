@@ -26,11 +26,12 @@ export class EventsExecutor{
         this.eventsQueue.push(...events)
     }
 
-    async executeEventsQueue(canvas: Canvas, board: Board, timeout: number = this.eventsExecutionTimeout){
+    async executeEventsQueue(canvas: Canvas, board: Board, showAnimations: boolean = true, timeout: number = this.eventsExecutionTimeout){
       for (const event of this.eventsQueue){
         if(event){
-          await new Promise(resolve => setTimeout(resolve, timeout))
-          await this.getAnimationToExecute(canvas, board, event)
+          if(showAnimations)
+            await new Promise(resolve => setTimeout(resolve, timeout))
+          await this.getAnimationToExecute(canvas, board, event, showAnimations)
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
           this.gameService.setLocalGameState(board.serialize())
@@ -40,7 +41,7 @@ export class EventsExecutor{
       this.eventsQueue = []
     }
 
-    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[]){
+    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], showAnimations: boolean){
       const res = values(groupBy(laserPath, 'time'))
       const allPathsToDraw: PathInfo[] = []
 
@@ -49,22 +50,23 @@ export class EventsExecutor{
 
         return new Promise<void>(async resolve => {
           for (const path of allPaths)
-            await Promise.all(path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to)
+            await Promise.all(path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to, showAnimations)
             ))
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        //if(showAnimations)
+          await new Promise(resolve => setTimeout(resolve, 1000))
         resolve()
         })
 
     }
 
-    getAnimationToExecute(canvas: Canvas, board: Board, gameEvent: GameEvent){
+    getAnimationToExecute(canvas: Canvas, board: Board, gameEvent: GameEvent, showAnimations: boolean){
       switch(gameEvent.event_type){
         case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(canvas, board,
           board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y),
-          gameEvent.rotation > 180 ? gameEvent.rotation - 360 : gameEvent.rotation)
-        case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(canvas, board, gameEvent.moved_from, gameEvent.moved_to)
-        case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(canvas, board, gameEvent.teleported_from, gameEvent.teleported_to)
-        case GameEvents.LASER_SHOT_EVENT : return this.executeLaserAnimations(canvas, board, gameEvent.laser_path)
+          gameEvent.rotation > 180 ? gameEvent.rotation - 360 : gameEvent.rotation, showAnimations)
+        case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(canvas, board, gameEvent.moved_from, gameEvent.moved_to, showAnimations)
+        case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(canvas, board, gameEvent.teleported_from, gameEvent.teleported_to, showAnimations)
+        case GameEvents.LASER_SHOT_EVENT : return this.executeLaserAnimations(canvas, board, gameEvent.laser_path, showAnimations)
         default: return undefined
       }
     }

@@ -15,6 +15,7 @@ export class BoardComponent implements AfterViewInit {
   canvasGUI!: ElementRef<HTMLCanvasElement>
 
   readonly sizeScale = 0.07
+  animation = true
 
   constructor(private route: ActivatedRoute, private game: Game) {}
 
@@ -42,6 +43,11 @@ export class BoardComponent implements AfterViewInit {
   onResize(event: UIEvent) {
     const currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
     this.game.changeCurrentSize(currentSize)
+  }
+
+  changeAnimationShowOption(){
+    this.animation = !this.animation
+    this.game.changeAnimationsShowOption(this.animation)
   }
 
 }

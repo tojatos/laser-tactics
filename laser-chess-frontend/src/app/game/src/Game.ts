@@ -18,11 +18,11 @@ export class Game{
   guiCanvas!: GUICanvas
   gameId!: string
   sizeScale!: number
+  showAnimations: boolean = true
 
   constructor(private gameService: GameService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
       this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe(() => {
-        console.log("refresh invoked!")
         this.refreshGameState();
       });
     }
@@ -32,7 +32,6 @@ export class Game{
     this.sizeScale = sizeScale
     this.gameId = gameId
     await this.resources.loadAssets()
-    console.log("initiated")
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.guiCanvas = new GUICanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, guiCanvasContext, blockSize, this.resources, gameId)
     this.loadDisplay(gameId, (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale)
@@ -75,6 +74,11 @@ export class Game{
     this.guiCanvas.changeBlockSize(newSize)
   }
 
+  changeAnimationsShowOption(show: boolean){
+    this.showAnimations = show
+    this.gameCanvas.showAnimations = this.showAnimations
+  }
+
   refreshGameState(){
     if(this.gameId){
       this.gameService.getGameState(this.gameId).then(async res => {
@@ -105,7 +109,7 @@ export class Game{
     console.log("executing actions")
     this.gameCanvas.interactable = false
     this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
-    await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board)
+    await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, this.showAnimations)
   }
 
 }

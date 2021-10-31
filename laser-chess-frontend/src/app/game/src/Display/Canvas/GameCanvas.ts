@@ -18,6 +18,7 @@ export class GameCanvas extends Canvas {
     hoveredCell: Cell | undefined
     currentPlayer = this.authService.getCurrentJwtInfo().sub
     mediator: CanvasMediator | undefined
+    showAnimations: boolean = true
 
     constructor(private gameService: GameService,
       authService: AuthService,
@@ -78,7 +79,7 @@ export class GameCanvas extends Canvas {
 
     private async selectableCellEvent(selectedCell: Cell | undefined, board: Board){
       if(board.selectedCell && selectedCell){
-        await this.makeAMoveEvent(selectedCell.coordinates, board)
+        await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
         .then(async () => {
           this.gameService.increaseAnimationEvents()
@@ -124,7 +125,7 @@ export class GameCanvas extends Canvas {
 
       if(selectedCell){
         this.interactable = false
-        await this.animations.rotatePiece(this, board, selectedCell, degree, initialRotationDifference)
+        await this.animations.rotatePiece(this, board, selectedCell, degree, this.showAnimations, initialRotationDifference)
         this.interactable = true
       }
     }
@@ -157,8 +158,8 @@ export class GameCanvas extends Canvas {
       this.drawings.drawGame(this, board.cells)
     }
 
-    private makeAMoveEvent(coor: Coordinates, board: Board): Promise<void>{
-      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor)
+    private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean): Promise<void>{
+      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, showAnimations)
     }
 
 }
