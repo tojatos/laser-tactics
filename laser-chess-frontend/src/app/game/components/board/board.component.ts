@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { COLS, ROWS } from '../../src/constants';
 import { Game } from '../../src/Game';
 
 @Component({
@@ -33,21 +34,31 @@ export class BoardComponent implements AfterViewInit {
     }
 
     this.route.params.subscribe(async params => {
-      const currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
-      await this.game.initGame(gameCanvasContext, guiCanvasContext, currentSize, params.id, this.sizeScale)
+      await this.game.initGame(gameCanvasContext, guiCanvasContext, this.currentSize, params.id, this.sizeScale)
     })
 
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
-    const currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
-    this.game.changeCurrentSize(currentSize)
+    this.game.changeCurrentSize(this.currentSize)
   }
 
   changeAnimationShowOption(){
     this.animation = !this.animation
     this.game.changeAnimationsShowOption(this.animation)
+  }
+
+  get currentSize() {
+    return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
+  }
+
+  get containerHeight() {
+    return this.currentSize * ROWS
+  }
+
+  get containerWidth() {
+    return this.currentSize * COLS
   }
 
 }

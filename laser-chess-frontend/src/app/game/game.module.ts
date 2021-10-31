@@ -11,12 +11,14 @@ import { Game } from './src/Game';
 import { Animations } from './src/Display/Animations';
 import { Drawings } from './src/Display/Drawings';
 import { GameServiceInterceptor } from './services/game-service.interceptor';
+import { MaterialModule } from '../material/material.module';
 
 @NgModule({
   declarations: [GameComponent, BoardComponent, ChatComponent],
   imports: [
     CommonModule,
-    HttpClientModule
+    HttpClientModule,
+    MaterialModule
   ],
   exports: [GameComponent],
   providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor, { provide: HTTP_INTERCEPTORS, useClass: GameServiceInterceptor, multi: true }]

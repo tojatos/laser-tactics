@@ -1,8 +1,8 @@
-<p>board works!</p>
-<div class="game-container">
+<div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
   <canvas #canvas class="gameCanvas"></canvas>
   <canvas #gui class="guiCanvas"></canvas>
 </div>
-<button style = "position: relative;" (click) ="changeAnimationShowOption()">Show animations</button>
+<button mat-raised-button (click)="changeAnimationShowOption()">Show animations</button>
+
 
 
