@@ -192,15 +192,6 @@ async def read_own_items(current_user: schemas.User = Depends(get_current_active
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 
-# game_api_request_to_path = {
-#     GameApiRequestPath.GetGameStateRequest: "/get_game_state",
-#     GameApiRequestPath.StartGameRequest: "/start_game",
-#     GameApiRequestPath.ShootLaserRequest: "/shoot_laser",
-#     GameApiRequestPath.MovePieceRequest: "/move_piece",
-#     GameApiRequestPath.RotatePieceRequest: "/rotate_piece",
-# }
-
-
 @router.post(GameApiRequestPath.GetGameState, response_model=GameStateSerializable,
              responses={
                  404: {"detail": "Game with id {game_id} does not exist."}
@@ -391,8 +382,9 @@ async def unblock_user(username, current_user: schemas.User = Depends(get_curren
         raise HTTPException(status_code=404, detail="User not blocked")
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
+
+# noinspection PyTypeChecker
 async def websocket_endpoint(websocket: WebSocket,
-                             # current_user: schemas.User = Depends(get_current_active_user),
                              db: Session = Depends(get_db)
                              ):
     async def send_websocket_response(status_code: int):
@@ -413,34 +405,22 @@ async def websocket_endpoint(websocket: WebSocket,
                 except HTTPException:
                     await send_websocket_response(401)
             elif websocket_request.request_path is GameApiRequestPath.GetGameState:
-                request: GetGameStateRequest = websocket_request.request
-                game_state = game_service.get_game_state(request, db)
+                game_state = game_service.get_game_state(websocket_request.request, db)
                 await websocket.send_json(dataclasses.asdict(game_state))
-
-            elif websocket_request.request_path is GameApiRequestPath.ShootLaser:
-                request: ShootLaserRequest = websocket_request.request
+            elif websocket_request.request_path in [GameApiRequestPath.ShootLaser, GameApiRequestPath.MovePiece, GameApiRequestPath.RotatePiece]:
                 if current_user is None:
-                    await send_websocket_response(400)
+                    await send_websocket_response(401)
                 else:
-                    game_service.shoot_laser(current_user.username, request, db)
-                    await send_websocket_response(200)
-            elif websocket_request.request_path is GameApiRequestPath.MovePiece:
-                try:
-                    request: MovePieceRequest = websocket_request.request
-                    if current_user is None:
-                        await send_websocket_response(400)
-                    else:
-                        game_service.move_piece(current_user.username, request, db)
+                    try:
+                        if websocket_request.request_path is GameApiRequestPath.ShootLaser:
+                            game_service.shoot_laser(current_user.username, websocket_request.request, db)
+                        if websocket_request.request_path is GameApiRequestPath.MovePiece:
+                            game_service.move_piece(current_user.username, websocket_request.request, db)
+                        if websocket_request.request_path is GameApiRequestPath.RotatePiece:
+                            game_service.rotate_piece(current_user.username, websocket_request.request, db)
                         await send_websocket_response(200)
-                except HTTPException as e:
-                    await send_websocket_response(e.status_code)
-            elif websocket_request.request_path is GameApiRequestPath.RotatePiece:
-                request: RotatePieceRequest = websocket_request.request
-                if current_user is None:
-                    await send_websocket_response(400)
-                else:
-                    game_service.rotate_piece(current_user.username, request, db)
-                    await send_websocket_response(200)
+                    except HTTPException as e:
+                        await send_websocket_response(e.status_code)
             else:
                 await send_websocket_response(404)
     except WebSocketDisconnect:
