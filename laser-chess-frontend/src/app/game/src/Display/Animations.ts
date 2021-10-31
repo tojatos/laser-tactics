@@ -3,6 +3,7 @@ import { cloneDeep } from "lodash";
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
+import { PieceType } from "../enums";
 import { Piece } from "../piece";
 import { Canvas } from "./Canvas/AbstractCanvas";
 import { Drawings } from "./Drawings";
@@ -12,12 +13,13 @@ export class Animations {
 
     constructor(private drawings: Drawings){}
 
-    async movePiece(canvas: Canvas, board: Board, originCooridantes: Coordinates, destinationCoordinates: Coordinates): Promise<void>{
+    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates): Promise<void>{
 
-        const origin = board.getCellByCoordinates(originCooridantes.x, originCooridantes.y)
+        const origin = board.getCellByCoordinates(originCoordinates.x, originCoordinates.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
 
-        const piece = origin?.auxiliaryPiece || origin?.piece
+        const pieceRef = origin?.auxiliaryPiece || origin?.piece
+        const piece = cloneDeep(pieceRef)
 
         if(!origin || !destination || !piece){
             console.error("Cannot move a piece. Wrong cell selected or piece is not in selected origin")
@@ -34,15 +36,20 @@ export class Animations {
             destination.canvasCoordinates.y
             )
 
-        const validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPiece(board, origin)
+        let validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPiece(board, board.cells, origin)
+        if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+          validCellsArray = this.cellsExcludingPiece(board, validCellsArray, destination)
 
         return new Promise<void>((resolve) => {
           const interval = setInterval(() => {
               this.drawings.drawGame(canvas, validCellsArray)
-              this.changePosition(piece, originCooridantes, destinationCoordinates, redrawDistance, fun)
+              this.changePosition(piece, originCoordinates, destinationCoordinates, redrawDistance, fun)
               this.drawings.drawPiece(canvas, piece)
               if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
+                this.drawings.drawGame(canvas, validCellsArray)
                 piece.currentCoordinates = destination.canvasCoordinates
+                if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+                  this.drawings.drawPiece(canvas, piece)
                 clearInterval(interval)
                 resolve()
               }
@@ -51,28 +58,31 @@ export class Animations {
 
     }
 
-    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number): Promise<void>{
-      const piece = atCell?.piece
+    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, initialRotationDifference: number = 0): Promise<void>{
+      const piece = cloneDeep(atCell?.piece)
 
       if(!piece || !atCell)
         return
 
+      piece.rotation_degree += initialRotationDifference
       const speed = 20
       const degreesPerFrame = byDegrees > 0 ? 2 : -2
 
-      const validCellsArray = this.cellsExcludingPiece(board, atCell)
+      const validCellsArray = this.cellsExcludingPiece(board, board.cells, atCell)
       const desiredPiecePosition = piece.rotation_degree + byDegrees
 
       return new Promise<void>((resolve) => {
         const interval = setInterval(() => {
             this.drawings.drawGame(canvas, validCellsArray)
             piece.rotation_degree += degreesPerFrame
-            this.drawings.highlightCell(canvas, atCell)
+            this.drawings.highlightCell(canvas, atCell, piece)
             this.drawings.drawPiece(canvas, piece)
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
               if(piece.rotation_degree < 0)
                 piece.rotation_degree = 360 + piece.rotation_degree
               piece.rotation_degree = desiredPiecePosition % 360
+              this.drawings.drawGame(canvas, validCellsArray)
+              this.drawings.highlightCell(canvas, atCell, piece)
               clearInterval(interval)
               resolve()
             }
@@ -126,8 +136,8 @@ export class Animations {
 
     }
 
-    private cellsExcludingPiece(board: Board, cell: Cell){
-        return board.cells.filter(c => c.piece != board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y)?.piece)
+    private cellsExcludingPiece(board: Board, cells: Cell[], cell: Cell){
+        return cells.filter(c => c.piece != board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y)?.piece)
     }
 
     private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){

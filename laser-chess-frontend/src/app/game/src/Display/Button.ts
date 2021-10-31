@@ -1,6 +1,6 @@
 import { Coordinates } from "src/app/game/game.models";
-import { COLS } from "../../constants";
-import { ButtonTypes } from "../../enums";
+import { COLS } from "../constants";
+import { ButtonTypes } from "../enums";
 
 export class Button {
   originPosition!: Coordinates

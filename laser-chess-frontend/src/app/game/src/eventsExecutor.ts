@@ -29,17 +29,14 @@ export class EventsExecutor{
     async executeEventsQueue(canvas: Canvas, board: Board, timeout: number = this.eventsExecutionTimeout){
       for (const event of this.eventsQueue){
         if(event){
-          console.log("executing a single action")
           await new Promise(resolve => setTimeout(resolve, timeout))
           await this.getAnimationToExecute(canvas, board, event)
-          console.log("single action executed!")
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
           this.gameService.setLocalGameState(board.serialize())
           this.drawings.drawGame(canvas, board.cells)
         }
       }
-      console.log("all actions executed!")
       this.eventsQueue = []
     }
 
@@ -54,9 +51,7 @@ export class EventsExecutor{
           for (const path of allPaths)
             await Promise.all(path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to)
             ))
-          console.log("shot all lazor paths! Awaiting for 1 second to disappear")
         await new Promise(resolve => setTimeout(resolve, 1000))
-        console.log("anim i done!")
         resolve()
         })
 
@@ -64,7 +59,9 @@ export class EventsExecutor{
 
     getAnimationToExecute(canvas: Canvas, board: Board, gameEvent: GameEvent){
       switch(gameEvent.event_type){
-        case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(canvas, board, board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y), gameEvent.rotation)
+        case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(canvas, board,
+          board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y),
+          gameEvent.rotation > 180 ? gameEvent.rotation - 360 : gameEvent.rotation)
         case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(canvas, board, gameEvent.moved_from, gameEvent.moved_to)
         case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(canvas, board, gameEvent.teleported_from, gameEvent.teleported_to)
         case GameEvents.LASER_SHOT_EVENT : return this.executeLaserAnimations(canvas, board, gameEvent.laser_path)

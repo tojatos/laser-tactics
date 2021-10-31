@@ -21,26 +21,26 @@ export class BoardComponent implements AfterViewInit {
   ngAfterViewInit() {
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
-      alert("Couldnt load context")
+      alert("Couldn't load context")
       return
     }
 
     const guiCanvasContext = this.canvasGUI.nativeElement.getContext('2d')
     if(!guiCanvasContext){
-      alert("Couldnt load context")
+      alert("Couldn't load context")
       return
     }
 
     this.route.params.subscribe(async params => {
       const currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
-      await this.game.initGame(gameCanvasContext, guiCanvasContext, currentSize, params.id)
+      await this.game.initGame(gameCanvasContext, guiCanvasContext, currentSize, params.id, this.sizeScale)
     })
 
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
-    const currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+    const currentSize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
     this.game.changeCurrentSize(currentSize)
   }
 

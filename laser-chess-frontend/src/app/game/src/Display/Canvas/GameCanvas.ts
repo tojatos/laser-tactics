@@ -51,7 +51,7 @@ export class GameCanvas extends Canvas {
       this.interactable = false
 
       if(board.selectedCell){
-        this.selectableCellEvent(selectedCell, board)
+        await this.selectableCellEvent(selectedCell, board)
       }
       else {
         if(selectedCell){
@@ -66,6 +66,7 @@ export class GameCanvas extends Canvas {
 
     mouseEventFromGui(mousePos: Coordinates, board: Board){
       const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
+      console.log(selectedCell)
 
       if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
         this.unselectCellEvent(board)
@@ -77,17 +78,22 @@ export class GameCanvas extends Canvas {
 
     private async selectableCellEvent(selectedCell: Cell | undefined, board: Board){
       if(board.selectedCell && selectedCell){
-        this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
         await this.makeAMoveEvent(selectedCell.coordinates, board)
-        this.gameService.increaseAnimationEvents()
-        board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
-        this.gameService.setLocalGameState(board.serialize())
-        this.drawings.drawGame(this, board.cells)
-        board.currentTurn++
-        this.eventEmitter.invokeRefresh()
-
+        this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
+        .then(async () => {
+          this.gameService.increaseAnimationEvents()
+          board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
+          this.gameService.setLocalGameState(board.serialize())
+          board.currentTurn++
+          this.eventEmitter.invokeRefresh()
+        })
+        .finally(() => {
+          this.unselectCellEvent(board)
+        })
       }
-      this.unselectCellEvent(board)
+      else
+        this.unselectCellEvent(board)
+
     }
 
     private canvasHover(event: MouseEvent, board: Board) {
@@ -113,14 +119,13 @@ export class GameCanvas extends Canvas {
       }
     }
 
-    async rotationButtonPressed(board: Board, degree: number){
+    async rotationButtonPressed(board: Board, degree: number, initialRotationDifference: number){
       const selectedCell = board.selectedCell
 
       if(selectedCell){
         this.interactable = false
-        await this.animations.rotatePiece(this, board, selectedCell, degree)
-        this.redrawGame(board)
-        this.drawings.highlightCell(this, selectedCell)
+        await this.animations.rotatePiece(this, board, selectedCell, degree, initialRotationDifference)
+        this.interactable = true
       }
     }
 

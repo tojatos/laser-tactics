@@ -46,7 +46,7 @@ export class Board implements BoardInterface {
     return this.selectedCell.piece?.getPossibleMoves(this, this.selectedCell).find(c => c.coordinates.x == x && c.coordinates.y == y)
   }
 
-  movePiece(origin: Coordinates, destination: Coordinates){
+    movePiece(origin: Coordinates, destination: Coordinates){
     const originCell = this.getCellByCoordinates(origin.x, origin.y)
     const destinationCell = this.getCellByCoordinates(destination.x, destination.y)
     if(originCell && destinationCell && originCell.piece){
@@ -64,9 +64,13 @@ export class Board implements BoardInterface {
   }
 
   rotatePiece(at: Coordinates, angle: number){
-    const cell = this.cells.find(c => c.coordinates == at)
-    if(cell?.piece)
-      cell.piece.rotation_degree = angle
+    const cell = this.getCellByCoordinates(at.x, at.y)
+    console.log(cell?.piece?.rotation_degree)
+    if(cell?.piece){
+      const newDegree = (cell.piece.rotation_degree + angle) % 360
+      cell.piece.rotation_degree = newDegree
+    }
+    console.log(cell?.piece?.rotation_degree)
   }
 
 
@@ -79,7 +83,7 @@ export class Board implements BoardInterface {
     return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
   }
 
-  getLaserCell(){ // needs to be changed - source info from backend
+  getLaserCell(){
     const player = this.authService.getCurrentJwtInfo().sub
     if(this.isMyTurn())
       return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
@@ -87,6 +91,7 @@ export class Board implements BoardInterface {
   }
 
   executeEvent(gameEvent: GameEvent){
+    console.log("EXECUTING EVENT", gameEvent)
     switch(gameEvent.event_type){
       case GameEvents.PIECE_ROTATED_EVENT : this.rotatePiece(gameEvent.rotated_piece_at, gameEvent.rotation); break
       case GameEvents.PIECE_MOVED_EVENT : this.movePiece(gameEvent.moved_from, gameEvent.moved_to); break

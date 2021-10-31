@@ -4,7 +4,7 @@ import { Cell } from "../cell"
 import { PIECE_SIZE_SCALE } from "../constants"
 import { Piece } from "../piece"
 import { Canvas } from "./Canvas/AbstractCanvas"
-import { Button } from "./Canvas/Button"
+import { Button } from "./Button"
 
 @Injectable()
 export class Drawings {
@@ -32,7 +32,7 @@ export class Drawings {
     }
 
 
-    highlightCell(canvas: Canvas, cell: Cell | undefined, color: string = this.highlightColor){
+    highlightCell(canvas: Canvas, cell: Cell | undefined, piece: Piece | undefined = undefined, color: string = this.highlightColor){
         if(cell) {
           canvas.ctx.save()
           canvas.ctx.globalAlpha = 0.5;
@@ -42,8 +42,9 @@ export class Drawings {
           canvas.ctx.fillStyle = color
           canvas.ctx.fill()
           canvas.ctx.restore()
-            if(cell.piece)
-              this.drawPiece(canvas, cell.piece)
+          const pieceToDraw = piece || cell.piece
+            if(pieceToDraw)
+              this.drawPiece(canvas, pieceToDraw)
         }
     }
 

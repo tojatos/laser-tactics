@@ -13,9 +13,7 @@ export class GameService {
   constructor(private http: HttpClient) { }
 
   async getGameState(gameId: string): Promise<HttpResponse<GameState>> {
-    const res = await this.http.post<GameState>('api/v1/get_game_state', { "game_id": gameId }, { observe: 'response' }).pipe(
-      catchError(this.handleError)
-    ).toPromise()
+    const res = await this.http.post<GameState>('api/v1/get_game_state', { "game_id": gameId }, { observe: 'response' }).toPromise()
 
     if(res.body)
       res.body.game_id = gameId
@@ -24,7 +22,7 @@ export class GameService {
 
   }
 
-  async movePiece(gameId: string, from: Coordinates, to: Coordinates){
+  movePiece(gameId: string, from: Coordinates, to: Coordinates){
 
     const movePieceRequest: MovePieceRequest = {
       game_id: gameId,
@@ -32,12 +30,10 @@ export class GameService {
       move_to: to
     }
 
-    return this.http.post<void>('/api/v1/move_piece', movePieceRequest, { observe: 'response' }).pipe(
-      catchError(this.handleError)
-    ).toPromise()
+    return this.http.post<void>('/api/v1/move_piece', movePieceRequest).toPromise()
   }
 
-  async rotatePiece(gameId: string, at: Coordinates, angle: number){
+  rotatePiece(gameId: string, at: Coordinates, angle: number){
 
     const rotatePieceRequest: RotatePieceRequest = {
       game_id: gameId,
@@ -45,15 +41,11 @@ export class GameService {
       angle: angle
     }
 
-    return this.http.post<void>('/api/v1/rotate_piece', rotatePieceRequest, { observe: 'response' }).pipe(
-      catchError(this.handleError)
-    ).toPromise()
+    return this.http.post<void>('/api/v1/rotate_piece', rotatePieceRequest).toPromise()
   }
 
-  async shootLaser(gameId: string){
-    return this.http.post<void>('/api/v1/shoot_laser', { game_id: gameId }, { observe: 'response' }).pipe(
-      catchError(this.handleError)
-    ).toPromise()
+  shootLaser(gameId: string){
+    return this.http.post<void>('/api/v1/shoot_laser', { game_id: gameId }).toPromise()
   }
 
   increaseAnimationEvents(){
@@ -91,16 +83,5 @@ export class GameService {
 
     return undefined
 
-  }
-
-  private handleError(error: HttpErrorResponse) {
-    if (error.status === 0) {
-      console.error('An error occurred:', error.error);
-    } else {
-      console.error(
-        `Backend returned code ${error.status}, body was: `, error.error);
-    }
-    window.alert("ERROR!: " + error.error.detail) //define type of
-    return throwError(error.error);
   }
 }

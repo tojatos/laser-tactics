@@ -17,6 +17,7 @@ export class Game{
   gameCanvas!: GameCanvas
   guiCanvas!: GUICanvas
   gameId!: string
+  sizeScale!: number
 
   constructor(private gameService: GameService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
@@ -27,13 +28,14 @@ export class Game{
     }
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, guiCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, guiCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number){
+    this.sizeScale = sizeScale
     this.gameId = gameId
     await this.resources.loadAssets()
     console.log("initiated")
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.guiCanvas = new GUICanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, guiCanvasContext, blockSize, this.resources, gameId)
-    this.loadDisplay(gameId, (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07)
+    this.loadDisplay(gameId, (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale)
   }
 
   loadDisplay(gameId: string, displaySize: number){
@@ -48,7 +50,7 @@ export class Game{
             gameState = res.body
             this.gameService.setAnimationEventsNum(gameState.game_events.length)
           }
-          displaySize = (innerWidth > innerHeight ? innerHeight : innerWidth) * 0.07
+          displaySize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
           this.board.initBoard(gameState, displaySize)
           this.gameCanvas.initCanvas(this.board, this.guiCanvas)
           this.guiCanvas.initCanvas(this.board, this.gameCanvas)
@@ -76,14 +78,11 @@ export class Game{
   refreshGameState(){
     if(this.gameId){
       this.gameService.getGameState(this.gameId).then(async res => {
-        console.log("request received!")
         if(res.body){
           //this.gameService.setAnimationEventsNum(res.body.game_events.length)
           const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
-          if(animationsToShow > 0){
-            console.log("new actions to execute! Proceeding...")
+          if(animationsToShow > 0)
             await this.executePendingActions(res.body, animationsToShow)
-          }
 
           this.board.currentTurn = res.body.turn_number
 
@@ -92,7 +91,8 @@ export class Game{
 
           if(myTurn)
             return
-            setTimeout(() => this.refreshGameState(), 500)
+
+          setTimeout(() => this.refreshGameState(), 500)
 
         }
         else

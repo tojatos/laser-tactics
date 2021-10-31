@@ -12,8 +12,8 @@ export class CanvasMediator {
     this.gameCanvas.interactable = false
   }
 
-  async sendRotationInfo(board: Board, rotation: number){
-    await this.gameCanvas.rotationButtonPressed(board, rotation)
+  async sendRotationInfo(board: Board, rotation: number, initialRotationDifference: number = 0){
+    await this.gameCanvas.rotationButtonPressed(board, rotation, initialRotationDifference)
   }
 
   sendPossibleMovesShowRequest(board: Board){
