@@ -8,13 +8,12 @@ import { Animations } from "../Animations"
 import { Drawings } from "../Drawings"
 import { Resources } from "../Resources"
 import { Canvas } from "./AbstractCanvas"
-import { Button } from "./Button"
+import { Button } from "../Button"
 import { CanvasMediator } from "./CanvasMediator"
 import { GameCanvas } from "./GameCanvas"
 
 export class GUICanvas extends Canvas {
 
-  interactable: boolean = false
   rotation: number = 0
   mediator!: CanvasMediator
   currentPlayer = this.authService.getCurrentJwtInfo().sub
@@ -49,7 +48,7 @@ export class GUICanvas extends Canvas {
           case(ButtonTypes.RIGHT_ARROW_BUTTON): await this.rotationPressed(board, 90); break;
           case(ButtonTypes.LEFT_ARROW_BUTTON): await this.rotationPressed(board, -90); break;
           case(ButtonTypes.LASER_BUTTON): this.laserButtonPressed(board); break;
-          case(ButtonTypes.ACCEPT_BUTTON): this.acceptRotationButtonPressed(board); break;
+          case(ButtonTypes.ACCEPT_BUTTON): this.acceptRotationButtonPressed(board, this.rotation); break;
         }
         return
       }
@@ -58,7 +57,7 @@ export class GUICanvas extends Canvas {
     this.hideCanvas()
 
     if(this.rotation != 0){
-      await this.mediator.sendRotationInfo(board, this.rotation < 180 ? -90 : 360 - this.rotation)
+      await this.mediator.sendRotationInfo(board, this.rotation < 180 ? -this.rotation : 360 - this.rotation, this.rotation)
       this.rotation = 0
       board.unselectCell()
       this.mediator.drawGameOnGameCanvas(board)
@@ -139,34 +138,35 @@ export class GUICanvas extends Canvas {
   }
 
   async rotationPressed(board: Board, degree: number){
+    await this.mediator.sendRotationInfo(board, degree, this.rotation)
     this.rotation += degree
     if(this.rotation < 0)
       this.rotation = 360 + this.rotation
     this.rotation %= 360
 
-    await this.mediator.sendRotationInfo(board, degree)
     this.removeButton(ButtonTypes.LASER_BUTTON)
     this.removeButton(ButtonTypes.ACCEPT_BUTTON)
 
-
-    if(this.rotation == 0)
-      this.addButton(ButtonTypes.LASER_BUTTON, this.resources.laserShotButton)
+    if(this.rotation == 0){
+      if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
+        this.addButton(ButtonTypes.LASER_BUTTON, this.resources.laserShotButton)
+    }
     else
       this.addButton(ButtonTypes.ACCEPT_BUTTON, this.resources.acceptButton)
 
     this.drawings.clearBoard(this)
     this.showButtons()
 
-
     if(this.rotation == 0)
       this.mediator.sendPossibleMovesShowRequest(board)
   }
 
-  acceptRotationButtonPressed(board: Board){
+  acceptRotationButtonPressed(board: Board, rotation: number){
     const selectedCell = board.selectedCell
 
     if(selectedCell){
-      this.gameService.rotatePiece(this.gameId, selectedCell.coordinates, selectedCell.piece!.rotation_degree)
+      board.rotatePiece(selectedCell.coordinates, this.rotation)
+      this.gameService.rotatePiece(this.gameId, selectedCell.coordinates, rotation)
       this.gameService.increaseAnimationEvents()
       board.currentTurn++
       this.unselectCellEvent(board)
