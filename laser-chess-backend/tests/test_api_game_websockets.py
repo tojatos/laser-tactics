@@ -49,29 +49,28 @@ p1_king_coordinates = (4, 0)
 p2_king_coordinates = (4, 8)
 
 
-# @pytest.mark.timeout(2)
-def test_get_game_state(client: TestClient):
-    with client.websocket_connect("/ws") as ws:
-        ws: WebSocket
-        ws.send_json(dataclasses.asdict(get_game_state_request))
-        data = ws.receive_json()
-        print(data)
-        assert True
-        # return tu.post_data("/get_game_state", json=asdict(get_game_state_request))
+def get_game_state(ws: WebSocket):
+    request = WebsocketRequest(GameApiRequestPath.GetGameState, get_game_state_request)
+    ws.send_json(dataclasses.asdict(request))
+    game_state_dict = ws.receive_json()
+    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+    game_state = game_state_serializable.to_normal()
+    return game_state
 
-#
-# def game_state_from_response(response):
-#     assert response.status_code == 200, response.text
-#     game_state_dict = response.json()
-#
-#     game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
-#     game_state = game_state_serializable.to_normal()
-#     return game_state
-#
-#
-# def post_shoot_laser(tu, token_num: int):
-#     return tu.post_data("/shoot_laser", tokens[token_num], json=asdict(shoot_laser_request))
-#
+
+def auth(ws: WebSocket, token_num: int):
+    request = WebsocketRequest(GameApiRequestPath.WebsocketAuth, WebsocketAuthRequest(tokens[token_num]))
+    ws.send_json(dataclasses.asdict(request))
+    response_json = ws.receive_json()
+    return WebsocketResponse(**response_json)
+
+
+def shoot_laser(ws: WebSocket):
+    request = WebsocketRequest(GameApiRequestPath.ShootLaser, shoot_laser_request)
+    ws.send_json(dataclasses.asdict(request))
+    response_json = ws.receive_json()
+    return WebsocketResponse(**response_json)
+
 #
 # def post_move_piece(tu, token_num: int, coordinates_from: CellCoordinates, coordinates_to: CellCoordinates):
 #     request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from),
@@ -84,19 +83,31 @@ def test_get_game_state(client: TestClient):
 #     return tu.post_data("/rotate_piece", tokens[token_num], json=asdict(request))
 #
 #
-# def test_start_game(tu):
-#     game_state = game_state_from_response(post_get_game_state(tu))
-#     assert game_state.game_phase is GamePhase.STARTED
-#     assert game_state.turn_number is 1
+def test_start_game(client: TestClient):
+    with client.websocket_connect("/ws") as ws:
+        ws: WebSocket
+        game_state = get_game_state(ws)
+        assert game_state.game_phase is GamePhase.STARTED
+        assert game_state.turn_number is 1
+
+
+def test_auth(client: TestClient):
+    with client.websocket_connect("/ws") as ws:
+        ws: WebSocket
+        response = auth(ws, 0)
+        assert response.status_code == 200
+
+
+def test_shoot_laser(client: TestClient):
+    with client.websocket_connect("/ws") as ws:
+        ws: WebSocket
+        auth(ws, 0)
+        response = shoot_laser(ws)
+        assert response.status_code == 200
 #
-#
-# def test_shoot_laser(tu):
-#     response = post_shoot_laser(tu, 0)
-#     assert response.status_code == 200
-#
-#     game_state = game_state_from_response(post_get_game_state(tu))
-#     assert game_state.board.cells[(5, 0)] is None
-#     assert game_state.board.cells[(6, 1)] is None
+        game_state = get_game_state(ws)
+        assert game_state.board.cells[(5, 0)] is None
+        assert game_state.board.cells[(6, 1)] is None
 #
 #
 # def test_move_block(tu):

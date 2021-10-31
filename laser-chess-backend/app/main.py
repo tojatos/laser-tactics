@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from starlette.websockets import WebSocket
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.core import schemas
 from app.core import crud, models
@@ -192,36 +192,46 @@ async def read_own_items(current_user: schemas.User = Depends(get_current_active
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 
-@router.post("/get_game_state", response_model=GameStateSerializable, responses={
-    404: {"detail": "Game with id {game_id} does not exist."}
-})
+# game_api_request_to_path = {
+#     GameApiRequestPath.GetGameStateRequest: "/get_game_state",
+#     GameApiRequestPath.StartGameRequest: "/start_game",
+#     GameApiRequestPath.ShootLaserRequest: "/shoot_laser",
+#     GameApiRequestPath.MovePieceRequest: "/move_piece",
+#     GameApiRequestPath.RotatePieceRequest: "/rotate_piece",
+# }
+
+
+@router.post(GameApiRequestPath.GetGameState, response_model=GameStateSerializable,
+             responses={
+                 404: {"detail": "Game with id {game_id} does not exist."}
+             })
 async def get_game_state(request: GetGameStateRequest, db: Session = Depends(get_db)):
     game_state = game_service.get_game_state(request, db)
     return game_state
 
 
-@router.post("/start_game")
+@router.post(GameApiRequestPath.StartGame)
 async def start_game(request: StartGameRequest,
                      current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     game_service.start_game(current_user.username, request, db)
 
 
-@router.post("/move_piece")
+@router.post(GameApiRequestPath.MovePiece)
 async def move_piece(request: MovePieceRequest,
                      current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     game_service.move_piece(current_user.username, request, db)
 
 
-@router.post("/rotate_piece")
+@router.post(GameApiRequestPath.RotatePiece)
 async def move_piece(request: RotatePieceRequest,
                      current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     game_service.rotate_piece(current_user.username, request, db)
 
 
-@router.post("/shoot_laser")
+@router.post(GameApiRequestPath.ShootLaser)
 async def shoot_laser(request: ShootLaserRequest,
                       current_user: schemas.User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):
@@ -382,22 +392,47 @@ async def unblock_user(username, current_user: schemas.User = Depends(get_curren
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
 
-# router method is not working with websockets
-# @app.websocket_route("/ws")
-async def websocket_endpoint(websocket: WebSocket, db: Session = Depends(get_db)):
+async def websocket_endpoint(websocket: WebSocket,
+                             # current_user: schemas.User = Depends(get_current_active_user),
+                             db: Session = Depends(get_db)
+                             ):
+    current_user: schemas.User = None
     await websocket.accept()
+    try:
+        while True:
+            websocket_request_dict = await websocket.receive_json()
+            websocket_request: WebsocketRequest = WebsocketRequest(**websocket_request_dict)
+            if websocket_request.request_path is GameApiRequestPath.WebsocketAuth:
+                request: WebsocketAuthRequest = websocket_request.request
+                token = request.token
+                try:
+                    current_user = await get_current_user(token, db)
+                    response = WebsocketResponse(200)
+                    await websocket.send_json(dataclasses.asdict(response))
+                except HTTPException:
+                    response = WebsocketResponse(401)
+                    await websocket.send_json(dataclasses.asdict(response))
 
-    game_state_dict = await websocket.receive_json()
-    request: GetGameStateRequest = GetGameStateRequest(**game_state_dict)
+            if websocket_request.request_path is GameApiRequestPath.GetGameState:
+                request: GetGameStateRequest = websocket_request.request
+                game_state = game_service.get_game_state(request, db)
+                await websocket.send_json(dataclasses.asdict(game_state))
 
-    game_state = game_service.get_game_state(request, db)
+            if websocket_request.request_path is GameApiRequestPath.ShootLaser:
+                request: ShootLaserRequest = websocket_request.request
+                if current_user is None:
+                    response = WebsocketResponse(400)
+                    await websocket.send_json(dataclasses.asdict(response))
+                else:
+                    game_service.shoot_laser(current_user.username, request, db)
+                    response = WebsocketResponse(200)
+                    await websocket.send_json(dataclasses.asdict(response))
+    except WebSocketDisconnect:
+        pass
 
-    await websocket.send_json(dataclasses.asdict(game_state))
-    await websocket.close()
 
 app.include_router(router)
 app.add_api_websocket_route("/ws", websocket_endpoint)
-
 
 if __name__ == "__main__":
     # models.Base.metadata.drop_all(bind=engine)
