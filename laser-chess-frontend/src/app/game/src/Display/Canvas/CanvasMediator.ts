@@ -36,4 +36,8 @@ export class CanvasMediator {
     this.gameCanvas.mouseEventFromGui(mousePos, board)
   }
 
+  clearGuiCanvas(){
+    this.guiCanvas.hideCanvas()
+  }
+
 }

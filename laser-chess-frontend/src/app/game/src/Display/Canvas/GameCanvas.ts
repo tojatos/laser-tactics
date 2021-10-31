@@ -63,6 +63,12 @@ export class GameCanvas extends Canvas {
 
       const myTurn = board.isMyTurn()
       this.interactable = myTurn
+
+      if(!this.interactable){
+        this.redrawGame(board)
+        this.mediator?.clearGuiCanvas()
+      }
+
     }
 
     mouseEventFromGui(mousePos: Coordinates, board: Board){
@@ -78,6 +84,7 @@ export class GameCanvas extends Canvas {
     }
 
     private async selectableCellEvent(selectedCell: Cell | undefined, board: Board){
+      this.interactable = false
       if(board.selectedCell && selectedCell){
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
@@ -90,10 +97,13 @@ export class GameCanvas extends Canvas {
         })
         .finally(() => {
           this.unselectCellEvent(board)
+          this.interactable = true
         })
       }
-      else
+      else {
         this.unselectCellEvent(board)
+        this.interactable = true
+      }
 
     }
 
