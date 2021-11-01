@@ -2,6 +2,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tokenPayload, UserToken } from '../app.models';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { FormControl } from '@angular/forms';
+import { analyzeAndValidateNgModules } from '@angular/compiler';
 // import * as moment from "moment"
 
 @Injectable({
@@ -23,6 +25,13 @@ export class AuthService {
     body.set('password', pass)
 
     return this.http.post<UserToken>('/api/v1/token', body.toString(), options).toPromise().then(res => this.setSession(res))
+  }
+  login2(form: FormControl): Promise<UserToken> {
+    let urlSearchParams = new URLSearchParams();
+
+    
+    console.log(urlSearchParams.toString)
+    return this.http.post<any>('/api/v1/token', form).toPromise().then(res => this.setSession(res))
   }
 
   register(login:string, email:string, pass:string){
