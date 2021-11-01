@@ -29,7 +29,7 @@ export class AuthService {
   login2(form: FormControl): Promise<UserToken> {
     let urlSearchParams = new URLSearchParams();
 
-    
+
     console.log(urlSearchParams.toString)
     return this.http.post<any>('/api/v1/token', form).toPromise().then(res => this.setSession(res))
   }
