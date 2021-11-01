@@ -40,6 +40,16 @@ class Player(str, Enum):
     NONE = auto()
 
 
+class EventType(str, AutoNameEnum):
+    PIECE_ROTATED_EVENT = auto()
+    PIECE_MOVED_EVENT = auto()
+    TELEPORT_EVENT = auto()
+    LASER_SHOT_EVENT = auto()
+    PIECE_TAKEN_EVENT = auto()
+    PIECE_DESTROYED_EVENT = auto()
+    SHOOT_LASER_EVENT = auto()
+
+
 @dataclass
 class Piece:
     piece_type: PieceType
@@ -118,12 +128,28 @@ class PieceTakenEvent:
     taken_on: CellCoordinates
     piece_that_took_type: PieceType
     piece_taken_type: PieceType
+    event_type: str = EventType.PIECE_DESTROYED_EVENT
 
     def to_serializable(self):
         return PieceTakenEventSerializable(
             cell_coordinates_to_serializable(self.taken_on),
             self.piece_that_took_type,
             self.piece_taken_type,
+        )
+
+
+@dataclass
+class PieceDestroyedEvent:
+    destroyed_on: CellCoordinates
+    piece_destroyed: Piece
+    laser_destroy_time: int
+    event_type: str = EventType.PIECE_DESTROYED_EVENT
+
+    def to_serializable(self):
+        return PieceDestroyedEventSerializable(
+            cell_coordinates_to_serializable(self.destroyed_on),
+            self.piece_destroyed,
+            self.laser_destroy_time,
         )
 
 
@@ -173,6 +199,17 @@ class PieceTakenEventSerializable:
 
 
 @dataclass
+class PieceDestroyedEventSerializable:
+    destroyed_on: CellCoordinatesSerializable
+    piece_destroyed: Piece
+    laser_destroy_time: int
+    event_type: str = EventType.PIECE_DESTROYED_EVENT
+
+    def to_normal(self) -> PieceDestroyedEvent:
+        return PieceDestroyedEvent(tuple(self.destroyed_on), self.piece_destroyed, self.laser_destroy_time)
+
+
+@dataclass
 class PieceRotatedEventSerializable:
     rotated_piece_at: CellCoordinatesSerializable
     rotation: int
@@ -205,10 +242,12 @@ class LaserShotEventSerializable:
         return LaserShotEvent([(x.time, tuple(x.coordinates)) for x in self.laser_path])
 
 
-GameEvent = Union[PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent, PieceTakenEvent]
+GameEvent = Union[
+    PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent, PieceTakenEvent, PieceDestroyedEvent]
 UserEvent = Union[PieceRotatedEvent, PieceMovedEvent, ShootLaserEvent]
 
-GameEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable, PieceTakenEventSerializable]
+GameEventSerializable = Union[
+    PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable, PieceTakenEventSerializable, PieceDestroyedEventSerializable]
 UserEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, ShootLaserEvent]
 
 

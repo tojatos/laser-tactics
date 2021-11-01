@@ -111,6 +111,7 @@ class Game:
         laser_rotation = laser_cell.piece.rotation_degree
 
         laser_path = []
+        pieces_destroyed_by_laser_events = []
         initial_laser_direction = direction_from_rotation[laser_rotation]
 
         laser_queue: Queue[(CellCoordinates, Direction, int)] = Queue()
@@ -147,6 +148,7 @@ class Game:
                             laser_queue.put((current_coordinates, last_laser_direction, time + 1))
                     if piece_hit.piece_type is PieceType.LASER:
                         cells_after_laser_hit[current_coordinates] = None
+                        pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.BLOCK:
                         should_deflect = last_laser_direction == opposite_direction(piece_facing_direction)
                         if should_deflect:
@@ -154,6 +156,7 @@ class Game:
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
+                            pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.BEAM_SPLITTER:
                         should_deflect_in_both_sides = last_laser_direction == piece_facing_direction
                         should_deflect_right = last_laser_direction == direction_from_rotation[
@@ -174,12 +177,14 @@ class Game:
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
+                            pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.HYPER_SQUARE:
                         pass
                     if piece_hit.piece_type is PieceType.HYPER_CUBE:
                         laser_queue.put((current_coordinates, last_laser_direction, time + 1))
                     if piece_hit.piece_type is PieceType.KING:
                         cells_after_laser_hit[current_coordinates] = None
+                        pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.TRIANGULAR_MIRROR:
                         should_deflect_right = last_laser_direction == direction_from_rotation[
                             normalize_rotation(piece_hit.rotation_degree + 270)]
@@ -195,6 +200,7 @@ class Game:
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
+                            pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.DIAGONAL_MIRROR:
                         should_deflect_right = last_laser_direction in [piece_facing_direction,
                                                                         opposite_direction(piece_facing_direction)]
@@ -204,6 +210,7 @@ class Game:
 
         self.game_state.board.cells = cells_after_laser_hit
         self.game_state.game_events.append(LaserShotEvent(laser_path))
+        self.game_state.game_events.extend(pieces_destroyed_by_laser_events)
         self.game_state.turn_number += 1
 
     def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> bool:
