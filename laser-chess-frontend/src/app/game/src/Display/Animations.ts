@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { cloneDeep } from "lodash";
+import { cloneDeep, reject } from "lodash";
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
@@ -36,9 +36,9 @@ export class Animations {
             destination.canvasCoordinates.y
             )
 
-        let validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPiece(board, board.cells, origin)
+        let validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPieces(board, [origin])
         if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
-          validCellsArray = this.cellsExcludingPiece(board, validCellsArray, destination)
+          validCellsArray = this.cellsExcludingPieces(board, [origin, destination])
 
         const intervalAction = () => {
           this.drawings.drawGame(canvas, validCellsArray)
@@ -82,7 +82,7 @@ export class Animations {
       const speed = 20
       const degreesPerFrame = byDegrees > 0 ? 2 : -2
 
-      const validCellsArray = this.cellsExcludingPiece(board, board.cells, atCell)
+      const validCellsArray = this.cellsExcludingPieces(board, [atCell])
       const desiredPiecePosition = piece.rotation_degree + byDegrees
 
       const intervalAction = () => {
@@ -171,8 +171,20 @@ export class Animations {
 
     }
 
-    private cellsExcludingPiece(board: Board, cells: Cell[], cell: Cell){
-        return cells.filter(c => c.piece != board.getCellByCoordinates(cell.coordinates.x, cell.coordinates.y)?.piece)
+    async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, showAnimations: boolean){
+      return new Promise<void>((resolve, reject) => {
+        const pieceToDestroy = board.getCellByCoordinates(at.x, at.y)
+        if(pieceToDestroy){
+          this.drawings.drawGame(canvas, this.cellsExcludingPieces(board, [pieceToDestroy]))
+          resolve()
+        }
+        else
+          console.error("There is no piece to destroy")
+      })
+    }
+
+    private cellsExcludingPieces(board: Board, cells: Cell[]){
+        return board.cells.filter(c => cells.every(cl => cl.piece != board.getCellByCoordinates(c.coordinates.x, c.coordinates.y)?.piece) )
     }
 
     private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){

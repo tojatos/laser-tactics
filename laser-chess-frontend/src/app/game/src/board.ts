@@ -91,11 +91,11 @@ export class Board implements BoardInterface {
   }
 
   executeEvent(gameEvent: GameEvent){
-    console.log("EXECUTING EVENT", gameEvent)
     switch(gameEvent.event_type){
       case GameEvents.PIECE_ROTATED_EVENT : this.rotatePiece(gameEvent.rotated_piece_at, gameEvent.rotation); break
       case GameEvents.PIECE_MOVED_EVENT : this.movePiece(gameEvent.moved_from, gameEvent.moved_to); break
       case GameEvents.TELEPORT_EVENT : this.movePiece(gameEvent.teleported_from, gameEvent.teleported_to); break
+      case GameEvents.PIECE_DESTROYED_EVENT : this.removePiece(gameEvent.destroyed_on); break
     }
   }
 
@@ -136,6 +136,12 @@ export class Board implements BoardInterface {
 
     return gameStateSerialized
 
+  }
+
+  removePiece(at: Coordinates) {
+    const cell = this.getCellByCoordinates(at.x, at.y)
+    if(cell?.piece)
+      cell.piece = null
   }
 
 }

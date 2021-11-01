@@ -36,7 +36,6 @@ export class GameCanvas extends Canvas {
       this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
       this.drawings.drawGame(this, board.cells)
-      this.interactable = board.isMyTurn()
       this.mediator = new CanvasMediator(this, guiCanvas)
     }
 

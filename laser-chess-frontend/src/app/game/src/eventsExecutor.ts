@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { groupBy, values } from "lodash";
-import { Coordinates, GameEvent, LaserShotEventEntity } from "../game.models";
+import { clone, groupBy, values } from "lodash";
+import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
 import { GameService } from "../services/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
@@ -44,14 +44,21 @@ export class EventsExecutor{
     async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], showAnimations: boolean){
       const res = values(groupBy(laserPath, 'time'))
       const allPathsToDraw: PathInfo[] = []
+      const allEventsAfterLaserShot = this.eventsQueue.slice(this.eventsQueue.indexOf(clone(this.eventsQueue).reverse().find(e => e.event_type == GameEvents.LASER_SHOT_EVENT)!) + 1)
+      console.log(allEventsAfterLaserShot)
 
         this.startPath(res[1], res.flat(), res[0][0], allPathsToDraw)
         const allPaths = values(groupBy(allPathsToDraw, 'time'))
 
         return new Promise<void>(async resolve => {
           for (const path of allPaths)
-            await Promise.all(path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to, showAnimations)
-            ))
+            await Promise.all([
+              ...path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to, showAnimations))
+              // ...allEventsAfterLaserShot.filter(e => e.event_type == GameEvents.PIECE_DESTROYED_EVENT && e.laser_destroy_time == path[0].time)
+              // .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, showAnimations)) // clears all board as well so laser is cut.
+              // gotta make individual canvas for each animation or at least for laser
+            ]
+            )
         //if(showAnimations)
           await new Promise(resolve => setTimeout(resolve, 1000))
         resolve()

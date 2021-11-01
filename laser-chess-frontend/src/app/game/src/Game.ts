@@ -39,7 +39,7 @@ export class Game{
 
   loadDisplay(gameId: string, displaySize: number){
     this.gameService.getGameState(gameId).then(
-      res => {
+      async res => {
         if(res.body) {
           //this.gameService.setAnimationEventsNum(res.body.game_events.length)
           res.body.game_id = gameId
@@ -55,7 +55,7 @@ export class Game{
           this.guiCanvas.initCanvas(this.board, this.gameCanvas)
 
           if(animationsToShow > 0)
-            this.executePendingActions(res.body, animationsToShow)
+            await this.executePendingActions(res.body, animationsToShow)
 
           this.board.currentTurn = res.body.turn_number
           const myTurn = this.board.isMyTurn()
