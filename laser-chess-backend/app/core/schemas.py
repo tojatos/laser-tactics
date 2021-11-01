@@ -15,24 +15,6 @@ class FriendRequestStatus(AutoNameEnum):
     REJECTED = auto()
 
 
-class ItemBase(BaseModel):
-    title: str
-
-    description: Optional[str] = None
-
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
-
-
 class UserBase(BaseModel):
     username: str
     email: EmailStr
@@ -63,10 +45,14 @@ class TokenData(BaseModel):
     username: Optional[str] = None
 
 
+class VerificationTokenData(BaseModel):
+    email: Optional[str] = None
+
+
 class User(UserBase):
     id: int
     is_active: bool
-    items: List[Item] = []
+    is_verified: bool
 
     class Config:
         orm_mode = True

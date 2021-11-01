@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from datetime import datetime
 
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
@@ -31,25 +32,22 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
+def verify_user(user: schemas.User, db: Session):
+    user.is_verified = True
+    user.verification_date = datetime.now()
+    db.add(user)
+    db.commit()
+    return user
+
+
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password)
+    db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password,
+                          registration_date=datetime.now())
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
-
-
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Item).offset(skip).limit(limit).all()
-
-
-def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
-    db_item = models.Item(**item.dict(), owner_id=user_id)
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    return db_item
 
 
 def create_lobby(db: Session, user: schemas.User):

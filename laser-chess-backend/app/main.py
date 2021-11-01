@@ -5,15 +5,18 @@ import uvicorn
 from fastapi import status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_mail import MessageSchema, FastMail
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
 
 from app.core import schemas
 from app.core import crud, models
 from app.core.database import SessionLocal, engine
+from app.core.email import EmailSchema, verification_template, conf
 from app.game_engine import game_service
 from app.game_engine.models import *
 from app.game_engine.requests import *
@@ -29,6 +32,8 @@ def get_env(key, fallback):
 SECRET_KEY = get_env('SECRET_KEY', "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
 ALGORITHM = get_env('ALGORITHM', "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 10080)
+VERIFY_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 15)
+VERIFICATION_URL = "<verification_url>/"
 API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
 PORT = get_env('PORT', 8000)
@@ -67,6 +72,60 @@ def get_db():
         db.close()
 
 
+def generate_verification_token(email: str):
+    token_expires = timedelta(minutes=VERIFY_TOKEN_EXPIRE_MINUTES)
+
+    token = create_access_token(
+
+        data={"sub": email}, expires_delta=token_expires
+
+    )
+    return token
+
+
+@router.post("/send_verification_email/{username}")
+async def send_verification_email(username: str, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, username=username)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if db_user.is_verified:
+        raise HTTPException(status_code=400, detail="User already verified")
+
+    token = generate_verification_token(db_user.email)
+    verification_url = VERIFICATION_URL + token
+    email = EmailSchema(email=[db_user.email])
+    message = MessageSchema(
+        subject="Verify your LaserTactics account",
+        recipients=email.dict().get("email"),
+        body=verification_template(username=username, verification_url=verification_url),
+        subtype="html"
+    )
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+    return {'detail': "Verification email sent"}
+
+
+@router.get("/users/verify/{token}")
+def verify_user(token: str, db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=400, detail="The verification link is invalid or has expired.")
+        token_data = schemas.VerificationTokenData(email=email)
+    except JWTError:
+        raise HTTPException(status_code=400, detail="The verification link is invalid or has expired.")
+    user = crud.get_user_by_email(db, token_data.email)
+    if user is None:
+        raise HTTPException(status_code=400, detail="The verification link is invalid or has expired.")
+    if user.is_verified:
+        raise HTTPException(status_code=200, detail='Account already confirmed. Please login.')
+    else:
+        crud.verify_user(user=user, db=db)
+    return {"detail": "Account verified successfully"}
+
+
 @router.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
@@ -90,17 +149,6 @@ def read_user(username: str, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
-
-
-@router.post("/users/{user_id}/items/", response_model=schemas.Item)
-def create_item_for_user(user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)):
-    return crud.create_user_item(db=db, item=item, user_id=user_id)
-
-
-@router.get("/items/", response_model=List[schemas.Item])
-def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    items = crud.get_items(db, skip=skip, limit=limit)
-    return items
 
 
 def verify_password(plain_password, hashed_password):
@@ -182,12 +230,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @router.get("/users/me/", response_model=schemas.User)
 async def read_users_me(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
-
-
-# TODO idk something with this
-@router.get("/users/me/items/")
-async def read_own_items(current_user: schemas.User = Depends(get_current_active_user)):
-    return [{"item_id": "Foo", "owner": current_user.username}]
 
 
 @router.post("/get_game_state", response_model=GameStateSerializable, responses={
