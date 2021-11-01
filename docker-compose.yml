@@ -1,0 +1,37 @@
+version: '3.7'
+services:
+  angular:
+    build: ./laser-chess-frontend
+    ports:
+      - '8080:8080'
+    depends_on:
+      - fastapi
+    command: >
+      bash -c "ng serve --host 0.0.0.0 --port 8080 --proxy-config ./src/proxy.conf.docker.json"
+
+  fastapi:
+    build: ./laser-chess-backend
+    restart: always
+    command: python -m app.main
+    ports:
+      - 80:80
+    depends_on:
+      - db
+    environment:
+      - SQLALCHEMY_DATABASE_URL=postgresql://postgres:admin@db:5432/laserchess
+      - HOST=0.0.0.0
+      - PORT=80
+
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=laserchess
+    expose:
+      - 5432
+
+volumes:
+  postgres_data:
