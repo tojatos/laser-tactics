@@ -8,7 +8,6 @@ from passlib.context import CryptContext
 
 from ..game_engine.models import GameState
 from ..game_engine.requests import StartGameRequest
-from uuid import uuid4
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -48,52 +47,6 @@ def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
-
-
-def create_lobby(db: Session, user: schemas.User):
-    db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username)
-    db.add(db_lobby)
-    db.commit()
-    db.refresh(db_lobby)
-    return db_lobby
-
-
-def get_lobbies(db: Session, skip: int = 0, limit: int = 100):
-    lobbies = db.query(models.Lobby).offset(skip).limit(limit).all()
-    return lobbies
-
-
-def get_lobby(db: Session, lobby_id: int):
-    return db.query(models.Lobby).filter(models.Lobby.id == lobby_id).first()
-
-
-def join_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
-    lobby.player_two_username = user.username
-    db.commit()
-    db.refresh(lobby)
-    return lobby
-
-
-def leave_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
-    if lobby.player_one_username == user.username:
-        lobby.player_one_username = lobby.player_two_username
-        lobby.player_two_username = None
-    elif lobby.player_two_username == user.username:
-        lobby.player_two_username = None
-    if lobby.player_two_username is None and lobby.player_one_username is None:
-        db.delete(lobby)
-        db.commit()
-        return {"msg": "All players left. Lobby successfully deleted"}
-    db.commit()
-    db.refresh(lobby)
-    return lobby
-
-
-def update_lobby(db: Session, lobby: schemas.Lobby):
-    db_lobby = lobby
-    db.commit()
-    db.refresh(db_lobby)
-    return db_lobby
 
 
 def get_game_state_table(db: Session, game_id: str):

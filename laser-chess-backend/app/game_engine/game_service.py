@@ -50,11 +50,7 @@ def shoot_laser(user_id: string, request: ShootLaserRequest, db: Session):
         raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
 
     game = Game(game_state)
-
-    can_move, error = game.validate_laser_shoot(player)
-    if not can_move:
-        raise HTTPException(status_code=403, detail=f"Unable to shoot laser. {error}")
-
+    # TODO: game move validation
     game.shoot_laser(player)
     crud.update_game(db, game.game_state, request.game_id)
 
@@ -69,9 +65,9 @@ def move_piece(user_id: string, request: MovePieceRequest, db: Session):
 
     game = Game(game_state)
 
-    can_move, error = game.validate_move(player, tuple(request.move_from), tuple(request.move_to))
+    can_move = game.validate_move(player, tuple(request.move_from), tuple(request.move_to))
     if not can_move:
-        raise HTTPException(status_code=403, detail=f"Unable to make a move. {error}")
+        raise HTTPException(status_code=403, detail=f"Unable to make a move.")
 
     game.move(tuple(request.move_from), tuple(request.move_to))
     crud.update_game(db, game.game_state, request.game_id)
@@ -87,9 +83,9 @@ def rotate_piece(user_id: string, request: RotatePieceRequest, db: Session):
 
     game = Game(game_state)
 
-    can_rotate, error = game.validate_rotation(player, tuple(request.rotate_at), request.angle)
+    can_rotate = game.validate_rotation(player, tuple(request.rotate_at), request.angle)
     if not can_rotate:
-        raise HTTPException(status_code=403, detail=f"Unable to rotate. {error}")
+        raise HTTPException(status_code=403, detail=f"Unable to make a move.")
 
     game.rotate(tuple(request.rotate_at), request.angle)
     crud.update_game(db, game.game_state, request.game_id)
