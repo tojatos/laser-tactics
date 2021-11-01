@@ -11,10 +11,10 @@ import { LoginEmitterService } from 'src/app/services/login-emitter.service';
 })
 
 
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
   @Output() public changeLoginState: EventEmitter<boolean> = new EventEmitter<boolean>();
-  
+
   hide = true;
   form = new FormGroup({
     username: new FormControl(''),
@@ -24,12 +24,8 @@ export class LoginComponent implements OnInit {
   errorMessage = '';
   constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router, private loginEmitter: LoginEmitterService) {}
 
-    ngOnInit(): void {
-      
-    }
-   
     get f() { return this.form.controls; }
-    
+
     onSubmit(): void {
       const { username, password } = this.form.value;
       console.log(this.form.value)
@@ -41,7 +37,7 @@ export class LoginComponent implements OnInit {
                       this.router.navigate(['/'])
                   }
               )
-      }      
+      }
     }
-  
+
 }
