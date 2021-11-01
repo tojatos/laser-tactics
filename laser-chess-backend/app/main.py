@@ -1,3 +1,5 @@
+import dataclasses
+import os
 from datetime import datetime, timedelta
 
 import uvicorn
@@ -9,6 +11,7 @@ from passlib.context import CryptContext
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.core import schemas
 from app.core import crud, models
@@ -183,43 +186,243 @@ async def read_own_items(current_user: schemas.User = Depends(get_current_active
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 
-@router.post("/get_game_state", response_model=GameStateSerializable, responses={
-    404: {"detail": "Game with id {game_id} does not exist."}
-})
+@router.post(GameApiRequestPath.GetGameState, response_model=GameStateSerializable,
+             responses={
+                 404: {"detail": "Game with id {game_id} does not exist."}
+             })
 async def get_game_state(request: GetGameStateRequest, db: Session = Depends(get_db)):
     game_state = game_service.get_game_state(request, db)
     return game_state
 
 
-@router.post("/start_game")
+@router.post(GameApiRequestPath.StartGame)
 async def start_game(request: StartGameRequest,
                      current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     game_service.start_game(current_user.username, request, db)
 
 
-@router.post("/move_piece")
+@router.post(GameApiRequestPath.MovePiece)
 async def move_piece(request: MovePieceRequest,
                      current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     game_service.move_piece(current_user.username, request, db)
 
 
-@router.post("/rotate_piece")
+@router.post(GameApiRequestPath.RotatePiece)
 async def move_piece(request: RotatePieceRequest,
                      current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     game_service.rotate_piece(current_user.username, request, db)
 
 
-@router.post("/shoot_laser")
+@router.post(GameApiRequestPath.ShootLaser)
 async def shoot_laser(request: ShootLaserRequest,
                       current_user: schemas.User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):
     game_service.shoot_laser(current_user.username, request, db)
 
 
+@router.get("/lobby")
+async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    lobbies = crud.get_lobbies(db, skip=skip, limit=limit)
+    return lobbies
+
+
+@router.get("/lobby/{lobby_id}", response_model=schemas.Lobby)
+async def get_lobby(lobby_id,
+                    db: Session = Depends(get_db)):
+    db_lobby = crud.get_lobby(db, lobby_id)
+    if db_lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    return db_lobby
+
+
+@router.post("/lobby/create", response_model=schemas.Lobby, status_code=status.HTTP_201_CREATED)
+async def create_lobby(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return crud.create_lobby(db=db, user=current_user)
+
+
+@router.patch("/lobby/join")
+async def join_lobby(lobby_id: int, current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
+    lobby = crud.get_lobby(db, lobby_id)
+    if lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    if lobby.player_one_username == current_user.username or lobby.player_two_username == current_user.username:
+        raise HTTPException(status_code=403, detail="cannot join own lobby")
+    if lobby.player_one_username and lobby.player_two_username:
+        raise HTTPException(status_code=403, detail="lobby already is full")
+    return crud.join_lobby(db=db, user=current_user, lobby=lobby)
+
+
+@router.patch("/lobby/leave")
+async def leave_lobby(lobby_id: int, current_user: schemas.User = Depends(get_current_active_user),
+                      db: Session = Depends(get_db)):
+    lobby = crud.get_lobby(db, lobby_id)
+    if lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    if lobby.player_one_username != current_user.username and lobby.player_two_username != current_user.username:
+        raise HTTPException(status_code=403, detail="user already not in the lobby")
+    lobby = crud.leave_lobby(db=db, user=current_user, lobby=lobby)
+    return lobby
+
+
+@router.patch("/lobby/update")
+async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User = Depends(get_current_active_user),
+                       db: Session = Depends(get_db)):
+    db_lobby = crud.get_lobby(db, lobby.id)
+    if db_lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such id")
+    if db_lobby.game_id != lobby.game_id:
+        raise HTTPException(status_code=404, detail="Game id does not match")
+    if db_lobby.player_one_username != current_user.username:
+        raise HTTPException(status_code=403, detail="only player 1 of the game can change game settings")
+    lobby = crud.update_lobby(db=db, lobby=db_lobby, lobby_new_data=lobby)
+    return lobby
+
+
+@router.get("/users/me/friends")
+async def get_users_friends(current_user: schemas.User = Depends(get_current_active_user),
+                            db: Session = Depends(get_db)):
+    return crud.get_users_friends(user=current_user, db=db)
+
+
+# TODO: think about: refactor response>
+@router.get("/users/me/friends/requests")
+async def get_pending_requests(current_user: schemas.User = Depends(get_current_active_user),
+                               db: Session = Depends(get_db)):
+    return crud.get_users_pending_friend_requests(user=current_user, db=db)
+
+
+@router.post("/users/me/friends/requests/send", status_code=status.HTTP_201_CREATED)
+async def send_friend_request(friend_username: str, current_user: schemas.User = Depends(get_current_active_user),
+                              db: Session = Depends(get_db)):
+    if friend_username == current_user.username:
+        raise HTTPException(status_code=404, detail="Cannot send request to yourself")
+    friend_to_be = crud.get_user(username=friend_username, db=db)
+    if friend_to_be is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    friends = crud.get_users_friends(current_user, db)
+    if friend_username in friends:
+        raise HTTPException(status_code=403, detail="User already in friends")
+    pending = filter(lambda d: d["user_one_username"], crud.get_users_pending_friend_requests(user=current_user, db=db))
+    if current_user.username in pending:
+        raise HTTPException(status_code=403, detail="There already is pending friend request for that user")
+    blocked = crud.get_blocked_users(user=friend_to_be, db=db)
+    # ???? do this better?
+    if current_user.username in blocked:
+        raise HTTPException(status_code=403, detail="That user has blocked this user")
+    return crud.create_friend_request(user_sending=current_user, user_sent_to=friend_to_be, db=db)
+
+
+@router.post("/users/me/friends/requests/accept")
+async def accept_friend_request(request_id: int, current_user: schemas.User = Depends(get_current_active_user),
+                                db: Session = Depends(get_db)):
+    request = crud.get_pending_friend_request(id=request_id, db=db)
+    if request is None:
+        raise HTTPException(status_code=404, detail="No pending friend request with such id")
+    if request.user_two_username != current_user.username:
+        raise HTTPException(status_code=401, detail="Cannot accept non-own friend request")
+    return crud.accept_friend_request(friend_request=request, db=db)
+
+
+@router.post("/users/me/friends/requests/decline")
+async def decline_friend_request(request_id: int, current_user: schemas.User = Depends(get_current_active_user),
+                                 db: Session = Depends(get_db)):
+    request = crud.get_pending_friend_request(id=request_id, db=db)
+    if request is None:
+        raise HTTPException(status_code=404, detail="No pending friend request with such id")
+    if request.user_two_username != current_user.username:
+        raise HTTPException(status_code=401, detail="Cannot decline non-own friend request")
+    return crud.decline_friend_request(friend_request=request, db=db)
+
+
+@router.delete("/users/me/friends/unfriend")
+async def remove_friend(friend_username: str, current_user: schemas.User = Depends(get_current_active_user),
+                        db: Session = Depends(get_db)):
+    friend = crud.get_user(db=db, username=friend_username)
+    if friend is None:
+        raise HTTPException(status_code=404, detail="User does not exists")
+    friends = crud.get_users_friends(current_user, db)
+    if friends is None or friend_username not in friends:
+        raise HTTPException(status_code=404, detail="User not in friends")
+    return crud.delete_friend_record(user=current_user, friend=friend, db=db)
+
+
+@router.get("/users/me/blocked")
+async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
+                            db: Session = Depends(get_db)):
+    return crud.get_blocked_users(user=current_user, db=db)
+
+
+@router.post("/users/{username}/block")
+async def block_user(username, current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
+    user_to_block = crud.get_user(username=username, db=db)
+    if not user_to_block:
+        raise HTTPException(status_code=404, detail="User not found")
+    return crud.create_block_record(user=current_user, user_to_block=user_to_block, db=db)
+
+
+@router.delete("/users/{username}/unblock")
+async def unblock_user(username, current_user: schemas.User = Depends(get_current_active_user),
+                       db: Session = Depends(get_db)):
+    user_to_unblock = crud.get_user(username=username, db=db)
+    blocked = crud.get_blocked_users(user=current_user, db=db)
+    if not user_to_unblock:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user_to_unblock.username not in blocked:
+        raise HTTPException(status_code=404, detail="User not blocked")
+    return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
+
+
+# noinspection PyTypeChecker
+async def websocket_endpoint(websocket: WebSocket,
+                             db: Session = Depends(get_db)
+                             ):
+    async def send_websocket_response(status_code: int):
+        await websocket.send_json(dataclasses.asdict(WebsocketResponse(status_code)))
+
+    current_user: schemas.User = None
+    await websocket.accept()
+    try:
+        while True:
+            websocket_request_dict = await websocket.receive_json()
+            websocket_request: WebsocketRequest = WebsocketRequest(**websocket_request_dict)
+            if websocket_request.request_path is GameApiRequestPath.WebsocketAuth:
+                request: WebsocketAuthRequest = websocket_request.request
+                token = request.token
+                try:
+                    current_user = await get_current_user(token, db)
+                    await send_websocket_response(200)
+                except HTTPException:
+                    await send_websocket_response(401)
+            elif websocket_request.request_path is GameApiRequestPath.GetGameState:
+                game_state = game_service.get_game_state(websocket_request.request, db)
+                await websocket.send_json(dataclasses.asdict(game_state))
+            elif websocket_request.request_path in [GameApiRequestPath.ShootLaser, GameApiRequestPath.MovePiece, GameApiRequestPath.RotatePiece]:
+                if current_user is None:
+                    await send_websocket_response(401)
+                else:
+                    try:
+                        if websocket_request.request_path is GameApiRequestPath.ShootLaser:
+                            game_service.shoot_laser(current_user.username, websocket_request.request, db)
+                        if websocket_request.request_path is GameApiRequestPath.MovePiece:
+                            game_service.move_piece(current_user.username, websocket_request.request, db)
+                        if websocket_request.request_path is GameApiRequestPath.RotatePiece:
+                            game_service.rotate_piece(current_user.username, websocket_request.request, db)
+                        await send_websocket_response(200)
+                    except HTTPException as e:
+                        await send_websocket_response(e.status_code)
+            else:
+                await send_websocket_response(404)
+    except WebSocketDisconnect:
+        pass
+
+
 app.include_router(router)
+app.add_api_websocket_route("/ws", websocket_endpoint)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)

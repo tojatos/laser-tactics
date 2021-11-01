@@ -9,6 +9,8 @@ from app.core.database import Base
 from app.game_engine.models import *
 from app.game_engine.requests import *
 from app.main import app, get_db, API_PREFIX
+from tests.conftest import engine, TestingSessionLocal
+from tests.utils import *
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -28,6 +30,9 @@ def override_get_db():
     finally:
         db.close()
 
+    app.dependency_overrides[get_db] = override_get_db
+    client = TestClient(app)
+    tu = TUtils(client, API_PREFIX)
 
 app.dependency_overrides[get_db] = override_get_db
 
@@ -69,8 +74,10 @@ def get_data(path: str, token: str = None, **kwargs):
     return make_request('GET', path, token, **kwargs)
 
 
-def get_token_data(create_user_data):
-    return dict(username=create_user_data['username'], password=create_user_data['password'])
+def post_move_piece(tu, token_num: int, coordinates_from: CellCoordinates, coordinates_to: CellCoordinates):
+    request = MovePieceRequest(game_id, cell_coordinates_to_serializable(coordinates_from),
+                               cell_coordinates_to_serializable(coordinates_to))
+    return tu.post_data("/move_piece", tokens[token_num], json=asdict(request))
 
 
 def post_create_user(create_user_data):
