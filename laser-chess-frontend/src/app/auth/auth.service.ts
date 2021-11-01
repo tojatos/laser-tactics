@@ -50,6 +50,7 @@ private setSession(authResult: UserToken) {
 }
 
 parseJWT(jwt: string | undefined){
+  console.log(jwt)
   return this.jwtHelper.decodeToken<tokenPayload>(jwt)
 }
 

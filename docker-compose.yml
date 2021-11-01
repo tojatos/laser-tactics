@@ -1,8 +1,16 @@
 version: '3.7'
-
 services:
+  angular:
+    build: ./laser-chess-frontend
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+    command: >
+      bash -c "ng serve --host 0.0.0.0 --port 8080 --proxy-config ./src/proxy.conf.docker.json"
+
   fastapi:
-    build: .
+    build: ./laser-chess-backend
     restart: always
     command: uvicorn app.main:app --host 0.0.0.0 --port 80
     ports:
