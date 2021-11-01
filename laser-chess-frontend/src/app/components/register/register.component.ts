@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
+import {FormControl, Validators, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-register',
@@ -9,37 +10,30 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class RegisterComponent implements OnInit {
 
-  form: any = {
-    username: null,
-    email: null,
-    password: null
-  };
+  hide = true;
+  form = new FormGroup({
+    username: new FormControl(''),
+    email: new FormControl(''),
+    password: new FormControl(''),
+  });
   isLoggedIn = false;
-  isRegisterFailed = false;
   errorMessage = '';
-  constructor(private authService: AuthService, private route: ActivatedRoute) {}
+  constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router) {}
 
     ngOnInit(): void {
-      this.authService.clearJWT()
-      if (this.authService.isLoggedIn()) {
-        this.isLoggedIn = true;
-      }
     }
 
     get f() { return this.form.controls; }
     
     onSubmit(): void {
-      const { username, email, password } = this.form;
-      console.log(username, email, password)
+      const { username, email, password } = this.form.value;
       if (!this.authService.isLoggedIn() && username && email && password) {
         this.authService.register(username, email, password)
+        this.router.navigate(['/login']);
                 }
       else this.authService.clearJWT()
         
       
-    }
-    reloadPage(): void {
-      window.location.reload();
     }
 
 

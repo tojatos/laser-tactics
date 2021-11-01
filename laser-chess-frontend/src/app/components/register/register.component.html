@@ -1,71 +1,36 @@
 <div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-    <mat-card class="box">
-      <mat-card-header>
-        <mat-card-title>Register</mat-card-title>
-      </mat-card-header>
-  
-      <form *ngIf="!isLoggedIn" class="form" (ngSubmit)="onSubmit()">
-        <mat-card-content>
-          <mat-form-field class="example-full-width">
-            <input matInput placeholder="Username" type="text" class="form-control"
-          name="username"
-          [(ngModel)]="form.username"
-          required
-          #username="ngModel">
-          <div
-        class="alert alert-danger"
-        role="alert"
-        *ngIf="username.errors && f.submitted"
-      >Username is required!
-    </div>
-          </mat-form-field>
-          
-          <mat-form-field class="example-full-width">
-            <input matInput placeholder="Email" type="email" class ="form-control"
-            name="email"
-            [(ngModel)]="form.email"
-            required
-            #email="ngModel">
-            <div
-        class="alert alert-danger"
-        role="alert"
-        *ngIf="email.errors && f.submitted"
-      >Email is required!
-    </div>
-          </mat-form-field>
-  
-          <mat-form-field class="example-full-width">
-            <input matInput placeholder="Password" type="password" class="form-control"
-            name="password"
-            [(ngModel)]="form.password"
-            required
-            minlength="6"
-            #password="ngModel">
-            <div
-          class="alert alert-danger"
-          role="alert"
-          *ngIf="password.errors && f.submitted"
-        >
-          <div *ngIf="password.errors.required">Password is required</div>
-          <div *ngIf="password.errors.minlength">
-            Password must be at least 6 characters
-          </div>
-        </div>
-          </mat-form-field>
-  
-        </mat-card-content>
-  
-        <button mat-stroked-button color="accent" class="btn-block">Register</button>
-        <div class="form-group">
-          <div
-            class="alert alert-danger"
-            role="alert"
-            *ngIf="f.submitted && isRegisterFailed"
-          >
-            Register failed: {{ errorMessage }}
-          </div>
-        </div>
-  
-      </form>
-    </mat-card>
-  </div>
+  <mat-card class="box">
+    <mat-card-header>
+      <mat-card-title>Register</mat-card-title>
+    </mat-card-header>
+
+    <form class="example-form" [formGroup]="form" *ngIf="!isLoggedIn" (ngSubmit)="onSubmit()">
+      <mat-card-content>
+        <mat-form-field class="example-full-width" appearance="standard" required>
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" type="text" maxlength="20">
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width" appearance="standard" required>
+          <mat-label>Email</mat-label>
+          <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com" maxlength="30">
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width" apearance="standard" required>
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" maxlength="30" [type]="hide ? 'password' : 'text'">
+          <button type="button" mat-icon-button matSuffix (click)="hide = !hide" attr.aria-label="'Hide password'"
+            attr.aria-pressed="hide">
+            <mat-icon class="icon-display">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+
+      </mat-card-content>
+
+      <button mat-stroked-button color="accent" class="btn-block">Register</button>
+      <div class="form-group">
+      </div>
+
+    </form>
+  </mat-card>
+</div>
