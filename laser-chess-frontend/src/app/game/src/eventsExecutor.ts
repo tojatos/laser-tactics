@@ -27,7 +27,7 @@ export class EventsExecutor{
     }
 
     async executeEventsQueue(canvas: Canvas, board: Board, showAnimations: boolean = true, timeout: number = this.eventsExecutionTimeout){
-      for (const event of this.eventsQueue){
+      for (const event of this.eventsQueue.filter(e => e.event_type != GameEvents.PIECE_DESTROYED_EVENT)){
         if(event){
           if(showAnimations)
             await new Promise(resolve => setTimeout(resolve, timeout))
@@ -44,8 +44,14 @@ export class EventsExecutor{
     async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], showAnimations: boolean){
       const res = values(groupBy(laserPath, 'time'))
       const allPathsToDraw: PathInfo[] = []
-      const allEventsAfterLaserShot = this.eventsQueue.slice(this.eventsQueue.indexOf(clone(this.eventsQueue).reverse().find(e => e.event_type == GameEvents.LASER_SHOT_EVENT)!) + 1)
-      console.log(allEventsAfterLaserShot)
+      const allDestroyedPieceEventsAfterLastLaserShot = this.eventsQueue.slice(this.eventsQueue.indexOf(clone(this.eventsQueue).reverse()
+      .find(e => e.event_type == GameEvents.LASER_SHOT_EVENT)!) + 1)
+      .filter(e => e.event_type == GameEvents.PIECE_DESTROYED_EVENT)
+
+      for (const pd of allDestroyedPieceEventsAfterLastLaserShot){
+        board.executeEvent(pd)
+        this.gameService.increaseAnimationEvents()
+      }
 
         this.startPath(res[1], res.flat(), res[0][0], allPathsToDraw)
         const allPaths = values(groupBy(allPathsToDraw, 'time'))
@@ -53,10 +59,9 @@ export class EventsExecutor{
         return new Promise<void>(async resolve => {
           for (const path of allPaths)
             await Promise.all([
-              ...path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to, showAnimations))
-              // ...allEventsAfterLaserShot.filter(e => e.event_type == GameEvents.PIECE_DESTROYED_EVENT && e.laser_destroy_time == path[0].time)
-              // .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, showAnimations)) // clears all board as well so laser is cut.
-              // gotta make individual canvas for each animation or at least for laser
+              ...path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to, showAnimations)),
+              ...allDestroyedPieceEventsAfterLastLaserShot.filter(e => e.event_type == GameEvents.PIECE_DESTROYED_EVENT && e.laser_destroy_time == path[0].time)
+              .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, showAnimations)) // clears field as well so laser is cut.
             ]
             )
         //if(showAnimations)

@@ -50,12 +50,16 @@ export class Drawings {
     }
 
     drawSingleCell(canvas: Canvas, cell: Cell){
+      this.clearSingleCell(canvas, cell)
+      if(cell.piece)
+        this.drawPiece(canvas, cell.piece)
+    }
+
+    clearSingleCell(canvas: Canvas, cell: Cell){
       canvas.ctx.save()
       canvas.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
       canvas.ctx.clearRect(this.cellDrawingOriginCoordinates(canvas.blockSize).x, this.cellDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize, canvas.blockSize);
       canvas.ctx.restore()
-      if(cell.piece)
-        this.drawPiece(canvas, cell.piece)
     }
 
     showPossibleMove(canvas: Canvas, cell: Cell | undefined, color: string = this.highlightColor){

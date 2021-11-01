@@ -8,7 +8,7 @@ import { Resources } from "../Resources"
 export abstract class Canvas {
 
   interactable: boolean = false
-  currentPlayer = this.authService.getCurrentJwtInfo().sub
+  currentPlayer = this.authService.getCurrentJwtInfo()?.sub
 
   constructor(protected readonly authService: AuthService, public readonly ctx: CanvasRenderingContext2D, public blockSize: number, protected readonly animations: Animations, protected readonly drawings: Drawings, public readonly resources: Resources, protected readonly gameId: string) {
       this.ctx.canvas.width = COLS * this.blockSize

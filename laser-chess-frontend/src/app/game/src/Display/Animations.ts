@@ -172,10 +172,10 @@ export class Animations {
     }
 
     async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, showAnimations: boolean){
-      return new Promise<void>((resolve, reject) => {
+      return new Promise<void>((resolve) => {
         const pieceToDestroy = board.getCellByCoordinates(at.x, at.y)
         if(pieceToDestroy){
-          this.drawings.drawGame(canvas, this.cellsExcludingPieces(board, [pieceToDestroy]))
+          this.drawings.clearSingleCell(canvas, pieceToDestroy)
           resolve()
         }
         else

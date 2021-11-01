@@ -46,7 +46,7 @@ parseJWT(jwt: string | undefined){
 
 getCurrentJwtInfo(){
   const jwt = localStorage.getItem('access_token')
-  return this.parseJWT(jwt || undefined)
+  return jwt ? this.parseJWT(jwt) : undefined
 }
 
 clearJWT(){

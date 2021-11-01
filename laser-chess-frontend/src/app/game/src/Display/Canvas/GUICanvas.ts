@@ -16,7 +16,6 @@ export class GUICanvas extends Canvas {
 
   rotation: number = 0
   mediator!: CanvasMediator
-  currentPlayer = this.authService.getCurrentJwtInfo().sub
   buttons: Button[] = []
 
   constructor( private gameService: GameService,

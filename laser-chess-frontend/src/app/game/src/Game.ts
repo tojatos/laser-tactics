@@ -43,9 +43,10 @@ export class Game{
         if(res.body) {
           //this.gameService.setAnimationEventsNum(res.body.game_events.length)
           res.body.game_id = gameId
+          console.log(this.gameService.getLocalGameState())
           let gameState = this.gameService.getLocalGameState() || res.body
-          const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
-          if((gameState != res.body && animationsToShow <= 0) || gameState.game_events.length == res.body.game_events.length || gameState.game_id != res.body.game_id){
+          let animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
+          if((gameState != res.body && animationsToShow <= 0) || gameState.game_events.length == res.body.game_events.length || gameState.game_id != res.body.game_id || animationsToShow > 5){
             gameState = res.body
             this.gameService.setAnimationEventsNum(gameState.game_events.length)
           }
@@ -58,6 +59,7 @@ export class Game{
             await this.executePendingActions(res.body, animationsToShow)
 
           this.board.currentTurn = res.body.turn_number
+          this.gameService.setLocalGameState(gameState)
           const myTurn = this.board.isMyTurn()
           this.gameCanvas.interactable = myTurn
           if(!myTurn)

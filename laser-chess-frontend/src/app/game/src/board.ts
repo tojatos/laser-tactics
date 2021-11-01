@@ -40,7 +40,7 @@ export class Board implements BoardInterface {
     return this.cells.find(c => c.coordinates.x == x && c.coordinates.y == y)
   }
 
-  getSelectableCellByCoordinates(x: number, y: number, owner: string): Cell | undefined {
+  getSelectableCellByCoordinates(x: number, y: number, owner: string | undefined): Cell | undefined {
     if(!this.selectedCell)
       return this.cells.find(c => c.coordinates.x == x && c.coordinates.y == y && c.piece?.piece_owner == this.parsePlayerIdToPlayerNumber(owner))
     return this.selectedCell.piece?.getPossibleMoves(this, this.selectedCell).find(c => c.coordinates.x == x && c.coordinates.y == y)
@@ -79,12 +79,12 @@ export class Board implements BoardInterface {
   }
 
   getMyLaser(){
-    const player = this.authService.getCurrentJwtInfo().sub
+    const player = this.authService.getCurrentJwtInfo()?.sub
     return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
   }
 
   getLaserCell(){
-    const player = this.authService.getCurrentJwtInfo().sub
+    const player = this.authService.getCurrentJwtInfo()?.sub
     if(this.isMyTurn())
       return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
     return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner != this.parsePlayerIdToPlayerNumber(player))
@@ -100,12 +100,12 @@ export class Board implements BoardInterface {
   }
 
   isMyTurn() {
-    const player = this.authService.getCurrentJwtInfo().sub
+    const player = this.authService.getCurrentJwtInfo()?.sub
     const turnOfPlayer = Math.round(this.currentTurn / 2) % 2 == 0 ? this.playerTwo : this.playerOne
-    return player != null && turnOfPlayer != null && player == turnOfPlayer
+    return player != undefined && turnOfPlayer != undefined && player == turnOfPlayer
   }
 
-  parsePlayerIdToPlayerNumber(playerId: string){
+  parsePlayerIdToPlayerNumber(playerId: string | undefined){
 
     if(playerId == this.playerOne)
       return PlayerType.PLAYER_ONE

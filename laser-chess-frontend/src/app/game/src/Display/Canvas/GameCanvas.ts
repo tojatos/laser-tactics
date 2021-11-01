@@ -16,7 +16,6 @@ import { PieceType } from "../../enums"
 export class GameCanvas extends Canvas {
 
     hoveredCell: Cell | undefined
-    currentPlayer = this.authService.getCurrentJwtInfo().sub
     mediator: CanvasMediator | undefined
     showAnimations: boolean = true
 
@@ -71,14 +70,15 @@ export class GameCanvas extends Canvas {
     }
 
     mouseEventFromGui(mousePos: Coordinates, board: Board){
-      const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
-      console.log(selectedCell)
+      if(this.interactable){
+        const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
 
-      if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
-        this.unselectCellEvent(board)
+        if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
+          this.unselectCellEvent(board)
 
-      else if(selectedCell)
-        this.selectableCellEvent(selectedCell, board)
+        else if(selectedCell)
+          this.selectableCellEvent(selectedCell, board)
+      }
 
     }
 
