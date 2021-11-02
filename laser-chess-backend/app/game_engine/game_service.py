@@ -23,15 +23,27 @@ def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerial
 
 
 def start_game(user_id: string, request: StartGameRequest, db: Session):
-    # TODO: validate request
-
-    # TODO: move this to lobby creation
-    initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id)
+    # validation
+    lobby = crud.get_lobby(db, lobby_id=request.lobby_id)
+    if not lobby:
+        raise HTTPException(status_code=404, detail="lobby not found, unable to start the game")
+    if not lobby.starting_position_reversed:
+        if lobby.player_one_username != user_id:
+            raise HTTPException(status_code=403, detail="unable to start the game")
+        else:
+            initial_state = empty_game_state(player_one_id=lobby.player_one_username, player_two_id=lobby.player_two_username)
+    else:
+        if lobby.player_two_username != user_id:
+            raise HTTPException(status_code=403, detail="unable to start the game")
+        else:
+            initial_state = empty_game_state(player_one_id=lobby.player_two_username, player_two_id=lobby.player_one_username)
+    game_id = lobby.game_id
+    # lobby is deleted here
     crud.start_game(db, initial_state, request)
 
     game = Game(initial_state)
     game.start_game()
-    crud.update_game(db, game.game_state, request.game_id)
+    crud.update_game(db, game.game_state, game_id)
 
 
 def get_player_from_user_id(game_state: GameState, user_id: str):

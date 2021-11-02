@@ -9,7 +9,8 @@ from tests.utils import *
 
 tokens = []
 game_id = "some_id"
-
+get_game_state_request = GetGameStateRequest(game_id)
+shoot_laser_request = ShootLaserRequest(game_id)
 
 @pytest.fixture(autouse=True)
 def ws(client):
@@ -21,6 +22,8 @@ def ws(client):
 @pytest.fixture(scope="session", autouse=True)
 def before_all():
     global tokens
+    global game_id
+    global get_game_state_request, shoot_laser_request
 
     connection = engine.connect()
     session = TestingSessionLocal(bind=connection)
@@ -35,18 +38,26 @@ def before_all():
     create_user_datas = list(
         map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 2)))
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
+
+    lobby_response = tu.post_data("/lobby/create",
+                 tokens[0]).json()
+    lobby_id = lobby_response["id"]
+    response = tu.patch_data(f"/lobby/join?lobby_id={lobby_id}",
+                  tokens[1]
+                  )
+
+    game_id = lobby_response["game_id"]
+    get_game_state_request = GetGameStateRequest(game_id)
+    shoot_laser_request = ShootLaserRequest(game_id)
     tu.post_data(
         "/start_game",
         tokens[0],
-        json=dict(game_id=game_id, player_one_id=create_user_datas[0]['username'],
-                  player_two_id=create_user_datas[1]['username']),
-    )
+        json=dict(lobby_id=lobby_response["id"])
+                  )
 
     session.commit()
 
 
-get_game_state_request = GetGameStateRequest(game_id)
-shoot_laser_request = ShootLaserRequest(game_id)
 p1_laser_coordinates = (5, 0)
 p2_laser_coordinates = (3, 8)
 p1_king_coordinates = (4, 0)
