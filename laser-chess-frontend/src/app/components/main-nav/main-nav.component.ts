@@ -13,40 +13,21 @@ import { LoginEmitterService } from 'src/app/services/login-emitter.service';
 })
 export class MainNavComponent {
 
-  loggedIn = false;
-
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.HandsetPortrait, Breakpoints.Small])
     .pipe(
       map(result => result.matches),
       shareReplay()
     );
 
-  constructor(private router: Router,private breakpointObserver: BreakpointObserver, private authService: AuthService, private loginEmitter: LoginEmitterService) { }
+  constructor(private router: Router,private breakpointObserver: BreakpointObserver, private authService: AuthService) { }
 
-  ngOnInit(): void {   
-    if (this.loginEmitter.subsRefresh == undefined) {
-      this.loginEmitter.subsRefresh = this.loginEmitter.
-      invokeLoggedInStateChange.subscribe(() => {
-        this.changeLoginState()
-      });
-    }
-    this.loggedIn = this.isLoggedin() 
-  }
-
-    isLoggedin(){
-      if (this.authService.isLoggedIn()) {
-        return true;
-      }
-      else return false;
+    get isLoggedin(){
+      return this.authService.isLoggedIn()
     }
 
     logout(){
       this.authService.clearJWT()
       this.router.navigate(['/'])
-      this.loggedIn = false;
     }   
 
-    changeLoginState(){
-      this.loggedIn = !this.loggedIn
-    }
 }
