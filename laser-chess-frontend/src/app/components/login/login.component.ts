@@ -33,7 +33,6 @@ export class LoginComponent {
         this.authService.login(username, password).then(
                   res => {
                       console.log(`User with token ${res.access_token} is logged in`);
-                      this.loginEmitter.invokeLoginToggle()
                       this.router.navigate(['/'])
                   }
               )
