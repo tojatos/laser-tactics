@@ -49,6 +49,7 @@ export class Game{
           if((gameState != res.body && animationsToShow <= 0) || gameState.game_events.length == res.body.game_events.length || gameState.game_id != res.body.game_id || animationsToShow > 5){
             gameState = res.body
             this.gameService.setAnimationEventsNum(gameState.game_events.length)
+            animationsToShow = 0
           }
           displaySize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
           this.board.initBoard(gameState, displaySize)
