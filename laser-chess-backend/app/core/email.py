@@ -37,3 +37,14 @@ def verification_template(username: str, verification_url: str):
     Best regards,
     LaserTactics Team
     """
+
+def change_password_template(username: str, url: str):
+    return f"""
+    Hello {username}! 
+
+    A password change for your account was requested. Please click the link below to change your password.
+
+    {url}
+    Best regards,
+    LaserTactics Team
+"""

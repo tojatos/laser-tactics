@@ -50,6 +50,15 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
+def change_password(user: schemas.User, new_password: str, db: Session):
+    db_user = get_user(db, user.username)
+    hashed_password = get_password_hash(new_password)
+    db_user.hashed_password = hashed_password
+    db.commit()
+    db.refresh(db_user)
+    return {"detail": "password change successful"}
+
+
 def create_lobby(db: Session, user: schemas.User):
     db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username)
     db.add(db_lobby)

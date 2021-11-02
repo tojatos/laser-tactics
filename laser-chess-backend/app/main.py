@@ -16,7 +16,7 @@ from starlette.responses import JSONResponse
 from app.core import schemas
 from app.core import crud, models
 from app.core.database import SessionLocal, engine
-from app.core.email import EmailSchema, verification_template, conf
+from app.core.email import EmailSchema, verification_template, conf, change_password_template
 from app.game_engine import game_service
 from app.game_engine.models import *
 from app.game_engine.requests import *
@@ -35,6 +35,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 10080)
 VERIFY_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 60 * 24)
 CHANGE_PASSWORD_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 20)
 VERIFICATION_URL = "<verification_url>/"
+CHANGE_PASSWORD_URL = "<change_password_url>/"
 API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
 PORT = get_env('PORT', 8000)
@@ -64,7 +65,7 @@ router = APIRouter(
 )
 
 
-class TokenPurpose(AutoNameEnum):
+class TokenPurpose(str,AutoNameEnum):
     LOGIN = auto()
     CHANGE_PASSWORD = auto()
     ACCOUNT_VERIFICATION = auto()
@@ -124,6 +125,27 @@ async def send_verification_email(username: str, db: Session = Depends(get_db)):
     return {'detail': "Verification email sent"}
 
 
+@router.post("/send_password_change_request/{username}")
+async def send_password_change_email(username: str, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, username=username)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    token = generate_change_password_token(username)
+    url = CHANGE_PASSWORD_URL + token
+    email = EmailSchema(email=[db_user.email])
+    message = MessageSchema(
+        subject="Your LaserTactics account password change",
+        recipients=email.dict().get("email"),
+        body=change_password_template(username=username, url=url),
+        subtype="html"
+    )
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+    return {'detail': "Verification email sent"}
+
+
 @router.post("/users/verify/{token}")
 def verify_user(token: str, db: Session = Depends(get_db)):
     try:
@@ -144,14 +166,16 @@ def verify_user(token: str, db: Session = Depends(get_db)):
         crud.verify_user(user=user, db=db)
     return {"detail": "Account verified successfully"}
 
-#??
-@router.post("/users/changepassword/{token}")
-def change_password(token: str, db: Session = Depends(get_db)):
+
+
+@router.post("/users/change_password/")
+def change_password(change_password_schema: schemas.EmergencyChangePasswordSchema, db: Session = Depends(get_db)):
     try:
+        token = change_password_schema.token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         purpose = payload.get("purpose")
-        if username is None or purpose != TokenPurpose.ACCOUNT_VERIFICATION:
+        if username is None or purpose != TokenPurpose.CHANGE_PASSWORD:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
         token_data = schemas.TokenData(username=username, purpose=purpose)
     except JWTError:
@@ -159,7 +183,7 @@ def change_password(token: str, db: Session = Depends(get_db)):
     user = crud.get_user(db, token_data.username)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-
+    return crud.change_password(user, change_password_schema.newPassword, db)
 
 
 @router.post("/users/", response_model=schemas.User)
@@ -271,6 +295,15 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @router.get("/users/me/", response_model=schemas.User)
 async def read_users_me(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
+
+
+@router.post("/users/me/change_password")
+def change_password(change_password_schema: schemas.ChangePasswordSchema,
+                    current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    db_user = crud.get_user(db=db, username=current_user.username)
+    if not verify_password(change_password_schema.oldPassword, db_user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid old password")
+    return crud.change_password(user=current_user, new_password=change_password_schema.newPassword, db=db)
 
 
 @router.post("/get_game_state", response_model=GameStateSerializable, responses={

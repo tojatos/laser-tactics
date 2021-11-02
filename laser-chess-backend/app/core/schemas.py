@@ -15,6 +15,16 @@ class FriendRequestStatus(AutoNameEnum):
     REJECTED = auto()
 
 
+class ChangePasswordSchema(BaseModel):
+    oldPassword: str
+    newPassword: str
+
+
+class EmergencyChangePasswordSchema(BaseModel):
+    token: str
+    newPassword: str
+
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr
