@@ -43,10 +43,12 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+    purpose: Optional[str] = None
 
 
 class VerificationTokenData(BaseModel):
     email: Optional[str] = None
+    purpose: Optional[str] = None
 
 
 class User(UserBase):

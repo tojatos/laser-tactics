@@ -32,7 +32,8 @@ def get_env(key, fallback):
 SECRET_KEY = get_env('SECRET_KEY', "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
 ALGORITHM = get_env('ALGORITHM', "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 10080)
-VERIFY_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 15)
+VERIFY_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 60 * 24)
+CHANGE_PASSWORD_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 20)
 VERIFICATION_URL = "<verification_url>/"
 API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
@@ -63,6 +64,12 @@ router = APIRouter(
 )
 
 
+class TokenPurpose(AutoNameEnum):
+    LOGIN = auto()
+    CHANGE_PASSWORD = auto()
+    ACCOUNT_VERIFICATION = auto()
+
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -77,7 +84,18 @@ def generate_verification_token(email: str):
 
     token = create_access_token(
 
-        data={"sub": email}, expires_delta=token_expires
+        data={"sub": email, "purpose": TokenPurpose.ACCOUNT_VERIFICATION}, expires_delta=token_expires
+
+    )
+    return token
+
+
+def generate_change_password_token(username: str):
+    token_expires = timedelta(minutes=CHANGE_PASSWORD_TOKEN_EXPIRE_MINUTES)
+
+    token = create_access_token(
+
+        data={"sub": username, "purpose": TokenPurpose.CHANGE_PASSWORD}, expires_delta=token_expires
 
     )
     return token
@@ -111,9 +129,10 @@ def verify_user(token: str, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
-        if email is None:
+        purpose = payload.get("purpose")
+        if email is None or purpose != TokenPurpose.ACCOUNT_VERIFICATION:
             raise HTTPException(status_code=400, detail="The verification link is invalid or has expired.")
-        token_data = schemas.VerificationTokenData(email=email)
+        token_data = schemas.VerificationTokenData(email=email, purpose=purpose)
     except JWTError:
         raise HTTPException(status_code=400, detail="The verification link is invalid or has expired.")
     user = crud.get_user_by_email(db, token_data.email)
@@ -124,6 +143,23 @@ def verify_user(token: str, db: Session = Depends(get_db)):
     else:
         crud.verify_user(user=user, db=db)
     return {"detail": "Account verified successfully"}
+
+#??
+@router.post("/users/changepassword/{token}")
+def change_password(token: str, db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        purpose = payload.get("purpose")
+        if username is None or purpose != TokenPurpose.ACCOUNT_VERIFICATION:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+        token_data = schemas.TokenData(username=username, purpose=purpose)
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    user = crud.get_user(db, token_data.username)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+
 
 
 @router.post("/users/", response_model=schemas.User)
@@ -186,7 +222,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = schemas.TokenData(username=username)
+        purpose: str = payload.get("purpose")
+        if purpose != TokenPurpose.LOGIN:
+            raise credentials_exception
+        token_data = schemas.TokenData(username=username, purpose=purpose)
     except JWTError:
         raise credentials_exception
     user = crud.get_user(db, token_data.username)
@@ -222,7 +261,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
     access_token = create_access_token(
 
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username, "purpose": TokenPurpose.LOGIN}, expires_delta=access_token_expires
 
     )
 
