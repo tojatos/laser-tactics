@@ -1,6 +1,6 @@
 {
   "/api/v1/*": {
-      "target": "http://fastapi",
+      "target": "http://krzysztofruczkowski.pl/laser-tactics/",
       "secure": false,
       "changeOrigin": true
       }

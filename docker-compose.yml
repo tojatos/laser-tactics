@@ -1,20 +1,24 @@
 version: '3.7'
 services:
   angular:
-    build: ./laser-chess-frontend
+    build:
+      context: ./laser-chess-frontend
+      args:
+        BASE_HREF: "/laser-tactics/"
     ports:
-      - '8080:8080'
+      - 2346:80
     depends_on:
       - fastapi
-    command: >
-      bash -c "ng serve --host 0.0.0.0 --port 8080 --proxy-config ./src/proxy.conf.docker.json"
+    #command: >
+      #ng serve --host 0.0.0.0 --port 8080 --proxy-config ./src/proxy.conf.docker.json --base-href="/laser-tactics/" --disable-host-check
+
 
   fastapi:
     build: ./laser-chess-backend
     restart: always
     command: python -m app.main
     ports:
-      - 80:80
+      - 2345:80
     depends_on:
       - db
     environment:
