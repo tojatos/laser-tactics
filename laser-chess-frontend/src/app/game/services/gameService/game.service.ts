@@ -1,5 +1,6 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { gameStateFullEndpoint, movePieceFullEndpoint, rotatePieceFullEndpoint, shootLaserFullEndpoint } from 'src/app/api-definitions';
 import { BoardInterface, Coordinates, GameState } from '../../game.models';
 import { MovePieceRequest, RotatePieceRequest } from '../../game.request.models'
 import { AbstractGameService } from './abstract-game-service';
@@ -12,7 +13,7 @@ export class GameService extends AbstractGameService {
   constructor(private http: HttpClient) { super(); }
 
   async getGameState(gameId: string): Promise<HttpResponse<GameState>> {
-    const res = await this.http.post<GameState>('api/v1/get_game_state', { "game_id": gameId }, { observe: 'response' }).toPromise()
+    const res = await this.http.post<GameState>(gameStateFullEndpoint, { "game_id": gameId }, { observe: 'response' }).toPromise()
 
     if(res.body)
       res.body.game_id = gameId
@@ -29,7 +30,7 @@ export class GameService extends AbstractGameService {
       move_to: to
     }
 
-    return this.http.post<void>('/api/v1/move_piece', movePieceRequest).toPromise()
+    return this.http.post<void>(movePieceFullEndpoint, movePieceRequest).toPromise()
   }
 
   rotatePiece(gameId: string, at: Coordinates, angle: number){
@@ -40,11 +41,11 @@ export class GameService extends AbstractGameService {
       angle: angle
     }
 
-    return this.http.post<void>('/api/v1/rotate_piece', rotatePieceRequest).toPromise()
+    return this.http.post<void>(rotatePieceFullEndpoint, rotatePieceRequest).toPromise()
   }
 
   shootLaser(gameId: string){
-    return this.http.post<void>('/api/v1/shoot_laser', { game_id: gameId }).toPromise()
+    return this.http.post<void>(shootLaserFullEndpoint, { game_id: gameId }).toPromise()
   }
 
   increaseAnimationEvents(){

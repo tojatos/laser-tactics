@@ -64,8 +64,8 @@ export class Game{
           this.gameService.setLocalGameState(gameState)
           const myTurn = this.board.isMyTurn()
           this.gameCanvas.interactable = myTurn
-          //if(!myTurn)
-            //this.refreshGameState()
+          if(!myTurn)
+            this.refreshGameState()
         }
 
       }
