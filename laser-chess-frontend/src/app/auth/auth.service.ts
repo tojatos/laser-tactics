@@ -42,10 +42,6 @@ export class AuthService {
     return this.http.post<any>(usersFullEndpoint, {'username': login, 'email': email, 'password': pass}).subscribe(res => this.setSession(res));
   }
 
-  getlobbies(){
-    return this.http.get('api/v1/')
-  }
-
 private setSession(authResult: UserToken) {
     // const expiresAt = moment().add(authResult.expiresIn,'second')
     localStorage.setItem(this.idToken, authResult.access_token)
