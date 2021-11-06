@@ -1,5 +1,5 @@
 import { AuthService } from "src/app/auth/auth.service"
-import { Board } from "../../board"
+import { GameService } from "src/app/game/services/gameService/game.service"
 import { COLS, ROWS } from "../../constants"
 import { Animations } from "../Animations"
 import { Drawings } from "../Drawings"
@@ -10,7 +10,7 @@ export abstract class Canvas {
   interactable: boolean = false
   currentPlayer = this.authService.getCurrentJwtInfo()?.sub
 
-  constructor(protected readonly authService: AuthService, public readonly ctx: CanvasRenderingContext2D, public blockSize: number, protected readonly animations: Animations, protected readonly drawings: Drawings, public readonly resources: Resources, protected readonly gameId: string) {
+  constructor(protected readonly gameService: GameService, protected readonly authService: AuthService, public readonly ctx: CanvasRenderingContext2D, public blockSize: number, protected readonly animations: Animations, protected readonly drawings: Drawings, public readonly resources: Resources, protected readonly gameId: string) {
       this.ctx.canvas.width = COLS * this.blockSize
       this.ctx.canvas.height = ROWS * this.blockSize
   }

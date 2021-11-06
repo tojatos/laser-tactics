@@ -1,6 +1,6 @@
 import { AuthService } from "src/app/auth/auth.service"
 import { EventEmitterService } from "src/app/game/services/event-emitter.service"
-import { GameService } from "src/app/game/services/game.service"
+import { GameService } from "src/app/game/services/gameService/game.service"
 import { Board } from "../../board"
 import { COLS, ROWS } from "../../constants"
 import { ButtonTypes, PieceType } from "../../enums"
@@ -18,7 +18,7 @@ export class GUICanvas extends Canvas {
   mediator!: CanvasMediator
   buttons: Button[] = []
 
-  constructor( private gameService: GameService,
+  constructor( gameService: GameService,
     authService: AuthService,
     private eventEmitter: EventEmitterService,
     animations: Animations,
@@ -27,7 +27,7 @@ export class GUICanvas extends Canvas {
     blockSize: number,
     resources: Resources,
     gameId: string) {
-    super(authService, ctx, blockSize, animations, drawings, resources, gameId)
+    super(gameService, authService, ctx, blockSize, animations, drawings, resources, gameId)
   }
 
   initCanvas(board: Board, gameCanvas: GameCanvas){

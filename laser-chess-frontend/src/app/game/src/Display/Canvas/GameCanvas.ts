@@ -1,7 +1,7 @@
 import { AuthService } from "src/app/auth/auth.service"
 import { EventEmitterService } from "../../../services/event-emitter.service"
 import { Coordinates } from "../../../game.models"
-import { GameService } from "../../../services/game.service"
+import { GameService } from "../../../services/gameService/game.service"
 import { Board } from "../../board"
 import { Cell } from "../../cell"
 import { Animations } from "../Animations"
@@ -19,7 +19,7 @@ export class GameCanvas extends Canvas {
     mediator: CanvasMediator | undefined
     showAnimations: boolean = true
 
-    constructor(private gameService: GameService,
+    constructor(gameService: GameService,
       authService: AuthService,
       private eventEmitter: EventEmitterService,
       animations: Animations,
@@ -28,7 +28,7 @@ export class GameCanvas extends Canvas {
        blockSize: number,
        resources: Resources,
        gameId: string) {
-        super(authService, ctx, blockSize, animations, drawings, resources, gameId)
+        super(gameService, authService, ctx, blockSize, animations, drawings, resources, gameId)
     }
 
     initCanvas(board: Board, guiCanvas: GUICanvas){

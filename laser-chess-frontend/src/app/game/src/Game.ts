@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
-import { GameService } from "src/app/game/services/game.service";
+import { GameService } from "src/app/game/services/gameService/game.service";
 import { GameState } from "../game.models";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
@@ -19,11 +19,12 @@ export class Game{
   gameId!: string
   sizeScale!: number
   showAnimations: boolean = true
+  isInitiated = false
 
   constructor(private gameService: GameService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
       this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe(() => {
-        this.refreshGameState();
+        //this.refreshGameState();
       });
     }
   }
@@ -35,6 +36,7 @@ export class Game{
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.guiCanvas = new GUICanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, guiCanvasContext, blockSize, this.resources, gameId)
     this.loadDisplay(gameId, (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale)
+    this.isInitiated = true
   }
 
   loadDisplay(gameId: string, displaySize: number){
@@ -43,7 +45,6 @@ export class Game{
         if(res.body) {
           //this.gameService.setAnimationEventsNum(res.body.game_events.length)
           res.body.game_id = gameId
-          console.log(this.gameService.getLocalGameState())
           let gameState = this.gameService.getLocalGameState() || res.body
           let animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
           if((gameState != res.body && animationsToShow <= 0) || gameState.game_events.length == res.body.game_events.length || gameState.game_id != res.body.game_id || animationsToShow > 5){
@@ -63,8 +64,8 @@ export class Game{
           this.gameService.setLocalGameState(gameState)
           const myTurn = this.board.isMyTurn()
           this.gameCanvas.interactable = myTurn
-          if(!myTurn)
-            this.refreshGameState()
+          //if(!myTurn)
+            //this.refreshGameState()
         }
 
       }

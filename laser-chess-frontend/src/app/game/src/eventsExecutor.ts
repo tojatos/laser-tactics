@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { clone, groupBy, values } from "lodash";
 import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
-import { GameService } from "../services/game.service";
+import { GameService } from "../services/gameService/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
 import { Canvas } from "./Display/Canvas/AbstractCanvas";

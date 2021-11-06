@@ -1,16 +1,15 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { BoardInterface, Coordinates, GameState } from '../game.models';
-import { MovePieceRequest, RotatePieceRequest } from '../game.request.models'
+import { BoardInterface, Coordinates, GameState } from '../../game.models';
+import { MovePieceRequest, RotatePieceRequest } from '../../game.request.models'
+import { AbstractGameService } from './abstract-game-service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GameService {
+export class GameService extends AbstractGameService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { super(); }
 
   async getGameState(gameId: string): Promise<HttpResponse<GameState>> {
     const res = await this.http.post<GameState>('api/v1/get_game_state', { "game_id": gameId }, { observe: 'response' }).toPromise()

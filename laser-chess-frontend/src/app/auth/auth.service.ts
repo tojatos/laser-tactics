@@ -50,8 +50,11 @@ private setSession(authResult: UserToken) {
 }
 
 parseJWT(jwt: string | undefined){
-  console.log(jwt)
   return this.jwtHelper.decodeToken<tokenPayload>(jwt)
+}
+
+get jwt() {
+  return localStorage.getItem('access_token')
 }
 
 getCurrentJwtInfo(){
