@@ -5,18 +5,17 @@ import { GameState } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
+import { GameActions } from "./Display/Canvas/GameActions";
 import { GameCanvas } from "./Display/Canvas/GameCanvas";
-import { GUICanvas } from "./Display/Canvas/GUICanvas";
 import { Drawings } from "./Display/Drawings";
 import { Resources } from "./Display/Resources";
-import { GameEvents } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
 @Injectable()
 export class Game{
 
   gameCanvas!: GameCanvas
-  guiCanvas!: GUICanvas
+  gameActions!: GameActions
   gameId!: string
   sizeScale!: number
   showAnimations: boolean = true
@@ -35,12 +34,12 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, guiCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number){
     this.sizeScale = sizeScale
     this.gameId = gameId
     await this.resources.loadAssets()
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
-    this.guiCanvas = new GUICanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, guiCanvasContext, blockSize, this.resources, gameId)
+    this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
     this.gameService.connect(this.gameId)
   }
 
@@ -48,10 +47,6 @@ export class Game{
 
       let gameState = this.gameService.getLocalGameState() || receivedGameState
       let animationsToShow = this.gameService.animationsToShow(receivedGameState.game_events.length)
-
-      console.log(gameState)
-      console.log(receivedGameState)
-      console.log(animationsToShow)
 
       if((gameState != receivedGameState && animationsToShow <= 0)
       || gameState.game_events.length == receivedGameState.game_events.length
@@ -64,8 +59,8 @@ export class Game{
       }
 
       this.board.initBoard(gameState, displaySize)
-      this.gameCanvas.initCanvas(this.board, this.guiCanvas)
-      this.guiCanvas.initCanvas(this.board, this.gameCanvas)
+      this.gameCanvas.initCanvas(this.board, this.gameActions)
+      this.gameActions.initCanvas(this.gameCanvas)
 
       if(animationsToShow > 0)
         await this.executePendingActions(receivedGameState, animationsToShow)
@@ -81,7 +76,6 @@ export class Game{
   changeCurrentSize(newSize: number){
     this.board.changeCellCoordinates(newSize)
     this.gameCanvas.changeBlockSize(newSize, this.board)
-    this.guiCanvas.changeBlockSize(newSize)
   }
 
   changeAnimationsShowOption(show: boolean){
@@ -124,6 +118,18 @@ export class Game{
     this.gameCanvas.interactable = false
     this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
     await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, this.showAnimations)
+  }
+
+  passRotation(degree: number){
+    this.gameActions.rotationPressed(this.board, degree)
+  }
+
+  passLaserShoot(){
+    this.gameActions.laserButtonPressed(this.board)
+  }
+
+  passAccept(){
+    this.gameActions.acceptRotationButtonPressed(this.board)
   }
 
   closeWebsocketConnection(){

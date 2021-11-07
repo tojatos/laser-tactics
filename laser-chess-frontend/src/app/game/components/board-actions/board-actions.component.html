@@ -5,7 +5,7 @@
   <mat-icon [style.font-size.px]="height">arrow_back</mat-icon>
 </button>
 <button mat-raised-button
-[disabled]="laserPossible"
+[disabled]="!laserPossible"
 (click)="sendButtonPressInfo('laser')"
 [style.height.px]="height" [style.width.px]="width">
   <mat-icon [style.font-size.px]="height">light_mode</mat-icon>

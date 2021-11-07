@@ -4,7 +4,6 @@ import { Cell } from "../cell"
 import { PIECE_SIZE_SCALE } from "../constants"
 import { Piece } from "../piece"
 import { Canvas } from "./Canvas/AbstractCanvas"
-import { Button } from "./Button"
 
 @Injectable()
 export class Drawings {
@@ -90,13 +89,6 @@ export class Drawings {
       canvas.ctx.translate(at.x, at.y)
       canvas.ctx.fillStyle = "red";
       canvas.ctx.fillRect(-this.laserThickness / 2, -this.laserThickness / 2, this.laserThickness, this.laserThickness)
-      canvas.ctx.restore()
-    }
-
-    drawButton(canvas: Canvas, button: Button){
-      canvas.ctx.save()
-      canvas.ctx.globalAlpha = 0.8;
-      canvas.ctx.drawImage(button.image, button.originPosition.x, button.originPosition.y, button.width, button.height)
       canvas.ctx.restore()
     }
 

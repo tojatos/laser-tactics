@@ -1,11 +1,11 @@
 import { Coordinates } from "src/app/game/game.models";
 import { Board } from "../../board";
+import { GameActions } from "./GameActions";
 import { GameCanvas } from "./GameCanvas";
-import { GUICanvas } from "./GUICanvas";
 
-export class CanvasMediator {
+export class GameMediator {
 
-  constructor(public gameCanvas: GameCanvas, public guiCanvas: GUICanvas){}
+  constructor(public gameCanvas: GameCanvas, public gameActions: GameActions){}
 
   sendLaserShotInfo(board: Board){
     this.gameCanvas.redrawGame(board)
@@ -21,7 +21,7 @@ export class CanvasMediator {
   }
 
   sendSelectionInfoToGuiCanvas(board: Board){
-    this.guiCanvas.newCellSelectedEvent(board)
+    this.gameActions.newCellSelectedEvent(board)
   }
 
   drawGameOnGameCanvas(board: Board){
@@ -36,8 +36,16 @@ export class CanvasMediator {
     this.gameCanvas.mouseEventFromGui(mousePos, board)
   }
 
-  clearGuiCanvas(){
-    this.guiCanvas.hideCanvas()
+  disableGameActionsButtons(){
+    this.gameActions.disableButtons()
+  }
+
+  rotatePieceToInitPosition(board: Board){
+    this.gameActions.rotatePieceToInitialPosition(board)
+  }
+
+  get currentRotation(){
+    return this.gameActions.rotation
   }
 
 }

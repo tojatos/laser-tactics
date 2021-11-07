@@ -18,7 +18,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly sizeScale = 0.07
   animation = true
 
-  constructor(private route: ActivatedRoute, private game: Game) {}
+  constructor(private route: ActivatedRoute, public game: Game) {}
 
   ngAfterViewInit() {
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
@@ -27,14 +27,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       return
     }
 
-    const guiCanvasContext = this.canvasGUI.nativeElement.getContext('2d')
-    if(!guiCanvasContext){
-      alert("Couldn't load context")
-      return
-    }
-
     this.route.params.subscribe(async params => {
-      await this.game.initGame(gameCanvasContext, guiCanvasContext, this.currentSize, params.id, this.sizeScale)
+      await this.game.initGame(gameCanvasContext, this.currentSize, params.id, this.sizeScale)
     })
 
   }
@@ -56,10 +50,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   buttonPressEvent(event: string){
     console.log(event)
     switch(event){
-      case "left": break
-      case "right": break
-      //case "laser": this.gameWs.shootLaser("string"); break
-      case "accept": break
+      case "left": this.game.passRotation(-90); break
+      case "right": this.game.passRotation(90); break
+      case "laser": this.game.passLaserShoot(); break
+      case "accept": this.game.passAccept(); break
     }
   }
 
@@ -73,6 +67,18 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   get containerWidth() {
     return this.currentSize * COLS
+  }
+
+  get rotationPossibleInfo() {
+    return this.game.gameActions.rotationActive
+  }
+
+  get laserPossibleInfo() {
+    return this.game.gameActions.laserActive
+  }
+
+  get acceptPossibleInfo() {
+    return this.game.gameActions.acceptActive
   }
 
 }
