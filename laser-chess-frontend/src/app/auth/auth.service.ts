@@ -26,15 +26,11 @@ export class AuthService {
     body.set('username', login)
     body.set('password', pass)
 
-    console.log(tokenFullEndpoint)
-
     return this.http.post<UserToken>(tokenFullEndpoint, body.toString(), options).toPromise().then(res => this.setSession(res))
   }
   login2(form: FormControl): Promise<UserToken> {
     let urlSearchParams = new URLSearchParams();
 
-
-    console.log(urlSearchParams.toString)
     return this.http.post<any>(tokenFullEndpoint, form).toPromise().then(res => this.setSession(res))
   }
 
