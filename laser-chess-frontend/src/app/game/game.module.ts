@@ -12,13 +12,15 @@ import { Animations } from './src/Display/Animations';
 import { Drawings } from './src/Display/Drawings';
 import { GameServiceInterceptor } from './services/game-service.interceptor';
 import { MaterialModule } from '../material/material.module';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [GameComponent, BoardComponent, ChatComponent],
   imports: [
     CommonModule,
     HttpClientModule,
-    MaterialModule
+    MaterialModule,
+    FlexLayoutModule
   ],
   exports: [GameComponent],
   providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor, { provide: HTTP_INTERCEPTORS, useClass: GameServiceInterceptor, multi: true }]
