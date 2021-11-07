@@ -20,20 +20,12 @@ export class GameMediator {
     this.gameCanvas.highlightPossibleMoves(board)
   }
 
-  sendSelectionInfoToGuiCanvas(board: Board){
+  sendSelectionInfoToActionPanel(board: Board){
     this.gameActions.newCellSelectedEvent(board)
   }
 
   drawGameOnGameCanvas(board: Board){
     this.gameCanvas.redrawGame(board)
-  }
-
-  passHoverInfoToGameCanvas(board: Board, mousePos: Coordinates){
-    this.gameCanvas.hoverEvent(mousePos, board)
-  }
-
-  passClickInfoToGameCanvas(board: Board, mousePos: Coordinates){
-    this.gameCanvas.mouseEventFromGui(mousePos, board)
   }
 
   disableGameActionsButtons(){
@@ -42,6 +34,10 @@ export class GameMediator {
 
   rotatePieceToInitPosition(board: Board){
     this.gameActions.rotatePieceToInitialPosition(board)
+  }
+
+  showPossibleMoves(board: Board){
+    this.gameCanvas.highlightPossibleMoves(board)
   }
 
   get currentRotation(){

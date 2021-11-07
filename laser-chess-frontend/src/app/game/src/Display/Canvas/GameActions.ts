@@ -53,6 +53,7 @@ export class GameActions {
     if(this.rotation == 0){
       if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
         this.laserActive = true
+      this.mediator.showPossibleMoves(board)
     }
     else {
       this.acceptActive = true

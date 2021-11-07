@@ -38,7 +38,7 @@ export class Game{
     this.sizeScale = sizeScale
     this.gameId = gameId
     await this.resources.loadAssets()
-    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
+    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
     this.gameService.connect(this.gameId)
   }
@@ -114,7 +114,6 @@ export class Game{
   }
 
   private async executePendingActions(game: GameState, animationsToShow: number){
-    console.log("executing actions")
     this.gameCanvas.interactable = false
     this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
     await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, this.showAnimations)

@@ -48,7 +48,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   buttonPressEvent(event: string){
-    console.log(event)
     switch(event){
       case "left": this.game.passRotation(-90); break
       case "right": this.game.passRotation(90); break

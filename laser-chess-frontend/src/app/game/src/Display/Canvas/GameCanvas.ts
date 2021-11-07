@@ -1,5 +1,4 @@
 import { AuthService } from "src/app/auth/auth.service"
-import { EventEmitterService } from "../../../services/event-emitter.service"
 import { Coordinates } from "../../../game.models"
 import { Board } from "../../board"
 import { Cell } from "../../cell"
@@ -9,7 +8,6 @@ import { Resources } from "../Resources"
 import { Canvas } from "./AbstractCanvas"
 import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
-import { PieceType } from "../../enums"
 import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
 import { GameActions } from "./GameActions"
 
@@ -21,7 +19,6 @@ export class GameCanvas extends Canvas {
 
     constructor(gameService: GameWebsocketService,
       authService: AuthService,
-      private eventEmitter: EventEmitterService,
       animations: Animations,
       drawings: Drawings,
       ctx: CanvasRenderingContext2D,
@@ -55,7 +52,7 @@ export class GameCanvas extends Canvas {
       else {
         if(selectedCell){
           this.selectCellEvent(selectedCell, board)
-          this.mediator?.sendSelectionInfoToGuiCanvas(board)
+          this.mediator?.sendSelectionInfoToActionPanel(board)
         }
       }
 
@@ -64,19 +61,6 @@ export class GameCanvas extends Canvas {
 
       if(!this.interactable){
         this.redrawGame(board)
-      }
-
-    }
-
-    mouseEventFromGui(mousePos: Coordinates, board: Board){
-      if(this.interactable){
-        const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
-
-        if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
-          this.unselectCellEvent(board)
-
-        else if(selectedCell)
-          this.selectableCellEvent(selectedCell, board)
       }
 
     }
@@ -131,6 +115,7 @@ export class GameCanvas extends Canvas {
         await this.animations.rotatePiece(this, board, selectedCell, degree, this.showAnimations, initialRotationDifference)
         this.interactable = true
       }
+
     }
 
     changeBlockSize(newSize: number, board: Board){
