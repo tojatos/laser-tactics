@@ -12,6 +12,7 @@ import { GUICanvas } from "./GUICanvas"
 import { CanvasMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
 import { PieceType } from "../../enums"
+import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
 
 export class GameCanvas extends Canvas {
 
@@ -19,7 +20,7 @@ export class GameCanvas extends Canvas {
     mediator: CanvasMediator | undefined
     showAnimations: boolean = true
 
-    constructor(gameService: GameService,
+    constructor(gameService: GameWebsocketService,
       authService: AuthService,
       private eventEmitter: EventEmitterService,
       animations: Animations,
@@ -86,24 +87,24 @@ export class GameCanvas extends Canvas {
       this.interactable = false
       if(board.selectedCell && selectedCell){
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
+        this.gameService.increaseAnimationEvents()
+        board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
+        this.gameService.setLocalGameState(board.serialize())
+        board.currentTurn++
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
-        .then(async () => {
-          this.gameService.increaseAnimationEvents()
-          board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
-          this.gameService.setLocalGameState(board.serialize())
-          board.currentTurn++
-          this.eventEmitter.invokeRefresh()
-        })
-        .finally(() => {
-          this.unselectCellEvent(board)
+        if(!board.isMyTurn()){
+          console.log("FROM NOW ON I AM OBSERVING")
+          this.interactable = false
+          this.eventEmitter.invokeObservator()
+        }
+        else
           this.interactable = true
-        })
+        this.unselectCellEvent(board)
       }
       else {
         this.unselectCellEvent(board)
         this.interactable = true
       }
-
     }
 
     private canvasHover(event: MouseEvent, board: Board) {

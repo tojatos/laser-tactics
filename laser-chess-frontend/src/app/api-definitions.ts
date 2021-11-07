@@ -9,6 +9,7 @@ export const movePieceEndpoint = '/move_piece'
 export const rotatePieceEndpoint = '/rotate_piece'
 export const shootLaserEndpoint = '/shoot_laser'
 export const authWebsocketEndpoint = '/ws_auth'
+export const observeWebsocketEndpoint = '/ws_observe'
 
 export const usersFullEndpoint = fullEndpoint(usersEndpoint)
 export const tokenFullEndpoint = fullEndpoint(tokenEndpoint)

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { COLS, ROWS } from '../../src/constants';
 import { Game } from '../../src/Game';
@@ -8,7 +8,7 @@ import { Game } from '../../src/Game';
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss']
 })
-export class BoardComponent implements AfterViewInit {
+export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>
 
@@ -39,6 +39,10 @@ export class BoardComponent implements AfterViewInit {
 
   }
 
+  ngOnDestroy() {
+    this.game.closeWebsocketConnection()
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
     this.game.changeCurrentSize(this.currentSize)
@@ -50,10 +54,11 @@ export class BoardComponent implements AfterViewInit {
   }
 
   buttonPressEvent(event: string){
+    console.log(event)
     switch(event){
       case "left": break
       case "right": break
-      case "laser": break
+      //case "laser": this.gameWs.shootLaser("string"); break
       case "accept": break
     }
   }

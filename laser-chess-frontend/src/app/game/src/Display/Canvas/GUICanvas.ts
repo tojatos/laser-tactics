@@ -11,6 +11,7 @@ import { Canvas } from "./AbstractCanvas"
 import { Button } from "../Button"
 import { CanvasMediator } from "./CanvasMediator"
 import { GameCanvas } from "./GameCanvas"
+import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
 
 export class GUICanvas extends Canvas {
 
@@ -18,7 +19,7 @@ export class GUICanvas extends Canvas {
   mediator!: CanvasMediator
   buttons: Button[] = []
 
-  constructor( gameService: GameService,
+  constructor( gameService: GameWebsocketService,
     authService: AuthService,
     private eventEmitter: EventEmitterService,
     animations: Animations,
@@ -165,9 +166,16 @@ export class GUICanvas extends Canvas {
 
     if(selectedCell){
       board.rotatePiece(selectedCell.coordinates, this.rotation)
-      this.gameService.rotatePiece(this.gameId, selectedCell.coordinates, rotation)
       this.gameService.increaseAnimationEvents()
+      this.gameService.rotatePiece(this.gameId, selectedCell.coordinates, rotation)
       board.currentTurn++
+      if(!board.isMyTurn()){
+        console.log("FROM NOW ON I AM OBSERVING")
+        this.interactable = false
+        this.eventEmitter.invokeObservator()
+      }
+      else
+        this.interactable = true
       this.unselectCellEvent(board)
     }
     else
@@ -175,7 +183,6 @@ export class GUICanvas extends Canvas {
 
     this.rotation = 0
     this.hideCanvas()
-    this.eventEmitter.invokeRefresh()
   }
 
   private unselectCellEvent(board: Board){
@@ -192,9 +199,13 @@ export class GUICanvas extends Canvas {
       board.currentTurn++
       this.unselectCellEvent(board)
       this.gameService.shootLaser(this.gameId)
-      .finally(() => {
-        this.eventEmitter.invokeRefresh()
-      })
+      if(!board.isMyTurn()){
+        console.log("FROM NOW ON I AM OBSERVING")
+        this.interactable = false
+        this.eventEmitter.invokeObservator()
+      }
+      else
+        this.interactable = true
     }
   }
 
