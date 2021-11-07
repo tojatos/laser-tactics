@@ -71,7 +71,6 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "src/proxy.conf.json",
             "port": 8080
           },
           "configurations": {

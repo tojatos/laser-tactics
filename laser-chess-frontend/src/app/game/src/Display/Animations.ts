@@ -26,7 +26,6 @@ export class Animations {
             return
         }
 
-        const speed = 20
         const redrawDistance = 5
 
         const fun = this.designateLinearFunction(
@@ -60,14 +59,16 @@ export class Animations {
         })
 
         return new Promise<void>((resolve) => {
-          const interval = setInterval(() => {
+          const interval = () => {
             intervalAction()
             if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
               lastAction()
-              clearInterval(interval)
               resolve()
             }
-          }, 100 / speed )
+            else
+              window.requestAnimationFrame(interval)
+          }
+          window.requestAnimationFrame(interval)
         })
 
     }
@@ -79,7 +80,6 @@ export class Animations {
         return
 
       piece.rotation_degree += initialRotationDifference
-      const speed = 20
       const degreesPerFrame = byDegrees > 0 ? 2 : -2
 
       const validCellsArray = this.cellsExcludingPieces(board, [atCell])
@@ -107,69 +107,86 @@ export class Animations {
         })
 
       return new Promise<void>((resolve) => {
-        const interval = setInterval(() => {
+        const interval = () => {
             intervalAction()
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
               lastAction()
-              clearInterval(interval)
               resolve()
             }
-        }, 100 / speed )
+            else
+              window.requestAnimationFrame(interval)
+        }
+        window.requestAnimationFrame(interval)
       })
 
     }
 
-    async laserAnimation(canvas: Canvas, board: Board, from: Coordinates, to: Coordinates, showAnimations: boolean): Promise<void> {
-      const fromCell = board.getCellByCoordinates(from.x, from.y)
-      let toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, to.x)), Math.min(8, Math.max(0, to.y)))?.canvasCoordinates
+    private laserAnimationStep(fromCell: Coordinates, toCell: Coordinates, laserIncrement: number){
 
-      if(to.x > 8)
-        toCell = {x: toCell!.x + board.blockSize!, y: toCell!.y}
-      else if(to.x < 0)
-        toCell = {x: toCell!.x - board.blockSize!, y: toCell!.y}
-      if(to.y > 8)
-        toCell = {x: toCell!.x, y: toCell!.y - board.blockSize!}
-      else if(to.y < 0)
-        toCell = {x: toCell!.x, y: toCell!.y + board.blockSize!}
+      const xModifier = this.getTranslationValue(fromCell.x, toCell.x)
+      const yModifier = this.getTranslationValue(fromCell.y, toCell.y)
 
-      const speed = 20
+      return {
+        x: fromCell.x - laserIncrement * xModifier,
+        y: fromCell.y - laserIncrement * yModifier
+      }
+
+  }
+
+    async laserAnimation(canvas: Canvas, board: Board, positions: [Coordinates, Coordinates][], showAnimations: boolean): Promise<void> {
       const laserIncrementPerFrame = 10
       let laserIncrement = laserIncrementPerFrame
-      if(fromCell && toCell){
-
-        const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.x)
-        const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.y)
 
         const lastAction = () => {
-          this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell!)
-          this.drawings.drawLaserCorner(canvas, toCell!)
+          for(const position of positions){
+
+            const fromCell = board.getCellByCoordinates(position[0].x, position[0].y)
+            const toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, position[1].x)), Math.min(8, Math.max(0, position[1].y)))
+
+            if(fromCell && toCell){
+              this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell.canvasCoordinates)
+              this.drawings.drawLaserCorner(canvas, toCell.canvasCoordinates)
+            }
+
+          }
         }
 
         if(!showAnimations)
           return new Promise<void>((resolve) => { lastAction(); resolve() })
 
         return new Promise<void>((resolve) => {
-          const interval = setInterval(() => {
+          const interval = () => {
+            for(const position of positions){
+              const fromCell = board.getCellByCoordinates(position[0].x, position[0].y)
+              const toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, position[1].x)), Math.min(8, Math.max(0, position[1].y)))
 
-            const currentCoordinates = {
-              x: fromCell.canvasCoordinates.x - laserIncrement * xModifier,
-              y: fromCell.canvasCoordinates.y - laserIncrement * yModifier
+              if(fromCell && toCell){
+                let finalDest = toCell?.canvasCoordinates
+
+                if(position[1].x > 8)
+                  finalDest = {x: toCell.canvasCoordinates.x + canvas.blockSize, y: toCell.canvasCoordinates.y}
+                else if(position[1].x < 0)
+                  finalDest = {x: toCell.canvasCoordinates.x - canvas.blockSize, y: toCell.canvasCoordinates.y}
+                if(position[1].y > 8)
+                  finalDest = {x: toCell.canvasCoordinates.x, y: toCell.canvasCoordinates.y - canvas.blockSize}
+                else if(position[1].y < 0)
+                  finalDest = {x: toCell.canvasCoordinates.x, y: toCell.canvasCoordinates.y + canvas.blockSize}
+
+                this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, this.laserAnimationStep(fromCell.canvasCoordinates, finalDest, laserIncrement))
+              }
             }
-
-            this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, currentCoordinates)
-            // this.drawings.drawPiece(canvas, board.getLaserCell()!.piece!) - will crash app if laser cell is not present
-
             laserIncrement += laserIncrementPerFrame
-            if(this.inVicinity(toCell!, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
+
+            if(laserIncrement >= canvas.blockSize){
               lastAction()
-              clearInterval(interval)
               resolve()
             }
-          }, 100 / speed )
+            else
+              window.requestAnimationFrame(interval)
+          }
+          window.requestAnimationFrame(interval)
         })
       }
-
-    }
 
     async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, showAnimations: boolean){
       return new Promise<void>((resolve) => {

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { clone, groupBy, values } from "lodash";
 import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
-import { GameService } from "../services/game.service";
+import { GameService } from "../services/gameService/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
 import { Canvas } from "./Display/Canvas/AbstractCanvas";
@@ -59,13 +59,15 @@ export class EventsExecutor{
         return new Promise<void>(async resolve => {
           for (const path of allPaths)
             await Promise.all([
-              ...path.map(p => this.animations.laserAnimation(canvas, board, p.from, p.to, showAnimations)),
+              this.animations.laserAnimation(canvas, board, path.map(p => [p.from, p.to]), showAnimations),
               ...allDestroyedPieceEventsAfterLastLaserShot.filter(e => e.event_type == GameEvents.PIECE_DESTROYED_EVENT && e.laser_destroy_time == path[0].time)
               .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, showAnimations)) // clears field as well so laser is cut.
             ]
             )
         //if(showAnimations)
           await new Promise(resolve => setTimeout(resolve, 1000))
+        const w = canvas.ctx.canvas.width
+        canvas.ctx.canvas.width = w
         resolve()
         })
 

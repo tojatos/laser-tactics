@@ -1,11 +1,11 @@
 import { Coordinates } from "src/app/game/game.models";
 import { Board } from "../../board";
+import { GameActions } from "./GameActions";
 import { GameCanvas } from "./GameCanvas";
-import { GUICanvas } from "./GUICanvas";
 
-export class CanvasMediator {
+export class GameMediator {
 
-  constructor(public gameCanvas: GameCanvas, public guiCanvas: GUICanvas){}
+  constructor(public gameCanvas: GameCanvas, public gameActions: GameActions){}
 
   sendLaserShotInfo(board: Board){
     this.gameCanvas.redrawGame(board)
@@ -20,24 +20,28 @@ export class CanvasMediator {
     this.gameCanvas.highlightPossibleMoves(board)
   }
 
-  sendSelectionInfoToGuiCanvas(board: Board){
-    this.guiCanvas.newCellSelectedEvent(board)
+  sendSelectionInfoToActionPanel(board: Board){
+    this.gameActions.newCellSelectedEvent(board)
   }
 
   drawGameOnGameCanvas(board: Board){
     this.gameCanvas.redrawGame(board)
   }
 
-  passHoverInfoToGameCanvas(board: Board, mousePos: Coordinates){
-    this.gameCanvas.hoverEvent(mousePos, board)
+  disableGameActionsButtons(){
+    this.gameActions.disableButtons()
   }
 
-  passClickInfoToGameCanvas(board: Board, mousePos: Coordinates){
-    this.gameCanvas.mouseEventFromGui(mousePos, board)
+  rotatePieceToInitPosition(board: Board){
+    this.gameActions.rotatePieceToInitialPosition(board)
   }
 
-  clearGuiCanvas(){
-    this.guiCanvas.hideCanvas()
+  showPossibleMoves(board: Board){
+    this.gameCanvas.highlightPossibleMoves(board)
+  }
+
+  get currentRotation(){
+    return this.gameActions.rotation
   }
 
 }

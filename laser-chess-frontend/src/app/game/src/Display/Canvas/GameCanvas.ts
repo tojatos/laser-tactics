@@ -1,41 +1,38 @@
 import { AuthService } from "src/app/auth/auth.service"
-import { EventEmitterService } from "../../../services/event-emitter.service"
 import { Coordinates } from "../../../game.models"
-import { GameService } from "../../../services/game.service"
 import { Board } from "../../board"
 import { Cell } from "../../cell"
 import { Animations } from "../Animations"
 import { Drawings } from "../Drawings"
 import { Resources } from "../Resources"
 import { Canvas } from "./AbstractCanvas"
-import { GUICanvas } from "./GUICanvas"
-import { CanvasMediator } from "./CanvasMediator"
+import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
-import { PieceType } from "../../enums"
+import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
+import { GameActions } from "./GameActions"
 
 export class GameCanvas extends Canvas {
 
     hoveredCell: Cell | undefined
-    mediator: CanvasMediator | undefined
+    mediator: GameMediator | undefined
     showAnimations: boolean = true
 
-    constructor(private gameService: GameService,
+    constructor(gameService: GameWebsocketService,
       authService: AuthService,
-      private eventEmitter: EventEmitterService,
       animations: Animations,
       drawings: Drawings,
       ctx: CanvasRenderingContext2D,
        blockSize: number,
        resources: Resources,
        gameId: string) {
-        super(authService, ctx, blockSize, animations, drawings, resources, gameId)
+        super(gameService, authService, ctx, blockSize, animations, drawings, resources, gameId)
     }
 
-    initCanvas(board: Board, guiCanvas: GUICanvas){
+    initCanvas(board: Board, gameActions: GameActions){
       this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
       this.drawings.drawGame(this, board.cells)
-      this.mediator = new CanvasMediator(this, guiCanvas)
+      this.mediator = new GameMediator(this, gameActions)
     }
 
     private canvasOnclick(event: MouseEvent, board: Board) {
@@ -55,7 +52,7 @@ export class GameCanvas extends Canvas {
       else {
         if(selectedCell){
           this.selectCellEvent(selectedCell, board)
-          this.mediator?.sendSelectionInfoToGuiCanvas(board)
+          this.mediator?.sendSelectionInfoToActionPanel(board)
         }
       }
 
@@ -64,20 +61,6 @@ export class GameCanvas extends Canvas {
 
       if(!this.interactable){
         this.redrawGame(board)
-        this.mediator?.clearGuiCanvas()
-      }
-
-    }
-
-    mouseEventFromGui(mousePos: Coordinates, board: Board){
-      if(this.interactable){
-        const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
-
-        if(board.selectedCell?.piece?.piece_type == PieceType.LASER)
-          this.unselectCellEvent(board)
-
-        else if(selectedCell)
-          this.selectableCellEvent(selectedCell, board)
       }
 
     }
@@ -86,24 +69,19 @@ export class GameCanvas extends Canvas {
       this.interactable = false
       if(board.selectedCell && selectedCell){
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
+        this.gameService.increaseAnimationEvents()
+        board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
+        this.gameService.setLocalGameState(board.serialize())
+        board.currentTurn++
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
-        .then(async () => {
-          this.gameService.increaseAnimationEvents()
-          board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
-          this.gameService.setLocalGameState(board.serialize())
-          board.currentTurn++
-          this.eventEmitter.invokeRefresh()
-        })
-        .finally(() => {
-          this.unselectCellEvent(board)
+        if(board.isMyTurn())
           this.interactable = true
-        })
+        this.unselectCellEvent(board)
       }
       else {
         this.unselectCellEvent(board)
         this.interactable = true
       }
-
     }
 
     private canvasHover(event: MouseEvent, board: Board) {
@@ -111,7 +89,7 @@ export class GameCanvas extends Canvas {
     }
 
     hoverEvent(mousePos: Coordinates, board: Board){
-      if(board.selectedCell && this.interactable){
+      if(board.selectedCell && this.interactable && this.mediator?.currentRotation == 0){
         const hoveredOver = board.getCellByCoordinates(mousePos.x, mousePos.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
@@ -137,6 +115,7 @@ export class GameCanvas extends Canvas {
         await this.animations.rotatePiece(this, board, selectedCell, degree, this.showAnimations, initialRotationDifference)
         this.interactable = true
       }
+
     }
 
     changeBlockSize(newSize: number, board: Board){
@@ -163,6 +142,8 @@ export class GameCanvas extends Canvas {
     }
 
     private unselectCellEvent(board: Board){
+      this.mediator?.disableGameActionsButtons()
+      this.mediator?.rotatePieceToInitPosition(board)
       board.unselectCell()
       this.drawings.drawGame(this, board.cells)
     }
