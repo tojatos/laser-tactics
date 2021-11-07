@@ -49,6 +49,15 @@ export class BoardComponent implements AfterViewInit {
     this.game.changeAnimationsShowOption(this.animation)
   }
 
+  buttonPressEvent(event: string){
+    switch(event){
+      case "left": break
+      case "right": break
+      case "laser": break
+      case "accept": break
+    }
+  }
+
   get currentSize() {
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }

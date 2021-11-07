@@ -13,9 +13,10 @@ import { Drawings } from './src/Display/Drawings';
 import { GameServiceInterceptor } from './services/game-service.interceptor';
 import { MaterialModule } from '../material/material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { BoardActionsComponent } from './components/board-actions/board-actions.component';
 
 @NgModule({
-  declarations: [GameComponent, BoardComponent, ChatComponent],
+  declarations: [GameComponent, BoardComponent, BoardActionsComponent, ChatComponent, BoardActionsComponent],
   imports: [
     CommonModule,
     HttpClientModule,

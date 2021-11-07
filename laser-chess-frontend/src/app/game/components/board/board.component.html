@@ -2,6 +2,9 @@
   <canvas #canvas class="gameCanvas"></canvas>
   <canvas #gui class="guiCanvas"></canvas>
 </div>
+<app-board-actions
+(buttonPressEmitter)="buttonPressEvent($event)"
+[containerHeight]="containerHeight" [containerWidth]="containerWidth" fxLayoutAlign="center"></app-board-actions>
 <!-- <button mat-raised-button (click)="changeAnimationShowOption()">Show animations</button> -->
 
 
