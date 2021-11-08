@@ -25,6 +25,7 @@ services:
       - SQLALCHEMY_DATABASE_URL=postgresql://postgres:admin@db:5432/laserchess
       - HOST=0.0.0.0
       - PORT=80
+      - ROOT_PATH=/laser-tactics-api
 
   db:
     image: postgres:13.0-alpine
