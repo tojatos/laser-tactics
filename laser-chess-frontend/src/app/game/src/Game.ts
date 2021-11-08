@@ -9,6 +9,7 @@ import { GameActions } from "./Display/Canvas/GameActions";
 import { GameCanvas } from "./Display/Canvas/GameCanvas";
 import { Drawings } from "./Display/Drawings";
 import { Resources } from "./Display/Resources";
+import { PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
 @Injectable()
@@ -61,6 +62,9 @@ export class Game{
       this.board.initBoard(gameState, displaySize)
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
+
+      if(this.board.playerNum == PlayerType.PLAYER_TWO)
+        this.flipBoard()
 
       if(animationsToShow > 0)
         await this.executePendingActions(receivedGameState, animationsToShow)
@@ -133,6 +137,11 @@ export class Game{
 
   closeWebsocketConnection(){
     this.gameService.closeConnection()
+  }
+
+  flipBoard(){
+    this.gameCanvas.isReversed = !this.gameCanvas.isReversed
+    this.gameCanvas.redrawGame(this.board)
   }
 
 }

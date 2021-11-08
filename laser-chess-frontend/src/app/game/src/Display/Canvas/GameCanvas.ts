@@ -31,7 +31,7 @@ export class GameCanvas extends Canvas {
     initCanvas(board: Board, gameActions: GameActions){
       this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
-      this.drawings.drawGame(this, board.cells)
+      this.drawings.drawGame(this, board.cells, this.isReversed)
       this.mediator = new GameMediator(this, gameActions)
     }
 
@@ -93,13 +93,13 @@ export class GameCanvas extends Canvas {
         const hoveredOver = board.getCellByCoordinates(mousePos.x, mousePos.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
-            this.drawings.drawSingleCell(this, hoveredOver)
-            this.drawings.highlightCell(this, hoveredOver)
+            this.drawings.drawSingleCell(this, hoveredOver, this.isReversed)
+            this.drawings.highlightCell(this, hoveredOver, this.isReversed)
           }
           else {
             if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
-              this.drawings.drawSingleCell(this, this.hoveredCell)
-              this.drawings.showPossibleMove(this, this.hoveredCell)
+              this.drawings.drawSingleCell(this, this.hoveredCell, this.isReversed)
+              this.drawings.showPossibleMove(this, this.hoveredCell, this.isReversed)
             }
           }
           this.hoveredCell = hoveredOver
@@ -112,7 +112,7 @@ export class GameCanvas extends Canvas {
 
       if(selectedCell){
         this.interactable = false
-        await this.animations.rotatePiece(this, board, selectedCell, degree, this.showAnimations, initialRotationDifference)
+        await this.animations.rotatePiece(this, board, selectedCell, degree, this.isReversed, this.showAnimations, initialRotationDifference)
         this.interactable = true
       }
 
@@ -122,34 +122,34 @@ export class GameCanvas extends Canvas {
       this.blockSize = newSize
       this.ctx.canvas.width = COLS * this.blockSize
       this.ctx.canvas.height = ROWS * this.blockSize
-      this.drawings.drawGame(this, board.cells)
+      this.drawings.drawGame(this, board.cells, this.isReversed)
     }
 
     redrawGame(board: Board){
-      this.drawings.drawGame(this, board.cells)
+      this.drawings.drawGame(this, board.cells, this.isReversed)
       this.interactable = true
     }
 
     private selectCellEvent(selectedCell: Cell, board: Board){
       board.selectCell(selectedCell)
-      this.drawings.highlightCell(this, selectedCell)
-      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c))
+      this.drawings.highlightCell(this, selectedCell, this.isReversed)
+      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.isReversed))
     }
 
     highlightPossibleMoves(board: Board){
       if(board.selectedCell)
-        board.selectedCell.piece?.getPossibleMoves(board, board.selectedCell).forEach(c => this.drawings.showPossibleMove(this, c))
+        board.selectedCell.piece?.getPossibleMoves(board, board.selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.isReversed))
     }
 
     private unselectCellEvent(board: Board){
       this.mediator?.disableGameActionsButtons()
       this.mediator?.rotatePieceToInitPosition(board)
       board.unselectCell()
-      this.drawings.drawGame(this, board.cells)
+      this.drawings.drawGame(this, board.cells, this.isReversed)
     }
 
     private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean): Promise<void>{
-      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, showAnimations)
+      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, this.isReversed, showAnimations)
     }
 
 }

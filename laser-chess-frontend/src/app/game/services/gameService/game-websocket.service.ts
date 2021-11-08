@@ -20,7 +20,7 @@ type websocketRequest = {
 })
 export class GameWebsocketService extends AbstractGameService {
 
-  constructor(private authService: AuthService, private _snackBar: MatSnackBar, private http: HttpClient, private eventEmitter: EventEmitterService){
+  constructor(private authService: AuthService, private _snackBar: MatSnackBar, private eventEmitter: EventEmitterService){
     super()
   }
 

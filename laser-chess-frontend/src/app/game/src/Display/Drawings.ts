@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core"
 import { Coordinates } from "../../game.models"
 import { Cell } from "../cell"
-import { PIECE_SIZE_SCALE } from "../constants"
+import { COLS, PIECE_SIZE_SCALE, ROWS } from "../constants"
 import { Piece } from "../piece"
 import { Canvas } from "./Canvas/AbstractCanvas"
 
@@ -11,9 +11,9 @@ export class Drawings {
     highlightColor: string = "yellow"
     laserThickness = 5
 
-    drawGame(canvas: Canvas, cells: Cell[]){
+    drawGame(canvas: Canvas, cells: Cell[], isReversed: boolean){
         this.clearBoard(canvas)
-        cells.forEach(c => { if(c.piece) this.drawPiece(canvas, c.piece) })
+        cells.forEach(c => { if(c.piece) this.drawPiece(canvas, c.piece, isReversed) })
     }
 
     clearBoard(canvas: Canvas){
@@ -23,20 +23,23 @@ export class Drawings {
         canvas.ctx.restore()
     }
 
-    drawPiece(canvas: Canvas, piece: Piece){
+    drawPiece(canvas: Canvas, piece: Piece, isReverse: boolean){
       canvas.ctx.save()
-      canvas.ctx.translate(piece.currentCoordinates.x, piece.currentCoordinates.y)
-      canvas.ctx.rotate(piece.rotation_degree / 180 * Math.PI)
+      const position = isReverse ? this.flipPosition(piece.currentCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : piece.currentCoordinates
+      const rotation = isReverse ? (piece.rotation_degree + 180) % 360 : piece.rotation_degree
+      canvas.ctx.translate(position.x, position.y)
+      canvas.ctx.rotate(rotation / 180 * Math.PI)
       canvas.ctx.drawImage(canvas.resources.getPieceFromMap(piece), this.pieceDrawingOriginCoordinates(canvas.blockSize).x, this.pieceDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize * PIECE_SIZE_SCALE, canvas.blockSize * PIECE_SIZE_SCALE)
       canvas.ctx.restore()
     }
 
 
-    highlightCell(canvas: Canvas, cell: Cell | undefined, piece: Piece | undefined = undefined, color: string = this.highlightColor){
+    highlightCell(canvas: Canvas, cell: Cell | undefined, isReverse: boolean, piece: Piece | undefined = undefined, color: string = this.highlightColor){
         if(cell) {
           canvas.ctx.save()
           canvas.ctx.globalAlpha = 0.5;
-          canvas.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
+          const cellCoor = isReverse ? this.flipPosition(cell.canvasCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : cell.canvasCoordinates
+          canvas.ctx.translate(cellCoor.x, cellCoor.y)
           canvas.ctx.beginPath()
           canvas.ctx.rect(this.cellDrawingOriginCoordinates(canvas.blockSize).x, this.cellDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize, canvas.blockSize)
           canvas.ctx.fillStyle = color
@@ -44,28 +47,30 @@ export class Drawings {
           canvas.ctx.restore()
           const pieceToDraw = piece || cell.piece
             if(pieceToDraw)
-              this.drawPiece(canvas, pieceToDraw)
+              this.drawPiece(canvas, pieceToDraw, isReverse)
         }
     }
 
-    drawSingleCell(canvas: Canvas, cell: Cell){
-      this.clearSingleCell(canvas, cell)
+    drawSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean){
+      this.clearSingleCell(canvas, cell, isReverse)
       if(cell.piece)
-        this.drawPiece(canvas, cell.piece)
+        this.drawPiece(canvas, cell.piece, isReverse)
     }
 
-    clearSingleCell(canvas: Canvas, cell: Cell){
+    clearSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean){
       canvas.ctx.save()
-      canvas.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
+      const cellCoor = isReverse ? this.flipPosition(cell.canvasCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : cell.canvasCoordinates
+      canvas.ctx.translate(cellCoor.x, cellCoor.y)
       canvas.ctx.clearRect(this.cellDrawingOriginCoordinates(canvas.blockSize).x, this.cellDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize, canvas.blockSize);
       canvas.ctx.restore()
     }
 
-    showPossibleMove(canvas: Canvas, cell: Cell | undefined, color: string = this.highlightColor){
+    showPossibleMove(canvas: Canvas, cell: Cell | undefined, isReverse: boolean, color: string = this.highlightColor){
       if(cell) {
           canvas.ctx.save()
           canvas.ctx.globalAlpha = 0.5;
-          canvas.ctx.translate(cell.canvasCoordinates.x, cell.canvasCoordinates.y)
+          const cellCoor = isReverse ? this.flipPosition(cell.canvasCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : cell.canvasCoordinates
+          canvas.ctx.translate(cellCoor.x, cellCoor.y)
           canvas.ctx.beginPath()
           canvas.ctx.arc(0, 0, canvas.blockSize / 10, 0, 2 * Math.PI, false);
           canvas.ctx.fillStyle = color
@@ -74,7 +79,9 @@ export class Drawings {
       }
     }
 
-    drawLaserLine(canvas: Canvas, from: Coordinates, to: Coordinates){
+    drawLaserLine(canvas: Canvas, from: Coordinates, to: Coordinates, isReverse: boolean){
+      from = isReverse ? this.flipPosition(from, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : from
+      to = isReverse ? this.flipPosition(to, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : to
       canvas.ctx.save()
       canvas.ctx.lineWidth = this.laserThickness
       canvas.ctx.beginPath()
@@ -84,8 +91,9 @@ export class Drawings {
       canvas.ctx.stroke()
     }
 
-    drawLaserCorner(canvas: Canvas, at: Coordinates){
+    drawLaserCorner(canvas: Canvas, at: Coordinates, isReverse: boolean){
       canvas.ctx.save()
+      at = isReverse ? this.flipPosition(at, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : at
       canvas.ctx.translate(at.x, at.y)
       canvas.ctx.fillStyle = "red";
       canvas.ctx.fillRect(-this.laserThickness / 2, -this.laserThickness / 2, this.laserThickness, this.laserThickness)
@@ -98,6 +106,10 @@ export class Drawings {
 
     pieceDrawingOriginCoordinates(blockSize: number): Coordinates {
         return {x: - blockSize * PIECE_SIZE_SCALE / 2, y: - blockSize * PIECE_SIZE_SCALE / 2}
+    }
+
+    flipPosition(coor: Coordinates, maxX: number, maxY: number){
+      return {x: maxX - coor.x, y: maxY - coor.y }
     }
 
 }

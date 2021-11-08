@@ -35,7 +35,7 @@ export class EventsExecutor{
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
           this.gameService.setLocalGameState(board.serialize())
-          this.drawings.drawGame(canvas, board.cells)
+          this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
         }
       }
       this.eventsQueue = []
@@ -59,9 +59,9 @@ export class EventsExecutor{
         return new Promise<void>(async resolve => {
           for (const path of allPaths)
             await Promise.all([
-              this.animations.laserAnimation(canvas, board, path.map(p => [p.from, p.to]), showAnimations),
+              this.animations.laserAnimation(canvas, board, path.map(p => [p.from, p.to]), canvas.isReversed, showAnimations),
               ...allDestroyedPieceEventsAfterLastLaserShot.filter(e => e.event_type == GameEvents.PIECE_DESTROYED_EVENT && e.laser_destroy_time == path[0].time)
-              .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, showAnimations)) // clears field as well so laser is cut.
+              .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, canvas.isReversed, showAnimations)) // clears field as well so laser is cut.
             ]
             )
         //if(showAnimations)
@@ -77,9 +77,9 @@ export class EventsExecutor{
       switch(gameEvent.event_type){
         case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(canvas, board,
           board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y),
-          gameEvent.rotation > 180 ? gameEvent.rotation - 360 : gameEvent.rotation, showAnimations)
-        case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(canvas, board, gameEvent.moved_from, gameEvent.moved_to, showAnimations)
-        case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(canvas, board, gameEvent.teleported_from, gameEvent.teleported_to, showAnimations)
+          gameEvent.rotation > 180 ? gameEvent.rotation - 360 : gameEvent.rotation, canvas.isReversed, showAnimations)
+        case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(canvas, board, gameEvent.moved_from, gameEvent.moved_to, canvas.isReversed, showAnimations)
+        case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(canvas, board, gameEvent.teleported_from, gameEvent.teleported_to, canvas.isReversed, showAnimations)
         case GameEvents.LASER_SHOT_EVENT : return this.executeLaserAnimations(canvas, board, gameEvent.laser_path, showAnimations)
         default: return undefined
       }
