@@ -3,7 +3,7 @@ from starlette.websockets import WebSocket
 
 from app.game_engine.models import *
 from app.game_engine.requests import *
-from app.main import app, get_db, API_PREFIX
+from app.main import app, get_db, API_PREFIX, manager
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
 
@@ -33,7 +33,7 @@ def before_all():
     tu = TUtils(client, API_PREFIX)
 
     create_user_datas = list(
-        map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 2)))
+        map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 3)))
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
     tu.post_data(
         "/start_game",
@@ -73,6 +73,12 @@ def receive_ws_response(ws: WebSocket):
 
 def auth(ws: WebSocket, token_num: int):
     request = WebsocketRequest(GameApiRequestPath.WebsocketAuth, WebsocketAuthRequest(tokens[token_num]))
+    send_dataclass(ws, request)
+    return receive_ws_response(ws)
+
+
+def observe(ws: WebSocket, game_id: str):
+    request = WebsocketRequest(GameApiRequestPath.WebsocketObserve, WebsocketObserveRequest(game_id))
     send_dataclass(ws, request)
     return receive_ws_response(ws)
 
@@ -271,3 +277,59 @@ def test_play_the_game(ws):
     assert game_state.turn_number is 3
     assert game_state.board.cells[(0, 1)] is None
     assert game_state.board.cells[(0, 2)] is not None
+
+
+def test_websocket_notify(client):
+    with client.websocket_connect("/ws") as ws0, \
+            client.websocket_connect("/ws") as ws1, \
+            client.websocket_connect("/ws") as ws2, \
+            client.websocket_connect("/ws") as ws3:
+        ws0: WebSocket
+        ws1: WebSocket
+        ws2: WebSocket
+        ws3: WebSocket
+        assert auth(ws1, 1).status_code == 200
+        assert auth(ws2, 2).status_code == 200
+
+        assert observe(ws1, game_id).status_code == 200
+        assert observe(ws2, game_id).status_code == 200
+        assert observe(ws3, game_id).status_code == 200
+
+        assert shoot_laser(ws0, 0).status_code == 200
+
+        game_state_dict = ws1.receive_json()
+        game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+        game_state = game_state_serializable.to_normal()
+        assert game_state.turn_number == 2
+
+        game_state_dict = ws2.receive_json()
+        game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+        game_state = game_state_serializable.to_normal()
+        assert game_state.turn_number == 2
+
+        game_state_dict = ws3.receive_json()
+        game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+        game_state = game_state_serializable.to_normal()
+        assert game_state.turn_number == 2
+
+        assert len(manager.game_observers[game_id]) == 3
+
+        ws2.close()
+
+        assert rotate_piece(ws0, 0, (0, 0), 90).status_code == 200
+
+        # check after last request to give manager some time to cleanup disconnected observer
+        assert len(manager.game_observers[game_id]) == 2
+
+        game_state_dict = ws1.receive_json()
+        game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+        game_state = game_state_serializable.to_normal()
+        assert game_state.turn_number == 3
+
+        game_state_dict = ws3.receive_json()
+        game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+        game_state = game_state_serializable.to_normal()
+        assert game_state.turn_number == 3
+
+
+
