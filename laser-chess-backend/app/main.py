@@ -34,15 +34,16 @@ def get_env(key, fallback):
 SECRET_KEY = get_env('SECRET_KEY', "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
 ALGORITHM = get_env('ALGORITHM', "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 10080)
+ROOT_PATH = get_env('ROOT_PATH', "/")
 API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
 PORT = get_env('PORT', 8000)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{API_PREFIX}/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{ROOT_PATH}{API_PREFIX}/token")
 
-app = FastAPI(openapi_url=f"{API_PREFIX}/openapi.json")
+app = FastAPI(root_path=ROOT_PATH, openapi_url=f"{API_PREFIX}/openapi.json")
 
 origins = [
     "http://localhost",
