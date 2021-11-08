@@ -65,12 +65,10 @@ export class Board implements BoardInterface {
 
   rotatePiece(at: Coordinates, angle: number){
     const cell = this.getCellByCoordinates(at.x, at.y)
-    console.log(cell?.piece?.rotation_degree)
     if(cell?.piece){
       const newDegree = (cell.piece.rotation_degree + angle) % 360
       cell.piece.rotation_degree = newDegree
     }
-    console.log(cell?.piece?.rotation_degree)
   }
 
 
@@ -97,6 +95,18 @@ export class Board implements BoardInterface {
       case GameEvents.TELEPORT_EVENT : this.movePiece(gameEvent.teleported_from, gameEvent.teleported_to); break
       case GameEvents.PIECE_DESTROYED_EVENT : this.removePiece(gameEvent.destroyed_on); break
     }
+  }
+
+  get playerNum(){
+    const player = this.authService.getCurrentJwtInfo()?.sub
+
+    if(player == this.playerOne)
+      return PlayerType.PLAYER_ONE
+
+    else if(player == this.playerTwo)
+      return PlayerType.PLAYER_TWO
+
+    return PlayerType.NONE
   }
 
   isMyTurn() {

@@ -13,7 +13,7 @@ export class Animations {
 
     constructor(private drawings: Drawings){}
 
-    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates, showAnimations: boolean): Promise<void>{
+    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates, isReverse: boolean, showAnimations: boolean): Promise<void>{
 
         const origin = board.getCellByCoordinates(originCoordinates.x, originCoordinates.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
@@ -40,16 +40,16 @@ export class Animations {
           validCellsArray = this.cellsExcludingPieces(board, [origin, destination])
 
         const intervalAction = () => {
-          this.drawings.drawGame(canvas, validCellsArray)
+          this.drawings.drawGame(canvas, validCellsArray, isReverse)
           this.changePosition(piece, originCoordinates, destinationCoordinates, redrawDistance, fun)
-          this.drawings.drawPiece(canvas, piece)
+          this.drawings.drawPiece(canvas, piece, isReverse)
         }
 
         const lastAction = () => {
-          this.drawings.drawGame(canvas, validCellsArray)
+          this.drawings.drawGame(canvas, validCellsArray, isReverse)
           piece.currentCoordinates = destination.canvasCoordinates
           if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
-            this.drawings.drawPiece(canvas, piece)
+            this.drawings.drawPiece(canvas, piece, isReverse)
         }
 
         if(!showAnimations)
@@ -73,7 +73,7 @@ export class Animations {
 
     }
 
-    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, showAnimations: boolean, initialRotationDifference: number = 0): Promise<void>{
+    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, isReverse: boolean, showAnimations: boolean, initialRotationDifference: number = 0): Promise<void>{
       const piece = cloneDeep(atCell?.piece)
 
       if(!piece || !atCell)
@@ -86,18 +86,18 @@ export class Animations {
       const desiredPiecePosition = piece.rotation_degree + byDegrees
 
       const intervalAction = () => {
-        this.drawings.drawGame(canvas, validCellsArray)
+        this.drawings.drawGame(canvas, validCellsArray, isReverse)
         piece.rotation_degree += degreesPerFrame
-        this.drawings.highlightCell(canvas, atCell, piece)
-        this.drawings.drawPiece(canvas, piece)
+        this.drawings.highlightCell(canvas, atCell, isReverse, piece)
+        this.drawings.drawPiece(canvas, piece, isReverse)
       }
 
       const lastAction = () => {
         if(piece.rotation_degree < 0)
           piece.rotation_degree = 360 + piece.rotation_degree
         piece.rotation_degree = desiredPiecePosition % 360
-        this.drawings.drawGame(canvas, validCellsArray)
-        this.drawings.highlightCell(canvas, atCell, piece)
+        this.drawings.drawGame(canvas, validCellsArray, isReverse)
+        this.drawings.highlightCell(canvas, atCell, isReverse, piece)
       }
 
       if(!showAnimations)
@@ -133,7 +133,7 @@ export class Animations {
 
   }
 
-    async laserAnimation(canvas: Canvas, board: Board, positions: [Coordinates, Coordinates][], showAnimations: boolean): Promise<void> {
+    async laserAnimation(canvas: Canvas, board: Board, positions: [Coordinates, Coordinates][], isReverse: boolean, showAnimations: boolean): Promise<void> {
       const laserIncrementPerFrame = 10
       let laserIncrement = laserIncrementPerFrame
 
@@ -144,8 +144,8 @@ export class Animations {
             const toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, position[1].x)), Math.min(8, Math.max(0, position[1].y)))
 
             if(fromCell && toCell){
-              this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell.canvasCoordinates)
-              this.drawings.drawLaserCorner(canvas, toCell.canvasCoordinates)
+              this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell.canvasCoordinates, isReverse)
+              this.drawings.drawLaserCorner(canvas, toCell.canvasCoordinates, isReverse)
             }
 
           }
@@ -172,7 +172,7 @@ export class Animations {
                 else if(position[1].y < 0)
                   finalDest = {x: toCell.canvasCoordinates.x, y: toCell.canvasCoordinates.y + canvas.blockSize}
 
-                this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, this.laserAnimationStep(fromCell.canvasCoordinates, finalDest, laserIncrement))
+                this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, this.laserAnimationStep(fromCell.canvasCoordinates, finalDest, laserIncrement), isReverse)
               }
             }
             laserIncrement += laserIncrementPerFrame
@@ -188,11 +188,11 @@ export class Animations {
         })
       }
 
-    async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, showAnimations: boolean){
+    async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, isReverse: boolean, showAnimations: boolean){
       return new Promise<void>((resolve) => {
         const pieceToDestroy = board.getCellByCoordinates(at.x, at.y)
         if(pieceToDestroy){
-          this.drawings.clearSingleCell(canvas, pieceToDestroy)
+          this.drawings.clearSingleCell(canvas, pieceToDestroy, isReverse)
           resolve()
         }
         else
