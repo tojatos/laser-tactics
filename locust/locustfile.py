@@ -26,6 +26,7 @@ for line in USER_CREDENTIALS:
 """
 
 
+# this one is kinda useless
 class RegisterWithUniqueUsersSteps(TaskSet):
 
     def on_start(self):
@@ -128,14 +129,11 @@ class LoginWithUniqueUsersSteps(TaskSet):
                 response.failure("Response did not contain expected key 'access_token'")
 
 
-"""
 class LoginWithUniqueUsersTest(HttpUser):
     wait_time = between(1, 5)
     tasks = {LoginWithUniqueUsersSteps: 5}
     host = "http://localhost/api/v1"
     sock = None
-
-"""
 
 
 class FriendsTest(HttpUser):
@@ -151,7 +149,7 @@ class RegisterWithUniqueUsersTest(HttpUser):
     tasks = {RegisterWithUniqueUsersSteps: 5}
     host = "http://localhost/api/v1"
     sock = None
-
+"""
 
 
 class LaserTacticsGuestUser(HttpUser):
@@ -162,4 +160,4 @@ class LaserTacticsGuestUser(HttpUser):
     @task
     def lobby(self):
         self.client.get("/lobby?skip=0&limit=100")
-"""
+
