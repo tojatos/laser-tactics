@@ -69,3 +69,4 @@ class WebsocketRequest:
 @dataclass
 class WebsocketResponse:
     status_code: int
+    body: str = ""

@@ -259,6 +259,7 @@ def test_draw(ws):
 
     response = rotate_piece(ws, 1, p2_laser_coordinates, 270)
     assert response.status_code == 403
+    assert response.body == "Unable to rotate. The game is over."
 
 
 def test_play_the_game(ws):
