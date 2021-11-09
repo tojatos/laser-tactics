@@ -13,7 +13,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
-from app.core import schemas
+from app.user import schemas
 from app.core import crud, models
 from app.core.database import SessionLocal, engine
 from app.game_engine import game_service

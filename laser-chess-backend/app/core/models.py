@@ -1,8 +1,8 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, PrimaryKeyConstraint, Enum
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum
 from sqlalchemy.orm import relationship
 
 from .database import Base
-from .schemas import FriendRequestStatus
+from app.user.schemas import FriendRequestStatus
 
 
 class User(Base):
