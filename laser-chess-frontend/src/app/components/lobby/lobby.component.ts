@@ -43,8 +43,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   startGame() {
-    if (this.lobby) {
-      this.lobbyService.startGame(this.lobby.game_id, this.lobby.player_one_username, this.lobby.player_two_username)
+    if (this.lobby &&  this.player_one && this.player_two) {
+      this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two)
       this.router.navigate(['/game', this.lobby.game_id])
     }
 

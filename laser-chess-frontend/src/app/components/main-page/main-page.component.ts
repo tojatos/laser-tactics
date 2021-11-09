@@ -45,4 +45,10 @@ export class MainPageComponent implements OnInit {
     this.router.navigate(['/lobby', lobby.id])
   }
 
+  async refreshList(){
+    this.fetched = false
+    this.dataSource.data = await this.lobbyService.getLobbies()
+    this.fetched = true
+  }
+
 }
