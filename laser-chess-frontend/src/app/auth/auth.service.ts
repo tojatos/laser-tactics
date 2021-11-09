@@ -31,7 +31,7 @@ export class AuthService {
   }
 
   register(login:string, email:string, pass:string){
-    return this.http.post<any>('/api/v1/users/', {'username': login, 'email': email, 'password': pass}).toPromise();
+    return this.http.post<any>(usersFullEndpoint, {'username': login, 'email': email, 'password': pass}).toPromise();
   }
 
 private setSession(authResult: UserToken) {
