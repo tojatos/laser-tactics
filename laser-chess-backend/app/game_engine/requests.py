@@ -13,11 +13,17 @@ class GameApiRequestPath(str, Enum):
     MovePiece = "/move_piece"
     RotatePiece = "/rotate_piece"
     WebsocketAuth = "/ws_auth"
+    WebsocketObserve = "/ws_observe"
 
 
 @dataclass
 class WebsocketAuthRequest:
     token: str
+
+
+@dataclass
+class WebsocketObserveRequest:
+    game_id: str
 
 
 @dataclass
@@ -51,7 +57,7 @@ class RotatePieceRequest:
     angle: int
 
 
-GameApiRequest = Union[GetGameStateRequest, StartGameRequest, ShootLaserRequest, MovePieceRequest, RotatePieceRequest, WebsocketAuthRequest]
+GameApiRequest = Union[GetGameStateRequest, StartGameRequest, ShootLaserRequest, MovePieceRequest, RotatePieceRequest, WebsocketAuthRequest, WebsocketObserveRequest]
 
 
 @dataclass

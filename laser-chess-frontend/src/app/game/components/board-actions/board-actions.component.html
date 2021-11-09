@@ -1,0 +1,25 @@
+<button mat-raised-button
+[disabled]="!rotationPossible"
+(click)="sendButtonPressInfo('left')"
+[style.height.px]="height" [style.width.px]="width">
+  <mat-icon [style.font-size.px]="height">arrow_back</mat-icon>
+</button>
+<button mat-raised-button
+[disabled]="!laserPossible"
+(click)="sendButtonPressInfo('laser')"
+[style.height.px]="height" [style.width.px]="width">
+  <mat-icon [style.font-size.px]="height">light_mode</mat-icon>
+</button>
+<button mat-raised-button
+[disabled]="!acceptPossible"
+(click)="sendButtonPressInfo('accept')"
+[style.height.px]="height"
+[style.width.px]="width">
+  <mat-icon [style.font-size.px]="height">done</mat-icon>
+</button>
+<button mat-raised-button
+[disabled]="!rotationPossible"
+(click)="sendButtonPressInfo('right')"
+[style.height.px]="height" [style.width.px]="width">
+  <mat-icon [style.font-size.px]="height">arrow_forward</mat-icon>
+</button>

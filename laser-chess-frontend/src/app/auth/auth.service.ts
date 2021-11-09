@@ -4,8 +4,8 @@ import { tokenPayload, UserToken } from '../app.models';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { FormControl } from '@angular/forms';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { tokenFullEndpoint, usersFullEndpoint } from '../api-definitions';
 // import * as moment from "moment"
 
 @Injectable({
@@ -27,7 +27,7 @@ export class AuthService {
     body.set('username', login)
     body.set('password', pass)
 
-    return this.http.post<UserToken>('/api/v1/token', body.toString(), options).toPromise().then(res => this.setSession(res))
+    return this.http.post<UserToken>(tokenFullEndpoint, body.toString(), options).toPromise().then(res => this.setSession(res))
   }
 
   register(login:string, email:string, pass:string){
@@ -42,8 +42,11 @@ private setSession(authResult: UserToken) {
 }
 
 parseJWT(jwt: string | undefined){
-  console.log(jwt)
   return this.jwtHelper.decodeToken<tokenPayload>(jwt)
+}
+
+get jwt() {
+  return localStorage.getItem('access_token')
 }
 
 getCurrentJwtInfo(){
