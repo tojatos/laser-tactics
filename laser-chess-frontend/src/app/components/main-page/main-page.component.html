@@ -1,4 +1,4 @@
-<div *ngIf="fetched" class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+<div *ngIf="fetched" class="main-wrapper" fxLayout="column" fxLayoutAlign="center center">
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
     <ng-container matColumnDef="player_one_username">
@@ -22,7 +22,9 @@
     </ng-container>
   
      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-   </table>
+    <tr mat-row (click)="joinLobby(row)"
+      *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <button mat-stroked-button color="accent" (click)="refreshList()">Refresh</button>
   
 </div>
