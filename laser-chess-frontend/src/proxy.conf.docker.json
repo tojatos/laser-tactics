@@ -1,7 +1,0 @@
-{
-  "/api/v1/*": {
-      "target": "http://krzysztofruczkowski.pl/laser-tactics/",
-      "secure": false,
-      "changeOrigin": true
-      }
-}
