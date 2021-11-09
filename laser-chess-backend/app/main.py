@@ -440,11 +440,15 @@ async def websocket_endpoint(websocket: WebSocket,
             elif websocket_request.request_path is GameApiRequestPath.GetGameState:
                 game_state = game_service.get_game_state(websocket_request.request, db)
                 await websocket.send_json(dataclasses.asdict(game_state))
-            elif websocket_request.request_path in [GameApiRequestPath.ShootLaser, GameApiRequestPath.MovePiece, GameApiRequestPath.RotatePiece]:
+            elif websocket_request.request_path in AuthenticatedGameApiRequestPaths:
                 if current_user is None:
                     await send_websocket_response(401, "You are not authenticated.")
                 else:
                     try:
+                        if websocket_request.request_path is GameApiRequestPath.GiveUp:
+                            game_service.give_up(current_user.username, websocket_request.request, db)
+                        if websocket_request.request_path is GameApiRequestPath.OfferDraw:
+                            game_service.offer_draw(current_user.username, websocket_request.request, db)
                         if websocket_request.request_path is GameApiRequestPath.ShootLaser:
                             game_service.shoot_laser(current_user.username, websocket_request.request, db)
                         if websocket_request.request_path is GameApiRequestPath.MovePiece:
