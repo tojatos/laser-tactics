@@ -86,6 +86,20 @@ def observe(ws: WebSocket, game_id: str):
     return receive_ws_response(ws)
 
 
+def give_up(ws: WebSocket, token_num: int):
+    auth(ws, token_num)
+    request = WebsocketRequest(GameApiRequestPath.GiveUp, GiveUpRequest(game_id))
+    send_dataclass(ws, request)
+    return receive_ws_response(ws)
+
+
+def offer_draw(ws: WebSocket, token_num: int):
+    auth(ws, token_num)
+    request = WebsocketRequest(GameApiRequestPath.OfferDraw, OfferDrawRequest(game_id))
+    send_dataclass(ws, request)
+    return receive_ws_response(ws)
+
+
 def shoot_laser(ws: WebSocket, token_num: int):
     auth(ws, token_num)
     request = WebsocketRequest(GameApiRequestPath.ShootLaser, shoot_laser_request)
@@ -283,6 +297,56 @@ def test_play_the_game(ws):
     assert game_state.board.cells[(0, 2)] is not None
 
 
+def test_give_up_p1(ws):
+    assert give_up(ws, 0).status_code == 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
+
+
+def test_give_up_p2(ws):
+    assert give_up(ws, 1).status_code == 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_ONE_VICTORY
+
+
+def test_offer_draw_accepted(ws):
+    assert offer_draw(ws, 0).status_code == 200
+    assert offer_draw(ws, 1).status_code == 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.DRAW
+
+
+def test_disallow_immediate_multiple_draw_offers(ws):
+    assert offer_draw(ws, 0).status_code == 200
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 0, (0, 0), 90)
+    assert offer_draw(ws, 0).status_code == 403
+    rotate_piece(ws, 1, (8, 8), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    assert offer_draw(ws, 1).status_code == 200
+    assert offer_draw(ws, 0).status_code == 200
+    assert rotate_piece(ws, 0, (0, 0), 90).status_code == 403
+
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.DRAW
+
+
+def offer_draw_ignored(ws):
+    offer_draw(ws, 0)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    offer_draw(ws, 1)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.STARTED
+
+
 def test_websocket_notify(client):
     with client.websocket_connect("/ws") as ws0, \
             client.websocket_connect("/ws") as ws1, \
@@ -334,6 +398,3 @@ def test_websocket_notify(client):
         game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
         game_state = game_state_serializable.to_normal()
         assert game_state.turn_number == 3
-
-
-

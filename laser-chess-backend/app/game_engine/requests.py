@@ -12,6 +12,8 @@ class GameApiRequestPath(str, Enum):
     ShootLaser = "/shoot_laser"
     MovePiece = "/move_piece"
     RotatePiece = "/rotate_piece"
+    GiveUp = "/give_up"
+    OfferDraw = "/offer_draw"
     WebsocketAuth = "/ws_auth"
     WebsocketObserve = "/ws_observe"
 
@@ -57,7 +59,27 @@ class RotatePieceRequest:
     angle: int
 
 
-GameApiRequest = Union[GetGameStateRequest, StartGameRequest, ShootLaserRequest, MovePieceRequest, RotatePieceRequest, WebsocketAuthRequest, WebsocketObserveRequest]
+@dataclass
+class GiveUpRequest:
+    game_id: str
+
+
+@dataclass
+class OfferDrawRequest:
+    game_id: str
+
+
+AuthenticatedGameApiRequestPaths = {
+    GameApiRequestPath.StartGame,
+    GameApiRequestPath.ShootLaser,
+    GameApiRequestPath.MovePiece,
+    GameApiRequestPath.RotatePiece,
+    GameApiRequestPath.GiveUp,
+    GameApiRequestPath.OfferDraw,
+}
+
+GameApiRequest = Union[GetGameStateRequest, StartGameRequest, ShootLaserRequest, MovePieceRequest, RotatePieceRequest,
+                       GiveUpRequest, OfferDrawRequest, WebsocketAuthRequest, WebsocketObserveRequest]
 
 
 @dataclass
