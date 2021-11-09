@@ -15,6 +15,7 @@ with open('testdata.csv', 'r+') as f_uc:
 with open('usernames.csv', 'r+') as f_u:
     reader = csv.reader(f_u)
     USERNAMES = list(reader)
+
 """
 # For now this makes sure users are in database, run it if they aren't
 for line in USER_CREDENTIALS:
@@ -22,7 +23,7 @@ for line in USER_CREDENTIALS:
     requests.post("http://localhost/api/v1/users/", json={
         "username": username, "email": email, "password": password
     })
-    """
+"""
 
 
 class RegisterWithUniqueUsersSteps(TaskSet):
@@ -54,13 +55,13 @@ class FriendsModule(TaskSet):
                                         }) as response:
                 self.token = response.json()['access_token']
 
-    @task
+    @task(10)
     def get_friends(self):
         self.client.get(
             "/users/me/friends",
             headers={"authorization": "Bearer " + self.token})
 
-    @task
+    @task(10)
     def send_random_friend_request(self):
         username = choice(USERNAMES)
         with self.client.post(
@@ -69,7 +70,7 @@ class FriendsModule(TaskSet):
                 params={'friend_username': username}) as response:
             logging.info(response)
 
-    @task
+    @task(3)
     def accept_random_request(self):
         with self.client.get(
                 "/users/me/friends/requests",
@@ -80,13 +81,11 @@ class FriendsModule(TaskSet):
             if len(f_requests) > 0:
                 req = choice(f_requests)
                 with self.client.post(
-                        "/users/me/friends/requests/accept",
-                        headers={"authorization": "Bearer " + self.token},
-                        # why that gives unprocessable entity?
-                        params={'request_id ': req['id']}) as response1:
+                        f"/users/me/friends/requests/accept?request_id={req['id']}",
+                        headers={"authorization": "Bearer " + self.token}) as response1:
                     logging.info(response1.json())
 
-    @task
+    @task(4)
     def decline_random_request(self):
         with self.client.get(
                 "/users/me/friends/requests",
@@ -97,11 +96,13 @@ class FriendsModule(TaskSet):
             if len(f_requests) > 0:
                 req = choice(f_requests)
                 with self.client.post(
-                        "/users/me/friends/requests/decline",
-                        headers={"authorization": "Bearer " + self.token},
-                        # ??
-                        params={'request_id ': req['id']}) as response1:
+                        f"/users/me/friends/requests/decline?request_id={req['id']}",
+                        headers={"authorization": "Bearer " + self.token}) as response1:
                     logging.info(response1.json())
+
+    @task(1)
+    def stop(self):
+        self.interrupt()
 
 
 class LoginWithUniqueUsersSteps(TaskSet):
