@@ -9,9 +9,6 @@ services:
       - 2346:80
     depends_on:
       - fastapi
-    #command: >
-      #ng serve --host 0.0.0.0 --port 8080 --proxy-config ./src/proxy.conf.docker.json --base-href="/laser-tactics/" --disable-host-check
-
 
   fastapi:
     build: ./laser-chess-backend
