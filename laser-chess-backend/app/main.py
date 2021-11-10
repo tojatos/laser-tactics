@@ -315,7 +315,7 @@ async def send_friend_request(friend_username: str, current_user: schemas.User =
     friends = crud.get_users_friends(current_user, db)
     if friend_username in friends:
         raise HTTPException(status_code=403, detail="User already in friends")
-    pending = filter(lambda d: d["user_one_username"], crud.get_users_pending_friend_requests(user=current_user, db=db))
+    pending = filter(lambda d: d.user_one_username, crud.get_users_pending_friend_requests(user=current_user, db=db))
     if current_user.username in pending:
         raise HTTPException(status_code=403, detail="There already is pending friend request for that user")
     blocked = crud.get_blocked_users(user=friend_to_be, db=db)
