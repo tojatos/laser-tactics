@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent, HttpHandler, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tokenPayload, UserToken } from '../app.models';
 import { JwtHelperService } from '@auth0/angular-jwt';
@@ -17,6 +17,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {}
 
+
   async login(login:string, pass:string): Promise<UserToken> {
     let options = {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
@@ -28,14 +29,9 @@ export class AuthService {
 
     return this.http.post<UserToken>(tokenFullEndpoint, body.toString(), options).toPromise().then(res => this.setSession(res))
   }
-  login2(form: FormControl): Promise<UserToken> {
-    let urlSearchParams = new URLSearchParams();
-
-    return this.http.post<any>(tokenFullEndpoint, form).toPromise().then(res => this.setSession(res))
-  }
 
   register(login:string, email:string, pass:string){
-    return this.http.post<any>(usersFullEndpoint, {'username': login, 'email': email, 'password': pass}).subscribe(res => this.setSession(res));
+    return this.http.post<any>(usersFullEndpoint, {'username': login, 'email': email, 'password': pass}).toPromise();
   }
 
 private setSession(authResult: UserToken) {

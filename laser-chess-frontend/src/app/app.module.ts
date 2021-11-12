@@ -16,6 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegisterComponent } from './components/register/register.component';
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 import { MainPageComponent } from './components/main-page/main-page.component';
+import { LobbyComponent } from './components/lobby/lobby.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { MainPageComponent } from './components/main-page/main-page.component';
     LoginComponent,
     UserPageComponent,
     RegisterComponent,
-    MainPageComponent
+    MainPageComponent,
+    LobbyComponent
   ],
   imports: [
     BrowserModule,

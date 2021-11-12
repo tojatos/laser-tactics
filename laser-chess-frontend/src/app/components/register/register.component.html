@@ -4,7 +4,7 @@
       <mat-card-title>Register</mat-card-title>
     </mat-card-header>
 
-    <form class="example-form" [formGroup]="form" *ngIf="!isLoggedIn" (ngSubmit)="onSubmit()">
+    <form class="example-form" [formGroup]="form" *ngIf="!loggedIn" (ngSubmit)="onSubmit()">
       <mat-card-content>
         <mat-form-field class="example-full-width" appearance="standard" required>
           <mat-label>Username</mat-label>

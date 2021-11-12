@@ -10,10 +10,26 @@ export interface tokenPayload {
 
 export interface Lobby {
   id: string,
-  gameId: string,
+  game_id: string,
   name: string,
   player_one_username: string,
   player_two_username: string,
   is_ranked: boolean,
-  is_private: boolean
+  is_private: boolean,
+  starting_position_reversed: boolean
+}
+
+export interface Item {
+  title: string,
+  description: string,
+  id: number,
+  owner_id: number
+}
+
+export interface User {
+  username: string,
+  email: string,
+  id: number,
+  is_active: boolean,
+  items: Item[]
 }
