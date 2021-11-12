@@ -15,6 +15,8 @@ export const gameStateEndpoint = '/get_game_state'
 export const movePieceEndpoint = '/move_piece'
 export const rotatePieceEndpoint = '/rotate_piece'
 export const shootLaserEndpoint = '/shoot_laser'
+export const giveUpEndpoint = '/give_up'
+export const offerDrawEndpoint = '/offer_draw'
 export const authWebsocketEndpoint = '/ws_auth'
 export const observeWebsocketEndpoint = '/ws_observe'
 
@@ -31,6 +33,6 @@ export const joinLobbyFullEndpoint = (id: string = "") => fullEndpoint(joinLobby
 export const gameFullEndpoint = (id: string  = "") => fullEndpoint(gameEnpoint, `/${id}`)
 export const startGameFullEndpoint = fullEndpoint(startGameEndpoint)
 export const userFullEndpoint = (id: string  = "") => fullEndpoint(userEndpoint, `/${id}`)
-
-
+export const giveUpFullEndpoint = fullEndpoint(giveUpEndpoint)
+export const offerDrawFullEndpoint = fullEndpoint(offerDrawEndpoint)
 

@@ -2,7 +2,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from "rxjs/webSocket";
-import { authWebsocketEndpoint, gameStateEndpoint, gameStateFullEndpoint, movePieceEndpoint, observeWebsocketEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
+import { authWebsocketEndpoint, gameStateEndpoint, gameStateFullEndpoint, giveUpEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
 import { AuthService } from 'src/app/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { Coordinates, GameState } from '../../game.models';
@@ -95,6 +95,18 @@ export class GameWebsocketService extends AbstractGameService {
     const request = { game_id: gameId }
 
     this.sendRequest(shootLaserEndpoint, request)
+  }
+
+  giveUp(gameId: string) {
+    const request = { game_id: gameId }
+
+    this.sendRequest(giveUpEndpoint, request)
+  }
+
+  offerDraw(gameId: string) {
+    const request = { game_id: gameId }
+
+    this.sendRequest(offerDrawEndpoint, request)
   }
 
   closeConnection(){
