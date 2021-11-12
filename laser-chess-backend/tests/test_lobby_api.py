@@ -1,13 +1,8 @@
-from dataclasses import asdict
-
 import pytest
 
-from app.game_engine.models import *
-from app.game_engine.requests import *
 from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
-import sqlalchemy as sa
 
 tokens = []
 game_id = "some_id"
@@ -29,6 +24,8 @@ def before_all():
 
     create_user_datas = list(
         map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 2)))
+    for user in create_user_datas:
+        verify_user(session, user["username"])
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
 
     session.commit()

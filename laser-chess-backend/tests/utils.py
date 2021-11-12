@@ -1,10 +1,16 @@
 import dataclasses
 
 from starlette.testclient import TestClient
+from app.core import crud
 
 
 def get_token_data(create_user_data):
     return dict(username=create_user_data['username'], password=create_user_data['password'])
+
+
+def verify_user(db, username):
+    user = crud.get_user(db, username)
+    crud.verify_user(user, db)
 
 
 @dataclasses.dataclass

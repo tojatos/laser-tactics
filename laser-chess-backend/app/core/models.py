@@ -1,5 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, PrimaryKeyConstraint, Enum, Time
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Column, Integer, String, Enum, DateTime
 
 from .database import Base
 from .schemas import FriendRequestStatus
@@ -13,9 +12,9 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
-    registration_date = Column(Time)
+    registration_date = Column(DateTime)
     is_verified = Column(Boolean, default=False)
-    verification_date = Column(Time)
+    verification_date = Column(DateTime)
 
 
 class GameStateTable(Base):
