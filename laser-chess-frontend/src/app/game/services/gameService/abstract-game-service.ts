@@ -1,0 +1,51 @@
+import { HttpResponse } from "@angular/common/http"
+import { Injectable } from "@angular/core"
+import { BoardInterface, Coordinates, GameState } from "../../game.models"
+
+@Injectable({
+  providedIn: 'root'
+})
+export abstract class AbstractGameService {
+
+  abstract getGameState(gameId: string): Promise<HttpResponse<GameState>> | void
+  abstract movePiece(gameId: string, from: Coordinates, to: Coordinates): Promise<void> | void
+  abstract rotatePiece(gameId: string, at: Coordinates, angle: number): Promise<void> | void
+  abstract shootLaser(gameId: string): Promise<void> | void
+
+  increaseAnimationEvents(){
+    const num = parseInt(localStorage.getItem("animationEvents") || "0") + 1
+    localStorage.setItem("animationEvents", num.toString())
+  }
+
+  setAnimationEventsNum(num: number){
+    localStorage.setItem("animationEvents", num.toString())
+  }
+
+  get numOfAnimationEvents(){
+    return parseInt(localStorage.getItem("animationEvents") || "0")
+  }
+
+  animationsToShow(totalNumOfAnimations: number){
+    return totalNumOfAnimations - this.numOfAnimationEvents
+  }
+
+  setLocalGameState(game: GameState){
+    game.game_events = []
+    localStorage.setItem("board", JSON.stringify(game))
+  }
+
+  getLocalGameState(): GameState | null{
+    const board = localStorage.getItem("board")
+    return board && JSON.parse(board)
+  }
+
+  get lastGameState(){
+
+    const gameState = localStorage.getItem("board")
+    if(gameState)
+      return JSON.parse(gameState) as BoardInterface
+
+    return undefined
+
+  }
+}

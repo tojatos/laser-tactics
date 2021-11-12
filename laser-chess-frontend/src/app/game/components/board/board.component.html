@@ -1,0 +1,13 @@
+<div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
+  <canvas #canvas class="gameCanvas"></canvas>
+</div>
+<div *ngIf="this.game.isInitiated">
+<app-board-actions
+(buttonPressEmitter)="buttonPressEvent($event)"
+[containerHeight]="containerHeight" [containerWidth]="containerWidth"
+[rotationPossible]="rotationPossibleInfo" [acceptPossible]="acceptPossibleInfo" [laserPossible]="laserPossibleInfo"
+fxLayoutAlign="center"></app-board-actions>
+</div>
+
+
+

@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -11,13 +11,22 @@ import { GameModule } from './game/game.module';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { UserPageComponent } from './components/user-page/user-page.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RegisterComponent } from './components/register/register.component';
+import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
+import { MainPageComponent } from './components/main-page/main-page.component';
+import { LobbyComponent } from './components/lobby/lobby.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainNavComponent,
     LoginComponent,
-    UserPageComponent
+    UserPageComponent,
+    RegisterComponent,
+    MainPageComponent,
+    LobbyComponent
   ],
   imports: [
     BrowserModule,
@@ -25,9 +34,14 @@ import { UserPageComponent } from './components/user-page/user-page.component';
     BrowserAnimationsModule,
     MaterialModule,
     GameModule,
-    HttpClientModule
+    HttpClientModule,
+    FlexLayoutModule,
+    FormsModule,
+    ReactiveFormsModule
     ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
-  bootstrap: [AppComponent]
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, { provide: JWT_OPTIONS, useValue: JWT_OPTIONS }, JwtHelperService],
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  
 })
 export class AppModule { }

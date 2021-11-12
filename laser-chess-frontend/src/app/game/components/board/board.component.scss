@@ -1,0 +1,21 @@
+$imagePath: "/assets/board.svg";
+
+.gameCanvas {
+
+  background-image: url($imagePath);
+  background-size: cover;
+  z-index: 1;
+  position: absolute;
+}
+
+.guiCanvas {
+
+  position: absolute;
+  z-index: 2;
+}
+
+.game-container {
+  position: relative;
+  cursor: pointer;
+  border: solid 5px white;
+}
