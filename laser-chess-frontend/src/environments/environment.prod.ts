@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  API_URL: "http://got-pttk.icu/laser-tactics-api",
-  WEBSOCKET_URL: "ws://got-pttk.icu/laser-tactics-api/ws",
+  API_URL: "https://lasertactics.online/laser-tactics-api",
+  WEBSOCKET_URL: "wss://lasertactics.online/laser-tactics-api/ws",
   API_PREFIX: "/api/v1"
 };

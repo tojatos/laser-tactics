@@ -5,8 +5,8 @@ RUN npm install
 RUN npm install -g @angular/cli
 COPY . .
 
-#ARG BASE_HREF
-RUN ng build #--base-href="${BASE_HREF}"
+ARG BASE_HREF=/
+RUN ng build --base-href="${BASE_HREF}"
 
 FROM nginx:1.21.3
 COPY --from=build /app/dist/laser-chess-frontend  /usr/share/nginx/html
