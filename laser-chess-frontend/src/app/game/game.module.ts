@@ -15,6 +15,7 @@ import { MaterialModule } from '../material/material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BoardActionsComponent } from './components/board-actions/board-actions.component';
 import { BoardLogComponent } from './components/board-log/board-log.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [GameComponent, BoardComponent, BoardActionsComponent, ChatComponent, BoardActionsComponent, BoardLogComponent],
@@ -22,7 +23,8 @@ import { BoardLogComponent } from './components/board-log/board-log.component';
     CommonModule,
     HttpClientModule,
     MaterialModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    FormsModule
   ],
   exports: [GameComponent],
   providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor, { provide: HTTP_INTERCEPTORS, useClass: GameServiceInterceptor, multi: true }]

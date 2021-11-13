@@ -853,13 +853,13 @@ export class Board implements BoardInterface {
     return undefined
   }
 
-  setInitialGameState(){
-    this.setGameState(initialGameState)
+  setInitialGameState(blockSize: number){
+    this.setGameState(initialGameState, blockSize)
   }
 
-  setGameState(gameState: GameState){
+  setGameState(gameState: GameState, blockSize: number){
     if(this.blockSize)
-      this.initBoard(gameState, this.blockSize)
+      this.initBoard(gameState, blockSize)
   }
 
   serialize(): GameState{
@@ -878,7 +878,8 @@ export class Board implements BoardInterface {
       board: boardInterface,
       game_phase: GamePhase.STARTED,
       turn_number: this.currentTurn,
-      game_events: []
+      game_events: [],
+      user_events: []
     }
 
     return gameStateSerialized

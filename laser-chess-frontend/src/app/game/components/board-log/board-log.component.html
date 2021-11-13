@@ -1,3 +1,5 @@
-<button mat-raised-button (click)="buildEvent()">click!</button>
-<button mat-raised-button (click)="returnToCurrentEvent()">return</button>
-
+<mat-selection-list #userEvents [style.height.px]="maxHeight" (selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)" [multiple]="false">
+    <mat-list-option *ngFor="let userEvent of gameState?.user_events; let i = index" [value]="i+1">
+      {{notationList[i]}}
+    </mat-list-option>
+  </mat-selection-list>

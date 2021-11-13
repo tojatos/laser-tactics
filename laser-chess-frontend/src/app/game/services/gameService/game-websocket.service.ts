@@ -51,7 +51,7 @@ export class GameWebsocketService extends AbstractGameService {
       this.sendRequest(authWebsocketEndpoint, {token : token})
 
     this.getGameState(gameId)
-
+    this.getGameState(gameId)
   }
 
   private showSnackbar(message: string) {

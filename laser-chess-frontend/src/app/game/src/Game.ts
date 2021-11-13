@@ -30,7 +30,7 @@ export class Game{
   isInitiated = false
   analizeMode = analizeModes.NOT_ANALIZING
 
-  constructor(private gameService: GameWebsocketService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
+  constructor(public gameService: GameWebsocketService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
       this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe((value: GameState) => {
         this.refreshGameState(value);
@@ -99,9 +99,9 @@ export class Game{
     this.board.currentTurn = gameState.turn_number
     this.gameService.setLocalGameState(this.board.serialize())
     this.gameService.setAnimationEventsNum(gameState.game_events.length)
+    this.gameCanvas.redrawGame(this.board)
     const myTurn = this.board.isMyTurn()
     this.gameCanvas.interactable = myTurn
-    this.gameCanvas.redrawGame(this.board)
   }
 
   async loadNewGameState(newGameState: GameState){
@@ -142,7 +142,7 @@ export class Game{
   showGameEvent(gameEvents: GameEvent[]){
     this.analizeMode = analizeModes.ANALING
     this.gameCanvas.interactable = false
-    this.board.setInitialGameState()
+    this.board.setInitialGameState(this.displaySize)
     this.gameCanvas.redrawGame(this.board)
     this.executePendingActions(gameEvents, gameEvents.length, false, false)
   }
