@@ -8,6 +8,7 @@
 [rotationPossible]="rotationPossibleInfo" [acceptPossible]="acceptPossibleInfo" [laserPossible]="laserPossibleInfo"
 fxLayoutAlign="center"></app-board-actions>
 </div>
+<app-board-log (gameLogEmitter)="buildEvent($event)"></app-board-log>
 
 
 

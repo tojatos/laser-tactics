@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
-import { GameState } from "../game.models";
+import { GameEvent, GameState } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
@@ -67,7 +67,7 @@ export class Game{
         this.flipBoard()
 
       if(animationsToShow > 0)
-        await this.executePendingActions(receivedGameState, animationsToShow)
+        await this.executePendingActions(receivedGameState.game_events, animationsToShow, this.showAnimations)
 
       this.board.currentTurn = receivedGameState.turn_number
       this.gameService.setLocalGameState(gameState)
@@ -96,7 +96,7 @@ export class Game{
       //this.gameService.setAnimationEventsNum(res.body.game_events.length)
       const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
       if(animationsToShow > 0)
-        await this.executePendingActions(newGameState, animationsToShow)
+        await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
 
       this.board.currentTurn = newGameState.turn_number
 
@@ -117,10 +117,17 @@ export class Game{
 
   }
 
-  private async executePendingActions(game: GameState, animationsToShow: number){
+  showGameEvent(gameEvents: GameEvent[]){
+    this.board.setInitialGameState()
+    this.gameCanvas.redrawGame(this.board)
+    this.executePendingActions(gameEvents, gameEvents.length, false, false)
     this.gameCanvas.interactable = false
-    this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
-    await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, this.showAnimations)
+  }
+
+  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, showLaser: boolean = true){
+    this.gameCanvas.interactable = false
+    this.eventsExecutor.addEventsToExecute(events.slice(-animationsToShow))
+    await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, showLaser)
   }
 
   passRotation(degree: number){

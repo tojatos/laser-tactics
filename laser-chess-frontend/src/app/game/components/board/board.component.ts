@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/constants';
 import { Game } from '../../src/Game';
 
@@ -54,6 +55,11 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       case "laser": this.game.passLaserShoot(); break
       case "accept": this.game.passAccept(); break
     }
+  }
+
+  buildEvent(gameEvents: GameEvent[]){
+    console.log(gameEvents)
+    this.game.showGameEvent(gameEvents)
   }
 
   get currentSize() {
