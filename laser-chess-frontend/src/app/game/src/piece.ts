@@ -10,10 +10,9 @@ export class Piece implements PieceInterface {
   special_move_made = false
   currentCoordinates: Coordinates
 
-  constructor(owner: string, pieceType: string, rotation_degree: number, coordinates: Coordinates, mirror_perspective: boolean = false){
+  constructor(owner: string, pieceType: string, rotation_degree: number, coordinates: Coordinates){
     this.piece_owner = owner
     this.rotation_degree = rotation_degree
-    if(mirror_perspective) this.rotation_degree + 180
     this.piece_type = pieceType in PieceType ? (<any>PieceType)[pieceType] : PieceType.UNKNOWN
     this.currentCoordinates = coordinates
   }

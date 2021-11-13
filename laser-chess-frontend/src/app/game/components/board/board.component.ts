@@ -58,8 +58,11 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   buildEvent(gameEvents: GameEvent[]){
-    console.log(gameEvents)
     this.game.showGameEvent(gameEvents)
+  }
+
+  returnToCurrentEvent(){
+    this.game.returnToCurrentEvent()
   }
 
   get currentSize() {

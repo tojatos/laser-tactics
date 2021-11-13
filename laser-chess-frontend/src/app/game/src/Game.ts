@@ -12,6 +12,12 @@ import { Resources } from "./Display/Resources";
 import { PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
+enum analizeModes {
+  ANALING = "ANALIZING",
+  EXITING_ANALYZE_MODE = "EXITTING_ANALYZE_MODE",
+  NOT_ANALIZING = "NOT_ANALIZING"
+}
+
 @Injectable()
 export class Game{
 
@@ -22,6 +28,7 @@ export class Game{
   showAnimations: boolean = true
   executingActions = false
   isInitiated = false
+  analizeMode = analizeModes.NOT_ANALIZING
 
   constructor(private gameService: GameWebsocketService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
@@ -87,41 +94,62 @@ export class Game{
     this.gameCanvas.showAnimations = this.showAnimations
   }
 
+  loadConcreteGameState(gameState: GameState){
+    this.board.initBoard(gameState, this.displaySize)
+    this.board.currentTurn = gameState.turn_number
+    this.gameService.setLocalGameState(this.board.serialize())
+    this.gameService.setAnimationEventsNum(gameState.game_events.length)
+    const myTurn = this.board.isMyTurn()
+    this.gameCanvas.interactable = myTurn
+    this.gameCanvas.redrawGame(this.board)
+  }
+
+  async loadNewGameState(newGameState: GameState){
+    this.executingActions = true
+    //this.gameService.setAnimationEventsNum(res.body.game_events.length)
+    const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
+    if(animationsToShow > 0)
+      await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
+
+    this.board.currentTurn = newGameState.turn_number
+
+    this.gameService.setLocalGameState(this.board.serialize())
+    this.gameService.setAnimationEventsNum(newGameState.game_events.length)
+    const myTurn = this.board.isMyTurn()
+    this.gameCanvas.interactable = myTurn
+
+    this.executingActions = false
+
+    if(this.gameService.lastMessage?.game_events && this.gameService.lastMessage != newGameState)
+      this.refreshGameState(this.gameService.lastMessage)
+  }
+
   async refreshGameState(newGameState: GameState){
-    if(this.gameId){
+    if(this.gameId && this.analizeMode != analizeModes.ANALING){
       if(!this.isInitiated)
         this.loadDisplay(this.displaySize, newGameState)
-      else {
-      this.executingActions = true
-      //this.gameService.setAnimationEventsNum(res.body.game_events.length)
-      const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
-      if(animationsToShow > 0)
-        await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
-
-      this.board.currentTurn = newGameState.turn_number
-
-      this.gameService.setLocalGameState(this.board.serialize())
-      this.gameService.setAnimationEventsNum(newGameState.game_events.length)
-      const myTurn = this.board.isMyTurn()
-      this.gameCanvas.interactable = myTurn
-
-      this.executingActions = false
-
-      if(this.gameService.lastMessage?.game_events && this.gameService.lastMessage != newGameState)
-        this.refreshGameState(this.gameService.lastMessage)
-    }
-
+      else if(this.analizeMode == analizeModes.EXITING_ANALYZE_MODE){
+        this.loadConcreteGameState(newGameState)
+        this.analizeMode = analizeModes.NOT_ANALIZING
+      }
+      else 
+        this.loadNewGameState(newGameState)
     }
     else
       console.error("Board not properly initialized")
-
   }
 
   showGameEvent(gameEvents: GameEvent[]){
+    this.analizeMode = analizeModes.ANALING
+    this.gameCanvas.interactable = false
     this.board.setInitialGameState()
     this.gameCanvas.redrawGame(this.board)
     this.executePendingActions(gameEvents, gameEvents.length, false, false)
-    this.gameCanvas.interactable = false
+  }
+
+  returnToCurrentEvent(){
+    this.analizeMode = analizeModes.EXITING_ANALYZE_MODE
+    this.gameService.getGameState(this.gameId)
   }
 
   private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, showLaser: boolean = true){

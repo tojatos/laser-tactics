@@ -2069,6 +2069,7 @@ const gameState: GameState = JSON.parse(`
 export class BoardLogComponent implements OnInit {
 
   @Output() gameLogEmitter = new EventEmitter<GameEvent[]>();
+  @Output() gameReturnEmitter = new EventEmitter();
 
   constructor() { }
 
@@ -2076,8 +2077,11 @@ export class BoardLogComponent implements OnInit {
   }
 
   buildEvent() {
-    console.log("d")
     this.gameLogEmitter.emit(gameState.game_events)
+  }
+
+  returnToCurrentEvent(){
+    this.gameReturnEmitter.emit()
   }
 
 }

@@ -858,9 +858,8 @@ export class Board implements BoardInterface {
   }
 
   setGameState(gameState: GameState){
-    if(this.blockSize){
+    if(this.blockSize)
       this.initBoard(gameState, this.blockSize)
-    }
   }
 
   serialize(): GameState{
