@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   angular:
+    restart: always
     build:
       context: ./laser-chess-frontend
       args:
@@ -22,8 +23,6 @@ services:
     build: ./laser-chess-backend
     restart: always
     command: python -m app.main
-    #ports:
-    #  - 2345:80
     networks:
       - web
       - default
