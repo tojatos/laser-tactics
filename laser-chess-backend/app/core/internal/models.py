@@ -1,7 +1,7 @@
-from sqlalchemy import Boolean, Column, Integer, String, Enum, DateTime
+from sqlalchemy import Boolean, Column, Integer, String, Enum, DateTime, Float
 
 from .database import Base
-from .schemas import FriendRequestStatus
+from .schemas import FriendRequestStatus, LobbyStatus
 
 
 class User(Base):
@@ -15,6 +15,9 @@ class User(Base):
     registration_date = Column(DateTime)
     is_verified = Column(Boolean, default=False)
     verification_date = Column(DateTime)
+   # rating = Column(Integer)
+   # rating_deviation = Column(Float)
+   # rating_volatility = Column(Float)
 
 
 class GameStateTable(Base):
@@ -25,6 +28,8 @@ class GameStateTable(Base):
     player_two_id = Column(String)
     game_id = Column(String)
     game_state_json = Column(String)
+
+
 
 
 class Lobby(Base):
@@ -38,6 +43,7 @@ class Lobby(Base):
     is_ranked = Column(Boolean, default=False)
     is_private = Column(Boolean, default=False)
     starting_position_reversed = Column(Boolean, default=False)
+    #status = Column(Enum(LobbyStatus))
 
 
 class FriendRequests(Base):

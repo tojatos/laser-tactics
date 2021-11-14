@@ -6,11 +6,11 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 
-from . import models, schemas
+from app.core.internal import schemas, models
 from passlib.context import CryptContext
 
-from ..game_engine.models import GameState
-from ..game_engine.requests import StartGameRequest
+from app.game_engine.models import GameState
+from app.game_engine.requests import StartGameRequest
 from uuid import uuid4
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

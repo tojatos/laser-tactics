@@ -15,6 +15,13 @@ class FriendRequestStatus(AutoNameEnum):
     REJECTED = auto()
 
 
+class LobbyStatus(AutoNameEnum):
+    CREATED = auto()
+    ABANDONED = auto()
+    GAME_STARTED = auto()
+    GAME_ENDED = auto()
+
+
 class ChangePasswordSchema(BaseModel):
     oldPassword: str
     newPassword: str
@@ -89,6 +96,7 @@ class Lobby(BaseModel):
     is_ranked: bool = False
     is_private: bool = False
     starting_position_reversed: bool = False
+    #lobby_status: LobbyStatus
 
     class Config:
         orm_mode = True
@@ -108,5 +116,3 @@ class BlockedUsers(BaseModel):
     id: int
     user: str
     blocked_user: str
-
-

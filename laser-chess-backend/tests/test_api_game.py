@@ -4,9 +4,9 @@ import pytest
 
 from app.game_engine.models import *
 from app.game_engine.requests import *
-from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
+from app.main import app, get_db, API_PREFIX
 
 tokens = []
 game_id = "some_id"

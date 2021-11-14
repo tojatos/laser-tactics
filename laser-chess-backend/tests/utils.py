@@ -1,7 +1,7 @@
 import dataclasses
 
 from starlette.testclient import TestClient
-from app.core import crud
+from app.core.internal import crud
 
 
 def get_token_data(create_user_data):

@@ -1,9 +1,10 @@
 import pytest
 from starlette.websockets import WebSocket
 
+from app.core.dependecies import manager
 from app.game_engine.models import *
 from app.game_engine.requests import *
-from app.main import app, get_db, API_PREFIX, manager
+from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
 

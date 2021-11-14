@@ -1,5 +1,6 @@
 import pytest
 
+from app.main import app
 from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *

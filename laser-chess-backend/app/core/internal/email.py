@@ -1,6 +1,7 @@
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-from pydantic import BaseModel, EmailStr
 from typing import List
+
+from fastapi_mail import ConnectionConfig
+from pydantic import BaseModel, EmailStr
 
 
 class EmailSchema(BaseModel):
