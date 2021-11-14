@@ -31,6 +31,7 @@ export class GameWebsocketService extends AbstractGameService {
   connect(gameId: string){
     this.subject.asObservable().subscribe(
       msg => {
+        console.log(msg)
         if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
           this.lastMessage = msg

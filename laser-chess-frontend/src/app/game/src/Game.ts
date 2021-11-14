@@ -158,6 +158,14 @@ export class Game{
     await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, showLaser)
   }
 
+  giveUp(){
+    this.gameService.giveUp(this.gameId)
+  }
+
+  offerDraw(){
+    this.gameService.offerDraw(this.gameId)
+  }
+
   passRotation(degree: number){
     this.gameActions.rotationPressed(this.board, degree)
   }

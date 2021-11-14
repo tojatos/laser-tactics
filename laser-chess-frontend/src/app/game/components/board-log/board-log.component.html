@@ -1,5 +1,9 @@
 <mat-selection-list #userEvents [style.height.px]="maxHeight" (selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)" [multiple]="false">
-    <mat-list-option *ngFor="let userEvent of gameState?.user_events; let i = index" [value]="i+1">
-      {{notationList[i]}}
-    </mat-list-option>
-  </mat-selection-list>
+  <mat-list-option *ngFor="let userEvent of gameState?.user_events; let i = index" [value]="i+1">
+    {{notationList[i]}}
+  </mat-list-option>
+</mat-selection-list>
+<div class="btns">
+  <button mat-icon-button (click)="giveUp()"><mat-icon>cancel</mat-icon></button>
+  <button mat-icon-button (click)="draw()"><mat-icon>volunteer_activism</mat-icon></button>
+</div>

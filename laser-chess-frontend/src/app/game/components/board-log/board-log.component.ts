@@ -13,6 +13,8 @@ export class BoardLogComponent implements OnChanges {
   @Input() maxHeight: number = 300
   @Output() gameLogEmitter = new EventEmitter<GameEvent[]>()
   @Output() gameReturnEmitter = new EventEmitter()
+  @Output() giveUpEmitter = new EventEmitter()
+  @Output() drawEmitter = new EventEmitter()
 
   notationList: string[] = []
 
@@ -91,6 +93,14 @@ export class BoardLogComponent implements OnChanges {
   }
     return "Unknown notation"
 
+  }
+
+  giveUp(){
+    this.giveUpEmitter.emit()
+  }
+
+  draw(){
+    this.drawEmitter.emit()
   }
 
   isUserEvent(gameEvent: GameEvent | undefined){

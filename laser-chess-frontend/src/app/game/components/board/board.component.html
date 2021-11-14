@@ -16,6 +16,8 @@ fxLayoutAlign="center"></app-board-actions>
 [maxHeight]="containerHeight * 0.8"
 (gameLogEmitter)="buildEvent($event)"
 (gameReturnEmitter)="returnToCurrentEvent()"
+(giveUpEmitter)="game.giveUp()"
+(drawEmitter)="game.offerDraw()"
 ></app-board-log>
 <div style="clear: both"></div>
 </div>
