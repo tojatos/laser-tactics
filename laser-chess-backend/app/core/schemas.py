@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from typing import List, Optional
 
-from pydantic import BaseModel, validator, validate_email, EmailStr
+from pydantic import BaseModel, validator, EmailStr
 
 
 class AutoNameEnum(Enum):
@@ -108,3 +108,5 @@ class BlockedUsers(BaseModel):
     id: int
     user: str
     blocked_user: str
+
+
