@@ -77,3 +77,12 @@ export interface LaserShotEventEntity {
   coordinates: Coordinates
 }
 
+export interface GiveUpEvent {
+  player: string,
+  event_type: GameEvents.GIVE_UP_EVENT
+}
+
+export interface DrawEvent {
+  player: string,
+  event_type: GameEvents.DRAW_EVENT
+}

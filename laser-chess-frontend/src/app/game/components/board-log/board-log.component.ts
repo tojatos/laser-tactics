@@ -21,10 +21,12 @@ export class BoardLogComponent implements OnChanges {
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges){
-    if(changes.gameState && changes.gameState.currentValue?.game_events.length > 0)
+    if(changes.gameState && changes.gameState.currentValue?.game_events.length > 0){
+      this.notationList = []
       changes.gameState.currentValue.user_events.forEach((element: GameEvent, index: number) => {
        this.notationList.push(this.eventNotation(index+1))
       })
+    }
   }
 
   buildEvent(gameEvents: GameEvent[]) {
