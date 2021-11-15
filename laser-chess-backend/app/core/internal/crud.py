@@ -9,6 +9,7 @@ from sqlalchemy import and_, or_
 from app.core.internal import schemas, models
 from passlib.context import CryptContext
 
+from app.core.internal.schemas import LobbyStatus
 from app.game_engine.models import GameState
 from app.game_engine.requests import StartGameRequest
 from uuid import uuid4
@@ -60,7 +61,8 @@ def change_password(user: schemas.User, new_password: str, db: Session):
 
 
 def create_lobby(db: Session, user: schemas.User):
-    db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username)
+    db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username,
+                            lobby_status=LobbyStatus.CREATED)
     db.add(db_lobby)
     db.commit()
     db.refresh(db_lobby)
@@ -72,8 +74,8 @@ def get_lobbies(db: Session, skip: int = 0, limit: int = 100):
     return lobbies
 
 
-def get_lobby(db: Session, lobby_id: int):
-    return db.query(models.Lobby).filter(models.Lobby.id == lobby_id).first()
+def get_lobby(db: Session, game_id: str):
+    return db.query(models.Lobby).filter(models.Lobby.game_id == game_id).first()
 
 
 def join_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
@@ -90,9 +92,7 @@ def leave_lobby(db: Session, user: schemas.User, lobby: schemas.Lobby):
     elif lobby.player_two_username == user.username:
         lobby.player_two_username = None
     if lobby.player_two_username is None and lobby.player_one_username is None:
-        db.delete(lobby)
-        db.commit()
-        return {"msg": "All players left. Lobby successfully deleted"}
+        lobby.lobby_status = LobbyStatus.ABANDONED
     db.commit()
     db.refresh(lobby)
     return lobby
@@ -118,7 +118,7 @@ def get_users_friends(user: schemas.User, db: Session):
     return friends_left + friends_right
 
 
-def get_friend_request(id: int, db: Session):
+def get_friend_request(id: str, db: Session):
     return db.query(models.FriendRequests).filter(models.FriendRequests.id == id).first()
 
 
@@ -129,7 +129,7 @@ def get_friend_record(user: schemas.User, friend: schemas.User, db: Session):
                                                             models.FriendRequests.user_one_username == friend.username)))).first()
 
 
-def get_pending_friend_request(id: int, db: Session):
+def get_pending_friend_request(id: str, db: Session):
     return db.query(models.FriendRequests).filter(and_(
         models.FriendRequests.id == id, models.FriendRequests.status == schemas.FriendRequestStatus.PENDING)).first()
 
@@ -141,7 +141,7 @@ def get_users_pending_friend_requests(user: schemas.User, db: Session):
 
 
 def create_friend_request(user_sending: schemas.User, user_sent_to: schemas.User, db: Session):
-    request = models.FriendRequests(user_one_username=user_sending.username, user_two_username=user_sent_to.username,
+    request = models.FriendRequests(id=str(uuid4()), user_one_username=user_sending.username, user_two_username=user_sent_to.username,
                                     status=schemas.FriendRequestStatus.PENDING)
     db.add(request)
     db.commit()
@@ -203,15 +203,15 @@ def get_game_state_table(db: Session, game_id: str):
 
 
 def start_game(db: Session, game_state: GameState, request: StartGameRequest):
-    # lobby = get_lobby(db, request.lobby_id)
+    lobby = get_lobby(db, request.game_id)
     game_state_json = json.dumps(dataclasses.asdict(game_state.to_serializable()))
     db_game_state = models.GameStateTable(player_one_id=request.player_one_id,
                                           player_two_id=request.player_two_id,
                                           game_id=request.game_id,
                                           game_state_json=game_state_json)
     db.add(db_game_state)
-    # if lobby is not None:
-    #    db.delete(lobby)
+    if lobby is not None:
+        lobby.lobby_status = LobbyStatus.GAME_STARTED
     db.commit()
     db.refresh(db_game_state)
     return db_game_state

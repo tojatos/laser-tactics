@@ -26,8 +26,9 @@ async def get_pending_requests(current_user: schemas.User = Depends(get_current_
 
 
 @router.post("/requests/send", status_code=status.HTTP_201_CREATED)
-async def send_friend_request(friend_username: str, current_user: schemas.User = Depends(get_current_active_user),
+async def send_friend_request(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                               db: Session = Depends(get_db)):
+    friend_username = usernameSchema.username
     if friend_username == current_user.username:
         raise HTTPException(status_code=404, detail="Cannot send request to yourself")
     friend_to_be = crud.get_user(username=friend_username, db=db)
@@ -47,9 +48,9 @@ async def send_friend_request(friend_username: str, current_user: schemas.User =
 
 
 @router.post("/requests/accept")
-async def accept_friend_request(request_id: int, current_user: schemas.User = Depends(get_current_active_user),
+async def accept_friend_request(request_id: schemas.FriendRequestId, current_user: schemas.User = Depends(get_current_active_user),
                                 db: Session = Depends(get_db)):
-    request = crud.get_pending_friend_request(id=request_id, db=db)
+    request = crud.get_pending_friend_request(id=request_id.id, db=db)
     if request is None:
         raise HTTPException(status_code=404, detail="No pending friend request with such id")
     if request.user_two_username != current_user.username:
@@ -58,9 +59,9 @@ async def accept_friend_request(request_id: int, current_user: schemas.User = De
 
 
 @router.post("/requests/decline")
-async def decline_friend_request(request_id: int, current_user: schemas.User = Depends(get_current_active_user),
+async def decline_friend_request(request_id: schemas.FriendRequestId, current_user: schemas.User = Depends(get_current_active_user),
                                  db: Session = Depends(get_db)):
-    request = crud.get_pending_friend_request(id=request_id, db=db)
+    request = crud.get_pending_friend_request(id=request_id.id, db=db)
     if request is None:
         raise HTTPException(status_code=404, detail="No pending friend request with such id")
     if request.user_two_username != current_user.username:
@@ -69,8 +70,9 @@ async def decline_friend_request(request_id: int, current_user: schemas.User = D
 
 
 @router.delete("/unfriend")
-async def remove_friend(friend_username: str, current_user: schemas.User = Depends(get_current_active_user),
+async def remove_friend(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                         db: Session = Depends(get_db)):
+    friend_username = usernameSchema.username
     friend = crud.get_user(db=db, username=friend_username)
     if friend is None:
         raise HTTPException(status_code=404, detail="User does not exists")

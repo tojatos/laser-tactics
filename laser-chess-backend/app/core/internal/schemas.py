@@ -69,16 +69,16 @@ class VerificationTokenData(BaseModel):
 
 
 class User(UserBase):
-    id: int
     is_active: bool
     is_verified: bool
+
+    # rating: int
 
     class Config:
         orm_mode = True
 
 
 class LobbyEditData(BaseModel):
-    id: int
     game_id: str
     name: str
     player_one_username: str
@@ -88,15 +88,14 @@ class LobbyEditData(BaseModel):
 
 
 class Lobby(BaseModel):
-    id: int
     game_id: str
     name: str
-    player_one_username: str
+    player_one_username: Optional[str] = None
     player_two_username: Optional[str] = None
     is_ranked: bool = False
     is_private: bool = False
     starting_position_reversed: bool = False
-    #lobby_status: LobbyStatus
+    lobby_status: LobbyStatus
 
     class Config:
         orm_mode = True
@@ -116,3 +115,15 @@ class BlockedUsers(BaseModel):
     id: int
     user: str
     blocked_user: str
+
+
+class Username(BaseModel):
+    username: str
+
+
+class LobbyId(BaseModel):
+    game_id: str
+
+
+class FriendRequestId(BaseModel):
+    id: str

@@ -1,6 +1,5 @@
 import pytest
 
-from app.main import app
 from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
@@ -35,6 +34,7 @@ def before_all():
 def test_create_lobby_happy(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
 
 
 def test_create_lobby_unauthorized(tu):
@@ -45,48 +45,51 @@ def test_create_lobby_unauthorized(tu):
 def test_join_lobby_happy(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201
-    response = tu.patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response.json()['game_id']})
     assert response.status_code == 200
 
 
 def test_join_lobby_unauthorized(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
 
-    response = tu.patch_data(f"/lobby/join?lobby_id={response.json()['id']}", "1234")
+    response = tu.patch_data(f"/lobby/join", "1234", json={"game_id": response.json()['game_id']})
     assert response.status_code == 401
 
 
 def test_join_lobby_full(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
 
-    response = tu.patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response.json()['game_id']})
     assert response.status_code == 200
     assert response.json()["player_one_username"] is not None
     assert response.json()["player_two_username"] is not None
 
-    response = tu.patch_data(f"/lobby/join?lobby_id={response.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response.json()['game_id']})
     assert response.status_code == 403
 
 
 def test_join_lobby_mulitiple(tu):
     response_create = tu.post_data("/lobby/create", tokens[0])
     assert response_create.status_code == 201
+    assert response_create.json()["lobby_status"] == "CREATED"
 
-    response = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response_create.json()['game_id']})
 
     assert response.status_code == 200
 
-    response = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 403
 
-    response = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 403
 
 
 def test_join_lobby_notexisting(tu):
-    response = tu.patch_data(f"/lobby/join?lobby_id=9999999", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": "???"})
     assert response.status_code == 404
 
 
@@ -96,12 +99,12 @@ def test_leave_lobby_happy(tu):
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
-    response = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 200
     assert response.json()["player_one_username"] is not None
     assert response.json()["player_two_username"] is not None
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/leave", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 200
     assert response.json()["player_one_username"] is not None
     assert response.json()["player_two_username"] is None
@@ -113,12 +116,12 @@ def test_leave_lobby_happy_withswap(tu):
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
-    response_join_1 = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    response_join_1 = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response_join_1.status_code == 200
     assert response_join_1.json()["player_one_username"] is not None
     assert response_join_1.json()["player_two_username"] is not None
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    response = tu.patch_data(f"/lobby/leave", tokens[0], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 200
     assert response.json()["player_one_username"] == response_join_1.json()["player_two_username"]
     assert response.json()["player_two_username"] is None
@@ -128,7 +131,7 @@ def test_leave_lobby_unauthorized(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response.json()['id']}", "1234")
+    response = tu.patch_data(f"/lobby/leave", "1234", json={"game_id": response.json()['game_id']})
     assert response.status_code == 401
 
 
@@ -138,22 +141,22 @@ def test_leave_lobby_with_delet(tu):
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
-    response_join_1 = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    response_join_1 = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response_join_1.status_code == 200
     assert response_join_1.json()["player_one_username"] is not None
     assert response_join_1.json()["player_two_username"] is not None
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    response = tu.patch_data(f"/lobby/leave", tokens[0], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 200
     assert response.json()["player_one_username"] == response_join_1.json()["player_two_username"]
     assert response.json()["player_two_username"] is None
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[1])
+    response = tu.patch_data(f"/lobby/leave", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 200
-    assert response.json()["msg"] == "All players left. Lobby successfully deleted"
 
-    response = tu.get_data(f"/lobby/{response_create.json()['id']}")
-    assert response.status_code == 404
+    response = tu.get_data(f"/lobby/{response_create.json()['game_id']}")
+    assert response.status_code == 200
+    assert response.json()["lobby_status"] == "ABANDONED"
 
 
 def test_leave_lobby_mulitiple(tu):
@@ -162,25 +165,25 @@ def test_leave_lobby_mulitiple(tu):
     assert response_create.json()["player_one_username"] is not None
     assert response_create.json()["player_two_username"] is None
 
-    response_join_1 = tu.patch_data(f"/lobby/join?lobby_id={response_create.json()['id']}", tokens[1])
+    response_join_1 = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response_create.json()['game_id']})
     assert response_join_1.status_code == 200
     assert response_join_1.json()["player_one_username"] is not None
     assert response_join_1.json()["player_two_username"] is not None
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    response = tu.patch_data(f"/lobby/leave", tokens[0], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 200
     assert response.json()["player_one_username"] == response_join_1.json()["player_two_username"]
     assert response.json()["player_two_username"] is None
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    response = tu.patch_data(f"/lobby/leave", tokens[0], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 403
 
-    response = tu.patch_data(f"/lobby/leave?lobby_id={response_create.json()['id']}", tokens[0])
+    response = tu.patch_data(f"/lobby/leave", tokens[0], json={"game_id": response_create.json()['game_id']})
     assert response.status_code == 403
 
 
 def test_leave_lobby_notexisting(tu):
-    response = tu.patch_data(f"/lobby/leave?lobby_id=999999", tokens[1])
+    response = tu.patch_data(f"/lobby/leave", tokens[0], json={"game_id": "????"})
     assert response.status_code == 404
 
 

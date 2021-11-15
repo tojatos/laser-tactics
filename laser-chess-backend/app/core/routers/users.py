@@ -88,18 +88,20 @@ async def get_users_blocked(current_user: schemas.User = Depends(get_current_act
     return crud.get_blocked_users(user=current_user, db=db)
 
 
-@router.post("/{username}/block")
-async def block_user(username, current_user: schemas.User = Depends(get_current_active_user),
+@router.post("/block")
+async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
+    username = usernameSchema.username
     user_to_block = crud.get_user(username=username, db=db)
     if not user_to_block:
         raise HTTPException(status_code=404, detail="User not found")
     return crud.create_block_record(user=current_user, user_to_block=user_to_block, db=db)
 
 
-@router.delete("/{username}/unblock")
-async def unblock_user(username, current_user: schemas.User = Depends(get_current_active_user),
+@router.delete("/unblock")
+async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
+    username = usernameSchema.username
     user_to_unblock = crud.get_user(username=username, db=db)
     blocked = crud.get_blocked_users(user=current_user, db=db)
     if not user_to_unblock:

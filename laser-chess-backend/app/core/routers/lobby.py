@@ -18,10 +18,10 @@ async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get
     return lobbies
 
 
-@router.get("/{lobby_id}", response_model=schemas.Lobby)
-async def get_lobby(lobby_id,
+@router.get("/{game_id}", response_model=schemas.Lobby)
+async def get_lobby(game_id: str,
                     db: Session = Depends(get_db)):
-    db_lobby = crud.get_lobby(db, lobby_id)
+    db_lobby = crud.get_lobby(db, game_id)
     if db_lobby is None:
         raise HTTPException(status_code=404, detail="No lobby with such id")
     return db_lobby
@@ -32,9 +32,10 @@ async def create_lobby(current_user: schemas.User = Depends(get_current_active_u
     return crud.create_lobby(db=db, user=current_user)
 
 
-@router.patch("/join")
-async def join_lobby(lobby_id: int, current_user: schemas.User = Depends(get_current_active_user),
+@router.patch("/join", response_model=schemas.Lobby)
+async def join_lobby(lobbyId: schemas.LobbyId, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
+    lobby_id = lobbyId.game_id
     lobby = crud.get_lobby(db, lobby_id)
     if lobby is None:
         raise HTTPException(status_code=404, detail="No lobby with such id")
@@ -45,9 +46,10 @@ async def join_lobby(lobby_id: int, current_user: schemas.User = Depends(get_cur
     return crud.join_lobby(db=db, user=current_user, lobby=lobby)
 
 
-@router.patch("/leave")
-async def leave_lobby(lobby_id: int, current_user: schemas.User = Depends(get_current_active_user),
+@router.patch("/leave", response_model=schemas.Lobby)
+async def leave_lobby(lobbyId: schemas.LobbyId, current_user: schemas.User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):
+    lobby_id = lobbyId.game_id
     lobby = crud.get_lobby(db, lobby_id)
     if lobby is None:
         raise HTTPException(status_code=404, detail="No lobby with such id")
@@ -57,10 +59,10 @@ async def leave_lobby(lobby_id: int, current_user: schemas.User = Depends(get_cu
     return lobby
 
 
-@router.patch("/update")
+@router.patch("/update", response_model=schemas.Lobby)
 async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
-    db_lobby = crud.get_lobby(db, lobby.id)
+    db_lobby = crud.get_lobby(db, lobby.game_id)
     if db_lobby is None:
         raise HTTPException(status_code=404, detail="No lobby with such id")
     if db_lobby.game_id != lobby.game_id:

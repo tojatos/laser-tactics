@@ -6,6 +6,7 @@ from app.core.dependecies import generate_verification_token, VERIFICATION_URL, 
     CHANGE_PASSWORD_URL
 from app.core.internal import crud
 from app.core.internal.email import EmailSchema, verification_template, conf, change_password_template
+from app.core.internal.schemas import  Username
 
 router = APIRouter(
     prefix="/email",
@@ -14,8 +15,9 @@ router = APIRouter(
 )
 
 
-@router.post("/send_verification_email/{username}")
-async def send_verification_email(username: str, db: Session = Depends(get_db)):
+@router.post("/send_verification_email")
+async def send_verification_email(usernameSchema: Username, db: Session = Depends(get_db)):
+    username = usernameSchema.username
     db_user = crud.get_user(db, username=username)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -38,8 +40,9 @@ async def send_verification_email(username: str, db: Session = Depends(get_db)):
 
 
 # TODO should always return 200?
-@router.post("/send_password_change_request/{username}")
-async def send_password_change_email(username: str, db: Session = Depends(get_db)):
+@router.post("/send_password_change_request")
+async def send_password_change_email(usernameSchema: Username, db: Session = Depends(get_db)):
+    username = usernameSchema.username
     db_user = crud.get_user(db, username=username)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
