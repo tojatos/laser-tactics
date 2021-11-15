@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { Coordinates, GameEvent, GameState } from '../../game.models';
+import { cloneDeep } from 'lodash';
+import { GameEvent, GameState } from '../../game.models';
 import { GameEvents } from '../../src/enums';
 
 @Component({
@@ -17,15 +18,20 @@ export class BoardLogComponent implements OnChanges {
   @Output() drawEmitter = new EventEmitter()
 
   notationList: string[] = []
+  validGameState: GameState | undefined
 
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges){
     if(changes.gameState && changes.gameState.currentValue?.game_events.length > 0){
+      console.log(changes.gameState.currentValue)
       this.notationList = []
-      changes.gameState.currentValue.user_events.forEach((element: GameEvent, index: number) => {
-       this.notationList.push(this.eventNotation(index+1))
-      })
+      this.validGameState = cloneDeep(this.gameState)
+      this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT)
+      this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT)
+      this.validGameState?.user_events.forEach((_, i) => {
+        this.notationList.push(this.eventNotation(i))
+      })      
     }
   }
 
@@ -38,40 +44,38 @@ export class BoardLogComponent implements OnChanges {
   }
 
   onSelection(e: number){
-    if(this.gameState){
-      if(e == this.gameState?.user_events.length)
-        this.gameReturnEmitter.emit()
-      else
-        this.gameLogEmitter.emit(this.getCorresponingEventChain(e))
+    if(this.validGameState){
+    this.gameLogEmitter.emit(this.getCorresponingEventChain(e)!.filter(evnt => evnt.event_type != GameEvents.OFFER_DRAW_EVENT))
+    if(e == this.validGameState?.user_events.length-1)
+      this.gameReturnEmitter.emit()
+    
     }
   }
 
   getCorresponingEventChain(userEventIndex: number){
     let search = 0
     let iterator = 0
-    if(this.gameState){
-      while(search <= userEventIndex && iterator < 100){
-          if(this.isUserEvent(this.gameState.game_events[iterator])){
-              search++
-            }
-            iterator++
-        }
+    if(this.validGameState){
+      while(search <= userEventIndex + 1 && iterator < 100)
+        if(this.isUserEvent(this.validGameState.game_events[iterator++]))
+          search++
 
-        return this.gameState?.game_events.slice(0, iterator-1)
+        return this.validGameState?.game_events.slice(0, iterator-1)
       }
 
     return undefined
 
   }
 
-  eventNotation(userEventIndex: number | undefined){
-    if(userEventIndex){
+  eventNotation(userEventIndex: number){
     const corresponingEventChain = this.getCorresponingEventChain(userEventIndex)
     const lastUserEventInGameEventsIndex = corresponingEventChain?.reverse().findIndex(ge => this.isUserEvent(ge))
     const lastEvents = corresponingEventChain?.slice(0, lastUserEventInGameEventsIndex!+1)
     const subEventTeleport = lastEvents?.find(le => le.event_type == GameEvents.TELEPORT_EVENT)
     const subEventTaken = lastEvents?.find(le => le.event_type == GameEvents.PIECE_TAKEN_EVENT)
     
+    console.log(lastEvents)
+
     if(lastEvents){
       const lastUserEvent = lastEvents.slice(-1)[0]
       if(subEventTeleport?.event_type == GameEvents.TELEPORT_EVENT){
@@ -92,7 +96,6 @@ export class BoardLogComponent implements OnChanges {
       else if (lastUserEvent.event_type == GameEvents.PIECE_ROTATED_EVENT)
         return `${lastUserEvent.rotated_piece_at.x}_${lastUserEvent.rotated_piece_at.y} (${lastUserEvent.rotation})`
     }
-  }
     return "Unknown notation"
 
   }
@@ -109,6 +112,7 @@ export class BoardLogComponent implements OnChanges {
     return gameEvent?.event_type == GameEvents.PIECE_MOVED_EVENT 
         || gameEvent?.event_type == GameEvents.PIECE_ROTATED_EVENT
         || gameEvent?.event_type == GameEvents.LASER_SHOT_EVENT
+        || gameEvent?.event_type == GameEvents.OFFER_DRAW_EVENT
   }
 
   getNotation(index: number){

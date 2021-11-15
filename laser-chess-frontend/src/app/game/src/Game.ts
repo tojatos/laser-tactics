@@ -9,7 +9,7 @@ import { GameActions } from "./Display/Canvas/GameActions";
 import { GameCanvas } from "./Display/Canvas/GameCanvas";
 import { Drawings } from "./Display/Drawings";
 import { Resources } from "./Display/Resources";
-import { PlayerType } from "./enums";
+import { GamePhase, PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
 enum analizeModes {
@@ -53,34 +53,17 @@ export class Game{
 
   async loadDisplay(displaySize: number, receivedGameState: GameState){
 
-      let gameState = this.gameService.getLocalGameState() || receivedGameState
-      let animationsToShow = this.gameService.animationsToShow(receivedGameState.game_events.length)
-
-      if((gameState != receivedGameState && animationsToShow <= 0)
-      || gameState.game_events.length == receivedGameState.game_events.length
-      || gameState.game_id != receivedGameState.game_id
-      || animationsToShow > 5){
-
-        gameState = receivedGameState
-        this.gameService.setAnimationEventsNum(gameState.game_events.length)
-        animationsToShow = 0
-      }
-
-      this.board.initBoard(gameState, displaySize)
+      this.board.initBoard(receivedGameState, displaySize)
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
 
       if(this.board.playerNum == PlayerType.PLAYER_TWO)
         this.flipBoard()
 
-      if(animationsToShow > 0)
-        await this.executePendingActions(receivedGameState.game_events, animationsToShow, this.showAnimations)
-
-      this.board.currentTurn = receivedGameState.turn_number
-      this.gameService.setLocalGameState(gameState)
+      this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)
       const myTurn = this.board.isMyTurn()
       this.gameCanvas.interactable = myTurn
-
+      
       this.isInitiated = true
   }
 
@@ -97,7 +80,6 @@ export class Game{
   loadConcreteGameState(gameState: GameState){
     this.board.initBoard(gameState, this.displaySize)
     this.board.currentTurn = gameState.turn_number
-    this.gameService.setLocalGameState(this.board.serialize())
     this.gameService.setAnimationEventsNum(gameState.game_events.length)
     this.gameCanvas.redrawGame(this.board)
     const myTurn = this.board.isMyTurn()
@@ -106,14 +88,12 @@ export class Game{
 
   async loadNewGameState(newGameState: GameState){
     this.executingActions = true
-    //this.gameService.setAnimationEventsNum(res.body.game_events.length)
     const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
     if(animationsToShow > 0)
       await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
 
     this.board.currentTurn = newGameState.turn_number
 
-    this.gameService.setLocalGameState(this.board.serialize())
     this.gameService.setAnimationEventsNum(newGameState.game_events.length)
     const myTurn = this.board.isMyTurn()
     this.gameCanvas.interactable = myTurn
@@ -126,14 +106,21 @@ export class Game{
 
   async refreshGameState(newGameState: GameState){
     if(this.gameId && this.analizeMode != analizeModes.ANALING){
-      if(!this.isInitiated)
-        this.loadDisplay(this.displaySize, newGameState)
-      else if(this.analizeMode == analizeModes.EXITING_ANALYZE_MODE){
-        this.loadConcreteGameState(newGameState)
-        this.analizeMode = analizeModes.NOT_ANALIZING
+      if(newGameState.game_phase != GamePhase.STARTED){
+        if(!this.isInitiated)
+          this.loadDisplay(this.displaySize, newGameState)
+        this.gameCanvas.interactable = false
       }
-      else 
-        this.loadNewGameState(newGameState)
+      else{
+        if(!this.isInitiated)
+          this.loadDisplay(this.displaySize, newGameState)
+        else if(this.analizeMode == analizeModes.EXITING_ANALYZE_MODE){
+          this.loadConcreteGameState(newGameState)
+          this.analizeMode = analizeModes.NOT_ANALIZING
+        }
+        else 
+          this.loadNewGameState(newGameState)
+    }
     }
     else
       console.error("Board not properly initialized")

@@ -1,8 +1,7 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from "rxjs/webSocket";
-import { authWebsocketEndpoint, gameStateEndpoint, gameStateFullEndpoint, giveUpEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
+import { authWebsocketEndpoint, gameStateEndpoint, giveUpEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
 import { AuthService } from 'src/app/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { Coordinates, GameState } from '../../game.models';
@@ -31,7 +30,6 @@ export class GameWebsocketService extends AbstractGameService {
   connect(gameId: string){
     this.subject.asObservable().subscribe(
       msg => {
-        console.log(msg)
         if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
           this.lastMessage = msg
@@ -51,7 +49,6 @@ export class GameWebsocketService extends AbstractGameService {
     if(token)
       this.sendRequest(authWebsocketEndpoint, {token : token})
 
-    this.getGameState(gameId)
     this.getGameState(gameId)
   }
 
@@ -108,6 +105,19 @@ export class GameWebsocketService extends AbstractGameService {
     const request = { game_id: gameId }
 
     this.sendRequest(offerDrawEndpoint, request)
+  }
+
+  showDrawOffer(gameId: string){
+    // const res = Swal.fire({
+    //   title: "Draw offer",
+    //   text: "Player offers draw",
+    //   icon: 'question',
+    //   showCancelButton: true
+    // })
+    // console.log(res)
+    const res = window.confirm("draw?")
+    if(res)
+      this.offerDraw(gameId)
   }
 
   closeConnection(){

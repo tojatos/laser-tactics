@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { clone, groupBy, values } from "lodash";
 import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
-import { GameService } from "../services/gameService/game.service";
+import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
 import { Canvas } from "./Display/Canvas/AbstractCanvas";
@@ -17,7 +17,7 @@ type PathInfo = {
 @Injectable()
 export class EventsExecutor{
 
-    constructor(private gameService: GameService, private drawings: Drawings, private animations: Animations) {}
+    constructor(private gameService: GameWebsocketService, private drawings: Drawings, private animations: Animations) {}
 
     eventsQueue : GameEvent[] = []
     eventsExecutionTimeout = 500
@@ -34,6 +34,8 @@ export class EventsExecutor{
           await this.getAnimationToExecute(canvas, board, event, showAnimations, showLaser)
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
+          if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum)
+            this.gameService.showDrawOffer(board.gameId!)
           this.gameService.setLocalGameState(board.serialize())
           this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
         }
