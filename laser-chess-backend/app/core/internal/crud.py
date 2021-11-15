@@ -277,10 +277,14 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
     return PlayerMatchHistory(matches=(list_left + list_right))
 
 
+# TODO refactor - feed the algorithm rating data (r, rd, v) from before rating series
 def update_user_rating(db: Session, player: schemas.User):
     user_rating = get_player_rating(db, player)
     matches = get_user_matches(db, player, RATING_PERIOD)
-    new_rating = update_rating(PlayerRatingUpdate(rating=user_rating.rating, rating_deviation=user_rating.rating_deviation, volatility=user_rating.rating_volatility), matches)
-    new_user_rating = schemas.UserRating(username=player.username, rating=new_rating.rating, rating_deviation=new_rating.rating_deviation, rating_volatility=new_rating.volatility)
+    new_rating = update_rating(
+        PlayerRatingUpdate(rating=user_rating.rating, rating_deviation=user_rating.rating_deviation,
+                           volatility=user_rating.rating_volatility), matches)
+    new_user_rating = schemas.UserRating(username=player.username, rating=new_rating.rating,
+                                         rating_deviation=new_rating.rating_deviation,
+                                         rating_volatility=new_rating.volatility)
     update_user_rating_in_db(db, new_user_rating)
-
