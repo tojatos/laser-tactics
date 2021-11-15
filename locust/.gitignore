@@ -1,2 +1,4 @@
 .idea
+.venv.lock
+pyenv.cfg
 __pycache__
