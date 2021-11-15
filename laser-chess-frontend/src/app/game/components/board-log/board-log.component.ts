@@ -27,8 +27,8 @@ export class BoardLogComponent implements OnChanges {
       console.log(changes.gameState.currentValue)
       this.notationList = []
       this.validGameState = cloneDeep(this.gameState)
-      this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT)
-      this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT)
+      this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
+      this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
       this.validGameState?.user_events.forEach((_, i) => {
         this.notationList.push(this.eventNotation(i))
       })      
@@ -45,7 +45,7 @@ export class BoardLogComponent implements OnChanges {
 
   onSelection(e: number){
     if(this.validGameState){
-    this.gameLogEmitter.emit(this.getCorresponingEventChain(e)!.filter(evnt => evnt.event_type != GameEvents.OFFER_DRAW_EVENT))
+    this.gameLogEmitter.emit(this.getCorresponingEventChain(e)!.filter(evnt => evnt.event_type != GameEvents.OFFER_DRAW_EVENT && evnt.event_type != GameEvents.GIVE_UP_EVENT))
     if(e == this.validGameState?.user_events.length-1)
       this.gameReturnEmitter.emit()
     
@@ -113,6 +113,7 @@ export class BoardLogComponent implements OnChanges {
         || gameEvent?.event_type == GameEvents.PIECE_ROTATED_EVENT
         || gameEvent?.event_type == GameEvents.LASER_SHOT_EVENT
         || gameEvent?.event_type == GameEvents.OFFER_DRAW_EVENT
+        || gameEvent?.event_type == GameEvents.GIVE_UP_EVENT
   }
 
   getNotation(index: number){
