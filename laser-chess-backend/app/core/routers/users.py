@@ -1,13 +1,10 @@
-from datetime import timedelta
-
 from fastapi import Depends, HTTPException
 from fastapi import status, APIRouter
-from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app.core.dependecies import get_db, SECRET_KEY, ALGORITHM, TokenPurpose, authenticate_user, \
-    ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_current_active_user, get_current_user, verify_password
+from app.core.dependecies import get_db, SECRET_KEY, ALGORITHM, TokenPurpose, get_current_active_user, get_current_user, \
+    verify_password
 from app.core.internal import schemas, crud
 from app.game_engine.models import *
 
@@ -82,13 +79,13 @@ def read_user(username: str, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.get("/me/blocked")
+@router.get("/me/blocked", response_model=List[schemas.Username])
 async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return crud.get_blocked_users(user=current_user, db=db)
 
 
-@router.post("/block")
+@router.post("/block", response_model=schemas.BlockedUsers)
 async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     username = usernameSchema.username

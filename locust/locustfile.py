@@ -9,11 +9,13 @@ import logging
 
 # TODO figure out how to do setup for entire process?
 with open('testdata.csv', 'r+') as f_uc:
-    reader = csv.reader(f_uc)
+    reader = csv.reader(f_uc, )
+    next(reader, None)
     USER_CREDENTIALS = list(reader)
 
 with open('usernames.csv', 'r+') as f_u:
     reader = csv.reader(f_u)
+    next(reader, None)
     USERNAMES = list(reader)
 
 """
@@ -64,11 +66,12 @@ class FriendsModule(TaskSet):
 
     @task(10)
     def send_random_friend_request(self):
-        username = choice(USERNAMES)
+        username = choice(USERNAMES)[0]
+        logging.info('Friend request to %s username', username)
         with self.client.post(
                 "/users/me/friends/requests/send",
                 headers={"authorization": "Bearer " + self.token},
-                params={'friend_username': username}) as response:
+                json={"username": username}) as response:
             logging.info(response)
 
     @task(3)
@@ -82,8 +85,9 @@ class FriendsModule(TaskSet):
             if len(f_requests) > 0:
                 req = choice(f_requests)
                 with self.client.post(
-                        f"/users/me/friends/requests/accept?request_id={req['id']}",
-                        headers={"authorization": "Bearer " + self.token}) as response1:
+                        f"/users/me/friends/requests/accept",
+                        headers={"authorization": "Bearer " + self.token},
+                        json={"id": req['id']}) as response1:
                     logging.info(response1.json())
 
     @task(4)
@@ -97,8 +101,9 @@ class FriendsModule(TaskSet):
             if len(f_requests) > 0:
                 req = choice(f_requests)
                 with self.client.post(
-                        f"/users/me/friends/requests/decline?request_id={req['id']}",
-                        headers={"authorization": "Bearer " + self.token}) as response1:
+                        f"/users/me/friends/requests/decline",
+                        headers={"authorization": "Bearer " + self.token},
+                        json={"id": req['id']}) as response1:
                     logging.info(response1.json())
 
     @task(1)
@@ -128,13 +133,13 @@ class LoginWithUniqueUsersSteps(TaskSet):
             except KeyError:
                 response.failure("Response did not contain expected key 'access_token'")
 
-
+"""
 class LoginWithUniqueUsersTest(HttpUser):
     wait_time = between(1, 5)
     tasks = {LoginWithUniqueUsersSteps: 5}
     host = "http://localhost/api/v1"
     sock = None
-
+"""
 
 class FriendsTest(HttpUser):
     wait_time = between(1, 5)
@@ -151,7 +156,7 @@ class RegisterWithUniqueUsersTest(HttpUser):
     sock = None
 """
 
-
+"""
 class LaserTacticsGuestUser(HttpUser):
     @task
     def users(self):
@@ -161,3 +166,4 @@ class LaserTacticsGuestUser(HttpUser):
     def lobby(self):
         self.client.get("/lobby?skip=0&limit=100")
 
+"""

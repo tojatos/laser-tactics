@@ -106,7 +106,7 @@ class FriendRequestCreate(BaseModel):
 
 
 class FriendRequest(FriendRequestCreate):
-    id: int
+    id: str
     user_one_username: str
     status: FriendRequestStatus
 
