@@ -63,4 +63,12 @@ isLoggedIn(){
   return localStorage.getItem(this.idToken) != null
 }
 
+getUsername(){
+  if (localStorage.getItem(this.idToken) != null){
+  return this.getCurrentJwtInfo()!.sub}
+  else{
+    return ""
+  }
+}
+
 }

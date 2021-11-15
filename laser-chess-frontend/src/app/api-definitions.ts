@@ -8,6 +8,7 @@ export const lobbyEndpoint = '/lobby'
 export const updateLobbyEndpoint = '/lobby/update'
 export const createLobbyEndpoint = '/lobby/create'
 export const joinLobbyEndpoint = '/lobby/join'
+export const leaveLobbyEndpoint = '/lobby/leave'
 export const userEndpoint = '/users'
 export const gameEnpoint = '/game'
 export const startGameEndpoint = '/start_game'
@@ -28,6 +29,7 @@ export const lobbyFullEndpoint = (id: string = "") => fullEndpoint(lobbyEndpoint
 export const updateLobbyFullEndpoint = (id: string = "") => fullEndpoint(updateLobbyEndpoint, `/${id}`)
 export const createLobbyFullEndpoint = (id: string = "") => fullEndpoint(createLobbyEndpoint, `/${id}`)
 export const joinLobbyFullEndpoint = (id: string = "") => fullEndpoint(joinLobbyEndpoint, `/${id}`)
+export const leaveLobbyFullEndpoint = (id: string = "") => fullEndpoint(leaveLobbyEndpoint, `/${id}`)
 export const gameFullEndpoint = (id: string  = "") => fullEndpoint(gameEnpoint, `/${id}`)
 export const startGameFullEndpoint = fullEndpoint(startGameEndpoint)
 export const userFullEndpoint = (id: string  = "") => fullEndpoint(userEndpoint, `/${id}`)
