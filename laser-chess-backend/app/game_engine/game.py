@@ -308,7 +308,6 @@ class Game:
         game_draw_offers: List[OfferDrawEvent] = [e for e in self.game_state.user_events if
                                                   isinstance(e, OfferDrawEvent)]
         this_player_draw_offers = [e for e in game_draw_offers if e.player is player]
-        print(this_player_draw_offers)
 
         if not this_player_draw_offers:
             return True, ""
