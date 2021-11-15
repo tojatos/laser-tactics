@@ -5,10 +5,4 @@ RUN npm install
 RUN npm install -g @angular/cli
 COPY . .
 
-ARG BASE_HREF=/
-RUN ng build --base-href="${BASE_HREF}"
-
-FROM nginx:1.21.3
-COPY --from=build /app/dist/laser-chess-frontend  /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+ENTRYPOINT ng serve --host 0.0.0.0 --port 8080 --proxy-config ./src/proxy.conf.docker.json

@@ -1,48 +1,26 @@
 version: '3.7'
 services:
   angular:
-    restart: always
-    build:
-      context: ./laser-chess-frontend
-      args:
-        BASE_HREF: "/"
-    networks:
-      - web
-      - default
+    build: ./laser-chess-frontend
+    ports:
+      - '8080:8080'
     depends_on:
       - fastapi
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.laser-tactics-front.rule=(Host(`lasertactics.online`))"
-      - "traefik.http.routers.laser-tactics-front.tls=true"
-      - "traefik.http.routers.laser-tactics-front.tls.certresolver=myresolver"
-      - "traefik.http.services.laser-tactics-front.loadbalancer.server.port=80"
-      - "traefik.docker.network=traefik_default"
 
   fastapi:
     build: ./laser-chess-backend
     restart: always
     command: python -m app.main
-    networks:
-      - web
-      - default
+    ports:
+      - 80:80
     depends_on:
       - db
     environment:
       - SQLALCHEMY_DATABASE_URL=postgresql://postgres:admin@db:5432/laserchess
       - HOST=0.0.0.0
       - PORT=80
-      - ROOT_PATH=/laser-tactics-api
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.middlewares.laser-tactics-api-stripprefix.stripPrefix.prefixes=/laser-tactics-api"
-      - "traefik.http.routers.laser-tactics-api.rule=(Host(`lasertactics.online`) && PathPrefix(`/laser-tactics-api/`))"
-      - "traefik.http.routers.laser-tactics-api.middlewares=laser-tactics-api-stripprefix"
-      - "traefik.http.routers.laser-tactics-api.entrypoints=websecure"
-      - "traefik.http.routers.laser-tactics-api.tls=true"
-      - "traefik.http.routers.laser-tactics-api.tls.certresolver=myresolver"
-      - "traefik.http.services.laser-tactics-api.loadbalancer.server.port=80"
-      - "traefik.docker.network=traefik_default"
+      - ROOT_PATH=
+
   db:
     image: postgres:13.0-alpine
     volumes:
@@ -56,8 +34,3 @@ services:
 
 volumes:
   postgres_data:
-
-networks:
-  web:
-    name: traefik_default
-    external: true

@@ -1,0 +1,14 @@
+FROM node:16.10.0 AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
+RUN npm install -g @angular/cli
+COPY . .
+
+ARG BASE_HREF=/
+RUN ng build --base-href="${BASE_HREF}"
+
+FROM nginx:1.21.3
+COPY --from=build /app/dist/laser-chess-frontend  /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
