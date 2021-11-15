@@ -1,18 +1,21 @@
 import dataclasses
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 
+from app.core.dependecies import RATING_PERIOD
 from app.core.internal import schemas, models
 from passlib.context import CryptContext
 
-from app.core.internal.schemas import LobbyStatus
+from app.core.internal.schemas import LobbyStatus, GameResult
 from app.game_engine.models import GameState
 from app.game_engine.requests import StartGameRequest
 from uuid import uuid4
+from app.Rating.schemas import PlayerMatchResult, PlayerMatchHistory, PlayerRatingUpdate
+from app.Rating.rating import get_starting_rating, update_rating
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -141,7 +144,8 @@ def get_users_pending_friend_requests(user: schemas.User, db: Session):
 
 
 def create_friend_request(user_sending: schemas.User, user_sent_to: schemas.User, db: Session):
-    request = models.FriendRequests(id=str(uuid4()), user_one_username=user_sending.username, user_two_username=user_sent_to.username,
+    request = models.FriendRequests(id=str(uuid4()), user_one_username=user_sending.username,
+                                    user_two_username=user_sent_to.username,
                                     status=schemas.FriendRequestStatus.PENDING)
     db.add(request)
     db.commit()
@@ -222,3 +226,61 @@ def update_game(db: Session, game_state: GameState, game_id: str):
     db_game_state = get_game_state_table(db, game_id)
     db_game_state.game_state_json = game_state_json
     db.commit()
+
+
+def get_player_rating(db: Session, user: schemas.User):
+    db_user = get_user(db, user.username)
+    rating = schemas.UserRating(username=db_user.username, rating=db_user.rating,
+                                rating_deviation=db_user.rating_deviation, rating_volatility=db_user.rating_volatility)
+    return rating
+
+
+def update_user_rating_in_db(db: Session, rating: schemas.UserRating):
+    db_user = get_user(db, rating.username)
+    db_user.rating = rating.rating
+    db_user.rating_deviation = rating.rating_deviation
+    db_user.rating_volatility = rating.rating_volatility
+    db.commit()
+    db.refresh(db_user)
+    return rating
+
+
+# rating period in days
+def get_user_matches(db: Session, user: schemas.User, rating_period: int):
+    def determine_result_player_one(result):
+        if result == GameResult.PLAYER_ONE_WIN:
+            return 1
+        elif result == GameResult.DRAW:
+            return 0.5
+        else:
+            return 0
+
+    def determine_result_player_two(result):
+        if result == GameResult.PLAYER_TWO_WIN:
+            return 1
+        elif result == GameResult.DRAW:
+            return 0.5
+        else:
+            return 0
+
+    crossout_date = datetime.now() - timedelta(days=rating_period)
+    matches_left = db.query(models.GameHistory).filter(
+        and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date))
+    list_left = [PlayerMatchResult(player2_rating=match.player_two_rating,
+                                   player2_rating_deviation=match.player_two_deviation,
+                                   result=determine_result_player_one(match.result)) for
+                 match in matches_left]
+    list_right = [PlayerMatchResult(player2_rating=match.player_one_rating,
+                                    player2_rating_deviation=match.player_one_deviation,
+                                    result=determine_result_player_two(match.result)) for
+                  match in matches_left]
+    return PlayerMatchHistory(matches=(list_left + list_right))
+
+
+def update_user_rating(db: Session, player: schemas.User):
+    user_rating = get_player_rating(db, player)
+    matches = get_user_matches(db, player, RATING_PERIOD)
+    new_rating = update_rating(PlayerRatingUpdate(rating=user_rating.rating, rating_deviation=user_rating.rating_deviation, volatility=user_rating.rating_volatility), matches)
+    new_user_rating = schemas.UserRating(username=player.username, rating=new_rating.rating, rating_deviation=new_rating.rating_deviation, rating_volatility=new_rating.volatility)
+    update_user_rating_in_db(db, new_user_rating)
+

@@ -2,6 +2,7 @@ from enum import Enum, auto
 from typing import List, Optional
 
 from pydantic import BaseModel, validator, EmailStr
+import datetime as dt
 
 
 class AutoNameEnum(Enum):
@@ -20,6 +21,12 @@ class LobbyStatus(AutoNameEnum):
     ABANDONED = auto()
     GAME_STARTED = auto()
     GAME_ENDED = auto()
+
+
+class GameResult(AutoNameEnum):
+    PLAYER_ONE_WIN = auto()
+    PLAYER_TWO_WIN = auto()
+    DRAW = auto()
 
 
 class ChangePasswordSchema(BaseModel):
@@ -72,10 +79,29 @@ class User(UserBase):
     is_active: bool
     is_verified: bool
 
-    # rating: int
+    rating: int
 
     class Config:
         orm_mode = True
+
+
+class UserRating(BaseModel):
+    username: str
+    rating: int
+    rating_deviation: float
+    rating_volatility: float
+
+
+class GameHistoryEntry(BaseModel):
+    player_one_username: str
+    player_one_rating: int
+    player_one_deviation: float
+    player_two_username: str
+    player_two_rating: int
+    player_two_deviation: float
+    result: GameResult
+    game_end_date: dt.datetime
+    is_rated: bool
 
 
 class LobbyEditData(BaseModel):
