@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/auth.service';
 import { Router } from '@angular/router';
-import { LoginEmitterService } from 'src/app/services/login-emitter.service';
 import { LobbyService } from 'src/app/services/lobby.service';
-import { Lobby } from 'src/app/app.models';
 
 @Component({
   selector: 'app-main-nav',
@@ -30,7 +28,7 @@ export class MainNavComponent {
 
     logout(){
       this.authService.clearJWT()
-      this.router.navigate(['/'])
+      this.redirectTo('/')
     }
 
     getUsername(){
@@ -40,8 +38,13 @@ export class MainNavComponent {
     async createLobby(){
       this.lobby = await this.lobbyService.createLobby()
       console.log(this.lobby)
-      this.router.navigate(['/lobby', this.lobby.game_id])
-        }
+      this.redirectTo('/lobby', this.lobby.game_id)
+    }
+
+  redirectTo(uri:string, params: string = ""){
+      this.router.navigate([uri, params]).then(()=>
+      window.location.reload() );
+  }
 
 
 }

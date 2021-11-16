@@ -7,13 +7,13 @@
       <span>Laser Tactics</span>
       <span class="spacer"></span>
       <div fxShow="true" fxHide.lt-md="true" >
-        <a href="#" mat-button routerLink="">Home</a>
-        <a href="#" mat-button [routerLink]="lobby" (click)="createLobby()">New game</a>
+        <a mat-button (click)="redirectTo('/')">Home</a>
+        <a mat-button (click)="createLobby()">New game</a>
         <a href="/tutorial" mat-button>Tutorial</a>
         <a href="/settings" mat-button>Settings</a>
-        <a href="#" *ngIf="!isLoggedin"  mat-button routerLink="login" routerLinkActive="active">Login</a>
-        <a href="#" *ngIf="!isLoggedin" mat-button mat-raised-button routerLink="register" routerLinkActive="active">Register</a>
-        <a mat-button *ngIf="isLoggedin" mat-button routerLink="user" routerLinkActive="active">Profile</a>
+        <a *ngIf="!isLoggedin"  mat-button (click)="redirectTo('/login')">Login</a>
+        <a *ngIf="!isLoggedin" mat-button mat-raised-button (click)="redirectTo('/register')">Register</a>
+        <a mat-button *ngIf="isLoggedin" mat-button (click)="redirectTo('/profile')">Profile</a>
         <a mat-button *ngIf="isLoggedin" (click)="logout()">Logout</a>
       </div>
     </mat-toolbar-row>
