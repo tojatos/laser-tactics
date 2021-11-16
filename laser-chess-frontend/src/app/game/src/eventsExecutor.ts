@@ -36,7 +36,6 @@ export class EventsExecutor{
           board.executeEvent(event)
           if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum)
             this.gameService.showDrawOffer(board.gameId!)
-          this.gameService.setLocalGameState(board.serialize())
           this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
         }
       }

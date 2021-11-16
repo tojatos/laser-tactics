@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { clone } from "lodash";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { GameEvent, GameState } from "../game.models";
@@ -38,6 +39,13 @@ export class Game{
         this.refreshGameState(value);
       });
     }
+
+    if (this.eventEmitter.subsRollback == undefined) {
+      this.eventEmitter.subsRollback = this.eventEmitter.invokeMoveRollback.subscribe((value: GameState) => {
+        this.board.initBoard(value, this.displaySize)
+        this.gameCanvas.redrawGame(this.board)
+      });
+    }
   }
 
   get displaySize(){
@@ -65,6 +73,8 @@ export class Game{
       this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)
       const myTurn = this.board.isMyTurn()
       this.gameCanvas.interactable = myTurn
+
+      console.log(myTurn)
 
       this.isInitiated = true
   }
