@@ -3,13 +3,13 @@ import { environment } from "src/environments/environment";
 export const fullEndpoint = (endpoint: String, sub: String = "/") => `${environment.API_URL}${environment.API_PREFIX}${endpoint}${sub}`
 
 export const usersEndpoint = '/users'
+export const friendsEndpoint = '/users/me/friends'
 export const tokenEndpoint = '/token'
 export const lobbyEndpoint = '/lobby'
 export const updateLobbyEndpoint = '/lobby/update'
 export const createLobbyEndpoint = '/lobby/create'
 export const joinLobbyEndpoint = '/lobby/join'
 export const leaveLobbyEndpoint = '/lobby/leave'
-export const userEndpoint = '/users'
 export const gameEnpoint = '/game'
 export const startGameEndpoint = '/start_game'
 export const gameStateEndpoint = '/get_game_state'
@@ -32,7 +32,8 @@ export const joinLobbyFullEndpoint = (id: string = "") => fullEndpoint(joinLobby
 export const leaveLobbyFullEndpoint = (id: string = "") => fullEndpoint(leaveLobbyEndpoint, `/${id}`)
 export const gameFullEndpoint = (id: string  = "") => fullEndpoint(gameEnpoint, `/${id}`)
 export const startGameFullEndpoint = fullEndpoint(startGameEndpoint)
-export const userFullEndpoint = (id: string  = "") => fullEndpoint(userEndpoint, `/${id}`)
+export const userFullEndpoint = (id: string  = "") => fullEndpoint(usersEndpoint, `/${id}`)
+export const friendsFullEndpoint = (id: string  = "") => fullEndpoint(friendsEndpoint, `/${id}`)
 
 
 

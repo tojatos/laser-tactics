@@ -12,11 +12,10 @@ export class RegisterComponent implements OnInit {
 
   hide = true;
   form = new FormGroup({
-    username: new FormControl(''),
-    email: new FormControl(''),
-    password: new FormControl(''),
+    username: new FormControl('',[Validators.required]),
+    email: new FormControl('',[Validators.required, Validators.email]),
+    password: new FormControl('',[Validators.required]),
   });
-  errorMessage = '';
   constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
@@ -27,8 +26,9 @@ export class RegisterComponent implements OnInit {
   onSubmit(): void {
     const { username, email, password } = this.form.value;
     if (!this.authService.isLoggedIn() && username && email && password) {
-      this.authService.register(username, email, password)
-      this.router.navigate(['/login']);
+      this.authService.register(username, email, password).then(res => {
+        this.router.navigate(['/login'])
+      }).catch(err => console.log(err))
     }
     else {
       console.log("")
@@ -37,4 +37,5 @@ export class RegisterComponent implements OnInit {
   get loggedIn() {
     return this.authService.isLoggedIn()
   }
+
 }
