@@ -30,11 +30,8 @@ export class GameWebsocketService extends AbstractGameService {
   connect(gameId: string){
     this.subject.asObservable().subscribe(
       msg => {
-        console.log(msg)
         if(msg.status_code && msg.status_code != 200){
-          console.log(msg.body)
           this.showSnackbar(msg.body)
-          console.log(this.lastMessage)
           if(this.lastMessage)
             this.eventEmitter.invokeRollback(this.lastMessage)
           else
@@ -43,7 +40,6 @@ export class GameWebsocketService extends AbstractGameService {
         else if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
           this.lastMessage = msg
-          console.log(msg)
           this.eventEmitter.invokeRefresh(msg)
         }
       },

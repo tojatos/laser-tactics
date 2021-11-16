@@ -58,6 +58,7 @@ export class Game{
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
     this.gameService.connect(this.gameId)
+    this.gameCanvas.redrawGame(this.board)
   }
 
   destroyGame(){

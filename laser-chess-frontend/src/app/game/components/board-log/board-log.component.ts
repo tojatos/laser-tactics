@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { cloneDeep } from 'lodash';
 import { GameEvent, GameState } from '../../game.models';
 import { GameEvents } from '../../src/enums';
@@ -8,7 +8,7 @@ import { GameEvents } from '../../src/enums';
   templateUrl: './board-log.component.html',
   styleUrls: ['./board-log.component.scss']
 })
-export class BoardLogComponent implements OnChanges {
+export class BoardLogComponent implements OnChanges, OnDestroy {
 
   @Input() gameState: GameState | undefined
   @Input() maxHeight: number = 300
@@ -20,11 +20,11 @@ export class BoardLogComponent implements OnChanges {
   notationList: string[] = []
   validGameState: GameState | undefined
 
-  constructor() { }
+  constructor() {}
 
   ngOnChanges(changes: SimpleChanges){
+    this.notationList = []
     if(changes.gameState && changes.gameState.currentValue?.game_events.length > 0){
-      this.notationList = []
       this.validGameState = cloneDeep(this.gameState)
       this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
       this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
@@ -32,6 +32,10 @@ export class BoardLogComponent implements OnChanges {
         this.notationList.push(this.eventNotation(i))
       })
     }
+  }
+
+  ngOnDestroy(){
+    this.notationList = []
   }
 
   buildEvent(gameEvents: GameEvent[]) {
