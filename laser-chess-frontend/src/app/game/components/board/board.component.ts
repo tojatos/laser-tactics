@@ -23,7 +23,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   constructor(private route: ActivatedRoute, public game: Game) {}
 
   ngAfterViewInit() {
-
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
       alert("Couldn't load context")
@@ -33,12 +32,11 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     this.route.params.subscribe(async params => {
       await this.game.initGame(gameCanvasContext, this.currentSize, params.id, this.sizeScale)
     })
-
   }
 
   ngOnDestroy() {
     this.game.closeWebsocketConnection()
-    this.game.isInitiated = false
+    this.game.destroyGame()
   }
 
   @HostListener('window:resize', ['$event'])
@@ -96,15 +94,15 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   get rotationPossibleInfo() {
-    return this.game.gameActions.rotationActive
+    return this.game.gameActions?.rotationActive
   }
 
   get laserPossibleInfo() {
-    return this.game.gameActions.laserActive
+    return this.game.gameActions?.laserActive
   }
 
   get acceptPossibleInfo() {
-    return this.game.gameActions.acceptActive
+    return this.game.gameActions?.acceptActive
   }
 
 }

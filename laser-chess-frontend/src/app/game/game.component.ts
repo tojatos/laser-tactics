@@ -7,13 +7,6 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GameComponent {
 
-  isInitiated = false
-
-  constructor() {
-    console.log(this.isInitiated)
-    if(!this.isInitiated){
-      this.isInitiated = true
-    }
-  }
+  constructor() {}
 
 }
