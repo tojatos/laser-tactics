@@ -29,6 +29,8 @@ export class Game{
   executingActions = false
   isInitiated = false
   analizeMode = analizeModes.NOT_ANALIZING
+  gamePhase: GamePhase = GamePhase.NOT_STARTED
+  whoseTurn: PlayerType = PlayerType.NONE
 
   constructor(public gameService: GameWebsocketService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
@@ -57,13 +59,13 @@ export class Game{
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
 
-      if(this.board.playerNum == PlayerType.PLAYER_TWO)
+      if(this.board.playerNum[0] == PlayerType.PLAYER_TWO)
         this.flipBoard()
 
       this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)
       const myTurn = this.board.isMyTurn()
       this.gameCanvas.interactable = myTurn
-      
+
       this.isInitiated = true
   }
 
@@ -118,12 +120,15 @@ export class Game{
           this.loadConcreteGameState(newGameState)
           this.analizeMode = analizeModes.NOT_ANALIZING
         }
-        else 
+        else
           this.loadNewGameState(newGameState)
     }
     }
     else
       console.error("Board not properly initialized")
+
+    this.gamePhase = newGameState.game_phase
+    this.whoseTurn = this.board.isMyTurn() ? this.board.playerNum : this.board.opponentNum
   }
 
   showGameEvent(gameEvents: GameEvent[]){

@@ -33,6 +33,7 @@ export class GameWebsocketService extends AbstractGameService {
         if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
           this.lastMessage = msg
+          console.log(msg)
           this.eventEmitter.invokeRefresh(msg)
         }
       },
