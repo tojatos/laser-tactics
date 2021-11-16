@@ -13,7 +13,7 @@ services:
       - fastapi
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laser-tactics-front.rule=(Host(`lasertactics.online`))"
+      - "traefik.http.routers.laser-tactics-front.rule=(Host(`lasertactics.online`) || Host(`www.lasertactics.online`))"
       - "traefik.http.routers.laser-tactics-front.tls=true"
       - "traefik.http.routers.laser-tactics-front.tls.certresolver=myresolver"
       - "traefik.http.services.laser-tactics-front.loadbalancer.server.port=80"
@@ -37,7 +37,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.laser-tactics-api-stripprefix.stripPrefix.prefixes=/laser-tactics-api"
-      - "traefik.http.routers.laser-tactics-api.rule=(Host(`lasertactics.online`) && PathPrefix(`/laser-tactics-api/`))"
+      - "traefik.http.routers.laser-tactics-api.rule=((Host(`lasertactics.online`) || Host(`www.lasertactics.online`)) && PathPrefix(`/laser-tactics-api/`))"
       - "traefik.http.routers.laser-tactics-api.middlewares=laser-tactics-api-stripprefix"
       - "traefik.http.routers.laser-tactics-api.entrypoints=websecure"
       - "traefik.http.routers.laser-tactics-api.tls=true"
