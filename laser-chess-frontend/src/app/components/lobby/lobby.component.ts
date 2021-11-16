@@ -1,5 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import * as _ from 'lodash';
 import { Lobby, User } from 'src/app/app.models';
 import { LobbyService } from 'src/app/services/lobby.service';
 import { UserService } from 'src/app/services/user.service';
@@ -17,7 +18,12 @@ export class LobbyComponent implements OnInit, OnDestroy {
   refresh = true
   player_one: string | undefined
   player_two: string | undefined
-  
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: Event) {
+    window.location.reload()
+  }
+
   ngOnInit(): void {
     this.route.params.subscribe(async params => {
       this.refreshLobbyState(params.id)
@@ -31,7 +37,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   async changePlayers(){
     if (this.lobby) {
       this.lobby.starting_position_reversed = !this.lobby.starting_position_reversed
-      await this.lobbyService.updateLobby(this.lobby)    
+      await this.lobbyService.updateLobby(this.lobby)
     }
   }
 
@@ -42,9 +48,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
   }
 
-  startGame() {
+  async startGame() {
     if (this.lobby &&  this.player_one && this.player_two) {
-      this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two)
+      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two)
       this.router.navigate(['/game', this.lobby.game_id])
     }
 

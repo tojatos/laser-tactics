@@ -5,12 +5,16 @@ import { PieceType } from "./enums";
 import { Piece } from "./piece";
 
 export class Cell implements CellInterface {
-  coordinates: Coordinates
-  canvasCoordinates: Coordinates
-  piece: Piece | null
+  coordinates!: Coordinates
+  canvasCoordinates!: Coordinates
+  piece!: Piece | null
   auxiliaryPiece: Piece | null = null
 
   constructor(coordinates: Coordinates, piece: PieceInterface | null, auxiliaryPiece: PieceInterface | null, blockSize: number){
+    this.init(coordinates, piece, auxiliaryPiece, blockSize)
+  }
+
+  init(coordinates: Coordinates, piece: PieceInterface | null, auxiliaryPiece: PieceInterface | null, blockSize: number){
     this.coordinates = coordinates
     this.canvasCoordinates = this.canvasCoordinatesSetter(blockSize)
     this.piece = piece && new Piece(piece.piece_owner, piece.piece_type, piece.rotation_degree, this.cloneCoordinates(this.canvasCoordinates))

@@ -26,10 +26,10 @@ export class MainPageComponent implements OnInit {
     console.log(this.dataSource.data)
     this.fetched = true
   }
- 
+
   getLobbies() {
        this.lobbyService.getLobbies().then(
-          lobbies => { 
+          lobbies => {
             console.log(lobbies)
              this.dataSource.data = lobbies}
         )
@@ -37,12 +37,12 @@ export class MainPageComponent implements OnInit {
 
   openLobby(lobby: Lobby) {
     console.log(lobby)
-    this.router.navigate(['/lobby', lobby.id])
+    this.router.navigate(['/lobby', lobby.game_id])
   }
 
   joinLobby(lobby: Lobby) {
-    this.lobbyService.joinLobby(lobby.id)
-    this.router.navigate(['/lobby', lobby.id])
+    this.lobbyService.joinLobby(lobby.game_id)
+    this.router.navigate(['/lobby', lobby.game_id])
   }
 
   async refreshList(){

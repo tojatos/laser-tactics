@@ -1,3 +1,6 @@
+<h1>{{parseGamePhase(game.gamePhase)}}</h1>
+<div [style.width.px]="containerWidth * 1.7" [style.height.px]="containerHeight">
+<div class="float">
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
   <canvas #canvas class="gameCanvas"></canvas>
 </div>
@@ -8,6 +11,15 @@
 [rotationPossible]="rotationPossibleInfo" [acceptPossible]="acceptPossibleInfo" [laserPossible]="laserPossibleInfo"
 fxLayoutAlign="center"></app-board-actions>
 </div>
-
-
+</div>
+<app-board-log class="float"
+[gameState]="game.gameService.lastMessage"
+[maxHeight]="containerHeight * 0.8"
+(gameLogEmitter)="buildEvent($event)"
+(gameReturnEmitter)="returnToCurrentEvent()"
+(giveUpEmitter)="game.giveUp()"
+(drawEmitter)="game.offerDraw()"
+></app-board-log>
+<div style="clear: both"></div>
+</div>
 
