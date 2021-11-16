@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { clone } from "lodash";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { GameEvent, GameState } from "../game.models";
@@ -161,7 +160,7 @@ export class Game{
       console.error("Board not properly initialized")
 
     this.gamePhase = newGameState.game_phase
-    this.whoseTurn = this.board.isMyTurn() ? this.board.playerNum : this.board.opponentNum
+    this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
   }
 
   showGameEvent(gameEvents: GameEvent[]){
