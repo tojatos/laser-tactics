@@ -9,7 +9,6 @@ def test_create_user(tu):
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["email"] == "deadpool@example.com"
-    assert "id" in data
 
     response = tu.post_data("/token", data={"username": "deadpool", "password": "chimichangas4life"})
     assert response.status_code == 200, response.text

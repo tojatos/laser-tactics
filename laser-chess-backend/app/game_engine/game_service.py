@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from .game import Game
 from .models import *
 from .requests import *
-from ..core import crud
+from ..core.internal import crud
 
 
 def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerializable:

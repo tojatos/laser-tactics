@@ -1,9 +1,10 @@
 import pytest
 from starlette.websockets import WebSocket
 
+from app.core.dependecies import manager
 from app.game_engine.models import *
 from app.game_engine.requests import *
-from app.main import app, get_db, API_PREFIX, manager
+from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
 
@@ -35,6 +36,8 @@ def before_all():
     create_user_datas = list(
         map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 3)))
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
+    for user in create_user_datas:
+        verify_user(session, user["username"])
     tu.post_data(
         "/start_game",
         tokens[0],

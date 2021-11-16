@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from typing import List, Optional
 
-from pydantic import BaseModel, validator, validate_email, EmailStr
+from pydantic import BaseModel, validator, EmailStr
 
 
 class AutoNameEnum(Enum):
@@ -15,22 +15,21 @@ class FriendRequestStatus(AutoNameEnum):
     REJECTED = auto()
 
 
-class ItemBase(BaseModel):
-    title: str
-
-    description: Optional[str] = None
-
-
-class ItemCreate(ItemBase):
-    pass
+class LobbyStatus(AutoNameEnum):
+    CREATED = auto()
+    ABANDONED = auto()
+    GAME_STARTED = auto()
+    GAME_ENDED = auto()
 
 
-class Item(ItemBase):
-    id: int
-    owner_id: int
+class ChangePasswordSchema(BaseModel):
+    oldPassword: str
+    newPassword: str
 
-    class Config:
-        orm_mode = True
+
+class EmergencyChangePasswordSchema(BaseModel):
+    token: str
+    newPassword: str
 
 
 class UserBase(BaseModel):
@@ -61,19 +60,25 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+    purpose: Optional[str] = None
+
+
+class VerificationTokenData(BaseModel):
+    email: Optional[str] = None
+    purpose: Optional[str] = None
 
 
 class User(UserBase):
-    id: int
     is_active: bool
-    items: List[Item] = []
+    is_verified: bool
+
+    # rating: int
 
     class Config:
         orm_mode = True
 
 
 class LobbyEditData(BaseModel):
-    id: int
     game_id: str
     name: str
     player_one_username: str
@@ -83,14 +88,14 @@ class LobbyEditData(BaseModel):
 
 
 class Lobby(BaseModel):
-    id: int
     game_id: str
     name: str
-    player_one_username: str
+    player_one_username: Optional[str] = None
     player_two_username: Optional[str] = None
     is_ranked: bool = False
     is_private: bool = False
     starting_position_reversed: bool = False
+    lobby_status: LobbyStatus
 
     class Config:
         orm_mode = True
@@ -101,7 +106,7 @@ class FriendRequestCreate(BaseModel):
 
 
 class FriendRequest(FriendRequestCreate):
-    id: int
+    id: str
     user_one_username: str
     status: FriendRequestStatus
 
@@ -110,3 +115,15 @@ class BlockedUsers(BaseModel):
     id: int
     user: str
     blocked_user: str
+
+
+class Username(BaseModel):
+    username: str
+
+
+class LobbyId(BaseModel):
+    game_id: str
+
+
+class FriendRequestId(BaseModel):
+    id: str
