@@ -1,4 +1,4 @@
-import glicko2
+from glicko2 import glicko2
 
 from .schemas import PlayerMatchHistory, PlayerRatingUpdate
 
