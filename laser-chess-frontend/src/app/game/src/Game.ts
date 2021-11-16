@@ -42,8 +42,7 @@ export class Game{
 
     if (this.eventEmitter.subsRollback == undefined) {
       this.eventEmitter.subsRollback = this.eventEmitter.invokeMoveRollback.subscribe((value: GameState) => {
-        this.board.initBoard(value, this.displaySize)
-        this.gameCanvas.redrawGame(this.board)
+          this.loadStaticGameState(value)
       });
     }
   }
@@ -98,6 +97,11 @@ export class Game{
     this.gameCanvas.interactable = myTurn
   }
 
+  loadStaticGameState(gameState: GameState){
+    this.board.initBoard(gameState, this.displaySize)
+    this.gameCanvas.redrawGame(this.board)
+  }
+
   async loadNewGameState(newGameState: GameState){
     this.executingActions = true
     const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
@@ -117,22 +121,21 @@ export class Game{
   }
 
   async refreshGameState(newGameState: GameState){
-    if(this.gameId && this.analizeMode != analizeModes.ANALIZING){
-      if(newGameState.game_phase != GamePhase.STARTED){
-        if(!this.isInitiated)
-          this.loadDisplay(this.displaySize, newGameState)
-        this.gameCanvas.interactable = false
+    if(this.gameId){
+      if(this.analizeMode != analizeModes.ANALIZING){
+          if(!this.isInitiated)
+            this.loadDisplay(this.displaySize, newGameState)
+          else if(this.analizeMode == analizeModes.EXITING_ANALYZE_MODE){
+            this.loadConcreteGameState(newGameState)
+            this.analizeMode = analizeModes.NOT_ANALIZING
+          }
+          else
+            this.loadNewGameState(newGameState)
+
+        if(newGameState.game_phase != GamePhase.STARTED)
+            this.gameCanvas.interactable = false
+
       }
-      else{
-        if(!this.isInitiated)
-          this.loadDisplay(this.displaySize, newGameState)
-        else if(this.analizeMode == analizeModes.EXITING_ANALYZE_MODE){
-          this.loadConcreteGameState(newGameState)
-          this.analizeMode = analizeModes.NOT_ANALIZING
-        }
-        else
-          this.loadNewGameState(newGameState)
-    }
     }
     else
       console.error("Board not properly initialized")
