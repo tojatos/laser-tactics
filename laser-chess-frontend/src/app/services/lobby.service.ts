@@ -35,7 +35,7 @@ export class LobbyService {
   }
 
   leaveLobby(lobby_id: string){
-    return this.http.patch<any>(leaveLobbyFullEndpoint() + `?lobby_id=${lobby_id}`, {}).toPromise()
+    return this.http.patch<any>(leaveLobbyFullEndpoint(), {game_id: lobby_id}).toPromise()
   }
 
 }

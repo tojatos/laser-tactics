@@ -7,6 +7,7 @@ import { forEach } from 'lodash';
 import { Lobby } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import { LobbyService } from 'src/app/services/lobby.service';
+import { LobbyStatus } from '../lobby/lobby.component';
 
 @Component({
   selector: 'app-main-page',
@@ -26,24 +27,20 @@ export class MainPageComponent implements OnInit {
   constructor(private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router) {}
 
   async ngOnInit() {
-    this.dataSource.data = await this.lobbyService.getLobbies()
-    this.dataSource.data.forEach(function(item, index, object) {
-      if(item.is_private==true) 
-      {
-        object.splice(index, 1);
-      }
-    })
+    const data = await this.lobbyService.getLobbies()
+
+    this.dataSource.data = data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED).slice(0, 8)
     this.fetched = true
   }
 
   openLobby(lobby: Lobby) {
     console.log(lobby)
-    this.router.navigate(['/lobby', lobby.id])
+    this.router.navigate(['/lobby', lobby.game_id])
   }
 
   joinLobby(lobby: Lobby) {
-    this.lobbyService.joinLobby(lobby.id)
-    this.router.navigate(['/lobby', lobby.id])
+    this.lobbyService.joinLobby(lobby.game_id)
+    this.router.navigate(['/lobby', lobby.game_id])
   }
 
   getMode(ranked: any) {
@@ -57,20 +54,16 @@ export class MainPageComponent implements OnInit {
 
   async refreshList(){
     this.fetched = false
-    this.dataSource.data = await this.lobbyService.getLobbies()
-    this.dataSource.data.forEach(function(item, index, object) {
-      if(item.is_private==true)
-      {
-        object.splice(index, 1);
-      }
-    })
+    const data = await this.lobbyService.getLobbies()
+
+    this.dataSource.data = data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED).slice(0, 8)
     this.fetched = true
   }
 
   async createLobby(){
     this.lobby = await this.lobbyService.createLobby()
     console.log(this.lobby)
-    this.router.navigate(['/lobby', this.lobby.id])
+    this.router.navigate(['/lobby', this.lobby.game_id])
       }
 
   async createPrivateLobby(){
@@ -78,7 +71,7 @@ export class MainPageComponent implements OnInit {
     this.lobby.is_private = true
     this.lobbyService.updateLobby(this.lobby)
     console.log(this.lobby)
-    this.router.navigate(['/lobby', this.lobby.id])
+    this.router.navigate(['/lobby', this.lobby.game_id])
       }
 
   async createRankedLobby(){
@@ -86,7 +79,7 @@ export class MainPageComponent implements OnInit {
     this.lobby.is_ranked = true
     this.lobbyService.updateLobby(this.lobby)
     console.log(this.lobby)
-    this.router.navigate(['/lobby', this.lobby.id])
+    this.router.navigate(['/lobby', this.lobby.game_id])
       }
 
 }

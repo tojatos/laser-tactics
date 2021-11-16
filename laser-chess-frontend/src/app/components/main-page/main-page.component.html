@@ -1,6 +1,6 @@
 <div *ngIf="fetched" class="main-wrapper" fxLayout="row" fxLayout.sm="column" fxLayout.xs="column" fxLayoutAlign="space-evenly stretch">
   <div *ngIf="fetched" fxFlex="40" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" >
-    <mat-table [dataSource]="dataSource.filteredData|slice:0:8" class="table-box">
+    <mat-table [dataSource]="dataSource" class="table-box">
 
       <ng-container matColumnDef="player_one_username">
         <mat-header-cell *matHeaderCellDef > Player 1 </mat-header-cell>

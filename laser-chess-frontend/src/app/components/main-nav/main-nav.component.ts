@@ -25,7 +25,7 @@ export class MainNavComponent {
 
     lobby: any
     username = ""
-    
+
     get isLoggedin(){
       this.getUsername()
       return this.authService.isLoggedIn()
@@ -45,7 +45,7 @@ export class MainNavComponent {
     getUsername(){
       this.username = this.authService.getUsername()
     }
-    
+
   redirectTo(uri:string, params: string = ""){
       this.router.navigate([uri, params]).then(()=>
       window.location.reload() );

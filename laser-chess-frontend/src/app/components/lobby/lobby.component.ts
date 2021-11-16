@@ -6,6 +6,13 @@ import * as _ from 'lodash';
 import { LobbyService } from 'src/app/services/lobby.service';
 import { UserService } from 'src/app/services/user.service';
 
+export enum LobbyStatus {
+  CREATED = "CREATED",
+  ABANDONED = "ABANDONED",
+  GAME_STARTED = "GAME_STARTED",
+  GAME_ENDED = "GAME_ENDED"
+}
+
 @Component({
   selector: 'app-lobby',
   templateUrl: './lobby.component.html',
@@ -42,13 +49,13 @@ export class LobbyComponent implements OnInit, OnDestroy {
   async changePlayers(){
     if (this.lobby && this.username== this.lobby.player_one_username) {
       this.lobby.starting_position_reversed = !this.lobby.starting_position_reversed
-      await this.lobbyService.updateLobby(this.lobby)    
+      await this.lobbyService.updateLobby(this.lobby)
     }
   }
 
   async joinLobby(){
     if (this.lobby && this.username!= this.lobby.player_one_username) {
-      await this.lobbyService.joinLobby(this.lobby.id)  
+      await this.lobbyService.joinLobby(this.lobby.game_id)
     }
   }
 
@@ -73,25 +80,28 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   leaveLobby() {
     if (this.lobby && (this.username== this.lobby.player_one_username ||this.username== this.lobby.player_two_username)){
-    this.lobbyService.leaveLobby(this.lobby.id)
+    this.lobbyService.leaveLobby(this.lobby.game_id)
     this.router.navigate(['/'])
     }
   }
 
   async refreshLobbyState(gameId: string){
     const lobbyData = await this.lobbyService.getLobbyById(gameId)
+    if(this.lobby?.lobby_status == LobbyStatus.GAME_STARTED)
+      this.router.navigate(['/game', this.lobby.game_id])
+
     this.lobby = lobbyData
     this.player_one = this.lobby.player_one_username
     this.player_two = this.lobby.player_two_username
     if(this.lobby.is_ranked){
       this.isRanked = "Ranked"
-    } 
+    }
     else{
       this.isRanked = "Casual"
     }
     if(this.lobby.is_private){
       this.isPrivate = "Private"
-    } 
+    }
     else{
       this.isPrivate = "Public"
     }

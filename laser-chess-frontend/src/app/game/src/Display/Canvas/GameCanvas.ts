@@ -71,7 +71,6 @@ export class GameCanvas extends Canvas {
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
         this.gameService.increaseAnimationEvents()
         board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
-        this.gameService.setLocalGameState(board.serialize())
         board.currentTurn++
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
         if(board.isMyTurn())

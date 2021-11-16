@@ -10,7 +10,7 @@ export const updateLobbyEndpoint = '/lobby/update'
 export const createLobbyEndpoint = '/lobby/create'
 export const joinLobbyEndpoint = '/lobby/join'
 export const leaveLobbyEndpoint = '/lobby/leave'
-export const gameEnpoint = '/game'
+export const gameEndpoint = '/game'
 export const startGameEndpoint = '/start_game'
 export const gameStateEndpoint = '/get_game_state'
 export const movePieceEndpoint = '/move_piece'
@@ -27,15 +27,14 @@ export const gameStateFullEndpoint = fullEndpoint(gameStateEndpoint)
 export const movePieceFullEndpoint = fullEndpoint(movePieceEndpoint)
 export const rotatePieceFullEndpoint = fullEndpoint(rotatePieceEndpoint)
 export const shootLaserFullEndpoint = fullEndpoint(shootLaserEndpoint)
-export const leaveLobbyFullEndpoint = (id: string = "") => fullEndpoint(leaveLobbyEndpoint, `/${id}`)
+export const leaveLobbyFullEndpoint = (id: string = "") => fullEndpoint(leaveLobbyEndpoint, id ? `/${id}` : '')
 export const startGameFullEndpoint = fullEndpoint(startGameEndpoint)
-//export const userFullEndpoint = (id: string  = "") => fullEndpoint(usersEndpoint, `/${id}`)
-export const friendsFullEndpoint = (id: string  = "") => fullEndpoint(friendsEndpoint, `/${id}`)
+export const friendsFullEndpoint = (id: string  = "") => fullEndpoint(friendsEndpoint, id ? `/${id}` : '')
 export const lobbyFullEndpoint = (id: string = "") => fullEndpoint(lobbyEndpoint, id ? `/${id}` : '')
 export const updateLobbyFullEndpoint = (id: string = "") => fullEndpoint(updateLobbyEndpoint, id ? `/${id}` : '')
 export const createLobbyFullEndpoint = (id: string = "") => fullEndpoint(createLobbyEndpoint, id ? `/${id}` : '')
 export const joinLobbyFullEndpoint = (id: string = "") => fullEndpoint(joinLobbyEndpoint, id ? `/${id}` : '')
-export const gameFullEndpoint = (id: string  = "") => fullEndpoint(gameEnpoint, id ? `/${id}` : '')
+export const gameFullEndpoint = (id: string  = "") => fullEndpoint(gameEndpoint, id ? `/${id}` : '')
 export const userFullEndpoint = (id: string  = "") => fullEndpoint(userEndpoint, id ? `/${id}` : '')
 export const giveUpFullEndpoint = fullEndpoint(giveUpEndpoint)
 export const offerDrawFullEndpoint = fullEndpoint(offerDrawEndpoint)
