@@ -24,14 +24,13 @@ export class BoardLogComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges){
     if(changes.gameState && changes.gameState.currentValue?.game_events.length > 0){
-      console.log(changes.gameState.currentValue)
       this.notationList = []
       this.validGameState = cloneDeep(this.gameState)
       this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
       this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
       this.validGameState?.user_events.forEach((_, i) => {
         this.notationList.push(this.eventNotation(i))
-      })      
+      })
     }
   }
 
@@ -48,7 +47,7 @@ export class BoardLogComponent implements OnChanges {
     this.gameLogEmitter.emit(this.getCorresponingEventChain(e)!.filter(evnt => evnt.event_type != GameEvents.OFFER_DRAW_EVENT && evnt.event_type != GameEvents.GIVE_UP_EVENT))
     if(e == this.validGameState?.user_events.length-1)
       this.gameReturnEmitter.emit()
-    
+
     }
   }
 
@@ -73,15 +72,15 @@ export class BoardLogComponent implements OnChanges {
     const lastEvents = corresponingEventChain?.slice(0, lastUserEventInGameEventsIndex!+1)
     const subEventTeleport = lastEvents?.find(le => le.event_type == GameEvents.TELEPORT_EVENT)
     const subEventTaken = lastEvents?.find(le => le.event_type == GameEvents.PIECE_TAKEN_EVENT)
-    
+
     console.log(lastEvents)
 
     if(lastEvents){
       const lastUserEvent = lastEvents.slice(-1)[0]
       if(subEventTeleport?.event_type == GameEvents.TELEPORT_EVENT){
         if(lastUserEvent.event_type == GameEvents.PIECE_MOVED_EVENT)
-          return `${lastUserEvent.moved_from.x}_${lastUserEvent.moved_from.y} - 
-          ${lastUserEvent.moved_to.x}_${lastUserEvent.moved_to.y} 
+          return `${lastUserEvent.moved_from.x}_${lastUserEvent.moved_from.y} -
+          ${lastUserEvent.moved_to.x}_${lastUserEvent.moved_to.y}
           (${subEventTeleport.teleported_to.x}_${subEventTeleport.teleported_to.y})`
       }
       else if (subEventTaken?.event_type == GameEvents.PIECE_TAKEN_EVENT){
@@ -91,7 +90,7 @@ export class BoardLogComponent implements OnChanges {
       else if (lastUserEvent.event_type == GameEvents.LASER_SHOT_EVENT)
         return "LASER"
       else if (lastUserEvent.event_type == GameEvents.PIECE_MOVED_EVENT)
-        return `${lastUserEvent.moved_from.x}_${lastUserEvent.moved_from.y} - 
+        return `${lastUserEvent.moved_from.x}_${lastUserEvent.moved_from.y} -
         ${lastUserEvent.moved_to.x}_${lastUserEvent.moved_to.y}`
       else if (lastUserEvent.event_type == GameEvents.PIECE_ROTATED_EVENT)
         return `${lastUserEvent.rotated_piece_at.x}_${lastUserEvent.rotated_piece_at.y} (${lastUserEvent.rotation})`
@@ -109,7 +108,7 @@ export class BoardLogComponent implements OnChanges {
   }
 
   isUserEvent(gameEvent: GameEvent | undefined){
-    return gameEvent?.event_type == GameEvents.PIECE_MOVED_EVENT 
+    return gameEvent?.event_type == GameEvents.PIECE_MOVED_EVENT
         || gameEvent?.event_type == GameEvents.PIECE_ROTATED_EVENT
         || gameEvent?.event_type == GameEvents.LASER_SHOT_EVENT
         || gameEvent?.event_type == GameEvents.OFFER_DRAW_EVENT

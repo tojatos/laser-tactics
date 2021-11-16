@@ -59,7 +59,7 @@ export class Game{
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
 
-      if(this.board.playerNum[0] == PlayerType.PLAYER_TWO)
+      if(this.board.playerNum == PlayerType.PLAYER_TWO)
         this.flipBoard()
 
       this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)

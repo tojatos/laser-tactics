@@ -23,6 +23,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   constructor(private route: ActivatedRoute, public game: Game) {}
 
   ngAfterViewInit() {
+
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
       alert("Couldn't load context")
@@ -37,6 +38,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.game.closeWebsocketConnection()
+    this.game.isInitiated = false
   }
 
   @HostListener('window:resize', ['$event'])

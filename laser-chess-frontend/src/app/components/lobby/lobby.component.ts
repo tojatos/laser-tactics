@@ -1,7 +1,7 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { Lobby, User } from 'src/app/app.models';
+import { Lobby } from 'src/app/app.models';
 import { LobbyService } from 'src/app/services/lobby.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -12,17 +12,12 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class LobbyComponent implements OnInit, OnDestroy {
 
-  constructor(private lobbyService: LobbyService, private route: ActivatedRoute, private router: Router, private userService: UserService) { }
+  constructor(private lobbyService: LobbyService, private route: ActivatedRoute, private router: Router) { }
 
   lobby: Lobby | undefined
   refresh = true
   player_one: string | undefined
   player_two: string | undefined
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: Event) {
-    window.location.reload()
-  }
 
   ngOnInit(): void {
     this.route.params.subscribe(async params => {
