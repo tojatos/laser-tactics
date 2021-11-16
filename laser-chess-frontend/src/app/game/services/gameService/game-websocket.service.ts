@@ -8,6 +8,8 @@ import { Coordinates, GameState } from '../../game.models';
 import { MovePieceRequest, RotatePieceRequest } from '../../game.request.models';
 import { EventEmitterService } from '../event-emitter.service';
 import { AbstractGameService } from './abstract-game-service';
+import Swal from 'sweetalert2'
+import { GamePhase } from '../../src/enums';
 
 type websocketRequest = {
   request_path: string,
@@ -115,16 +117,17 @@ export class GameWebsocketService extends AbstractGameService {
   }
 
   showDrawOffer(gameId: string){
-    // const res = Swal.fire({
-    //   title: "Draw offer",
-    //   text: "Player offers draw",
-    //   icon: 'question',
-    //   showCancelButton: true
-    // })
-    // console.log(res)
-    const res = window.confirm("draw?")
-    if(res)
-      this.offerDraw(gameId)
+    if(this.lastMessage?.game_phase == GamePhase.STARTED)
+      Swal.fire({
+        title: "Draw offer",
+        text: "Player offers draw",
+        icon: 'question',
+        showCancelButton: true
+      }).then(res => {
+        if(res.isConfirmed)
+          this.offerDraw(gameId)
+      })
+
   }
 
   closeConnection(){
