@@ -1,9 +1,10 @@
 import pytest
 from starlette.websockets import WebSocket
 
+from app.core.dependecies import manager
 from app.game_engine.models import *
 from app.game_engine.requests import *
-from app.main import app, get_db, API_PREFIX, manager
+from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
 
@@ -35,6 +36,8 @@ def before_all():
     create_user_datas = list(
         map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 3)))
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
+    for user in create_user_datas:
+        verify_user(session, user["username"])
     tu.post_data(
         "/start_game",
         tokens[0],
@@ -79,6 +82,20 @@ def auth(ws: WebSocket, token_num: int):
 
 def observe(ws: WebSocket, game_id: str):
     request = WebsocketRequest(GameApiRequestPath.WebsocketObserve, WebsocketObserveRequest(game_id))
+    send_dataclass(ws, request)
+    return receive_ws_response(ws)
+
+
+def give_up(ws: WebSocket, token_num: int):
+    auth(ws, token_num)
+    request = WebsocketRequest(GameApiRequestPath.GiveUp, GiveUpRequest(game_id))
+    send_dataclass(ws, request)
+    return receive_ws_response(ws)
+
+
+def offer_draw(ws: WebSocket, token_num: int):
+    auth(ws, token_num)
+    request = WebsocketRequest(GameApiRequestPath.OfferDraw, OfferDrawRequest(game_id))
     send_dataclass(ws, request)
     return receive_ws_response(ws)
 
@@ -259,6 +276,7 @@ def test_draw(ws):
 
     response = rotate_piece(ws, 1, p2_laser_coordinates, 270)
     assert response.status_code == 403
+    assert response.body == "Unable to rotate. The game is over."
 
 
 def test_play_the_game(ws):
@@ -277,6 +295,56 @@ def test_play_the_game(ws):
     assert game_state.turn_number is 3
     assert game_state.board.cells[(0, 1)] is None
     assert game_state.board.cells[(0, 2)] is not None
+
+
+def test_give_up_p1(ws):
+    assert give_up(ws, 0).status_code == 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
+
+
+def test_give_up_p2(ws):
+    assert give_up(ws, 1).status_code == 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_ONE_VICTORY
+
+
+def test_offer_draw_accepted(ws):
+    assert offer_draw(ws, 0).status_code == 200
+    assert offer_draw(ws, 1).status_code == 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.DRAW
+
+
+def test_disallow_immediate_multiple_draw_offers(ws):
+    assert offer_draw(ws, 0).status_code == 200
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 0, (0, 0), 90)
+    assert offer_draw(ws, 0).status_code == 403
+    rotate_piece(ws, 1, (8, 8), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    assert offer_draw(ws, 1).status_code == 200
+    assert offer_draw(ws, 0).status_code == 200
+    assert rotate_piece(ws, 0, (0, 0), 90).status_code == 403
+
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.DRAW
+
+
+def offer_draw_ignored(ws):
+    offer_draw(ws, 0)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    offer_draw(ws, 1)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 0, (0, 0), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+    rotate_piece(ws, 1, (8, 8), 90)
+
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.STARTED
 
 
 def test_websocket_notify(client):
@@ -330,6 +398,3 @@ def test_websocket_notify(client):
         game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
         game_state = game_state_serializable.to_normal()
         assert game_state.turn_number == 3
-
-
-

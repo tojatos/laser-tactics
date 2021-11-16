@@ -22,7 +22,7 @@ export class MainNavComponent {
     );
 
   constructor(private router: Router,private breakpointObserver: BreakpointObserver, private authService: AuthService, private lobbyService: LobbyService) {}
-    // lobby: Lobby | undefined
+
     lobby: any
     username = ""
     
@@ -33,18 +33,23 @@ export class MainNavComponent {
 
     logout(){
       this.authService.clearJWT()
-      this.router.navigate(['/'])
-    }
-
-    getUsername(){
-      this.username = this.authService.getUsername()
+      this.redirectTo('/')
     }
 
     async createLobby(){
       this.lobby = await this.lobbyService.createLobby()
       console.log(this.lobby)
-      this.router.navigate(['/lobby', this.lobby.id])
-        }
-      
+      this.redirectTo('/lobby', this.lobby.game_id)
+    }
+
+    getUsername(){
+      this.username = this.authService.getUsername()
+    }
     
+  redirectTo(uri:string, params: string = ""){
+      this.router.navigate([uri, params]).then(()=>
+      window.location.reload() );
+  }
+
+
 }

@@ -14,14 +14,19 @@ import { GameServiceInterceptor } from './services/game-service.interceptor';
 import { MaterialModule } from '../material/material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BoardActionsComponent } from './components/board-actions/board-actions.component';
+import { BoardLogComponent } from './components/board-log/board-log.component';
+import { FormsModule } from '@angular/forms';
+import { AppRoutingModule } from '../app-routing.module';
 
 @NgModule({
-  declarations: [GameComponent, BoardComponent, BoardActionsComponent, ChatComponent, BoardActionsComponent],
+  declarations: [GameComponent, BoardComponent, BoardActionsComponent, ChatComponent, BoardActionsComponent, BoardLogComponent],
   imports: [
     CommonModule,
     HttpClientModule,
     MaterialModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    FormsModule,
+    AppRoutingModule
   ],
   exports: [GameComponent],
   providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor, { provide: HTTP_INTERCEPTORS, useClass: GameServiceInterceptor, multi: true }]

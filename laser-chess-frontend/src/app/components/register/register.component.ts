@@ -37,5 +37,4 @@ export class RegisterComponent implements OnInit {
   get loggedIn() {
     return this.authService.isLoggedIn()
   }
-
 }

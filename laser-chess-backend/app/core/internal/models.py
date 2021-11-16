@@ -1,8 +1,7 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, PrimaryKeyConstraint, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Column, Integer, String, Enum, DateTime, Float
 
 from .database import Base
-from .schemas import FriendRequestStatus
+from .schemas import FriendRequestStatus, LobbyStatus
 
 
 class User(Base):
@@ -13,19 +12,12 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
-
-    items = relationship("Item", back_populates="owner")
-
-
-class Item(Base):
-    __tablename__ = "items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("User", back_populates="items")
+    registration_date = Column(DateTime)
+    is_verified = Column(Boolean, default=False)
+    verification_date = Column(DateTime)
+    # rating = Column(Integer)
+    # rating_deviation = Column(Float)
+    # rating_volatility = Column(Float)
 
 
 class GameStateTable(Base):
@@ -49,12 +41,13 @@ class Lobby(Base):
     is_ranked = Column(Boolean, default=False)
     is_private = Column(Boolean, default=False)
     starting_position_reversed = Column(Boolean, default=False)
+    lobby_status = Column(Enum(LobbyStatus))
 
 
 class FriendRequests(Base):
     __tablename__ = "friend_requests"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     user_one_username = Column(String)
     user_two_username = Column(String)
     status = Column(Enum(FriendRequestStatus))

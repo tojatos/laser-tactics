@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/tojatos/ZPI/branch/master/graph/badge.svg?token=B2NGI7PL5C)](https://codecov.io/gh/tojatos/ZPI)
+[![codecov](https://codecov.io/gh/tojatos/laser-tactics/branch/master/graph/badge.svg?token=B2NGI7PL5C)](https://codecov.io/gh/tojatos/laser-tactics)
 ![Python tests status](https://github.com/tojatos/ZPI/actions/workflows/ci.yml/badge.svg)
 
 # Laser tactics

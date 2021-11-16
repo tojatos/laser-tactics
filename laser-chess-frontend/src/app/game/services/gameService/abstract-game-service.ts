@@ -38,14 +38,4 @@ export abstract class AbstractGameService {
     const board = localStorage.getItem("board")
     return board && JSON.parse(board)
   }
-
-  get lastGameState(){
-
-    const gameState = localStorage.getItem("board")
-    if(gameState)
-      return JSON.parse(gameState) as BoardInterface
-
-    return undefined
-
-  }
 }

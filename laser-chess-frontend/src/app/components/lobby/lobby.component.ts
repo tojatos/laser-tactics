@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Lobby, User } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
+import * as _ from 'lodash';
 import { LobbyService } from 'src/app/services/lobby.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -21,14 +22,19 @@ export class LobbyComponent implements OnInit, OnDestroy {
   isRanked: string | undefined
   isPrivate: string | undefined
   username = ""
-  
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: Event) {
+    window.location.reload()
+  }
+
   ngOnInit(): void {
     this.route.params.subscribe(async params => {
       this.refreshLobbyState(params.id)
       this.username = this.authService.getUsername()
+
     })
   }
-
   ngOnDestroy(): void {
     this.refresh = false
   }
@@ -57,9 +63,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
   //   }
   // }
 
-  startGame() {
+  async startGame() {
     if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username) {
-      this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two)
+      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two)
       this.router.navigate(['/game', this.lobby.game_id])
     }
 
