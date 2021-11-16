@@ -40,8 +40,8 @@ export class MainNavComponent {
     async createLobby(){
       this.lobby = await this.lobbyService.createLobby()
       console.log(this.lobby)
-      this.router.navigate(['/lobby', this.lobby.id])
+      this.router.navigate(['/lobby', this.lobby.game_id])
         }
-      
-    
+
+
 }
