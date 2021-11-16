@@ -1,4 +1,4 @@
-import glicko2
+from app.Rating import glicko2
 
 from .schemas import PlayerMatchHistory, PlayerRatingUpdate
 
@@ -16,6 +16,6 @@ def update_rating(player_data: PlayerRatingUpdate, match_history: PlayerMatchHis
     rds = [match.player2_rating_deviation for match in match_history.matches]
     results = [match.result for match in match_history.matches]
     player.update_player(ratings, rds, results)
-    updated_player_rating = PlayerRatingUpdate(rating=player.rating, rating_deviation=player.rd, volatility=player.vol)
+    updated_player_rating = PlayerRatingUpdate(rating=round(player.rating, 2), rating_deviation=round(player.rd, 2), volatility=round(player.vol, 2))
     return updated_player_rating
 

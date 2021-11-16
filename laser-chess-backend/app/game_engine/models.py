@@ -281,6 +281,7 @@ class GameStateSerializable:
     turn_number: int
     game_events: List[GameEventSerializable]
     user_events: List[UserEventSerializable]
+    is_rated: bool
 
     def to_normal(self) -> "GameState":
         return GameState(
@@ -291,6 +292,7 @@ class GameStateSerializable:
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
             user_events=list(map(lambda x: x.to_normal(), self.user_events)),
+            is_rated=self.is_rated
         )
 
 
@@ -303,6 +305,7 @@ class GameState:
     turn_number: int
     game_events: List[GameEvent]
     user_events: List[UserEvent]
+    is_rated: bool
 
     def to_serializable(self) -> GameStateSerializable:
         return GameStateSerializable(
@@ -313,6 +316,7 @@ class GameState:
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
             user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
+            is_rated=self.is_rated,
         )
 
 
@@ -411,4 +415,4 @@ def empty_game_state(player_one_id, player_two_id) -> GameState:
     game_phase: GamePhase = GamePhase.NOT_STARTED
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [])
+    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], False)

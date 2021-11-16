@@ -22,7 +22,8 @@ def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerial
     return g
 
 
-def start_game(user_id: string, request: StartGameRequest, db: Session):
+def start_game(username: str, request: StartGameRequest, db: Session):
+    # TODO verify user is in game
     initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id)
     crud.start_game(db, initial_state, request)
 

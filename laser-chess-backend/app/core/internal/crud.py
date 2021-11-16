@@ -5,17 +5,17 @@ from datetime import datetime, timedelta
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
-
-from app.core.dependecies import RATING_PERIOD
 from app.core.internal import schemas, models
 from passlib.context import CryptContext
 
 from app.core.internal.schemas import LobbyStatus, GameResult
-from app.game_engine.models import GameState
+from app.game_engine.models import GameState, GamePhase
 from app.game_engine.requests import StartGameRequest
 from uuid import uuid4
 from app.Rating.schemas import PlayerMatchResult, PlayerMatchHistory, PlayerRatingUpdate
 from app.Rating.rating import get_starting_rating, update_rating
+
+RATING_PERIOD = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -46,8 +46,9 @@ def verify_user(user: schemas.User, db: Session):
 
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = get_password_hash(user.password)
+    starting_rating = get_starting_rating()
     db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password,
-                          registration_date=datetime.now())
+                          registration_date=datetime.now(), rating=starting_rating.rating, rating_deviation=starting_rating.rating_deviation, rating_volatility=starting_rating.volatility)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -221,18 +222,50 @@ def start_game(db: Session, game_state: GameState, request: StartGameRequest):
     return db_game_state
 
 
+def get_player_rating(db: Session, username: str):
+    db_user = get_user(db, username)
+    rating = schemas.UserRating(username=db_user.username, rating=db_user.rating,
+                                rating_deviation=db_user.rating_deviation, rating_volatility=db_user.rating_volatility)
+    return rating
+
+
 def update_game(db: Session, game_state: GameState, game_id: str):
     game_state_json = json.dumps(dataclasses.asdict(game_state.to_serializable()))
     db_game_state = get_game_state_table(db, game_id)
     db_game_state.game_state_json = game_state_json
+
+    def map_gameResult(game_phase: GamePhase):
+        if game_phase == GamePhase.DRAW:
+            return schemas.GameResult.DRAW
+        elif game_phase == GamePhase.PLAYER_ONE_VICTORY:
+            return schemas.GameResult.PLAYER_ONE_WIN
+        elif game_phase == GamePhase.PLAYER_TWO_VICTORY:
+            return schemas.GameResult.PLAYER_TWO_WIN
+        else:
+            return None
+
+    if game_state.game_phase in [GamePhase.DRAW, GamePhase.PLAYER_ONE_VICTORY, GamePhase.PLAYER_TWO_VICTORY]:
+        player_one_rating = get_player_rating(db, game_state.player_one_id)
+        player_two_rating = get_player_rating(db, game_state.player_two_id)
+        record = models.GameHistory(
+            game_id=game_id,
+            player_one_username=player_one_rating.username,
+            player_one_rating=player_one_rating.rating,
+            player_one_deviation=player_one_rating.rating_deviation,
+            player_two_username=player_two_rating.username,
+            player_two_rating=player_two_rating.rating,
+            player_two_deviation=player_two_rating.rating_deviation,
+            result=map_gameResult(game_state.game_phase),
+            game_end_date=datetime.now(),
+            is_rated=game_state.is_rated,
+        )
+        if record.is_rated:
+            update_user_rating(db, player_one_rating.username)
+            update_user_rating(db, player_two_rating.username)
+        lobby = get_lobby(db, game_id)
+        if lobby is not None:
+            lobby.lobby_status = LobbyStatus.GAME_ENDED
     db.commit()
-
-
-def get_player_rating(db: Session, user: schemas.User):
-    db_user = get_user(db, user.username)
-    rating = schemas.UserRating(username=db_user.username, rating=db_user.rating,
-                                rating_deviation=db_user.rating_deviation, rating_volatility=db_user.rating_volatility)
-    return rating
 
 
 def update_user_rating_in_db(db: Session, rating: schemas.UserRating):
@@ -278,7 +311,8 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
 
 
 # TODO refactor - feed the algorithm rating data (r, rd, v) from before rating series
-def update_user_rating(db: Session, player: schemas.User):
+def update_user_rating(db: Session, username: str):
+    player = get_user(db, username)
     user_rating = get_player_rating(db, player)
     matches = get_user_matches(db, player, RATING_PERIOD)
     new_rating = update_rating(

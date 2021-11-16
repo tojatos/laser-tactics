@@ -34,12 +34,15 @@ class GameHistory(Base):
     __tablename__ = "game_history"
 
     id = Column(Integer, primary_key=True, index=True)
+    game_id = Column(String)
     player_one_username = Column(String)
     player_one_rating = Column(Integer)
     player_one_deviation = Column(Float)
+    player_one_volatility = Column(Float)
     player_two_username = Column(String)
     player_two_rating = Column(Integer)
     player_two_deviation = Column(Float)
+    player_two_volatility = Column(Float)
     result = Column(Enum(GameResult))
     game_end_date = Column(DateTime)
     is_rated = Column(Boolean)

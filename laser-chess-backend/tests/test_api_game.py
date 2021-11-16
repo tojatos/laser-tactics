@@ -31,11 +31,11 @@ def before_all():
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
     for user in create_user_datas:
         verify_user(session, user["username"])
-    tu.post_data(
+    response = tu.post_data(
         "/start_game",
         tokens[0],
         json=dict(game_id=game_id, player_one_id=create_user_datas[0]['username'],
-                  player_two_id=create_user_datas[1]['username']),
+                  player_two_id=create_user_datas[1]['username'], is_rated=True),
     )
 
     session.commit()

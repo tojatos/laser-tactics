@@ -93,6 +93,7 @@ class UserRating(BaseModel):
 
 
 class GameHistoryEntry(BaseModel):
+    game_id: str
     player_one_username: str
     player_one_rating: int
     player_one_deviation: float
