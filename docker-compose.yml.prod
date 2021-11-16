@@ -5,8 +5,6 @@ services:
     build:
       context: ./laser-chess-frontend
       dockerfile: Dockerfile.prod
-      args:
-        BASE_HREF: ""
     image: tojatos/laser-tactics-frontend
     networks:
       - web
