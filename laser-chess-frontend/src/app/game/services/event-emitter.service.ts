@@ -11,6 +11,9 @@ export class EventEmitterService {
   invokeRefreshGameState = new EventEmitter()
   subsRefresh: Subscription | undefined
 
+  invokeMoveRollback = new EventEmitter()
+  subsRollback: Subscription | undefined
+
   invokeToggleObservator = new EventEmitter()
   subsObservator: Subscription | undefined
 
@@ -18,6 +21,10 @@ export class EventEmitterService {
 
   invokeRefresh(gameState: GameState){
     this.invokeRefreshGameState.emit(gameState)
+  }
+
+  invokeRollback(gameState: GameState){
+    this.invokeMoveRollback.emit(gameState)
   }
 
   invokeObservator(){
