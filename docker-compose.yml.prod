@@ -6,7 +6,8 @@ services:
       context: ./laser-chess-frontend
       dockerfile: Dockerfile.prod
       args:
-        BASE_HREF: "/"
+        BASE_HREF: ""
+    image: tojatos/laser-tactics-frontend
     networks:
       - web
       - default
@@ -22,6 +23,7 @@ services:
 
   fastapi:
     build: ./laser-chess-backend
+    image: tojatos/laser-tactics-backend
     restart: always
     command: python -m app.main
     networks:
