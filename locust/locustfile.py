@@ -22,7 +22,7 @@ with open('usernames.csv', 'r+') as f_u:
 # For now this makes sure users are in database, run it if they aren't
 for line in USER_CREDENTIALS:
     username, email, password = line
-    requests.post("http://localhost/api/v1/users/", json={
+    requests.post("http://localhost/api/v1/users", json={
         "username": username, "email": email, "password": password
     })
 """
@@ -38,7 +38,7 @@ class RegisterWithUniqueUsersSteps(TaskSet):
     @task
     def register(self):
         logging.info('Register with %s username, %s email and %s password', self.username, self.email, self.password)
-        self.client.post("/users/", json={
+        self.client.post("/users", json={
             "username": self.username, "email": self.email, "password": self.password
         })
         while True:
@@ -126,7 +126,7 @@ class LoginWithUniqueUsersSteps(TaskSet):
                                     }) as response:
             try:
                 self.client.get(
-                    "/users/me/",
+                    "/users/me",
                     headers={"authorization": "Bearer " + response.json()['access_token']})
             except JSONDecodeError:
                 response.failure("Response could not be decoded as JSON")
@@ -160,7 +160,7 @@ class RegisterWithUniqueUsersTest(HttpUser):
 class LaserTacticsGuestUser(HttpUser):
     @task
     def users(self):
-        self.client.get("/users/")
+        self.client.get("/users")
 
     @task
     def lobby(self):
