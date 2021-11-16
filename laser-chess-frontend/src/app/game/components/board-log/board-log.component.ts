@@ -73,8 +73,6 @@ export class BoardLogComponent implements OnChanges {
     const subEventTeleport = lastEvents?.find(le => le.event_type == GameEvents.TELEPORT_EVENT)
     const subEventTaken = lastEvents?.find(le => le.event_type == GameEvents.PIECE_TAKEN_EVENT)
 
-    console.log(lastEvents)
-
     if(lastEvents){
       const lastUserEvent = lastEvents.slice(-1)[0]
       if(subEventTeleport?.event_type == GameEvents.TELEPORT_EVENT){
@@ -113,10 +111,6 @@ export class BoardLogComponent implements OnChanges {
         || gameEvent?.event_type == GameEvents.LASER_SHOT_EVENT
         || gameEvent?.event_type == GameEvents.OFFER_DRAW_EVENT
         || gameEvent?.event_type == GameEvents.GIVE_UP_EVENT
-  }
-
-  getNotation(index: number){
-    this.notationList[index]
   }
 
 }

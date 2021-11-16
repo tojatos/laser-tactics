@@ -14,7 +14,7 @@ import { GamePhase, PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
 enum analizeModes {
-  ANALING = "ANALIZING",
+  ANALIZING = "ANALIZING",
   EXITING_ANALYZE_MODE = "EXITTING_ANALYZE_MODE",
   NOT_ANALIZING = "NOT_ANALIZING"
 }
@@ -117,7 +117,7 @@ export class Game{
   }
 
   async refreshGameState(newGameState: GameState){
-    if(this.gameId && this.analizeMode != analizeModes.ANALING){
+    if(this.gameId && this.analizeMode != analizeModes.ANALIZING){
       if(newGameState.game_phase != GamePhase.STARTED){
         if(!this.isInitiated)
           this.loadDisplay(this.displaySize, newGameState)
@@ -142,10 +142,9 @@ export class Game{
   }
 
   showGameEvent(gameEvents: GameEvent[]){
-    this.analizeMode = analizeModes.ANALING
+    this.analizeMode = analizeModes.ANALIZING
     this.gameCanvas.interactable = false
     this.board.setInitialGameState(this.displaySize)
-    this.gameCanvas.redrawGame(this.board)
     this.executePendingActions(gameEvents, gameEvents.length, false, false)
   }
 
