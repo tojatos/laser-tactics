@@ -33,23 +33,16 @@ export class MainNavComponent {
 
     logout(){
       this.authService.clearJWT()
-      this.redirectTo('/')
+      this.router.navigate(['/'])
     }
 
     async createLobby(){
       this.lobby = await this.lobbyService.createLobby()
-      console.log(this.lobby)
-      this.redirectTo('/lobby', this.lobby.game_id)
+      this.router.navigate(['/lobby', this.lobby.game_id])
     }
 
     getUsername(){
       this.username = this.authService.getUsername()
     }
-
-  redirectTo(uri:string, params: string = ""){
-      this.router.navigate([uri, params]).then(()=>
-      window.location.reload() );
-  }
-
 
 }

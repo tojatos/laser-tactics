@@ -825,6 +825,11 @@ export class Board implements BoardInterface {
     }
   }
 
+  get turnOfPlayer(){
+    const turnOfPlayer = Math.round(this.currentTurn / 2) % 2 == 0 ? this.playerTwo : this.playerOne
+    return this.parsePlayerIdToPlayerNumber(turnOfPlayer)
+  }
+
   get playerNum(){
     const player = this.authService.getCurrentJwtInfo()?.sub
 
@@ -833,18 +838,6 @@ export class Board implements BoardInterface {
 
     else if(player == this.playerTwo)
       return PlayerType.PLAYER_TWO
-
-    return PlayerType.NONE
-  }
-
-  get opponentNum(){
-    const player = this.authService.getCurrentJwtInfo()?.sub
-
-    if(player == this.playerOne)
-      return PlayerType.PLAYER_TWO
-
-    else if(player == this.playerTwo)
-      return PlayerType.PLAYER_ONE
 
     return PlayerType.NONE
   }
