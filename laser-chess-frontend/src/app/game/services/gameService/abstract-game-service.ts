@@ -1,6 +1,6 @@
 import { HttpResponse } from "@angular/common/http"
 import { Injectable } from "@angular/core"
-import { BoardInterface, Coordinates, GameState } from "../../game.models"
+import { Coordinates, GameState } from "../../game.models"
 
 @Injectable({
   providedIn: 'root'
@@ -29,13 +29,4 @@ export abstract class AbstractGameService {
     return totalNumOfAnimations - this.numOfAnimationEvents
   }
 
-  setLocalGameState(game: GameState){
-    game.game_events = []
-    localStorage.setItem("board", JSON.stringify(game))
-  }
-
-  getLocalGameState(): GameState | null{
-    const board = localStorage.getItem("board")
-    return board && JSON.parse(board)
-  }
 }

@@ -11,7 +11,7 @@
 $custom-palette: (
 	50: #000000,
   	100: #217180,
-  	200: #196a8a,
+  	200: #3b8ca5,
 	  contrast: (
     400: #292929, 
     500: #4a4b4b, 
@@ -25,7 +25,7 @@ $custom-palette: (
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 $laser-chess-frontend-primary: mat-palette($custom-palette,100);
-$laser-chess-frontend-accent:  mat-palette($custom-palette,100);
+$laser-chess-frontend-accent:  mat-palette($custom-palette,200);
 
 // The warn palette is optional (defaults to red).
 $laser-chess-frontend-warn: mat.define-palette(mat.$red-palette);
@@ -114,6 +114,22 @@ body {
 	max-width: 330px;
 }
 
+.table-box {
+	position: relative;
+	top: 0;
+	opacity: 1;
+	float: left;
+	padding: 10px 20px 10px 20px;
+	width: 100%;
+	background: rgb(51, 51, 51);
+	border-radius: 10px;
+	transform: scale(1);
+	-webkit-transform: scale(1);
+	-ms-transform: scale(1);
+	z-index: 3;
+	max-width: 400px;
+}
+
 .box.back {
 	transform: scale(.95);
 	-webkit-transform: scale(.95);
@@ -151,7 +167,7 @@ body {
 	appearance: standard;
 }
 
-.main-wrapper mat-card-header {
+.main-wrapper .mat-card-header {
 	text-align: center;
 	width: 100%;
 	display: block;
@@ -164,7 +180,7 @@ body {
 	margin: 0;
 }
 
-.main-wrapper .mat-card {
+.main-wrapper mat-card {
 	padding: 45px 70px 55px;
 }
 
@@ -174,3 +190,53 @@ body {
 	background: #1f1f1f;
 }
 
+.red-player-card {
+	background-color: #902b2b;
+	font-size: 20px;
+	border: 1px solid #410909;
+}
+
+.blue-player-card {
+	background-color: #276380;
+	font-size: 20px;
+	border: 1px solid #103d53;
+}
+
+.start-game-button {
+	transform: scale(1.6);
+}
+
+.leave-lobby-button {
+	transform: scale(0.75);
+}
+
+.refresh-icon {
+	cursor: pointer;
+	position: center;
+}
+
+.mat-header-cell, .mat-cell {
+	justify-content: center;
+  }
+
+  .mat-row .mat-cell {
+	border-bottom: 1px solid transparent;
+	border-top: 1px solid transparent;
+	cursor: pointer;
+  }
+
+  .mat-row:hover .mat-cell {
+	border-color: currentColor;
+  }
+  
+  .hover-button:hover{
+	background-color: #208d9725;
+  }
+
+  .menu {
+	border-radius: 0px;
+	margin-top: 13px;
+  }
+
+
+  

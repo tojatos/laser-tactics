@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { createLobbyFullEndpoint, joinLobbyFullEndpoint, lobbyFullEndpoint, startGameFullEndpoint, updateLobbyFullEndpoint } from '../api-definitions';
+import { createLobbyFullEndpoint, leaveLobbyFullEndpoint, joinLobbyFullEndpoint, lobbyFullEndpoint, startGameFullEndpoint, updateLobbyFullEndpoint } from '../api-definitions';
 import { Lobby } from '../app.models';
 
 @Injectable({
@@ -32,6 +32,10 @@ export class LobbyService {
 
   joinLobby(lobby_id: string){
     return this.http.patch<any>(joinLobbyFullEndpoint(), {game_id: lobby_id} ).toPromise()
+  }
+
+  leaveLobby(lobby_id: string){
+    return this.http.patch<any>(leaveLobbyFullEndpoint(), {game_id: lobby_id}).toPromise()
   }
 
 }

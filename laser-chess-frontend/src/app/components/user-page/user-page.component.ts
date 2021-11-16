@@ -16,12 +16,12 @@ export class UserPageComponent {
 
   ngOnInit(): void {
     this.route.params.subscribe(async params => {
-      this.userService.getUserByUsername(params.username).then(userData => {
-          this.user = userData
-          console.log(this.user)
-      })
+      this.userService.getUserMe().then(userData => {
+        this.user = userData
+    })
     })
 
   }
 
 }
+

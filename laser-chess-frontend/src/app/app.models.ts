@@ -1,3 +1,5 @@
+import { LobbyStatus } from "./components/lobby/lobby.component";
+
 export interface UserToken{
   access_token: string,
   token_type: string,
@@ -16,7 +18,8 @@ export interface Lobby {
   player_two_username: string,
   is_ranked: boolean,
   is_private: boolean,
-  starting_position_reversed: boolean
+  starting_position_reversed: boolean,
+  lobby_status: LobbyStatus
 }
 
 export interface Item {
