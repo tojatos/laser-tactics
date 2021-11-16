@@ -36,7 +36,7 @@ def verify_user(token: str, db: Session = Depends(get_db)):
     return {"detail": "Account verified successfully"}
 
 
-@router.post("/change_password/")
+@router.post("/change_password")
 def change_password(change_password_schema: schemas.EmergencyChangePasswordSchema, db: Session = Depends(get_db)):
     try:
         token = change_password_schema.token
@@ -54,7 +54,7 @@ def change_password(change_password_schema: schemas.EmergencyChangePasswordSchem
     return crud.change_password(user, change_password_schema.newPassword, db)
 
 
-@router.post("/", response_model=schemas.User)
+@router.post("", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -65,7 +65,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@router.get("/", response_model=List[schemas.User])
+@router.get("", response_model=List[schemas.User])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
@@ -108,7 +108,7 @@ async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.U
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
 
-@router.get("/me/", response_model=schemas.User)
+@router.get("/me", response_model=schemas.User)
 async def read_users_me(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
 
