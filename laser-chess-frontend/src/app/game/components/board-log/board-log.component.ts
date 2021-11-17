@@ -23,15 +23,17 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges){
-    this.notationList = []
-    if(changes.gameState && changes.gameState.currentValue?.game_events.length > 0){
-      this.validGameState = cloneDeep(this.gameState)
-      this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
-      this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
-      this.validGameState?.user_events.forEach((_, i) => {
-        this.notationList.push(this.eventNotation(i))
-      })
+    if(changes.gameState){
+      this.notationList = []
+      if(changes.gameState.currentValue?.game_events.length > 0){
+        this.validGameState = cloneDeep(this.gameState)
+        this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
+        this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
+        this.validGameState?.user_events.forEach((_, i) => {
+          this.notationList.push(this.eventNotation(i))
+        })
     }
+  }
   }
 
   ngOnDestroy(){

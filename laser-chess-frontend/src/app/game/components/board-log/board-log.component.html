@@ -1,4 +1,7 @@
-<mat-selection-list #userEvents [style.height.px]="maxHeight" (selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)" [multiple]="false">
+<h3>Game logs</h3>
+<mat-selection-list #userEvents [style.height.px]="maxHeight" 
+(selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)" 
+[multiple]="false">
   <mat-list-option *ngFor="let elem of notationList; let i = index" [value]="i">
     {{elem}}
   </mat-list-option>
