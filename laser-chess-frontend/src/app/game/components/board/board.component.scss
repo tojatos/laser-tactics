@@ -1,6 +1,7 @@
 $imagePath: "/assets/board.svg";
 
 .gameCanvas {
+
   background-image: url($imagePath);
   background-size: cover;
   z-index: 1;
@@ -8,13 +9,21 @@ $imagePath: "/assets/board.svg";
 }
 
 .guiCanvas {
+
   position: absolute;
   z-index: 2;
 }
 
 .game-container {
-  margin: 0 auto;
   position: relative;
   cursor: pointer;
   border: solid 5px white;
+}
+
+app-board-log {
+  margin: 5%;
+}
+
+.float {
+  float: left;
 }

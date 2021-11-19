@@ -17,26 +17,23 @@ export class LoginComponent {
 
   hide = true;
   form = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl(''),
+    username: new FormControl('',[Validators.required]),
+    password: new FormControl('',[Validators.required]),
   });
   isLoggedIn = false;
-  errorMessage = '';
   constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router, private loginEmitter: LoginEmitterService) {}
 
     get f() { return this.form.controls; }
 
     onSubmit(): void {
       const { username, password } = this.form.value;
-      console.log(this.form.value)
       if (!this.authService.isLoggedIn() && username && password) {
         this.authService.login(username, password).then(
                   res => {
                       console.log(`User with token ${res.access_token} is logged in`);
-                      this.loginEmitter.invokeLoginToggle()
                       this.router.navigate(['/'])
                   }
-              )
+              ).catch(err => console.log(err))
       }
     }
 

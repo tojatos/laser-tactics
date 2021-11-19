@@ -1,9 +1,11 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent, HttpHandler, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tokenPayload, UserToken } from '../app.models';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { FormControl } from '@angular/forms';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
+import { environment } from 'src/environments/environment';
+import { tokenFullEndpoint, usersFullEndpoint } from '../api-definitions';
 // import * as moment from "moment"
 
 @Injectable({
@@ -15,6 +17,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {}
 
+
   async login(login:string, pass:string): Promise<UserToken> {
     let options = {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
@@ -24,22 +27,11 @@ export class AuthService {
     body.set('username', login)
     body.set('password', pass)
 
-    return this.http.post<UserToken>('/api/v1/token', body.toString(), options).toPromise().then(res => this.setSession(res))
-  }
-  login2(form: FormControl): Promise<UserToken> {
-    let urlSearchParams = new URLSearchParams();
-
-
-    console.log(urlSearchParams.toString)
-    return this.http.post<any>('/api/v1/token', form).toPromise().then(res => this.setSession(res))
+    return this.http.post<UserToken>(tokenFullEndpoint, body.toString(), options).toPromise().then(res => this.setSession(res))
   }
 
   register(login:string, email:string, pass:string){
-    return this.http.post<any>('/api/v1/users/', {'username': login, 'email': email, 'password': pass}).subscribe(res => this.setSession(res));
-  }
-
-  getlobbies(){
-    return this.http.get('api/v1/')
+    return this.http.post<any>(usersFullEndpoint, {'username': login, 'email': email, 'password': pass}).toPromise();
   }
 
 private setSession(authResult: UserToken) {
@@ -50,8 +42,11 @@ private setSession(authResult: UserToken) {
 }
 
 parseJWT(jwt: string | undefined){
-  console.log(jwt)
   return this.jwtHelper.decodeToken<tokenPayload>(jwt)
+}
+
+get jwt() {
+  return localStorage.getItem('access_token')
 }
 
 getCurrentJwtInfo(){
@@ -66,6 +61,14 @@ clearJWT(){
 
 isLoggedIn(){
   return localStorage.getItem(this.idToken) != null
+}
+
+getUsername(){
+  if (localStorage.getItem(this.idToken) != null){
+  return this.getCurrentJwtInfo()!.sub}
+  else{
+    return ""
+  }
 }
 
 }

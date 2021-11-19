@@ -5,20 +5,21 @@ services:
     ports:
       - '8080:8080'
     depends_on:
-      - db
-    command: >
-      bash -c "ng serve --host 0.0.0.0 --port 8080 --proxy-config ./src/proxy.conf.docker.json"
+      - fastapi
 
   fastapi:
     build: ./laser-chess-backend
     restart: always
-    command: uvicorn app.main:app --host 0.0.0.0 --port 80
+    command: python -m app.main
     ports:
       - 80:80
     depends_on:
       - db
     environment:
       - SQLALCHEMY_DATABASE_URL=postgresql://postgres:admin@db:5432/laserchess
+      - HOST=0.0.0.0
+      - PORT=80
+      - ROOT_PATH=
 
   db:
     image: postgres:13.0-alpine

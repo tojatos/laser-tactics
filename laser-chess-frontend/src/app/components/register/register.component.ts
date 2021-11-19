@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
-import {FormControl, Validators, FormGroup} from '@angular/forms';
+import { FormControl, Validators, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
@@ -12,29 +12,29 @@ export class RegisterComponent implements OnInit {
 
   hide = true;
   form = new FormGroup({
-    username: new FormControl(''),
-    email: new FormControl(''),
-    password: new FormControl(''),
+    username: new FormControl('',[Validators.required]),
+    email: new FormControl('',[Validators.required, Validators.email]),
+    password: new FormControl('',[Validators.required]),
   });
-  isLoggedIn = false;
-  errorMessage = '';
-  constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router) {}
+  constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
-    ngOnInit(): void {
+  ngOnInit(): void {
+  }
+
+  get f() { return this.form.controls; }
+
+  onSubmit(): void {
+    const { username, email, password } = this.form.value;
+    if (!this.authService.isLoggedIn() && username && email && password) {
+      this.authService.register(username, email, password).then(res => {
+        this.router.navigate(['/login'])
+      }).catch(err => console.log(err))
     }
-
-    get f() { return this.form.controls; }
-    
-    onSubmit(): void {
-      const { username, email, password } = this.form.value;
-      if (!this.authService.isLoggedIn() && username && email && password) {
-        this.authService.register(username, email, password)
-        this.router.navigate(['/login']);
-                }
-      else this.authService.clearJWT()
-        
-      
+    else {
+      console.log("")
     }
-
-
+  }
+  get loggedIn() {
+    return this.authService.isLoggedIn()
+  }
 }

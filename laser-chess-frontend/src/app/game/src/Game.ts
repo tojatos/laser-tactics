@@ -1,117 +1,226 @@
 import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
-import { GameService } from "src/app/game/services/game.service";
-import { GameState } from "../game.models";
+import { GameEvent, GameState } from "../game.models";
+import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
+import { GameActions } from "./Display/Canvas/GameActions";
 import { GameCanvas } from "./Display/Canvas/GameCanvas";
-import { GUICanvas } from "./Display/Canvas/GUICanvas";
 import { Drawings } from "./Display/Drawings";
 import { Resources } from "./Display/Resources";
+import { GamePhase, PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
+
+enum analizeModes {
+  ANALIZING = "ANALIZING",
+  EXITING_ANALYZE_MODE = "EXITTING_ANALYZE_MODE",
+  NOT_ANALIZING = "NOT_ANALIZING"
+}
 
 @Injectable()
 export class Game{
 
-  gameCanvas!: GameCanvas
-  guiCanvas!: GUICanvas
-  gameId!: string
-  sizeScale!: number
+  gameCanvas: GameCanvas | undefined
+  gameActions: GameActions | undefined
+  gameId: string | undefined
+  sizeScale: number = 0
   showAnimations: boolean = true
+  executingActions = false
+  isInitiated = false
+  analizeMode = analizeModes.NOT_ANALIZING
+  gamePhase: GamePhase = GamePhase.NOT_STARTED
+  whoseTurn: PlayerType = PlayerType.NONE
 
-  constructor(private gameService: GameService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
+  constructor(public gameService: GameWebsocketService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
-      this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe(() => {
-        this.refreshGameState();
+      this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe((value: GameState) => {
+        this.refreshGameState(value);
+      });
+    }
+
+    if (this.eventEmitter.subsRollback == undefined) {
+      this.eventEmitter.subsRollback = this.eventEmitter.invokeMoveRollback.subscribe((value: GameState) => {
+          this.loadStaticGameState(value)
       });
     }
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, guiCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number){
+  get displaySize(){
+    return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
+  }
+
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number){
     this.sizeScale = sizeScale
     this.gameId = gameId
     await this.resources.loadAssets()
-    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
-    this.guiCanvas = new GUICanvas(this.gameService, this.authService, this.eventEmitter, this.animations, this.drawings, guiCanvasContext, blockSize, this.resources, gameId)
-    this.loadDisplay(gameId, (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale)
+    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
+    this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
+    this.gameService.connect(this.gameId)
+    this.gameCanvas.redrawGame(this.board)
   }
 
-  loadDisplay(gameId: string, displaySize: number){
-    this.gameService.getGameState(gameId).then(
-      async res => {
-        if(res.body) {
-          //this.gameService.setAnimationEventsNum(res.body.game_events.length)
-          res.body.game_id = gameId
-          console.log(this.gameService.getLocalGameState())
-          let gameState = this.gameService.getLocalGameState() || res.body
-          let animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
-          if((gameState != res.body && animationsToShow <= 0) || gameState.game_events.length == res.body.game_events.length || gameState.game_id != res.body.game_id || animationsToShow > 5){
-            gameState = res.body
-            this.gameService.setAnimationEventsNum(gameState.game_events.length)
-          }
-          displaySize = (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
-          this.board.initBoard(gameState, displaySize)
-          this.gameCanvas.initCanvas(this.board, this.guiCanvas)
-          this.guiCanvas.initCanvas(this.board, this.gameCanvas)
-
-          if(animationsToShow > 0)
-            await this.executePendingActions(res.body, animationsToShow)
-
-          this.board.currentTurn = res.body.turn_number
-          this.gameService.setLocalGameState(gameState)
-          const myTurn = this.board.isMyTurn()
-          this.gameCanvas.interactable = myTurn
-          if(!myTurn)
-            this.refreshGameState()
-        }
-
-      }
-    )
+  destroyGame(){
+    this.sizeScale = 0
+    this.gameId = ""
+    this.gameCanvas = undefined
+    this.gameActions = undefined
+    this.isInitiated = false
   }
 
-  changeCurrentSize(newSize: number){
-    this.board.changeCellCoordinates(newSize)
-    this.gameCanvas.changeBlockSize(newSize, this.board)
-    this.guiCanvas.changeBlockSize(newSize)
-  }
+  async loadDisplay(displaySize: number, receivedGameState: GameState){
 
-  changeAnimationsShowOption(show: boolean){
-    this.showAnimations = show
-    this.gameCanvas.showAnimations = this.showAnimations
-  }
+    if(this.gameCanvas && this.gameActions){
 
-  refreshGameState(){
-    if(this.gameId){
-      this.gameService.getGameState(this.gameId).then(async res => {
-        if(res.body){
-          //this.gameService.setAnimationEventsNum(res.body.game_events.length)
-          const animationsToShow = this.gameService.animationsToShow(res.body.game_events.length)
-          if(animationsToShow > 0)
-            await this.executePendingActions(res.body, animationsToShow)
+      this.board.initBoard(receivedGameState, displaySize)
+      this.gameCanvas.initCanvas(this.board, this.gameActions)
+      this.gameActions.initCanvas(this.gameCanvas)
 
-          this.board.currentTurn = res.body.turn_number
+      if(this.board.playerNum == PlayerType.PLAYER_TWO)
+        this.flipBoard()
 
-          const myTurn = this.board.isMyTurn()
-          this.gameCanvas.interactable = myTurn
+      this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)
+      const myTurn = this.board.isMyTurn()
+      this.gameCanvas.interactable = myTurn
 
-          if(myTurn)
-            return
-
-          setTimeout(() => this.refreshGameState(), 500)
-
-        }
-        else
-          console.error("Board not properly initialized")
-      })
+      this.isInitiated = true
     }
   }
 
-  private async executePendingActions(game: GameState, animationsToShow: number){
-    console.log("executing actions")
-    this.gameCanvas.interactable = false
-    this.eventsExecutor.addEventsToExecute(game.game_events.slice(-animationsToShow))
-    await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, this.showAnimations)
+  changeCurrentSize(newSize: number){
+    if(this.gameCanvas){
+      this.board.changeCellCoordinates(newSize)
+      this.gameCanvas?.changeBlockSize(newSize, this.board)
+    }
+  }
+
+  changeAnimationsShowOption(show: boolean){
+    if(this.gameCanvas){
+      this.showAnimations = show
+      this.gameCanvas.showAnimations = this.showAnimations
+    }
+  }
+
+  loadConcreteGameState(gameState: GameState){
+    if(this.gameCanvas){
+      this.board.initBoard(gameState, this.displaySize)
+      this.board.currentTurn = gameState.turn_number
+      this.gameService.setAnimationEventsNum(gameState.game_events.length)
+      this.gameCanvas.redrawGame(this.board)
+      const myTurn = this.board.isMyTurn()
+      this.gameCanvas.interactable = myTurn
+    }
+  }
+
+  loadStaticGameState(gameState: GameState){
+    if(this.gameCanvas){
+      this.board.initBoard(gameState, this.displaySize)
+      this.gameCanvas.redrawGame(this.board)
+    }
+  }
+
+  async loadNewGameState(newGameState: GameState){
+    if(this.gameCanvas){
+      this.executingActions = true
+      const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
+      if(animationsToShow > 0)
+        await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
+
+      this.board.currentTurn = newGameState.turn_number
+
+      this.gameService.setAnimationEventsNum(newGameState.game_events.length)
+      const myTurn = this.board.isMyTurn()
+      this.gameCanvas.interactable = myTurn
+
+      this.executingActions = false
+
+      if(this.gameService.lastMessage?.game_events && this.gameService.lastMessage != newGameState)
+        this.refreshGameState(this.gameService.lastMessage)
+    }
+  }
+
+  async refreshGameState(newGameState: GameState){
+    if(this.gameId && this.gameCanvas){
+      if(this.analizeMode != analizeModes.ANALIZING){
+          if(!this.isInitiated)
+            this.loadDisplay(this.displaySize, newGameState)
+          else if(this.analizeMode == analizeModes.EXITING_ANALYZE_MODE){
+            this.loadConcreteGameState(newGameState)
+            this.analizeMode = analizeModes.NOT_ANALIZING
+          }
+          else
+            this.loadNewGameState(newGameState)
+
+        if(newGameState.game_phase != GamePhase.STARTED)
+            this.gameCanvas.interactable = false
+
+      }
+    }
+    else
+      console.error("Board not properly initialized")
+
+    this.gamePhase = newGameState.game_phase
+    this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
+  }
+
+  showGameEvent(gameEvents: GameEvent[]){
+    if(this.gameCanvas){
+      this.analizeMode = analizeModes.ANALIZING
+      this.gameCanvas.interactable = false
+      this.board.setInitialGameState(this.displaySize)
+      this.executePendingActions(gameEvents, gameEvents.length, false, false)
+    }
+  }
+
+  returnToCurrentEvent(){
+    if(this.gameId){
+      this.analizeMode = analizeModes.EXITING_ANALYZE_MODE
+      this.gameService.getGameState(this.gameId)
+    }
+  }
+
+  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, showLaser: boolean = true){
+    if(this.gameCanvas){
+      this.gameCanvas.interactable = false
+      this.eventsExecutor.addEventsToExecute(events.slice(-animationsToShow))
+      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, showLaser)
+    }
+  }
+
+  giveUp(){
+    if(this.gameId)
+      this.gameService.giveUp(this.gameId)
+  }
+
+  offerDraw(){
+    if(this.gameId)
+      this.gameService.offerDraw(this.gameId)
+  }
+
+  passRotation(degree: number){
+    if(this.gameActions)
+      this.gameActions.rotationPressed(this.board, degree)
+  }
+
+  passLaserShoot(){
+    if(this.gameActions)
+      this.gameActions.laserButtonPressed(this.board)
+  }
+
+  passAccept(){
+    if(this.gameActions)
+      this.gameActions.acceptRotationButtonPressed(this.board)
+  }
+
+  closeWebsocketConnection(){
+    this.gameService.closeConnection()
+  }
+
+  flipBoard(){
+    if(this.gameCanvas){
+      this.gameCanvas.isReversed = !this.gameCanvas.isReversed
+      this.gameCanvas.redrawGame(this.board)
+    }
   }
 
 }

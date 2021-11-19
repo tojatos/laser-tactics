@@ -13,7 +13,7 @@ export class Animations {
 
     constructor(private drawings: Drawings){}
 
-    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates, showAnimations: boolean): Promise<void>{
+    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates, isReverse: boolean, showAnimations: boolean): Promise<void>{
 
         const origin = board.getCellByCoordinates(originCoordinates.x, originCoordinates.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
@@ -26,7 +26,6 @@ export class Animations {
             return
         }
 
-        const speed = 20
         const redrawDistance = 5
 
         const fun = this.designateLinearFunction(
@@ -41,16 +40,16 @@ export class Animations {
           validCellsArray = this.cellsExcludingPieces(board, [origin, destination])
 
         const intervalAction = () => {
-          this.drawings.drawGame(canvas, validCellsArray)
+          this.drawings.drawGame(canvas, validCellsArray, isReverse)
           this.changePosition(piece, originCoordinates, destinationCoordinates, redrawDistance, fun)
-          this.drawings.drawPiece(canvas, piece)
+          this.drawings.drawPiece(canvas, piece, isReverse)
         }
 
         const lastAction = () => {
-          this.drawings.drawGame(canvas, validCellsArray)
+          this.drawings.drawGame(canvas, validCellsArray, isReverse)
           piece.currentCoordinates = destination.canvasCoordinates
           if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
-            this.drawings.drawPiece(canvas, piece)
+            this.drawings.drawPiece(canvas, piece, isReverse)
         }
 
         if(!showAnimations)
@@ -60,44 +59,45 @@ export class Animations {
         })
 
         return new Promise<void>((resolve) => {
-          const interval = setInterval(() => {
+          const interval = () => {
             intervalAction()
             if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
               lastAction()
-              clearInterval(interval)
               resolve()
             }
-          }, 100 / speed )
+            else
+              window.requestAnimationFrame(interval)
+          }
+          window.requestAnimationFrame(interval)
         })
 
     }
 
-    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, showAnimations: boolean, initialRotationDifference: number = 0): Promise<void>{
+    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, isReverse: boolean, showAnimations: boolean, initialRotationDifference: number = 0): Promise<void>{
       const piece = cloneDeep(atCell?.piece)
 
       if(!piece || !atCell)
         return
 
       piece.rotation_degree += initialRotationDifference
-      const speed = 20
       const degreesPerFrame = byDegrees > 0 ? 2 : -2
 
       const validCellsArray = this.cellsExcludingPieces(board, [atCell])
       const desiredPiecePosition = piece.rotation_degree + byDegrees
 
       const intervalAction = () => {
-        this.drawings.drawGame(canvas, validCellsArray)
+        this.drawings.drawGame(canvas, validCellsArray, isReverse)
         piece.rotation_degree += degreesPerFrame
-        this.drawings.highlightCell(canvas, atCell, piece)
-        this.drawings.drawPiece(canvas, piece)
+        this.drawings.highlightCell(canvas, atCell, isReverse, piece)
+        this.drawings.drawPiece(canvas, piece, isReverse)
       }
 
       const lastAction = () => {
         if(piece.rotation_degree < 0)
           piece.rotation_degree = 360 + piece.rotation_degree
         piece.rotation_degree = desiredPiecePosition % 360
-        this.drawings.drawGame(canvas, validCellsArray)
-        this.drawings.highlightCell(canvas, atCell, piece)
+        this.drawings.drawGame(canvas, validCellsArray, isReverse)
+        this.drawings.highlightCell(canvas, atCell, isReverse, piece)
       }
 
       if(!showAnimations)
@@ -107,75 +107,92 @@ export class Animations {
         })
 
       return new Promise<void>((resolve) => {
-        const interval = setInterval(() => {
+        const interval = () => {
             intervalAction()
             if(this.inRotationVicinity(piece.rotation_degree, desiredPiecePosition, degreesPerFrame)){
               lastAction()
-              clearInterval(interval)
               resolve()
             }
-        }, 100 / speed )
+            else
+              window.requestAnimationFrame(interval)
+        }
+        window.requestAnimationFrame(interval)
       })
 
     }
 
-    async laserAnimation(canvas: Canvas, board: Board, from: Coordinates, to: Coordinates, showAnimations: boolean): Promise<void> {
-      const fromCell = board.getCellByCoordinates(from.x, from.y)
-      let toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, to.x)), Math.min(8, Math.max(0, to.y)))?.canvasCoordinates
+    private laserAnimationStep(fromCell: Coordinates, toCell: Coordinates, laserIncrement: number){
 
-      if(to.x > 8)
-        toCell = {x: toCell!.x + board.blockSize!, y: toCell!.y}
-      else if(to.x < 0)
-        toCell = {x: toCell!.x - board.blockSize!, y: toCell!.y}
-      if(to.y > 8)
-        toCell = {x: toCell!.x, y: toCell!.y - board.blockSize!}
-      else if(to.y < 0)
-        toCell = {x: toCell!.x, y: toCell!.y + board.blockSize!}
+      const xModifier = this.getTranslationValue(fromCell.x, toCell.x)
+      const yModifier = this.getTranslationValue(fromCell.y, toCell.y)
 
-      const speed = 20
+      return {
+        x: fromCell.x - laserIncrement * xModifier,
+        y: fromCell.y - laserIncrement * yModifier
+      }
+
+  }
+
+    async laserAnimation(canvas: Canvas, board: Board, positions: [Coordinates, Coordinates][], isReverse: boolean, showAnimations: boolean): Promise<void> {
       const laserIncrementPerFrame = 10
       let laserIncrement = laserIncrementPerFrame
-      if(fromCell && toCell){
-
-        const xModifier = this.getTranslationValue(fromCell.canvasCoordinates.x, toCell.x)
-        const yModifier = this.getTranslationValue(fromCell.canvasCoordinates.y, toCell.y)
 
         const lastAction = () => {
-          this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell!)
-          this.drawings.drawLaserCorner(canvas, toCell!)
+          for(const position of positions){
+
+            const fromCell = board.getCellByCoordinates(position[0].x, position[0].y)
+            const toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, position[1].x)), Math.min(8, Math.max(0, position[1].y)))
+
+            if(fromCell && toCell){
+              this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, toCell.canvasCoordinates, isReverse)
+              this.drawings.drawLaserCorner(canvas, toCell.canvasCoordinates, isReverse)
+            }
+
+          }
         }
 
         if(!showAnimations)
           return new Promise<void>((resolve) => { lastAction(); resolve() })
 
         return new Promise<void>((resolve) => {
-          const interval = setInterval(() => {
+          const interval = () => {
+            for(const position of positions){
+              const fromCell = board.getCellByCoordinates(position[0].x, position[0].y)
+              const toCell = board.getCellByCoordinates(Math.min(8, Math.max(0, position[1].x)), Math.min(8, Math.max(0, position[1].y)))
 
-            const currentCoordinates = {
-              x: fromCell.canvasCoordinates.x - laserIncrement * xModifier,
-              y: fromCell.canvasCoordinates.y - laserIncrement * yModifier
+              if(fromCell && toCell){
+                let finalDest = toCell?.canvasCoordinates
+
+                if(position[1].x > 8)
+                  finalDest = {x: toCell.canvasCoordinates.x + canvas.blockSize, y: toCell.canvasCoordinates.y}
+                else if(position[1].x < 0)
+                  finalDest = {x: toCell.canvasCoordinates.x - canvas.blockSize, y: toCell.canvasCoordinates.y}
+                if(position[1].y > 8)
+                  finalDest = {x: toCell.canvasCoordinates.x, y: toCell.canvasCoordinates.y - canvas.blockSize}
+                else if(position[1].y < 0)
+                  finalDest = {x: toCell.canvasCoordinates.x, y: toCell.canvasCoordinates.y + canvas.blockSize}
+
+                this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, this.laserAnimationStep(fromCell.canvasCoordinates, finalDest, laserIncrement), isReverse)
+              }
             }
-
-            this.drawings.drawLaserLine(canvas, fromCell.canvasCoordinates, currentCoordinates)
-            // this.drawings.drawPiece(canvas, board.getLaserCell()!.piece!) - will crash app if laser cell is not present
-
             laserIncrement += laserIncrementPerFrame
-            if(this.inVicinity(toCell!, currentCoordinates.x, currentCoordinates.y, laserIncrementPerFrame)){
+
+            if(laserIncrement >= canvas.blockSize){
               lastAction()
-              clearInterval(interval)
               resolve()
             }
-          }, 100 / speed )
+            else
+              window.requestAnimationFrame(interval)
+          }
+          window.requestAnimationFrame(interval)
         })
       }
 
-    }
-
-    async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, showAnimations: boolean){
+    async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, isReverse: boolean, showAnimations: boolean){
       return new Promise<void>((resolve) => {
         const pieceToDestroy = board.getCellByCoordinates(at.x, at.y)
         if(pieceToDestroy){
-          this.drawings.clearSingleCell(canvas, pieceToDestroy)
+          this.drawings.clearSingleCell(canvas, pieceToDestroy, isReverse)
           resolve()
         }
         else

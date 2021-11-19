@@ -4,7 +4,7 @@
       <mat-card-title>Register</mat-card-title>
     </mat-card-header>
 
-    <form class="example-form" [formGroup]="form" *ngIf="!isLoggedIn" (ngSubmit)="onSubmit()">
+    <form class="example-form" [formGroup]="form" *ngIf="!loggedIn" (ngSubmit)="onSubmit()">
       <mat-card-content>
         <mat-form-field class="example-full-width" appearance="standard" required>
           <mat-label>Username</mat-label>
@@ -13,7 +13,8 @@
 
         <mat-form-field class="example-full-width" appearance="standard" required>
           <mat-label>Email</mat-label>
-          <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com" maxlength="30">
+          <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com" maxlength="30" required>
+    
         </mat-form-field>
 
         <mat-form-field class="example-full-width" apearance="standard" required>

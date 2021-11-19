@@ -1,0 +1,20 @@
+@import "src/styles.scss";
+
+mat-selection-list {
+    overflow: auto;
+    min-width: 150px;
+    background-color: map_get($custom-palette,400);   
+}
+
+mat-selection-list::-webkit-scrollbar {
+    display: none;
+}
+
+button {
+    margin: 2%;
+}
+
+.btns{
+    margin: 10%;
+    text-align: center;
+}

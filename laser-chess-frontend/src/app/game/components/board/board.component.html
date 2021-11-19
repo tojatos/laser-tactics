@@ -1,8 +1,25 @@
+<h1>{{parseGamePhase(game.gamePhase)}}</h1>
+<div [style.width.px]="containerWidth * 1.7" [style.height.px]="containerHeight">
+<div class="float">
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
   <canvas #canvas class="gameCanvas"></canvas>
-  <canvas #gui class="guiCanvas"></canvas>
 </div>
-<!-- <button mat-raised-button (click)="changeAnimationShowOption()">Show animations</button> -->
-
-
+<div *ngIf="this.game.isInitiated">
+<app-board-actions
+(buttonPressEmitter)="buttonPressEvent($event)"
+[containerHeight]="containerHeight" [containerWidth]="containerWidth"
+[rotationPossible]="rotationPossibleInfo" [acceptPossible]="acceptPossibleInfo" [laserPossible]="laserPossibleInfo"
+fxLayoutAlign="center"></app-board-actions>
+</div>
+</div>
+<app-board-log class="float"
+[gameState]="game.gameService.lastMessage"
+[maxHeight]="containerHeight * 0.7"
+(gameLogEmitter)="buildEvent($event)"
+(gameReturnEmitter)="returnToCurrentEvent()"
+(giveUpEmitter)="game.giveUp()"
+(drawEmitter)="game.offerDraw()"
+></app-board-log>
+<div style="clear: both"></div>
+</div>
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from .game import Game
 from .models import *
 from .requests import *
-from ..core import crud
+from ..core.internal import crud
 
 
 def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerializable:
@@ -41,6 +41,38 @@ def get_player_from_user_id(game_state: GameState, user_id: str):
     }.get(user_id, None)
 
 
+def give_up(user_id: string, request: GiveUpRequest, db: Session):
+    game_state_serializable = get_game_state(GetGameStateRequest(request.game_id), db)
+    game_state = game_state_serializable.to_normal()
+    player = get_player_from_user_id(game_state, user_id)
+
+    if player is None:
+        raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
+
+    game = Game(game_state)
+
+    game.give_up(player)
+    crud.update_game(db, game.game_state, request.game_id)
+
+
+def offer_draw(user_id: string, request: GiveUpRequest, db: Session):
+    game_state_serializable = get_game_state(GetGameStateRequest(request.game_id), db)
+    game_state = game_state_serializable.to_normal()
+    player = get_player_from_user_id(game_state, user_id)
+
+    if player is None:
+        raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
+
+    game = Game(game_state)
+
+    can_move, error = game.validate_offer_draw(player)
+    if not can_move:
+        raise HTTPException(status_code=403, detail=f"Unable to offer draw. {error}")
+
+    game.offer_draw(player)
+    crud.update_game(db, game.game_state, request.game_id)
+
+
 def shoot_laser(user_id: string, request: ShootLaserRequest, db: Session):
     game_state_serializable = get_game_state(GetGameStateRequest(request.game_id), db)
     game_state = game_state_serializable.to_normal()
@@ -50,7 +82,11 @@ def shoot_laser(user_id: string, request: ShootLaserRequest, db: Session):
         raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
 
     game = Game(game_state)
-    # TODO: game move validation
+
+    can_move, error = game.validate_laser_shoot(player)
+    if not can_move:
+        raise HTTPException(status_code=403, detail=f"Unable to shoot laser. {error}")
+
     game.shoot_laser(player)
     crud.update_game(db, game.game_state, request.game_id)
 
@@ -65,9 +101,9 @@ def move_piece(user_id: string, request: MovePieceRequest, db: Session):
 
     game = Game(game_state)
 
-    can_move = game.validate_move(player, tuple(request.move_from), tuple(request.move_to))
+    can_move, error = game.validate_move(player, tuple(request.move_from), tuple(request.move_to))
     if not can_move:
-        raise HTTPException(status_code=403, detail=f"Unable to make a move.")
+        raise HTTPException(status_code=403, detail=f"Unable to make a move. {error}")
 
     game.move(tuple(request.move_from), tuple(request.move_to))
     crud.update_game(db, game.game_state, request.game_id)
@@ -83,9 +119,9 @@ def rotate_piece(user_id: string, request: RotatePieceRequest, db: Session):
 
     game = Game(game_state)
 
-    can_rotate = game.validate_rotation(player, tuple(request.rotate_at), request.angle)
+    can_rotate, error = game.validate_rotation(player, tuple(request.rotate_at), request.angle)
     if not can_rotate:
-        raise HTTPException(status_code=403, detail=f"Unable to make a move.")
+        raise HTTPException(status_code=403, detail=f"Unable to rotate. {error}")
 
     game.rotate(tuple(request.rotate_at), request.angle)
     crud.update_game(db, game.game_state, request.game_id)
