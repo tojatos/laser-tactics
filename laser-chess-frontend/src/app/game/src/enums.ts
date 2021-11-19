@@ -47,3 +47,11 @@ export enum ButtonTypes {
   LEFT_ARROW_BUTTON = "LEFT_ARROW_BUTTON",
   ACCEPT_BUTTON = "ACCEPT_BUTTON"
 }
+
+export enum EventsColors {
+  MOVE_EVENT = "yellow",
+  ROTATE_EVENT = "green",
+  PIECE_TAKEN = "orange",
+  PIECE_DESTROYED = "red",
+  TELEPORT_EVENT = "blue"
+}

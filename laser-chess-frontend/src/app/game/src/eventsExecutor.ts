@@ -36,7 +36,6 @@ export class EventsExecutor{
           board.executeEvent(event)
           if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum)
             this.gameService.showDrawOffer(board.gameId!)
-          this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
         }
       }
       this.eventsQueue = []
@@ -74,6 +73,8 @@ export class EventsExecutor{
           await new Promise(resolve => setTimeout(resolve, 1000))
         const w = canvas.ctx.canvas.width
         canvas.ctx.canvas.width = w
+        this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
+        allDestroyedPieceEventsAfterLastLaserShot.forEach(pde => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>pde).destroyed_on, canvas.isReversed, showAnimations))
         resolve()
         })
 

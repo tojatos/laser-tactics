@@ -10,6 +10,7 @@ import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
 import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
 import { GameActions } from "./GameActions"
+import { EventsColors } from "../../enums"
 
 export class GameCanvas extends Canvas {
 
@@ -67,6 +68,7 @@ export class GameCanvas extends Canvas {
 
     private async selectableCellEvent(selectedCell: Cell | undefined, board: Board){
       this.interactable = false
+      this.drawings.drawGame(this, board.cells, this.isReversed)
       if(board.selectedCell && selectedCell){
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
         this.gameService.increaseAnimationEvents()
@@ -79,6 +81,7 @@ export class GameCanvas extends Canvas {
       }
       else {
         this.unselectCellEvent(board)
+        this.drawings.drawGame(this, board.cells, this.isReversed)
         this.interactable = true
       }
     }
@@ -93,7 +96,7 @@ export class GameCanvas extends Canvas {
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
             this.drawings.drawSingleCell(this, hoveredOver, this.isReversed)
-            this.drawings.highlightCell(this, hoveredOver, this.isReversed)
+            this.drawings.highlightCell(this, hoveredOver, this.isReversed, hoveredOver.piece || undefined)
           }
           else {
             if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
@@ -131,7 +134,7 @@ export class GameCanvas extends Canvas {
 
     private selectCellEvent(selectedCell: Cell, board: Board){
       board.selectCell(selectedCell)
-      this.drawings.highlightCell(this, selectedCell, this.isReversed)
+      this.drawings.highlightCell(this, selectedCell, this.isReversed, selectedCell.piece || undefined)
       selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.isReversed))
     }
 
@@ -144,7 +147,6 @@ export class GameCanvas extends Canvas {
       this.mediator?.disableGameActionsButtons()
       this.mediator?.rotatePieceToInitPosition(board)
       board.unselectCell()
-      this.drawings.drawGame(this, board.cells, this.isReversed)
     }
 
     private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean): Promise<void>{
