@@ -35,6 +35,10 @@ export class Animations {
             destination.canvasCoordinates.y
             )
 
+        const numOfIterations = this.getTranslationValue(origin.canvasCoordinates.x, destination.canvasCoordinates.x) == 0 ?
+        Math.abs(destination.canvasCoordinates.y - origin.canvasCoordinates.y) / redrawDistance :
+        Math.abs(destination.canvasCoordinates.x - origin.canvasCoordinates.x) / redrawDistance
+
         let validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPieces(board, [origin])
         if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
           validCellsArray = this.cellsExcludingPieces(board, [origin, destination])
@@ -78,10 +82,13 @@ export class Animations {
           resolve()
         })
 
+        let iteration = 0
+
         return new Promise<void>((resolve) => {
           const interval = () => {
+            iteration++
             intervalAction()
-            if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
+            if(iteration >= numOfIterations){
               lastAction()
               resolve()
             }
@@ -223,10 +230,6 @@ export class Animations {
 
     private cellsExcludingPieces(board: Board, cells: Cell[]){
         return board.cells.filter(c => cells.every(cl => cl.piece != board.getCellByCoordinates(c.coordinates.x, c.coordinates.y)?.piece) )
-    }
-
-    private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){
-        return Math.abs(destination.x - currentPosX) < vicinity * 3 && Math.abs(destination.y - currentPosY) < vicinity * 3
     }
 
     private inRotationVicinity(currentRotation: number, desiredRotation: number, deegresPerFrame: number){
