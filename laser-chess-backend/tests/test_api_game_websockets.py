@@ -309,6 +309,16 @@ def test_give_up_p2(ws):
     assert game_state.game_phase is GamePhase.PLAYER_ONE_VICTORY
 
 
+def test_give_up_after_giving_up(ws):
+    assert give_up(ws, 0).status_code == 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
+
+    assert give_up(ws, 1).status_code != 200
+    game_state = get_game_state(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
+
+
 def test_offer_draw_accepted(ws):
     assert offer_draw(ws, 0).status_code == 200
     assert offer_draw(ws, 1).status_code == 200

@@ -48,6 +48,9 @@ class Game:
     def __init__(self, game_state: GameState):
         self.game_state = game_state
 
+    def is_game_started(self):
+        return self.game_state.game_phase is not GamePhase.NOT_STARTED
+
     def is_game_over(self):
         return self.game_state.game_phase in [GamePhase.DRAW, GamePhase.PLAYER_ONE_VICTORY,
                                               GamePhase.PLAYER_TWO_VICTORY]
@@ -264,6 +267,9 @@ class Game:
         self.check_victory()
 
     def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> Tuple[bool, Optional[str]]:
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
         if self.is_game_over():
             return False, "The game is over."
 
@@ -301,7 +307,18 @@ class Game:
                     return False, "King can take only once per turn."
         return True, None
 
+    def validate_give_up(self):
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
+        if self.is_game_over():
+            return False, "The game is over."
+        return True, None
+
     def validate_offer_draw(self, player):
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
         if self.is_game_over():
             return False, "The game is over."
 
@@ -318,6 +335,9 @@ class Game:
         return False, "You cannot make another draw offer so soon."
 
     def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int)-> Tuple[bool, Optional[str]]:
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
         if self.is_game_over():
             return False, "The game is over."
 
@@ -336,6 +356,9 @@ class Game:
         return True, None
 
     def validate_laser_shoot(self, player: Player) -> Tuple[bool, Optional[str]]:
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
         if self.is_game_over():
             return False, "The game is over."
 
