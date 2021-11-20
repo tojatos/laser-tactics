@@ -36,8 +36,6 @@ export class GameWebsocketService extends AbstractGameService {
           this.showSnackbar(msg.body)
           if(this.lastMessage)
             this.eventEmitter.invokeRollback(this.lastMessage)
-          else
-            window.location.reload()
         }
         else if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
@@ -46,10 +44,10 @@ export class GameWebsocketService extends AbstractGameService {
         }
       },
       err => {
-        console.log(err)
-        this.showSnackbar(err)
+        console.error(err)
+        this.showSnackbar("Connection error ocurred. Maybe there is no such game?")
       },
-      () => console.log('Connection closed')
+      () => this.showSnackbar("Connection to the server closed.")
     )
 
     this.sendRequest(observeWebsocketEndpoint, {game_id: gameId})
