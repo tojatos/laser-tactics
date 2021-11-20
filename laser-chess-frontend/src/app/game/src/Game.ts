@@ -31,6 +31,7 @@ export class Game{
   analizeMode = analizeModes.NOT_ANALIZING
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
+  playerNames: [string | undefined, string | undefined] = [undefined, undefined]
 
   constructor(public gameService: GameWebsocketService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
@@ -84,6 +85,9 @@ export class Game{
       this.gameCanvas.interactable = myTurn
 
       this.isInitiated = true
+
+      this.playerNames = this.gameCanvas.isReversed ? [this.board.playerTwo, this.board.playerOne] : [this.board.playerOne, this.board.playerTwo]
+
     }
   }
 
@@ -161,6 +165,11 @@ export class Game{
 
     this.gamePhase = newGameState.game_phase
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
+
+    if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
+      this.whoseTurn = PlayerType.PLAYER_ONE
+    else if(newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
+      this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
   async showGameEvent(gameEvents: GameEvent[]){

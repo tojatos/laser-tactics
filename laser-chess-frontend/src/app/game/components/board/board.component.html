@@ -1,9 +1,16 @@
-<h1>{{parseGamePhase(game.gamePhase)}}</h1>
+<h1>{{parseGamePhase(game.gamePhase)}}
+  <span *ngIf="game.gamePhase !== 'DRAW' && game.gamePhase !== 'NOT_STARTED'"
+  [style.color]="game.whoseTurn === 'PLAYER_ONE' ? 'red' : 'blue'">
+    ■
+  </span>
+</h1>
 <div [style.width.px]="containerWidth * 1.7" [style.height.px]="containerHeight">
 <div class="float">
+  <h3>{{game.playerNames[1]}}</h3>
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
   <canvas #canvas class="gameCanvas"></canvas>
 </div>
+<h3>{{game.playerNames[0]}}</h3>
 <div *ngIf="this.game.isInitiated">
 <app-board-actions
 (buttonPressEmitter)="buttonPressEvent($event)"
