@@ -4,7 +4,7 @@
     ■
   </span>
 </h1>
-<div [style.width.px]="containerWidth * 1.7" [style.height.px]="containerHeight">
+<div [style.width.px]="displayedContainerWidth" [style.height.px]="containerHeight">
 <div class="float">
   <h3>{{game.playerNames[1]}}</h3>
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
@@ -19,9 +19,10 @@
 fxLayoutAlign="center"></app-board-actions>
 </div>
 </div>
-<app-board-log class="float"
+<app-board-log class="float" #logs
+*ngIf="!isHandset"
 [gameState]="game.gameService.lastMessage"
-[maxHeight]="containerHeight * 0.7"
+[maxHeight]="containerHeight * 0.9"
 (gameLogEmitter)="buildEvent($event)"
 (gameReturnEmitter)="returnToCurrentEvent()"
 (giveUpEmitter)="game.giveUp()"

@@ -4,6 +4,7 @@ import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/constants';
 import { GamePhase, PlayerType } from '../../src/enums';
 import { Game } from '../../src/Game';
+import { BoardLogComponent } from '../board-log/board-log.component';
 
 @Component({
   selector: 'app-board',
@@ -14,10 +15,13 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>
 
-  @ViewChild('gui', { static: true })
-  canvasGUI!: ElementRef<HTMLCanvasElement>
+  @ViewChild('logs', { static: true })
+  logsComponent: ElementRef<BoardLogComponent> | undefined
 
   readonly sizeScale = 0.07
+  readonly handsetSize = 835
+  readonly handsetScale = 1.5
+  readonly placeForGameLogSize = 1.35
   animation = true
 
   constructor(private route: ActivatedRoute, public game: Game) {}
@@ -30,7 +34,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
 
     this.route.params.subscribe(async params => {
-      await this.game.initGame(gameCanvasContext, this.currentSize, params.id, this.sizeScale)
+      await this.game.initGame(gameCanvasContext,
+        this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
+        params.id,
+        this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale)
     })
   }
 
@@ -41,7 +48,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
-    this.game.changeCurrentSize(this.currentSize)
+    this.game.changeCurrentSize(this.isHandset ? this.currentSize * this.handsetScale : this.currentSize)
   }
 
   changeAnimationShowOption(){
@@ -81,16 +88,33 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  get isHandset(){
+    return innerWidth <= this.handsetSize
+  }
+
   get currentSize() {
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
   get containerHeight() {
-    return this.currentSize * ROWS
+    if(!this.isHandset)
+      return this.currentSize * ROWS
+    else
+      return this.currentSize * ROWS * this.handsetScale
   }
 
   get containerWidth() {
-    return this.currentSize * COLS
+    if(!this.isHandset)
+      return this.currentSize * COLS
+    else
+      return this.currentSize * ROWS * this.handsetScale
+  }
+
+  get displayedContainerWidth() {
+    if(this.isHandset)
+      return this.containerWidth
+    else
+      return this.containerWidth * this.placeForGameLogSize
   }
 
   get rotationPossibleInfo() {

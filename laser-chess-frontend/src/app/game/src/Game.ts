@@ -166,10 +166,10 @@ export class Game{
     this.gamePhase = newGameState.game_phase
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
 
-    if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
-      this.whoseTurn = PlayerType.PLAYER_ONE
-    else if(newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
-      this.whoseTurn = PlayerType.PLAYER_TWO
+  if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
+    this.whoseTurn = PlayerType.PLAYER_ONE
+  else if(newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
+    this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
   async showGameEvent(gameEvents: GameEvent[]){
