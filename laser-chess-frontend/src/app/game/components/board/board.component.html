@@ -23,10 +23,13 @@ fxLayoutAlign="center"></app-board-actions>
 *ngIf="!isHandset"
 [gameState]="game.gameService.lastMessage"
 [maxHeight]="containerHeight * 0.9"
+[gameFinished]="game.gamePhase !== 'STARTED'"
+[isSpectator]="isSpectator"
 (gameLogEmitter)="buildEvent($event)"
 (gameReturnEmitter)="returnToCurrentEvent()"
 (giveUpEmitter)="game.giveUp()"
 (drawEmitter)="game.offerDraw()"
+(rematchEmitter)="game.rematch()"
 ></app-board-log>
 <div style="clear: both"></div>
 </div>

@@ -129,4 +129,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     return this.game.gameActions?.acceptActive
   }
 
+  get isSpectator(){
+    return this.game.authService.getUsername() != this.game.playerNames[0] && this.game.authService.getUsername() != this.game.playerNames[1]
+  }
+
 }
