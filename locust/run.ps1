@@ -1,7 +1,7 @@
 $locustfile = "locustfile_game.py"
-$users = 1
-$spawn_rate = 1
-$run_time = "15s"
+$users = 10000
+$spawn_rate = 500
+$run_time = "150s"
 
 $date_timestamp = $(((get-date).ToUniversalTime()).ToString("yyyy_MM_dd_HH_mm_ss"))
 $target_dir = "results"
