@@ -149,7 +149,7 @@ export class Game{
             this.analizeMode = analizeModes.NOT_ANALIZING
           }
           else
-            this.loadNewGameState(newGameState)
+            await this.loadNewGameState(newGameState)
 
         if(newGameState.game_phase != GamePhase.STARTED)
             this.gameCanvas.interactable = false
