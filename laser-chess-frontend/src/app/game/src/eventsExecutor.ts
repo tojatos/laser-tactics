@@ -29,9 +29,9 @@ export class EventsExecutor{
     async executeEventsQueue(canvas: Canvas, board: Board, showAnimations: boolean = true, showLaser: boolean = true, timeout: number = this.eventsExecutionTimeout){
       for (const event of this.eventsQueue.filter(e => e.event_type != GameEvents.PIECE_DESTROYED_EVENT)){
         if(event){
-          if(showAnimations)
+          if(showAnimations && !document.hidden)
             await new Promise(resolve => setTimeout(resolve, timeout))
-          await this.getAnimationToExecute(canvas, board, event, this.eventsQueue.indexOf(event), showAnimations, showLaser)
+          await this.getAnimationToExecute(canvas, board, event, this.eventsQueue.indexOf(event), document.hidden ? false : showAnimations, showLaser)
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
           if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum)
@@ -69,7 +69,7 @@ export class EventsExecutor{
               .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, canvas.isReversed, showAnimations)) // clears field as well so laser is cut.
             ]
             )
-        if(showLaser)
+        if(showLaser && !document.hidden)
           await new Promise(resolve => setTimeout(resolve, 1000))
         const w = canvas.ctx.canvas.width
         canvas.ctx.canvas.width = w
