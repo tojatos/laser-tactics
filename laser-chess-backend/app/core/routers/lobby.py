@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.core.dependecies import get_db, get_current_active_user
 from app.core.internal import schemas, crud
+from app.game_engine import game_service
+from app.game_engine.requests import GameApiRequestPath, StartGameRequest
 
 router = APIRouter(
     prefix="/lobby",
@@ -71,3 +73,10 @@ async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User 
         raise HTTPException(status_code=403, detail="only player 1 of the game can change game settings")
     lobby = crud.update_lobby(db=db, lobby=db_lobby, lobby_new_data=lobby)
     return lobby
+
+
+@router.post(GameApiRequestPath.StartGame)
+async def start_game(request: StartGameRequest,
+                     current_user: schemas.User = Depends(get_current_active_user),
+                     db: Session = Depends(get_db)):
+    game_service.start_game(current_user.username, request, db)

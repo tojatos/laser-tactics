@@ -39,7 +39,7 @@ def before_all():
     for user in create_user_datas:
         verify_user(session, user["username"])
     tu.post_data(
-        "/start_game",
+        "/lobby/start_game",
         tokens[0],
         json=dict(game_id=game_id, player_one_id=create_user_datas[0]['username'],
                   player_two_id=create_user_datas[1]['username']),
