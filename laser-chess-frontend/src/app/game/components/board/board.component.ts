@@ -76,20 +76,20 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   parseGamePhase(gamePhase: GamePhase){
     switch(gamePhase){
       case GamePhase.STARTED: {
-        if(this.game.whoseTurn == PlayerType.PLAYER_ONE) return "Tura gracza czerwonego"
-        else if(this.game.whoseTurn == PlayerType.PLAYER_TWO) return "Tura gracza niebieskiego"
-        else return "Gra rozpoczęta. Tura nieokreślona"
+        if(this.game.whoseTurn == PlayerType.PLAYER_ONE) return "Red player's turn"
+        else if(this.game.whoseTurn == PlayerType.PLAYER_TWO) return "Blue player's turn"
+        else return "Game started - turn unknown"
       }
-      case GamePhase.DRAW: return "Remis"
-      case GamePhase.PLAYER_ONE_VICTORY: return "Zwyciestwo gracza czerwonego!"
-      case GamePhase.PLAYER_TWO_VICTORY: return "Zwyciestwo gracza niebieskiego!"
-      case GamePhase.NOT_STARTED: return "Gra nierozpoczęta"
-      default: return "Pobieranie danych..."
+      case GamePhase.DRAW: return "Draw"
+      case GamePhase.PLAYER_ONE_VICTORY: return "Red player wins!"
+      case GamePhase.PLAYER_TWO_VICTORY: return "Blue player wins!"
+      case GamePhase.NOT_STARTED: return "Game not started"
+      default: return "Loading data..."
     }
   }
 
   get isHandset(){
-    return innerWidth <= this.handsetSize
+    return (innerWidth > innerHeight ? innerHeight : innerWidth) <= this.handsetSize
   }
 
   get currentSize() {
@@ -107,7 +107,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     if(!this.isHandset)
       return this.currentSize * COLS
     else
-      return this.currentSize * ROWS * this.handsetScale
+      return this.currentSize * COLS * this.handsetScale
   }
 
   get displayedContainerWidth() {
