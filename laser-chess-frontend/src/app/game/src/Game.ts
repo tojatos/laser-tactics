@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
-import { GameEvent, GameState } from "../game.models";
+import { GameEvent, GameState, LaserShotEvent, LaserShotEventEntity } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
@@ -9,7 +9,7 @@ import { GameActions } from "./Display/Canvas/GameActions";
 import { GameCanvas } from "./Display/Canvas/GameCanvas";
 import { Drawings } from "./Display/Drawings";
 import { Resources } from "./Display/Resources";
-import { GamePhase, PlayerType } from "./enums";
+import { GameEvents, GamePhase, PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
 enum analizeModes {
@@ -163,12 +163,20 @@ export class Game{
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
   }
 
-  showGameEvent(gameEvents: GameEvent[]){
+  async showGameEvent(gameEvents: GameEvent[]){
     if(this.gameCanvas){
       this.analizeMode = analizeModes.ANALIZING
       this.gameCanvas.interactable = false
       this.board.setInitialGameState(this.displaySize)
-      this.executePendingActions(gameEvents, gameEvents.length, false, false)
+      await this.executePendingActions(gameEvents, gameEvents.length, false, false)
+      if(gameEvents.slice(-1)[0].event_type == GameEvents.LASER_SHOT_EVENT || gameEvents.slice(-1)[0].event_type == GameEvents.PIECE_DESTROYED_EVENT)
+        for(let i = gameEvents.length-1; i > 0; i--)
+          if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){
+            this.eventsExecutor.addEventsToExecute(gameEvents.slice(i, gameEvents.length))
+            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, true, 999999)
+            this.eventsExecutor.eventsQueue = []
+            i = -1
+          }
     }
   }
 

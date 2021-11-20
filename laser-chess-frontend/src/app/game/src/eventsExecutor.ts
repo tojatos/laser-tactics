@@ -41,7 +41,7 @@ export class EventsExecutor{
       this.eventsQueue = []
     }
 
-    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], eventId: number, showAnimations: boolean, showLaser: boolean){
+    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], eventId: number, showAnimations: boolean, showLaser: boolean, laserShowDuration = 1000){
       const res = values(groupBy(laserPath, 'time'))
       const allPathsToDraw: PathInfo[] = []
       const allDestroyedPieceEventsAfterLastLaserShot: GameEvent[] = []
@@ -70,7 +70,7 @@ export class EventsExecutor{
             ]
             )
         if(showLaser && !document.hidden)
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, laserShowDuration))
         const w = canvas.ctx.canvas.width
         canvas.ctx.canvas.width = w
         this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
