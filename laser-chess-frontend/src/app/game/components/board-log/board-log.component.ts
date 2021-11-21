@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { MatSelectionList } from '@angular/material/list';
 import { cloneDeep } from 'lodash';
 import { GameEvent, GameState } from '../../game.models';
 import { GameEvents } from '../../src/enums';
@@ -9,6 +10,9 @@ import { GameEvents } from '../../src/enums';
   styleUrls: ['./board-log.component.scss']
 })
 export class BoardLogComponent implements OnChanges, OnDestroy {
+
+  @ViewChild('userEvents')
+  logList: MatSelectionList | undefined
 
   @Input() gameState: GameState | undefined
   @Input() maxHeight: number = 300
@@ -51,6 +55,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   }
 
   returnToCurrentEvent(){
+    this.logList?.deselectAll()
     this.gameReturnEmitter.emit()
   }
 
@@ -58,7 +63,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     if(this.validGameState){
     this.gameLogEmitter.emit(this.userEventChains.slice(0, e+1).flat())
     if(e == this.userEventChains.length-1)
-      this.gameReturnEmitter.emit()
+      this.returnToCurrentEvent()
     }
   }
 
