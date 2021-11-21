@@ -40,7 +40,7 @@ export class Animations {
         Math.abs(destination.canvasCoordinates.x - origin.canvasCoordinates.x) / redrawDistance
 
         let validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPieces(board, [origin])
-        if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+        if(destination.piece?.piece_type != PieceType.HYPER_SQUARE)
           validCellsArray = this.cellsExcludingPieces(board, [origin, destination])
 
         const intervalAction = () => {
@@ -51,7 +51,7 @@ export class Animations {
             color = EventsColors.TELEPORT_EVENT
             this.drawings.drawPiece(canvas, origin.piece, isReverse)
           }
-          if(destination.piece && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+          if(destination.piece && origin.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
             color = EventsColors.PIECE_TAKEN
           this.drawings.highlightCell(canvas, origin, isReverse, piece, color)
           this.drawings.highlightCell(canvas, destination, isReverse, piece, color)
@@ -69,7 +69,7 @@ export class Animations {
           }
           else{
             let color = EventsColors.MOVE_EVENT
-            if(destination.piece && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+            if(destination.piece && origin.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
               color = EventsColors.PIECE_TAKEN
             this.drawings.highlightCell(canvas, origin, isReverse, undefined, color)
             this.drawings.highlightCell(canvas, destination, isReverse, piece, color)
