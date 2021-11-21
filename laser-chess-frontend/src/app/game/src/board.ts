@@ -842,6 +842,10 @@ export class Board implements BoardInterface {
     return PlayerType.NONE
   }
 
+  isPlayer(username: string){
+    return this.playerOne == username || this.playerTwo == username
+  }
+
   isMyTurn() {
     const player = this.authService.getCurrentJwtInfo()?.sub
     const turnOfPlayer = Math.round(this.currentTurn / 2) % 2 == 0 ? this.playerTwo : this.playerOne
