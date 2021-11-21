@@ -61,9 +61,10 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
 
   onSelection(e: number){
     if(this.validGameState){
-    this.gameLogEmitter.emit(this.userEventChains.slice(0, e+1).flat())
     if(e == this.userEventChains.length-1)
       this.returnToCurrentEvent()
+    else
+      this.gameLogEmitter.emit(this.userEventChains.slice(0, e+1).flat())
     }
   }
 
