@@ -22,6 +22,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly handsetSize = 835
   readonly handsetScale = 1.5
   readonly placeForGameLogSize = 1.35
+  readonly minWidth = 695
   animation = true
 
   constructor(private route: ActivatedRoute, public game: Game) {}
@@ -89,7 +90,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   get isHandset(){
-    return (innerWidth > innerHeight ? innerHeight : innerWidth) <= this.handsetSize
+    return innerWidth <= this.handsetSize
   }
 
   get currentSize() {
@@ -114,7 +115,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     if(this.isHandset)
       return this.containerWidth
     else
-      return this.containerWidth * this.placeForGameLogSize
+      return Math.max(this.containerWidth * this.placeForGameLogSize, this.minWidth)
   }
 
   get rotationPossibleInfo() {
