@@ -1,0 +1,15 @@
+{
+  "integrationFolder": "cypress/integration",
+  "supportFile": "cypress/support/index.ts",
+  "videosFolder": "cypress/videos",
+  "screenshotsFolder": "cypress/screenshots",
+  "pluginsFile": "cypress/plugins/index.ts",
+  "fixturesFolder": "cypress/fixtures",
+  "baseUrl": "http://localhost:8080",
+  "env": {
+    "EXTERNAL_API": "http://localhost",
+    "API_PREFIX": "/api/v1",
+    "LOGIN_URL": "/token",
+    "START_GAME_URL": "/start_game"
+  }
+}
