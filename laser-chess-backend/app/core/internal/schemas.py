@@ -78,8 +78,17 @@ class VerificationTokenData(BaseModel):
 class User(UserBase):
     is_active: bool
     is_verified: bool
-
+    registration_date: dt.date
     rating: int
+
+    class Config:
+        orm_mode = True
+
+
+class UserGet(BaseModel):
+    username: str
+    rating: int
+    registration_date: dt.date
 
     class Config:
         orm_mode = True
