@@ -6,11 +6,17 @@
 </h1>
 <div [style.width.px]="displayedContainerWidth" [style.height.px]="containerHeight">
 <div class="float">
-  <h3>{{game.playerNames[1]}}</h3>
+  <div class="boardText">
+    <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations</mat-slide-toggle>
+    <h3>{{game.playerNames[1]}}</h3>
+  </div>
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
   <canvas #canvas class="gameCanvas"></canvas>
 </div>
+<div class="boardText">
+  <p></p>
 <h3>{{game.playerNames[0]}}</h3>
+</div>
 <div *ngIf="this.game.isInitiated">
 <app-board-actions
 (buttonPressEmitter)="buttonPressEvent($event)"

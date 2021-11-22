@@ -53,7 +53,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   changeAnimationShowOption(){
-    this.animation = !this.animation
     this.game.changeAnimationsShowOption(this.animation)
   }
 
