@@ -8,12 +8,12 @@ from locust import TaskSet, task, HttpUser, between
 import logging
 
 # TODO figure out how to do setup for entire process?
-with open('testdata.csv', 'r+') as f_uc:
+with open('../testdata.csv', 'r+') as f_uc:
     reader = csv.reader(f_uc, )
     next(reader, None)
     USER_CREDENTIALS = list(reader)
 
-with open('usernames.csv', 'r+') as f_u:
+with open('../usernames.csv', 'r+') as f_u:
     reader = csv.reader(f_u)
     next(reader, None)
     USERNAMES = list(reader)
