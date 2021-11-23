@@ -37,8 +37,9 @@ API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
 PORT = get_env('PORT', 8000)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+ROOT_PATH = get_env('ROOT_PATH', "")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{ROOT_PATH}{API_PREFIX}/token")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{API_PREFIX}/token")
 
 
 class TokenPurpose(str, AutoNameEnum):

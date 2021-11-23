@@ -8,18 +8,19 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
 from app.core.dependecies import API_PREFIX, HOST, PORT, get_db, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, \
-    create_access_token, TokenPurpose
+    create_access_token, TokenPurpose, ROOT_PATH
 from app.core.internal import models, schemas
 from app.core.internal.database import engine
 from app.core.routers import friends, users, email, game, lobby
 from app.core.routers.game import websocket_endpoint
 from sqlalchemy.orm import Session
 
-app = FastAPI(openapi_url=f"{API_PREFIX}/openapi.json")
+app = FastAPI(root_path=ROOT_PATH, openapi_url=f"{API_PREFIX}/openapi.json")
 
 origins = [
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:2346",
 ]
 
 app.add_middleware(
