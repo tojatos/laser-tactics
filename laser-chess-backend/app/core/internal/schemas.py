@@ -174,3 +174,10 @@ class Stats(BaseModel):
     winrate_as_p1: float
     winrate_as_p2: float
     drawrate: float
+
+
+class Settings(BaseModel):
+    skip_animations: bool = False
+
+    class Config:
+        orm_mode = True

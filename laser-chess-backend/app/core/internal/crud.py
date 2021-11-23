@@ -53,9 +53,12 @@ def create_user(db: Session, user: schemas.UserCreate):
                           registration_date=datetime.now(), rating=starting_rating.rating,
                           rating_deviation=starting_rating.rating_deviation,
                           rating_volatility=starting_rating.volatility)
+    user_settings = models.UserSettings(username=user.username)
     db.add(db_user)
+    db.add(user_settings)
     db.commit()
     db.refresh(db_user)
+    db.refresh(user_settings)
     return db_user
 
 
@@ -239,10 +242,12 @@ def get_users_last_rating(db: Session, username: str, rating_period: int = RATIN
     crossout_date = datetime.now() - timedelta(days=rating_period)
     match_left = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_one_username == user.username,
-             models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).order_by(models.GameHistory.game_end_date).first()
+             models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).order_by(
+        models.GameHistory.game_end_date).first()
     match_right = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_two_username == user.username,
-             models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).order_by(models.GameHistory.game_end_date).first()
+             models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).order_by(
+        models.GameHistory.game_end_date).first()
     # None checks in case any or both matches are none
     if match_right is None and match_left is None:
         rating = get_player_rating(db, username)
@@ -340,9 +345,11 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
 
     crossout_date = datetime.now() - timedelta(days=rating_period)
     matches_left = db.query(models.GameHistory).filter(
-        and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).all()
+        and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date,
+             models.GameHistory.is_rated == True)).all()
     matches_right = db.query(models.GameHistory).filter(
-        and_(models.GameHistory.player_two_username == user.username, models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).all()
+        and_(models.GameHistory.player_two_username == user.username, models.GameHistory.game_end_date > crossout_date,
+             models.GameHistory.is_rated == True)).all()
     list_left = [PlayerMatchResult(player2_rating=match.player_two_rating,
                                    player2_rating_deviation=match.player_two_deviation,
                                    result=determine_result_player_one(match.result)) for
@@ -421,9 +428,9 @@ def get_stats(db: Session, user: schemas.User):
     draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
     wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN, matches))
     wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN, matches))
-    winrate = len(wins_as_p1 + wins_as_p2) /no_matches
-    winrate_as_p1 = len(games_as_p1)/ len(games_as_p1)
-    winrate_as_p2 = len(games_as_p2)/ len(games_as_p2)
+    winrate = len(wins_as_p1 + wins_as_p2) / no_matches
+    winrate_as_p1 = len(games_as_p1) / len(games_as_p1)
+    winrate_as_p2 = len(games_as_p2) / len(games_as_p2)
     no_wins = len(wins_as_p1 + wins_as_p2)
     no_draws = len(draws)
     drawrate = len(draws) / no_matches
@@ -439,3 +446,15 @@ def get_stats(db: Session, user: schemas.User):
     )
 
 
+def get_settings(db: Session, user: schemas.User):
+    return db.query(models.UserSettings).filter(models.UserSettings.username == user.username).first()
+
+
+def update_settings(settings: schemas.Settings, db: Session, user: schemas.User):
+    db_settings = get_settings(db, user)
+    # change settings here
+    db_settings.skip_animations = settings.skip_animations
+    # ------------------------------------------
+    db.commit()
+    db.refresh(db_settings)
+    return db_settings

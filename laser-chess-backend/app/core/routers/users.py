@@ -144,3 +144,13 @@ def get_stats(username: str, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return crud.get_stats(db=db, user=db_user)
+
+
+@router.get("/{username}/settings", response_model=schemas.Settings)
+def get_settings(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return crud.get_settings(db=db, user=current_user)
+
+
+@router.patch("/{username}/settings")
+def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return crud.update_settings(settings=settings, db=db, user=current_user)
