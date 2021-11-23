@@ -36,3 +36,16 @@ export interface User {
   is_active: boolean,
   items: Item[]
 }
+
+export interface FriendRequest {
+  id: string,
+  user_one_username: string,
+  user_two_username: number,
+  status: RequestStatus
+}
+
+export enum RequestStatus {
+  CREATED = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  DECLINED = "DECLINED"
+}

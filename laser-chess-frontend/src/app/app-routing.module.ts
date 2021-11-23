@@ -7,6 +7,8 @@ import { RegisterComponent } from './components/register/register.component';
 import { UserPageComponent } from './components/user-page/user-page.component';
 import { GameComponent } from './game/game.component';
 import { AuthGuard } from './guards/auth.guard';
+import { SettingsPasswordComponent } from './components/settings-password/settings-password.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 const routes: Routes = [
   {
@@ -22,8 +24,18 @@ const routes: Routes = [
     component: GameComponent
   },
   {
-    path: 'user',
+    path: 'users/:username',
     component: UserPageComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings',
+    component: SettingsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings/password',
+    component: SettingsPasswordComponent,
     canActivate: [AuthGuard]
   },
   {

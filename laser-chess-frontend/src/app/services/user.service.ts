@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { friendsFullEndpoint, userFullEndpoint } from '../api-definitions';
-import { User } from '../app.models';
+import { FriendRequest, User } from '../app.models';
 
 
 @Injectable({
@@ -11,12 +11,16 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
+  changePassword(oldPassword: string, newPassword: string){
+    return this.http.post<any>(userFullEndpoint("me/change_password"), {'oldPassword': oldPassword, 'newPassword': newPassword}).toPromise()
+  }
+
   getUserByUsername(username: string) {
     return this.http.get<User>(userFullEndpoint(username)).toPromise()
   }
 
   getUserMe() {
-    return this.http.get<User>(userFullEndpoint("me/")).toPromise()
+    return this.http.get<User>(userFullEndpoint("me")).toPromise()
   }
 
   getUserFriends() {
@@ -24,22 +28,22 @@ export class UserService {
   }
 
   getUserFriendsRequests() {
-    return this.http.get<any>(friendsFullEndpoint("requests")).toPromise()
+    return this.http.get<FriendRequest[]>(friendsFullEndpoint("requests")).toPromise()
   }
 
-  sendFriendRequests(friend_username: string) {
-    return this.http.post<any>(friendsFullEndpoint("requests/send"), {'friend_username':friend_username}).toPromise()
+  sendFriendRequests(username: string) {
+    return this.http.post<any>(friendsFullEndpoint("requests/send"), {'username':username}).toPromise()
   }
-  acceptFriendRequests(request_id: number) {
-    return this.http.post<any>(friendsFullEndpoint("requests/accept"), {'request_id': request_id}).toPromise()
-  }
-
-  declineFriendRequests(request_id: number) {
-    return this.http.post<any>(friendsFullEndpoint("requests/decline"),{'request_id': request_id}).toPromise()
+  acceptFriendRequests(id: string) {
+    return this.http.post<any>(friendsFullEndpoint("requests/accept"), {'id': id}).toPromise()
   }
 
-  removeFriend() {
-    return this.http.delete<any>(friendsFullEndpoint("unfriend")).toPromise()
+  declineFriendRequests(id: string) {
+    return this.http.post<any>(friendsFullEndpoint("requests/decline"),{'id': id}).toPromise()
+  }
+
+  removeFriend(username: string) {
+    return this.http.delete(friendsFullEndpoint("unfriend"),{body:{'username': username}}).subscribe()
   }
 
   getBlockedUsers() {
@@ -47,11 +51,11 @@ export class UserService {
   }
 
   blockUser(username: string) {
-    return this.http.post<any>(userFullEndpoint(`${username}/block`),{}).toPromise()
+    return this.http.post<any>(userFullEndpoint("block"),{'username': username}).toPromise()
   }
 
   unblockUser(username: string) {
-    return this.http.delete<any>(userFullEndpoint(`${username}/unblock`)).toPromise()
+    return this.http.delete(userFullEndpoint("unblock"),{body:{'username': username}}).subscribe()
   }
 
 }

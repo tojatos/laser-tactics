@@ -2,6 +2,10 @@
     <div class="main-wrapper" fxFlex="20" fxLayout="row" fxLayoutAlign="end start">
         <button mat-stroked-button color="warn" class="leave-lobby-button" (click)="leaveLobby()"> Leave lobby </button>
     </div>
+    <div class="main-wrapper" fxFlex="10" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
+        <mat-card class="mat-card-lobby"> 
+            <input class="input-box" #box (keyup.enter)="onEnter(box.value)" placeholder={{name}}> </mat-card>
+    </div>
     <div class="main-wrapper" fxFlex="20" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
         <mat-card *ngIf="!player_one" class="red-player-card" (click)="joinLobby()">
             Join lobby
@@ -22,11 +26,11 @@
     </div>
     <div class="main-wrapper" fxFlexAlign="center" fxFlex="20" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
         <mat-card class="mat-card-lobby"> {{isRanked}} </mat-card>
-        <mat-card class="mat-card-lobby"> {{isPrivate}} </mat-card>
-
+        <mat-card class="mat-card-lobby"  > 
+            <button mat-button (click)="changePrivacy()">{{isPrivate}}</button>
+             </mat-card>
     </div>
-    <div class="main-wrapper" fxFlex="20" sfxLayout="column" fxLayoutAlign="center start">
-
+    <div class="main-wrapper" fxFlex="30" sfxLayout="column" fxLayoutAlign="center start">
         <button mat-stroked-button color="accent" class="start-game-button" (click)="startGame()"> Start game </button>
     </div>
 

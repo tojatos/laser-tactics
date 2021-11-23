@@ -1,3 +1,18 @@
-<div  *ngIf="user" class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-    <mat-card>{{user.username}}</mat-card>
+<div  class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+    <mat-card>{{username}}</mat-card>
+    <mat-card *ngIf="isOwner"><input class="input-box" #box (keyup.enter)="onEnter('add', box.value)" placeholder="Username">Add friend </mat-card>
+    <mat-list *ngIf="isOwner">
+        <mat-list-item *ngFor="let friend of friends">
+            <button mat-list-item (click)="goToProfile(friend)"> {{friend}} </button>
+            <button mat-list-item (click)="unfriend(friend)"> Unfriend </button>
+        </mat-list-item>
+    </mat-list>
+    <mat-list *ngIf="isOwner">
+        <mat-list-item *ngFor="let request of friendsRequests">
+            <a matLine>{{request.user_one_username}}</a>
+            <button mat-list-item (click)="acceptFriendRequest(request.id)"> Accept </button>
+            <button mat-list-item (click)="declineFriendRequest(request.id)"> Decline </button>
+        </mat-list-item>
+    </mat-list>
+    <mat-card *ngIf="isOwner"><input class="input-box" #box (keyup.enter)="onEnter('block', box.value)" placeholder="Username"> Block user</mat-card>
     </div>

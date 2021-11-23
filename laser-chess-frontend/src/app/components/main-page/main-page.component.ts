@@ -22,7 +22,7 @@ export class MainPageComponent implements OnInit {
   lobby: any
   ranked = false
   public lobbies: Lobby[] | undefined
-  displayedColumns = ['player_one_username', 'player_two_username', 'Mode', 'join'];
+  displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
 
   constructor(private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router) {}
 
@@ -77,6 +77,15 @@ export class MainPageComponent implements OnInit {
   async createRankedLobby(){
     this.lobby = await this.lobbyService.createLobby()
     this.lobby.is_ranked = true
+    this.lobbyService.updateLobby(this.lobby)
+    console.log(this.lobby)
+    this.router.navigate(['/lobby', this.lobby.game_id])
+      }
+
+  async createPrivateRankedLobby(){
+    this.lobby = await this.lobbyService.createLobby()
+    this.lobby.is_ranked = true
+    this.lobby.is_private = true
     this.lobbyService.updateLobby(this.lobby)
     console.log(this.lobby)
     this.router.navigate(['/lobby', this.lobby.game_id])

@@ -4,6 +4,7 @@ import { Lobby } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import * as _ from 'lodash';
 import { LobbyService } from 'src/app/services/lobby.service';
+import {MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 export enum LobbyStatus {
   CREATED = "CREATED",
@@ -11,7 +12,6 @@ export enum LobbyStatus {
   GAME_STARTED = "GAME_STARTED",
   GAME_ENDED = "GAME_ENDED"
 }
-
 @Component({
   selector: 'app-lobby',
   templateUrl: './lobby.component.html',
@@ -28,12 +28,12 @@ export class LobbyComponent implements OnInit, OnDestroy {
   isRanked: string | undefined
   isPrivate: string | undefined
   username = ""
+  name = ""
 
   ngOnInit(): void {
     this.route.params.subscribe(async params => {
       this.refreshLobbyState(params.id)
       this.username = this.authService.getUsername()
-
     })
   }
   ngOnDestroy(): void {
@@ -53,16 +53,20 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
   }
 
-  // changeIfRanked() {
-  //   if (this.lobby && this.user?.username== this.lobby.player_one_username) {
-  //     if (this.isRanked == "Not ranked"){
-  //       this.isRanked = "Ranked"
-  //     }
-  //     else{this.isRanked = "Not ranked"}
-  //     !this.lobby.is_ranked
-  //     this.lobbyService.updateLobby(this.lobby)
-  //   }
-  // }
+  async changePrivacy() {
+    if (this.lobby && this.username== this.lobby.player_one_username) {
+      if(this.lobby.is_private){
+        this.isPrivate = "Public"
+        this.lobby.is_private = false
+      }
+      else{
+        this.isPrivate = "Private"
+        this.lobby.is_private = true
+      }
+      console.log(this.lobby)
+      await this.lobbyService.updateLobby(this.lobby)
+    }
+  }
 
   async startGame() {
     if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username) {
@@ -87,6 +91,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.lobby = lobbyData
     this.player_one = this.lobby.player_one_username
     this.player_two = this.lobby.player_two_username
+    this.name = this.lobby.name
     if(this.lobby.is_ranked){
       this.isRanked = "Ranked"
     }
@@ -107,4 +112,19 @@ export class LobbyComponent implements OnInit, OnDestroy {
     if(this.refresh)
       window.setTimeout(() => this.refreshLobbyState(gameId), 500)
   }
+
+  getName() {
+    return this.lobby?.name
+  }
+
+  async changeName(name: string){
+    if(this.lobby){
+      this.name = name
+      this.lobby.name = name
+      await this.lobbyService.updateLobby(this.lobby)
+    }
+  }
+
+  onEnter(name: string) { this.changeName(name) }
+
 }
