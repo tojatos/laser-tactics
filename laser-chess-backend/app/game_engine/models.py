@@ -58,6 +58,8 @@ class EventType(str, AutoNameEnum):
     PIECE_TAKEN_EVENT = auto()
     PIECE_DESTROYED_EVENT = auto()
     SHOOT_LASER_EVENT = auto()
+    GIVE_UP_EVENT = auto()
+    OFFER_DRAW_EVENT = auto()
 
 
 @dataclass
@@ -96,8 +98,33 @@ class Board:
 
 
 @dataclass
+class GiveUpEvent:
+    player: Player
+    event_type: str = EventType.GIVE_UP_EVENT
+
+    def to_serializable(self):
+        return self
+
+    def to_normal(self):
+        return self
+
+
+@dataclass
+class OfferDrawEvent:
+    player: Player
+    turn_number: int
+    event_type: str = EventType.OFFER_DRAW_EVENT
+
+    def to_serializable(self):
+        return self
+
+    def to_normal(self):
+        return self
+
+
+@dataclass
 class ShootLaserEvent:
-    laser_shot: bool = True
+    laser_shot: bool = True  # TODO: remove, not needed
     event_type: str = EventType.SHOOT_LASER_EVENT
 
     def to_serializable(self):
@@ -263,13 +290,15 @@ class LaserShotEventSerializable:
         return LaserShotEvent([(x.time, tuple(x.coordinates)) for x in self.laser_path])
 
 
-GameEvent = Union[
-    PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent, PieceTakenEvent, PieceDestroyedEvent]
-UserEvent = Union[PieceRotatedEvent, PieceMovedEvent, ShootLaserEvent]
+GameEvent = Union[PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent, PieceTakenEvent,
+                  PieceDestroyedEvent, GiveUpEvent, OfferDrawEvent]
+UserEvent = Union[PieceRotatedEvent, PieceMovedEvent, ShootLaserEvent, GiveUpEvent, OfferDrawEvent]
 
-GameEventSerializable = Union[
-    PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable, LaserShotEventSerializable, PieceTakenEventSerializable, PieceDestroyedEventSerializable]
-UserEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, ShootLaserEvent]
+GameEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable,
+                              LaserShotEventSerializable, PieceTakenEventSerializable, PieceDestroyedEventSerializable,
+                              GiveUpEvent, OfferDrawEvent]
+UserEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, ShootLaserEvent, GiveUpEvent,
+                              OfferDrawEvent]
 
 
 @dataclass

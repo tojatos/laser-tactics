@@ -5,8 +5,7 @@ services:
     build:
       context: ./laser-chess-frontend
       dockerfile: Dockerfile.prod
-      args:
-        BASE_HREF: "/"
+    image: tojatos/laser-tactics-frontend
     networks:
       - web
       - default
@@ -14,7 +13,7 @@ services:
       - fastapi
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laser-tactics-front.rule=(Host(`lasertactics.online`))"
+      - "traefik.http.routers.laser-tactics-front.rule=(Host(`lasertactics.online`) || Host(`www.lasertactics.online`))"
       - "traefik.http.routers.laser-tactics-front.tls=true"
       - "traefik.http.routers.laser-tactics-front.tls.certresolver=myresolver"
       - "traefik.http.services.laser-tactics-front.loadbalancer.server.port=80"
@@ -22,6 +21,7 @@ services:
 
   fastapi:
     build: ./laser-chess-backend
+    image: tojatos/laser-tactics-backend
     restart: always
     command: python -m app.main
     networks:
@@ -37,7 +37,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.laser-tactics-api-stripprefix.stripPrefix.prefixes=/laser-tactics-api"
-      - "traefik.http.routers.laser-tactics-api.rule=(Host(`lasertactics.online`) && PathPrefix(`/laser-tactics-api/`))"
+      - "traefik.http.routers.laser-tactics-api.rule=((Host(`lasertactics.online`) || Host(`www.lasertactics.online`)) && PathPrefix(`/laser-tactics-api/`))"
       - "traefik.http.routers.laser-tactics-api.middlewares=laser-tactics-api-stripprefix"
       - "traefik.http.routers.laser-tactics-api.entrypoints=websecure"
       - "traefik.http.routers.laser-tactics-api.tls=true"
@@ -46,6 +46,7 @@ services:
       - "traefik.docker.network=traefik_default"
   db:
     image: postgres:13.0-alpine
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:

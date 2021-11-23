@@ -25,7 +25,7 @@ export class AuthInterceptor implements HttpInterceptor {
       duration: 2000
     })
   }
-  
+
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const idToken = localStorage.getItem("access_token");
 

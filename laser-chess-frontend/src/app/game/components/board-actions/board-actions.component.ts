@@ -11,11 +11,11 @@ export class BoardActionsComponent {
 
   @Input() containerHeight: number = 0;
 
-  @Input() rotationPossible: boolean = false
+  @Input() rotationPossible: boolean | undefined
 
-  @Input() laserPossible: boolean = false
+  @Input() laserPossible: boolean | undefined
 
-  @Input() acceptPossible: boolean = false
+  @Input() acceptPossible: boolean | undefined
 
   @Output() buttonPressEmitter = new EventEmitter<string>();
 

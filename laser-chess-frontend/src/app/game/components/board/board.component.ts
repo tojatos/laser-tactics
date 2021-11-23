@@ -1,6 +1,8 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/constants';
+import { GamePhase, PlayerType } from '../../src/enums';
 import { Game } from '../../src/Game';
 
 @Component({
@@ -30,11 +32,11 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     this.route.params.subscribe(async params => {
       await this.game.initGame(gameCanvasContext, this.currentSize, params.id, this.sizeScale)
     })
-
   }
 
   ngOnDestroy() {
     this.game.closeWebsocketConnection()
+    this.game.destroyGame()
   }
 
   @HostListener('window:resize', ['$event'])
@@ -56,6 +58,29 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  buildEvent(gameEvents: GameEvent[]){
+    this.game.showGameEvent(gameEvents)
+  }
+
+  returnToCurrentEvent(){
+    this.game.returnToCurrentEvent()
+  }
+
+  parseGamePhase(gamePhase: GamePhase){
+    switch(gamePhase){
+      case GamePhase.STARTED: {
+        if(this.game.whoseTurn == PlayerType.PLAYER_ONE) return "Tura gracza czerwonego"
+        else if(this.game.whoseTurn == PlayerType.PLAYER_TWO) return "Tura gracza niebieskiego"
+        else return "Gra rozpoczęta. Tura nieokreślona"
+      }
+      case GamePhase.DRAW: return "Remis"
+      case GamePhase.PLAYER_ONE_VICTORY: return "Zwyciestwo gracza czerwonego!"
+      case GamePhase.PLAYER_TWO_VICTORY: return "Zwyciestwo gracza niebieskiego!"
+      case GamePhase.NOT_STARTED: return "Gra nierozpoczęta"
+      default: return "Pobieranie danych..."
+    }
+  }
+
   get currentSize() {
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
@@ -69,15 +94,15 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   get rotationPossibleInfo() {
-    return this.game.gameActions.rotationActive
+    return this.game.gameActions?.rotationActive
   }
 
   get laserPossibleInfo() {
-    return this.game.gameActions.laserActive
+    return this.game.gameActions?.laserActive
   }
 
   get acceptPossibleInfo() {
-    return this.game.gameActions.acceptActive
+    return this.game.gameActions?.acceptActive
   }
 
 }

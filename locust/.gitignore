@@ -2,3 +2,4 @@
 .venv.lock
 pyenv.cfg
 __pycache__
+results

@@ -21,6 +21,8 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:2346",
+    "https://lasertactics.online",
+    "https://www.lasertactics.online",
 ]
 
 app.add_middleware(
@@ -68,7 +70,6 @@ app.include_router(router)
 app.include_router(users.router, prefix=API_PREFIX)
 app.include_router(email.router, prefix=API_PREFIX)
 app.include_router(friends.router, prefix=API_PREFIX)
-app.include_router(game.router, prefix=API_PREFIX)
 app.include_router(lobby.router, prefix=API_PREFIX)
 app.add_api_websocket_route("/ws", websocket_endpoint)
 

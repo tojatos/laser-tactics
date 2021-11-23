@@ -1,14 +1,15 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from "rxjs/webSocket";
-import { authWebsocketEndpoint, gameStateEndpoint, gameStateFullEndpoint, movePieceEndpoint, observeWebsocketEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
+import { authWebsocketEndpoint, gameStateEndpoint, giveUpEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
 import { AuthService } from 'src/app/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { Coordinates, GameState } from '../../game.models';
 import { MovePieceRequest, RotatePieceRequest } from '../../game.request.models';
 import { EventEmitterService } from '../event-emitter.service';
 import { AbstractGameService } from './abstract-game-service';
+import Swal from 'sweetalert2'
+import { GamePhase } from '../../src/enums';
 
 type websocketRequest = {
   request_path: string,
@@ -31,7 +32,14 @@ export class GameWebsocketService extends AbstractGameService {
   connect(gameId: string){
     this.subject.asObservable().subscribe(
       msg => {
-        if((<GameState>msg).game_events){
+        if(msg.status_code && msg.status_code != 200){
+          this.showSnackbar(msg.body)
+          if(this.lastMessage)
+            this.eventEmitter.invokeRollback(this.lastMessage)
+          else
+            window.location.reload()
+        }
+        else if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
           this.lastMessage = msg
           this.eventEmitter.invokeRefresh(msg)
@@ -51,12 +59,11 @@ export class GameWebsocketService extends AbstractGameService {
       this.sendRequest(authWebsocketEndpoint, {token : token})
 
     this.getGameState(gameId)
-
   }
 
   private showSnackbar(message: string) {
     this._snackBar.open(message, "", {
-      duration: 2000
+      duration: 3000
     })
   }
 
@@ -95,6 +102,32 @@ export class GameWebsocketService extends AbstractGameService {
     const request = { game_id: gameId }
 
     this.sendRequest(shootLaserEndpoint, request)
+  }
+
+  giveUp(gameId: string) {
+    const request = { game_id: gameId }
+
+    this.sendRequest(giveUpEndpoint, request)
+  }
+
+  offerDraw(gameId: string) {
+    const request = { game_id: gameId }
+
+    this.sendRequest(offerDrawEndpoint, request)
+  }
+
+  showDrawOffer(gameId: string){
+    if(this.lastMessage?.game_phase == GamePhase.STARTED)
+      Swal.fire({
+        title: "Draw offer",
+        text: "Player offers draw",
+        icon: 'question',
+        showCancelButton: true
+      }).then(res => {
+        if(res.isConfirmed)
+          this.offerDraw(gameId)
+      })
+
   }
 
   closeConnection(){

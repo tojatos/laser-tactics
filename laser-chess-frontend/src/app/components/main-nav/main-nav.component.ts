@@ -6,7 +6,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { Router } from '@angular/router';
 import { LoginEmitterService } from 'src/app/services/login-emitter.service';
 import { LobbyService } from 'src/app/services/lobby.service';
-import { Lobby } from 'src/app/app.models';
+import { Lobby, User } from 'src/app/app.models';
 
 @Component({
   selector: 'app-main-nav',
@@ -22,9 +22,12 @@ export class MainNavComponent {
     );
 
   constructor(private router: Router,private breakpointObserver: BreakpointObserver, private authService: AuthService, private lobbyService: LobbyService) {}
-    // lobby: Lobby | undefined
+
     lobby: any
+    username = ""
+
     get isLoggedin(){
+      this.getUsername()
       return this.authService.isLoggedIn()
     }
 
@@ -33,15 +36,13 @@ export class MainNavComponent {
       this.router.navigate(['/'])
     }
 
-    getUsername(){
-      this.authService.getCurrentJwtInfo()!.sub
-    }
-
     async createLobby(){
       this.lobby = await this.lobbyService.createLobby()
-      console.log(this.lobby)
-      this.router.navigate(['/lobby', this.lobby.id])
-        }
-      
-    
+      this.router.navigate(['/lobby', this.lobby.game_id])
+    }
+
+    getUsername(){
+      this.username = this.authService.getUsername()
+    }
+
 }

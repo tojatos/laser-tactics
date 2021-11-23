@@ -48,8 +48,12 @@ class Game:
     def __init__(self, game_state: GameState):
         self.game_state = game_state
 
+    def is_game_started(self):
+        return self.game_state.game_phase is not GamePhase.NOT_STARTED
+
     def is_game_over(self):
-        return self.game_state.game_phase in [GamePhase.DRAW, GamePhase.PLAYER_ONE_VICTORY, GamePhase.PLAYER_TWO_VICTORY]
+        return self.game_state.game_phase in [GamePhase.DRAW, GamePhase.PLAYER_ONE_VICTORY,
+                                              GamePhase.PLAYER_TWO_VICTORY]
 
     def check_victory(self):
         is_p1_king_alive = len([c for c in self.game_state.board.cells.values()
@@ -72,6 +76,26 @@ class Game:
 
     def get_current_player(self):
         return Player.PLAYER_ONE if self.game_state.turn_number % 4 in [1, 2] else Player.PLAYER_TWO
+
+    def give_up(self, player):
+        event = GiveUpEvent(player)
+        self.game_state.user_events.append(event)
+        self.game_state.game_events.append(event)
+        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player is Player.PLAYER_TWO \
+            else GamePhase.PLAYER_TWO_VICTORY
+
+    def offer_draw(self, player):
+        game_draw_offers: List[OfferDrawEvent] = [e for e in self.game_state.user_events if
+                                                  isinstance(e, OfferDrawEvent)]
+
+        event = OfferDrawEvent(player, self.game_state.turn_number)
+        self.game_state.user_events.append(event)
+        self.game_state.game_events.append(event)
+
+        if game_draw_offers:
+            last_draw_offer = game_draw_offers[-1]
+            if last_draw_offer.player != player and self.game_state.turn_number - last_draw_offer.turn_number < 3:
+                self.game_state.game_phase = GamePhase.DRAW
 
     def start_game(self):
         self.game_state.game_phase = GamePhase.STARTED
@@ -109,7 +133,8 @@ class Game:
             self.game_state.board.cells[from_cell] = None
             self.game_state.game_events.append(PieceMovedEvent(from_cell, to_cell))
             if target_piece is not None:
-                self.game_state.game_events.append(PieceTakenEvent(to_cell, moved_piece.piece_type, target_piece.piece_type))
+                self.game_state.game_events.append(
+                    PieceTakenEvent(to_cell, moved_piece.piece_type, target_piece.piece_type))
         self.game_state.turn_number += 1
         self.check_victory()
 
@@ -170,7 +195,8 @@ class Game:
                             laser_queue.put((current_coordinates, last_laser_direction, time + 1))
                     if piece_hit.piece_type is PieceType.LASER:
                         cells_after_laser_hit[current_coordinates] = None
-                        pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
+                        pieces_destroyed_by_laser_events.append(
+                            PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.BLOCK:
                         should_deflect = last_laser_direction == opposite_direction(piece_facing_direction)
                         if should_deflect:
@@ -178,7 +204,8 @@ class Game:
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
-                            pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
+                            pieces_destroyed_by_laser_events.append(
+                                PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.BEAM_SPLITTER:
                         should_deflect_in_both_sides = last_laser_direction == piece_facing_direction
                         should_deflect_right = last_laser_direction == direction_from_rotation[
@@ -199,14 +226,16 @@ class Game:
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
-                            pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
+                            pieces_destroyed_by_laser_events.append(
+                                PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.HYPER_SQUARE:
                         pass
                     if piece_hit.piece_type is PieceType.HYPER_CUBE:
                         laser_queue.put((current_coordinates, last_laser_direction, time + 1))
                     if piece_hit.piece_type is PieceType.KING:
                         cells_after_laser_hit[current_coordinates] = None
-                        pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
+                        pieces_destroyed_by_laser_events.append(
+                            PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.TRIANGULAR_MIRROR:
                         should_deflect_right = last_laser_direction == direction_from_rotation[
                             normalize_rotation(piece_hit.rotation_degree + 270)]
@@ -222,7 +251,8 @@ class Game:
                             laser_queue.put((current_coordinates, next_laser_direction, time + 1))
                         else:
                             cells_after_laser_hit[current_coordinates] = None
-                            pieces_destroyed_by_laser_events.append(PieceDestroyedEvent(current_coordinates, piece_hit, time))
+                            pieces_destroyed_by_laser_events.append(
+                                PieceDestroyedEvent(current_coordinates, piece_hit, time))
                     if piece_hit.piece_type is PieceType.DIAGONAL_MIRROR:
                         should_deflect_right = last_laser_direction in [piece_facing_direction,
                                                                         opposite_direction(piece_facing_direction)]
@@ -237,6 +267,9 @@ class Game:
         self.check_victory()
 
     def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> Tuple[bool, Optional[str]]:
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
         if self.is_game_over():
             return False, "The game is over."
 
@@ -274,7 +307,37 @@ class Game:
                     return False, "King can take only once per turn."
         return True, None
 
-    def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> Tuple[bool, Optional[str]]:
+    def validate_give_up(self):
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
+        if self.is_game_over():
+            return False, "The game is over."
+        return True, None
+
+    def validate_offer_draw(self, player):
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
+        if self.is_game_over():
+            return False, "The game is over."
+
+        game_draw_offers: List[OfferDrawEvent] = [e for e in self.game_state.user_events if
+                                                  isinstance(e, OfferDrawEvent)]
+        this_player_draw_offers = [e for e in game_draw_offers if e.player is player]
+
+        if not this_player_draw_offers:
+            return True, ""
+
+        if self.game_state.turn_number - this_player_draw_offers[-1].turn_number > 3:
+            return True, ""
+
+        return False, "You cannot make another draw offer so soon."
+
+    def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int)-> Tuple[bool, Optional[str]]:
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
         if self.is_game_over():
             return False, "The game is over."
 
@@ -293,6 +356,9 @@ class Game:
         return True, None
 
     def validate_laser_shoot(self, player: Player) -> Tuple[bool, Optional[str]]:
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
         if self.is_game_over():
             return False, "The game is over."
 
