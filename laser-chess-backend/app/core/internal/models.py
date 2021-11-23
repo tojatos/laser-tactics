@@ -77,3 +77,11 @@ class BlockedUsers(Base):
     id = Column(Integer, primary_key=True, index=True)
     user = Column(String)
     blocked_user = Column(String)
+
+
+class UserSettings(Base):
+    __tablename__ = "user_settings"
+
+    username = Column(String, primary_key=True)
+    skip_animations = Column(Boolean, default=False)
+

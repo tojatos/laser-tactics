@@ -1,8 +1,8 @@
+import datetime as dt
 from enum import Enum, auto
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, validator, EmailStr
-import datetime as dt
 
 
 class AutoNameEnum(Enum):
@@ -174,3 +174,11 @@ class Stats(BaseModel):
     winrate_as_p1: float
     winrate_as_p2: float
     drawrate: float
+
+
+class Settings(BaseModel):
+    skip_animations: bool = False
+
+    class Config:
+        orm_mode = True
+
