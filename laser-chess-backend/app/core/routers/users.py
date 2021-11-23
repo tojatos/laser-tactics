@@ -128,7 +128,7 @@ def change_password(change_password_schema: schemas.ChangePasswordSchema,
 
 
 # TODO: test
-@router.post("/{username}/history")
+@router.get("/{username}/history")
 def get_users_game_history(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -138,7 +138,7 @@ def get_users_game_history(username: str, db: Session = Depends(get_db)):
 
 
 # TODO: test
-@router.post("/{username}/stats")
+@router.get("/{username}/stats")
 def get_stats(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
