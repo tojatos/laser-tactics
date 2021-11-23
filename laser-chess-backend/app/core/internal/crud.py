@@ -365,7 +365,6 @@ def update_user_rating(db: Session, username: str):
 
 
 def get_last_20_matches(db: Session, user: schemas.User):
-    db.query()
     crossout_date = datetime.now() - timedelta(days=HISTORY_MATCH_GET_LIMIT)
     matches_left = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_one_username == user.username,
@@ -377,3 +376,37 @@ def get_last_20_matches(db: Session, user: schemas.User):
         20).all()
     matches = sorted([matches_left + matches_right], key=lambda match: match.game_end_date)[0:19]
     return matches
+
+
+# TODO test
+def get_stats(db: Session, user: schemas.User):
+    crossout_date = datetime.now() - timedelta(days=HISTORY_MATCH_GET_LIMIT)
+    games_as_p1 = db.query(models.GameHistory).filter(
+        and_(models.GameHistory.player_one_username == user.username,
+             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date)
+    games_as_p2 = db.query(models.GameHistory).filter(
+        and_(models.GameHistory.player_two_username == user.username,
+             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date)
+    matches = list(sorted([games_as_p1 + games_as_p2], key=lambda match: match.game_end_date))
+    no_matches = len(matches)
+    draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
+    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN, matches))
+    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN, matches))
+    winrate = len(wins_as_p1 + wins_as_p2) /no_matches
+    winrate_as_p1 = len(games_as_p1)/ len(games_as_p1)
+    winrate_as_p2 = len(games_as_p2)/ len(games_as_p2)
+    no_wins = len(wins_as_p1 + wins_as_p2)
+    no_draws = len(draws)
+    drawrate = len(draws) / no_matches
+    return schemas.Stats(
+        matches=no_matches,
+        wins=no_wins,
+        draws=no_draws,
+        loses=no_matches - (no_wins + no_draws),
+        winrate=winrate,
+        winrate_as_p1=winrate_as_p1,
+        winrate_as_p2=winrate_as_p2,
+        drawrate=drawrate
+    )
+
+

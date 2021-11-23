@@ -163,3 +163,14 @@ class LobbyId(BaseModel):
 
 class FriendRequestId(BaseModel):
     id: str
+
+
+class Stats(BaseModel):
+    matches: int
+    wins: int
+    draws: int
+    loses: int
+    winrate: float
+    winrate_as_p1: float
+    winrate_as_p2: float
+    drawrate: float
