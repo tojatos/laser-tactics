@@ -337,9 +337,9 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
 
     crossout_date = datetime.now() - timedelta(days=rating_period)
     matches_left = db.query(models.GameHistory).filter(
-        and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date))
+        and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date)).all()
     matches_right = db.query(models.GameHistory).filter(
-        and_(models.GameHistory.player_two_username == user.username, models.GameHistory.game_end_date > crossout_date))
+        and_(models.GameHistory.player_two_username == user.username, models.GameHistory.game_end_date > crossout_date)).all()
     list_left = [PlayerMatchResult(player2_rating=match.player_two_rating,
                                    player2_rating_deviation=match.player_two_deviation,
                                    result=determine_result_player_one(match.result)) for
@@ -374,7 +374,15 @@ def get_last_20_matches(db: Session, user: schemas.User):
         and_(models.GameHistory.player_two_username == user.username,
              models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date).limit(
         20).all()
-    matches = sorted([matches_left + matches_right], key=lambda match: match.game_end_date)[0:19]
+    if not matches_left and not matches_right:
+        return []
+    elif not matches_left:
+        matches_sum = matches_right
+    elif not matches_right:
+        matches_sum = matches_left
+    else:
+        matches_sum = matches_left + matches_right
+    matches = sorted(matches_sum, key=lambda match: match.game_end_date)[0:19]
     return matches
 
 
@@ -383,11 +391,29 @@ def get_stats(db: Session, user: schemas.User):
     crossout_date = datetime.now() - timedelta(days=HISTORY_MATCH_GET_LIMIT)
     games_as_p1 = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_one_username == user.username,
-             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date)
+             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date).all()
     games_as_p2 = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_two_username == user.username,
-             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date)
-    matches = list(sorted([games_as_p1 + games_as_p2], key=lambda match: match.game_end_date))
+             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date).all()
+    # if there were no games
+    if not games_as_p1 and not games_as_p2:
+        return schemas.Stats(
+            matches=0,
+            wins=0,
+            draws=0,
+            loses=0,
+            winrate=0,
+            winrate_as_p1=0,
+            winrate_as_p2=0,
+            drawrate=0
+        )
+    elif not games_as_p1:
+        matches_sum = games_as_p2
+    elif not games_as_p2:
+        matches_sum = games_as_p1
+    else:
+        matches_sum = games_as_p1 + games_as_p2
+    matches = list(sorted(matches_sum, key=lambda match: match.game_end_date))
     no_matches = len(matches)
     draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
     wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN, matches))
