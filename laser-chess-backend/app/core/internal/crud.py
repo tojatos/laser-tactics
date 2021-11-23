@@ -239,13 +239,16 @@ def get_users_last_rating(db: Session, username: str, rating_period: int = RATIN
     crossout_date = datetime.now() - timedelta(days=rating_period)
     match_left = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_one_username == user.username,
-             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date).first()
+             models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).order_by(models.GameHistory.game_end_date).first()
     match_right = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_two_username == user.username,
-             models.GameHistory.game_end_date > crossout_date)).order_by(models.GameHistory.game_end_date).first()
+             models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).order_by(models.GameHistory.game_end_date).first()
     # None checks in case any or both matches are none
     if match_right is None and match_left is None:
-        return get_player_rating(db, username)
+        rating = get_player_rating(db, username)
+        return PlayerRatingUpdate(rating=rating.rating,
+                                  rating_deviation=rating.rating_deviation,
+                                  volatility=rating.rating_volatility)
     elif match_left is None:
         return PlayerRatingUpdate(rating=match_right.player_two_rating,
                                   rating_deviation=match_right.player_two_deviation,
@@ -317,7 +320,7 @@ def update_user_rating_in_db(db: Session, rating: schemas.UserRating):
     return rating
 
 
-# rating period in days
+# rating period in days, ranked matches only
 def get_user_matches(db: Session, user: schemas.User, rating_period: int):
     def determine_result_player_one(result):
         if result == GameResult.PLAYER_ONE_WIN:
@@ -337,9 +340,9 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
 
     crossout_date = datetime.now() - timedelta(days=rating_period)
     matches_left = db.query(models.GameHistory).filter(
-        and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date)).all()
+        and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).all()
     matches_right = db.query(models.GameHistory).filter(
-        and_(models.GameHistory.player_two_username == user.username, models.GameHistory.game_end_date > crossout_date)).all()
+        and_(models.GameHistory.player_two_username == user.username, models.GameHistory.game_end_date > crossout_date, models.GameHistory.is_rated == True)).all()
     list_left = [PlayerMatchResult(player2_rating=match.player_two_rating,
                                    player2_rating_deviation=match.player_two_deviation,
                                    result=determine_result_player_one(match.result)) for
