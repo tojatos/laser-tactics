@@ -1,8 +1,8 @@
+import datetime as dt
 from enum import Enum, auto
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, validator, EmailStr
-import datetime as dt
 
 
 class AutoNameEnum(Enum):
@@ -181,3 +181,4 @@ class Settings(BaseModel):
 
     class Config:
         orm_mode = True
+

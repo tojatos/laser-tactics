@@ -458,3 +458,4 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     db.commit()
     db.refresh(db_settings)
     return db_settings
+
