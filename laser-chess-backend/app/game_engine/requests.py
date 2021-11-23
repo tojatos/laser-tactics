@@ -38,6 +38,7 @@ class StartGameRequest:
     game_id: str
     player_one_id: str
     player_two_id: str
+    is_rated: bool
 
 
 @dataclass

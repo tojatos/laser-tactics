@@ -38,12 +38,13 @@ def before_all():
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
     for user in create_user_datas:
         verify_user(session, user["username"])
-    tu.post_data(
+    start_game_request = StartGameRequest(game_id, create_user_datas[0]['username'], create_user_datas[1]['username'], False)
+    start_game_response = tu.post_data(
         "/lobby/start_game",
         tokens[0],
-        json=dict(game_id=game_id, player_one_id=create_user_datas[0]['username'],
-                  player_two_id=create_user_datas[1]['username']),
+        json=dataclasses.asdict(start_game_request),
     )
+    assert start_game_response.status_code == 200
 
     session.commit()
 
