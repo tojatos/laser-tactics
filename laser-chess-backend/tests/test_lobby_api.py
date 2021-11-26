@@ -43,6 +43,40 @@ def test_create_lobby_unauthorized(tu):
     assert response.status_code == 401
 
 
+def test_create_lobby_multiple(tu):
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+
+
+def test_create_lobby_and_start_game(tu):
+    create_response = tu.post_data("/lobby/create", tokens[0])
+    assert create_response.status_code == 201
+    assert create_response.json()["lobby_status"] == "CREATED"
+
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+
+    start_game_request = StartGameRequest(create_response.json()["game_id"], "test0", "test1", False)
+    start_game_response = tu.post_data(
+        "/lobby/start_game",
+        tokens[0],
+        json=dataclasses.asdict(start_game_request),
+    )
+
+    assert start_game_response.status_code == 200
+
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+
 def test_join_lobby_happy(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201

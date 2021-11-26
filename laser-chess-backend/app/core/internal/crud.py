@@ -85,6 +85,11 @@ def get_lobbies(db: Session, skip: int = 0, limit: int = 100):
     return lobbies
 
 
+def get_user_created_lobbies(db: Session, user: schemas.User):
+    lobbies = db.query(models.Lobby).filter(and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.player_one_username == user.username)).all()
+    return lobbies
+
+
 def get_lobby(db: Session, game_id: str):
     return db.query(models.Lobby).filter(models.Lobby.game_id == game_id).first()
 

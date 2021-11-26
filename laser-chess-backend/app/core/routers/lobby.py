@@ -31,6 +31,9 @@ async def get_lobby(game_id: str,
 
 @router.post("/create", response_model=schemas.Lobby, status_code=status.HTTP_201_CREATED)
 async def create_lobby(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    lobbys = crud.get_user_created_lobbies(db=db, user=current_user)
+    if len(lobbys) > 0:
+        raise HTTPException(status_code=403, detail="This user has already created a lobby")
     return crud.create_lobby(db=db, user=current_user)
 
 
