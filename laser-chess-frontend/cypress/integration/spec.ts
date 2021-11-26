@@ -1,51 +1,37 @@
+import { Subject } from "rxjs/internal/Subject";
+
+const subject = new Subject<any>()
+
 describe('Gameplay tests', () => {
 
   let angular: any
   let gameComponent: any
 
   before(() => {
-
-    cy.request({ // log in
-      method: 'POST',
-      url: `${Cypress.env('EXTERNAL_API')}${Cypress.env('API_PREFIX')}${Cypress.env('LOGIN_URL')}`,
-      form: true,
-      body: {
-        "username": "string",
-        "password": "string"
-      }
-    }).then(res => {
-      const access_token = res.body.access_token
-      localStorage.setItem('access_token', access_token)
-      cy.request({ // create and start game
-        method: 'POST',
-        url: `${Cypress.env('EXTERNAL_API')}${Cypress.env('API_PREFIX')}${Cypress.env('START_GAME_URL')}`,
-        headers: {
-          "Authorization" : `Bearer ${access_token}`
-        },
-        body: {
-          "game_id": "test",
-          "player_one_id": "string",
-          "player_two_id": "string2"
-        }
-      })
-    }).then(() => { //load page
       cy.visit("/game/test")
       cy.get('canvas')
       .then(() => {
         cy.window().then(win => { //get component
-          angular = (win as any).ng;
+          angular = (win as any).ng
         })
         .then(() => cy.document())
         .then((doc) => {
+          cy.fixture('token.txt').then((data) => {
+            console.log(data)
+            localStorage.setItem("user_token", data)
+          })
           gameComponent = angular.getComponent(doc.querySelector("app-board"))
-          cy.wait(500).then(() => { // make sure game loaded
+          gameComponent.game.gameService.subject().unsubscribe()
+          cy.stub(gameComponent.game.gameService, "subject").returns(subject)
+          gameComponent.game.gameService.connect("test")
+          cy.fixture('initialGameState.json').then((data) => {
+            subject.next(data)
             expect(gameComponent.game.board.cells).to.have.length.greaterThan(0)
             cy.get('.mat-slide-toggle-bar').click() //disable animations
           })
     })
   })
-    })
-  })
+})
 
   const getCell = (gc: any, posX: number, posY: number) =>  gc.game.board.cells.find((c : any) => c.coordinates.x == posX && c.coordinates.y == posY)
 
@@ -96,6 +82,27 @@ describe('Gameplay tests', () => {
       })
     })
   })
+
+  it('Test laser', () => {
+
+    const laserPosition = getCell(gameComponent, 5, 0)
+    const beamSplitterPosition = getCell(gameComponent, 5, 1)
+    const blockPosition = getCell(gameComponent, 6, 1)
+    expect(laserPosition.piece.piece_type).to.be.equal("LASER")
+    expect(beamSplitterPosition.piece.piece_type).to.be.equal("BEAM_SPLITTER")
+    expect(blockPosition.piece.piece_type).to.be.equal("BLOCK")
+
+    cy.get('canvas').click(laserPosition.canvasCoordinates.x, laserPosition.canvasCoordinates.y).then(() => {
+    cy.get('app-board-actions > :nth-child(2)').click().then(() => {
+      cy.wait(500).then(() => {
+        cy.stub(gameComponent.game.gameService, 'shootLaser').returns("lole")
+        //expect(gameComponent.game.gameService.shootLaser).to.have.been.called
+        expect(blockPosition.piece).to.be.not.ok
+        expect(laserPosition.piece).to.be.not.ok
+      })
+    })
+  })
+})
 })
 
 

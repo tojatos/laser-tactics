@@ -25,13 +25,17 @@ export class GameWebsocketService extends AbstractGameService {
     super()
   }
 
-  private subject = webSocket<GameState | any>(environment.WEBSOCKET_URL);
+  subject = () => {
+    console.log("elo")
+    return webSocket<GameState | any>(environment.WEBSOCKET_URL)
+  }
 
   lastMessage: GameState | undefined = undefined
 
   connect(gameId: string){
-    this.subject.asObservable().subscribe(
+    this.subject().asObservable().subscribe(
       msg => {
+        console.log(msg)
         if(msg.status_code && msg.status_code != 200){
           this.showSnackbar(msg.body)
           if(this.lastMessage)
@@ -67,7 +71,7 @@ export class GameWebsocketService extends AbstractGameService {
 
   private sendRequest(path: string, request: any){
     const value: websocketRequest = { request_path: path, request: request}
-    this.subject.next(value)
+    this.subject().next(value)
   }
 
   getGameState(gameId: string) {
@@ -129,7 +133,7 @@ export class GameWebsocketService extends AbstractGameService {
   }
 
   closeConnection(){
-    this.subject.complete()
+    this.subject().complete()
   }
 
 }
