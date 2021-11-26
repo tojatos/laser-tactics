@@ -182,3 +182,8 @@ class Settings(BaseModel):
     class Config:
         orm_mode = True
 
+
+class JoinRandomRequest(BaseModel):
+    rating_lower_bound: int
+    rating_higher_bound: int
+    is_rated: bool

@@ -201,6 +201,24 @@ def create_block_record(user: schemas.User, user_to_block: schemas.User, db: Ses
     return record
 
 
+def get_random_lobby(params: schemas.JoinRandomRequest, db: Session):
+    def rating_in_bounds(params: schemas.JoinRandomRequest, lobby: models.Lobby):
+        opponent = get_user(db, lobby.player_one_username)
+        if not params.is_rated:
+            return True
+        elif params.rating_lower_bound < opponent.rating < params.rating_higher_bound:
+            return True
+        else:
+            return False
+
+    lobbys = db.query(models.Lobby).filter(
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.is_ranked == params.is_rated, models.Lobby.player_two_username == None)).all()
+    for lobby in lobbys:
+        if rating_in_bounds(params, lobby):
+            return lobby
+    return None
+
+
 def remove_block_record(user: schemas.User, blocked_user: schemas.User, db: Session):
     record = get_block_record(user=user, blocked=blocked_user, db=db)
     if record:
@@ -458,4 +476,3 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     db.commit()
     db.refresh(db_settings)
     return db_settings
-
