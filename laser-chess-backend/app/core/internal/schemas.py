@@ -132,6 +132,7 @@ class Lobby(BaseModel):
     is_private: bool = False
     starting_position_reversed: bool = False
     lobby_status: LobbyStatus
+    lobby_creation_date: dt.datetime
 
     class Config:
         orm_mode = True
@@ -148,7 +149,6 @@ class FriendRequest(FriendRequestCreate):
 
 
 class BlockedUsers(BaseModel):
-    id: int
     user: str
     blocked_user: str
 

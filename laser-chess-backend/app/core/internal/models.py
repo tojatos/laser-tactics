@@ -60,6 +60,7 @@ class Lobby(Base):
     is_private = Column(Boolean, default=False)
     starting_position_reversed = Column(Boolean, default=False)
     lobby_status = Column(Enum(LobbyStatus))
+    lobby_creation_date = Column(DateTime)
 
 
 class FriendRequests(Base):

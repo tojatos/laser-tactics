@@ -73,7 +73,7 @@ def change_password(user: schemas.User, new_password: str, db: Session):
 
 def create_lobby(db: Session, user: schemas.User):
     db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username,
-                            lobby_status=LobbyStatus.CREATED)
+                            lobby_status=LobbyStatus.CREATED, lobby_creation_date=datetime.now())
     db.add(db_lobby)
     db.commit()
     db.refresh(db_lobby)
