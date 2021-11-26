@@ -89,7 +89,7 @@ async def get_users_blocked(current_user: schemas.User = Depends(get_current_act
 
 
 # TODO: test
-@router.post("/block")
+@router.post("/me/block")
 async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     username = usernameSchema.username
@@ -103,7 +103,7 @@ async def block_user(usernameSchema: schemas.Username, current_user: schemas.Use
 
 
 # TODO: test
-@router.delete("/unblock")
+@router.delete("/me/unblock")
 async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
     username = usernameSchema.username
@@ -141,7 +141,7 @@ def get_users_game_history(username: str, db: Session = Depends(get_db)):
 
 
 # TODO: test
-@router.get("/{username}/stats")
+@router.get("/me/stats")
 def get_stats(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -149,12 +149,12 @@ def get_stats(username: str, db: Session = Depends(get_db)):
     return crud.get_stats(db=db, user=db_user)
 
 
-@router.get("/{username}/settings", response_model=schemas.Settings)
+@router.get("/me/settings", response_model=schemas.Settings)
 def get_settings(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     return crud.get_settings(db=db, user=current_user)
 
 
-@router.patch("/{username}/settings")
+@router.patch("/me/settings")
 def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     return crud.update_settings(settings=settings, db=db, user=current_user)
 

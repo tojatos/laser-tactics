@@ -213,7 +213,7 @@ def test_unfriend_multiple(tu):
 
 
 def test_block_user(tu):
-    response = tu.post_data("/users/block", tokens[0], json={"username": "test2"})
+    response = tu.post_data("/users/me/block", tokens[0], json={"username": "test2"})
     assert response.status_code == 200
 
     response = tu.get_data("/users/me/blocked", tokens[0])
@@ -226,13 +226,13 @@ def test_block_user(tu):
 
 
 def test_block_multiple(tu):
-    response = tu.post_data("/users/block", tokens[0], json={"username": "test2"})
+    response = tu.post_data("/users/me/block", tokens[0], json={"username": "test2"})
     assert response.status_code == 200
 
-    response = tu.post_data("/users/block", tokens[0], json={"username": "test2"})
+    response = tu.post_data("/users/me/block", tokens[0], json={"username": "test2"})
     assert response.status_code == 403
 
-    response = tu.post_data("/users/block", tokens[0], json={"username": "test2"})
+    response = tu.post_data("/users/me/block", tokens[0], json={"username": "test2"})
     assert response.status_code == 403
 
     response = tu.get_data("/users/me/blocked", tokens[0])
@@ -245,7 +245,7 @@ def test_block_multiple(tu):
 
 
 def test_unblock(tu):
-    response = tu.post_data("/users/block", tokens[0], json={"username": "test2"})
+    response = tu.post_data("/users/me/block", tokens[0], json={"username": "test2"})
     assert response.status_code == 200
 
     response = tu.get_data("/users/me/blocked", tokens[0])
@@ -256,7 +256,7 @@ def test_unblock(tu):
     response = tu.post_data("/users/me/friends/requests/send", tokens[2], json={"username": "test0"})
     assert response.status_code == 403
 
-    response = tu.delete_data("/users/unblock", tokens[0], json={"username": "test2"})
+    response = tu.delete_data("/users/me/unblock", tokens[0], json={"username": "test2"})
     assert response.status_code == 200
 
     response = tu.get_data("/users/me/blocked", tokens[0])
@@ -269,7 +269,7 @@ def test_unblock(tu):
 
 
 def test_unblock_multiple(tu):
-    response = tu.post_data("/users/block", tokens[0], json={"username": "test2"})
+    response = tu.post_data("/users/me/block", tokens[0], json={"username": "test2"})
     assert response.status_code == 200
 
     response = tu.get_data("/users/me/blocked", tokens[0])
@@ -280,13 +280,13 @@ def test_unblock_multiple(tu):
     response = tu.post_data("/users/me/friends/requests/send", tokens[2], json={"username": "test0"})
     assert response.status_code == 403
 
-    response = tu.delete_data("/users/unblock", tokens[0], json={"username": "test2"})
+    response = tu.delete_data("/users/me/unblock", tokens[0], json={"username": "test2"})
     assert response.status_code == 200
 
-    response = tu.delete_data("/users/unblock", tokens[0], json={"username": "test2"})
+    response = tu.delete_data("/users/me/unblock", tokens[0], json={"username": "test2"})
     assert response.status_code == 403
 
-    response = tu.delete_data("/users/unblock", tokens[0], json={"username": "test2"})
+    response = tu.delete_data("/users/me/unblock", tokens[0], json={"username": "test2"})
     assert response.status_code == 403
 
     response = tu.get_data("/users/me/blocked", tokens[0])
