@@ -85,8 +85,15 @@ def get_lobbies(db: Session, skip: int = 0, limit: int = 100):
     return lobbies
 
 
+def get_created_lobbies(db: Session, skip: int = 0, limit: int = 100):
+    lobbies = db.query(models.Lobby).filter(models.Lobby.lobby_status == LobbyStatus.CREATED).offset(skip).limit(
+        limit).all()
+    return lobbies
+
+
 def get_user_created_lobbies(db: Session, user: schemas.User):
-    lobbies = db.query(models.Lobby).filter(and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.player_one_username == user.username)).all()
+    lobbies = db.query(models.Lobby).filter(
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.player_one_username == user.username)).all()
     return lobbies
 
 
@@ -139,10 +146,11 @@ def get_friend_request(id: str, db: Session):
 
 
 def get_friend_record(user: schemas.User, friend: schemas.User, db: Session):
-    return db.query(models.FriendRequests).filter(or_(False, and_(models.FriendRequests.user_two_username == friend.username,
-                                                           models.FriendRequests.user_one_username == user.username),
-                                                      and_(models.FriendRequests.user_two_username == user.username,
-                                                            models.FriendRequests.user_one_username == friend.username))).first()
+    return db.query(models.FriendRequests).filter(
+        or_(False, and_(models.FriendRequests.user_two_username == friend.username,
+                        models.FriendRequests.user_one_username == user.username),
+            and_(models.FriendRequests.user_two_username == user.username,
+                 models.FriendRequests.user_one_username == friend.username))).first()
 
 
 def get_pending_friend_request(id: str, db: Session):
@@ -463,4 +471,3 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     db.commit()
     db.refresh(db_settings)
     return db_settings
-

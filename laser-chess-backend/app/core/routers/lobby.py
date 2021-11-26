@@ -16,7 +16,7 @@ router = APIRouter(
 
 @router.get("")
 async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    lobbies = crud.get_lobbies(db, skip=skip, limit=limit)
+    lobbies = crud.get_created_lobbies(db, skip=skip, limit=limit)
     return lobbies
 
 
