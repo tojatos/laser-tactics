@@ -250,14 +250,48 @@ def test_join_lobby_random_ranked(tu):
     assert response.status_code == 201
     assert response.json()["lobby_status"] == "CREATED"
 
+    response = tu.patch_data("/lobby/update", tokens[1],
+                             json={
+                                 "game_id": response.json()["game_id"],
+                                 "name": response.json()["name"],
+                                 "player_one_username": response.json()["player_one_username"],
+                                 "is_ranked": True,
+                                 "is_private": response.json()["is_private"],
+                                 "starting_position_reversed": response.json()["starting_position_reversed"]
+                             }
+                             )
+    assert response.status_code == 200
+
     response = tu.post_data("/lobby/create", tokens[2])
     assert response.status_code == 201
     assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.patch_data("/lobby/update", tokens[2],
+                             json={
+                                 "game_id": response.json()["game_id"],
+                                 "name": response.json()["name"],
+                                 "player_one_username": response.json()["player_one_username"],
+                                 "is_ranked": True,
+                                 "is_private": response.json()["is_private"],
+                                 "starting_position_reversed": response.json()["starting_position_reversed"]
+                             })
+    assert response.status_code == 200
 
     response = tu.post_data("/lobby/create", tokens[3])
     assert response.status_code == 201
     assert response.json()["lobby_status"] == "CREATED"
 
+    response = tu.patch_data("/lobby/update", tokens[3],
+                             json={
+                                 "game_id": response.json()["game_id"],
+                                 "name": response.json()["name"],
+                                 "player_one_username": response.json()["player_one_username"],
+                                 "is_ranked": True,
+                                 "is_private": response.json()["is_private"],
+                                 "starting_position_reversed": response.json()["starting_position_reversed"]
+                             }
+                             )
+    assert response.status_code == 200
 
     response = tu.post_data(f"/lobby/join_random", tokens[0],
                             json={"is_rated": True, "rating_lower_bound": 1400, "rating_higher_bound": 1600})
