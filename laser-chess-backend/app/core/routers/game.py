@@ -1,6 +1,6 @@
 import dataclasses
 
-from fastapi import Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
@@ -8,6 +8,17 @@ from app.core.dependecies import get_db, get_current_user, manager
 from app.core.internal import schemas
 from app.game_engine import game_service
 from app.game_engine.requests import *
+from app.game_engine.models import GameStateSerializable, empty_game_state
+
+router = APIRouter(
+    prefix="/game",
+    tags=["game"],
+    responses={404: {"description": "Not found"}},
+)
+
+@router.get("/initial_game_state", response_model=GameStateSerializable)
+async def get_initial_game_state():
+    return empty_game_state("", "").to_serializable()
 
 
 # noinspection PyTypeChecker
