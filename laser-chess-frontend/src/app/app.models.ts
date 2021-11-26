@@ -36,3 +36,7 @@ export interface User {
   is_active: boolean,
   items: Item[]
 }
+
+export interface Settings {
+  skip_animations: boolean
+}

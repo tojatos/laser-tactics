@@ -35,7 +35,6 @@ export class Game{
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
 
   constructor(public gameService: GameWebsocketService,
-    private lobbyService: LobbyService,
     public authService: AuthService,
     private eventEmitter: EventEmitterService,
     private eventsExecutor: EventsExecutor,
@@ -60,11 +59,13 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean){
     this.sizeScale = sizeScale
     this.gameId = gameId
     await this.resources.loadAssets()
+    this.showAnimations = animations
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
+    this.gameCanvas.showAnimations = this.showAnimations
     this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
     this.gameService.connect(this.gameId)
     this.gameCanvas.redrawGame(this.board)

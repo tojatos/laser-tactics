@@ -1,5 +1,6 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/constants';
 import { GamePhase, PlayerType } from '../../src/enums';
@@ -25,9 +26,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly minWidth = 695
   animation = true
 
-  constructor(private route: ActivatedRoute, public game: Game) {}
+  constructor(private route: ActivatedRoute, private userService: UserService, public game: Game) {}
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
+    this.animation = (await this.userService.getSettings().toPromise()).skip_animations
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
       alert("Couldn't load context")
@@ -38,7 +40,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       await this.game.initGame(gameCanvasContext,
         this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
         params.id,
-        this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale)
+        this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
+        this.animation)
     })
   }
 

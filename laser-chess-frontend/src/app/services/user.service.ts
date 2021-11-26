@@ -1,7 +1,7 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { friendsFullEndpoint, userFullEndpoint } from '../api-definitions';
-import { User } from '../app.models';
+import { friendsFullEndpoint, settingsFullEndpoint, userFullEndpoint } from '../api-definitions';
+import { User, Settings } from '../app.models';
 
 
 @Injectable({
@@ -36,6 +36,10 @@ export class UserService {
 
   declineFriendRequests(request_id: number) {
     return this.http.post<any>(friendsFullEndpoint("requests/decline"),{'request_id': request_id}).toPromise()
+  }
+
+  getSettings(){
+    return this.http.get<Settings>(settingsFullEndpoint)
   }
 
   removeFriend() {
