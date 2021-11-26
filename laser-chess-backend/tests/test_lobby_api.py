@@ -1,5 +1,6 @@
 import pytest
 
+from app.game_engine.requests import StartGameRequest
 from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
 from tests.utils import *
@@ -224,3 +225,13 @@ def test_update_lobby_notexisting(tu):
     }
     response = tu.patch_data(f"/lobby/update", tokens[1], json=json)
     assert response.status_code == 404
+
+
+def test_start_game_unauthorized(tu):
+    start_game_request = StartGameRequest("game_id", "test2", "test1", False)
+    start_game_response = tu.post_data(
+        "/lobby/start_game",
+        tokens[0],
+        json=dataclasses.asdict(start_game_request),
+    )
+    assert start_game_response.status_code == 403
