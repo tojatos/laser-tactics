@@ -82,20 +82,23 @@ def read_user(username: str, db: Session = Depends(get_db)):
 
 
 # TODO: test
-@router.get("/me/blocked", response_model=List[schemas.Username])
+@router.get("/me/blocked")
 async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return crud.get_blocked_users(user=current_user, db=db)
 
 
 # TODO: test
-@router.post("/block", response_model=schemas.BlockedUsers)
+@router.post("/block")
 async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     username = usernameSchema.username
     user_to_block = crud.get_user(username=username, db=db)
     if not user_to_block:
         raise HTTPException(status_code=404, detail="User not found")
+    blocked = crud.get_blocked_users(current_user, db)
+    if username in blocked:
+        raise HTTPException(status_code=403, detail="User already blocked")
     return crud.create_block_record(user=current_user, user_to_block=user_to_block, db=db)
 
 
@@ -109,7 +112,7 @@ async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.U
     if not user_to_unblock:
         raise HTTPException(status_code=404, detail="User not found")
     if user_to_unblock.username not in blocked:
-        raise HTTPException(status_code=404, detail="User not blocked")
+        raise HTTPException(status_code=403, detail="User not blocked")
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
 

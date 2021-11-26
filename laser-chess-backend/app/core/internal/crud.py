@@ -134,10 +134,10 @@ def get_friend_request(id: str, db: Session):
 
 
 def get_friend_record(user: schemas.User, friend: schemas.User, db: Session):
-    return db.query(models.FriendRequests).filter(or_(and_(models.FriendRequests.user_two_username == friend.username,
+    return db.query(models.FriendRequests).filter(or_(False, and_(models.FriendRequests.user_two_username == friend.username,
                                                            models.FriendRequests.user_one_username == user.username),
-                                                      and_((models.FriendRequests.user_two_username == user.username,
-                                                            models.FriendRequests.user_one_username == friend.username)))).first()
+                                                      and_(models.FriendRequests.user_two_username == user.username,
+                                                            models.FriendRequests.user_one_username == friend.username))).first()
 
 
 def get_pending_friend_request(id: str, db: Session):
