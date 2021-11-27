@@ -45,9 +45,8 @@ export class Drawings {
           canvas.ctx.fillStyle = color
           canvas.ctx.fill()
           canvas.ctx.restore()
-          const pieceToDraw = piece || cell.piece
-            if(pieceToDraw)
-              this.drawPiece(canvas, pieceToDraw, isReverse)
+          if(piece)
+            this.drawPiece(canvas, piece, isReverse)
         }
     }
 

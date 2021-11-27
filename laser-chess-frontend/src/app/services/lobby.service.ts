@@ -26,8 +26,8 @@ export class LobbyService {
     return this.http.post<Lobby>(createLobbyFullEndpoint(), {}).toPromise()
   }
 
-  startGame(game_id: string, player_one_id: string, player_two_id: string){
-    return this.http.post<any>(startGameFullEndpoint, {'game_id': game_id, 'player_one_id': player_one_id, 'player_two_id': player_two_id}).toPromise()
+  startGame(game_id: string, player_one_id: string, player_two_id: string, is_rated: boolean){
+    return this.http.post<any>(startGameFullEndpoint, {'game_id': game_id, 'player_one_id': player_one_id, 'player_two_id': player_two_id, "is_rated": is_rated}).toPromise()
   }
 
   joinLobby(lobby_id: string){

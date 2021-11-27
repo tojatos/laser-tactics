@@ -12,6 +12,8 @@ $custom-palette: (
 	50: #000000,
   	100: #217180,
   	200: #3b8ca5,
+	  400: #292929,
+	500: #4a4b4b,
 	  contrast: (
     400: #292929, 
     500: #4a4b4b, 
@@ -236,6 +238,11 @@ body {
   .menu {
 	border-radius: 0px;
 	margin-top: 13px;
+	display: block;
+  }
+
+  .menu-hidden {
+	display: none;
   }
 
 
