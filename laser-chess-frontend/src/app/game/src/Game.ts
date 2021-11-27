@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
+import { UserService } from "src/app/services/user.service";
 import { GameEvent, GameState, LaserShotEvent } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
@@ -32,9 +33,11 @@ export class Game{
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
+  playerRankings: [number, number] = [0, 0]
   initialGameState!: GameState
 
   constructor(public gameService: GameWebsocketService,
+    private userService: UserService,
     public authService: AuthService,
     private eventEmitter: EventEmitterService,
     private eventsExecutor: EventsExecutor,
@@ -98,6 +101,11 @@ export class Game{
       this.gameCanvas.interactable = myTurn
 
       this.playerNames = this.gameCanvas.isReversed ? [this.board.playerTwo, this.board.playerOne] : [this.board.playerOne, this.board.playerTwo]
+      const p1 = await this.userService.getUserByUsername(this.playerNames[0]!)
+      const p2 = await this.userService.getUserByUsername(this.playerNames[1]!)
+
+      this.playerRankings[0] = p1.rating
+      this.playerRankings[1] = p2.rating
     }
   }
 
