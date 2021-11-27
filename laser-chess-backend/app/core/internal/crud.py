@@ -480,11 +480,11 @@ def get_stats(db: Session, user: schemas.User):
     matches = list(sorted(matches_sum, key=lambda match: match.game_end_date))
     no_matches = len(matches)
     draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
-    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN, matches))
-    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN, matches))
+    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN and match.player_one_username == user.username, matches))
+    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN and match.player_two_username == user.username, matches))
     winrate = len(wins_as_p1 + wins_as_p2) / no_matches
-    winrate_as_p1 = len(games_as_p1) / len(games_as_p1)
-    winrate_as_p2 = len(games_as_p2) / len(games_as_p2)
+    winrate_as_p1 = len(wins_as_p1) / len(games_as_p1) if games_as_p1 else 0
+    winrate_as_p2 = len(wins_as_p2) / len(games_as_p2) if games_as_p2 else 0
     no_wins = len(wins_as_p1 + wins_as_p2)
     no_draws = len(draws)
     drawrate = len(draws) / no_matches
@@ -493,10 +493,10 @@ def get_stats(db: Session, user: schemas.User):
         wins=no_wins,
         draws=no_draws,
         loses=no_matches - (no_wins + no_draws),
-        winrate=winrate,
-        winrate_as_p1=winrate_as_p1,
-        winrate_as_p2=winrate_as_p2,
-        drawrate=drawrate
+        winrate=round(winrate, 2),
+        winrate_as_p1=round(winrate_as_p1, 2),
+        winrate_as_p2=round(winrate_as_p2, 2),
+        drawrate=round(drawrate, 2)
     )
 
 
