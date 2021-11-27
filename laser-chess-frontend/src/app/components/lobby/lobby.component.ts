@@ -39,6 +39,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.refresh = false
   }
 
+  get isPlayerOne(){
+    return this.username == this.lobby?.player_one_username
+  }
   async changePlayers(){
     if (this.lobby && this.username== this.lobby.player_one_username) {
       this.lobby.starting_position_reversed = !this.lobby.starting_position_reversed
@@ -67,20 +70,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
   }
 
-  // changeIfRanked() {
-  //   if (this.lobby && this.user?.username== this.lobby.player_one_username) {
-  //     if (this.isRanked == "Not ranked"){
-  //       this.isRanked = "Ranked"
-  //     }
-  //     else{this.isRanked = "Not ranked"}
-  //     !this.lobby.is_ranked
-  //     this.lobbyService.updateLobby(this.lobby)
-  //   }
-  // }
-
   async startGame() {
-    if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username) {
-      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, false)
+    if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username && this.lobby.is_ranked) {
+      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, this.lobby.is_ranked)
       this.router.navigate(['/game', this.lobby.game_id])
     }
 
