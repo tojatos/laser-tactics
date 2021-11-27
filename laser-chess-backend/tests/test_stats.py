@@ -1,4 +1,6 @@
 import pytest
+
+from app.core.internal import models
 from tests.test_rating import glickman_matches_in_db
 from app.main import app, get_db, API_PREFIX
 from tests.conftest import engine, TestingSessionLocal
@@ -10,6 +12,8 @@ game_id = "some_id"
 
 @pytest.fixture(scope="session", autouse=True)
 def before_all():
+    models.Base.metadata.drop_all(bind=engine)
+    models.Base.metadata.create_all(bind=engine)
     global tokens
 
     connection = engine.connect()
