@@ -141,7 +141,7 @@ def get_users_game_history(username: str, db: Session = Depends(get_db)):
 
 
 # TODO: test
-@router.get("/me/stats")
+@router.get("/{username}/stats")
 def get_stats(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -155,6 +155,12 @@ def get_settings(current_user: schemas.User = Depends(get_current_active_user), 
 
 
 @router.patch("/me/settings")
-def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user),
+                    db: Session = Depends(get_db)):
     return crud.update_settings(settings=settings, db=db, user=current_user)
 
+
+@router.get("/ranking/top", response_model=List[schemas.User])
+def get_top_ranked(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = crud.get_users_by_rating(db, skip=skip, limit=limit)
+    return users

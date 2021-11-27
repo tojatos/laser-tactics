@@ -38,6 +38,10 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
+def get_users_by_rating(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.User).order_by(models.User.rating.desc()).offset(skip).limit(limit).all()
+
+
 def verify_user(user: schemas.User, db: Session):
     user.is_verified = True
     user.verification_date = datetime.now()
