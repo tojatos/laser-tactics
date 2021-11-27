@@ -321,15 +321,30 @@ def update_game(db: Session, game_state: GameState, game_id: str):
             result=map_gameResult(game_state.game_phase),
             game_end_date=datetime.now(),
             is_rated=game_state.is_rated,
+            player_one_new_rating=None,
+            player_two_new_rating=None
         )
         db.add(record)
         if record.is_rated:
             update_user_rating(db, player_one_rating.username)
             update_user_rating(db, player_two_rating.username)
+            update_ratings_in_history(db, game_id, player_one_rating.username, player_two_rating.username)
+
         lobby = get_lobby(db, game_id)
         if lobby is not None:
             lobby.lobby_status = LobbyStatus.GAME_ENDED
     db.commit()
+
+
+def update_ratings_in_history(db: Session, game_id: str, player_one_username: str, player_two_username: str):
+    record = db.query(models.GameHistory).filter(models.GameHistory.game_id == game_id).first()
+    if record:
+        player_one_rating = get_user(db, player_one_username).rating
+        player_two_rating = get_user(db, player_two_username).rating
+        record.player_one_new_rating = player_one_rating
+        record.player_two_new_rating = player_two_rating
+        db.commit()
+        db.refresh(record)
 
 
 def update_user_rating_in_db(db: Session, rating: schemas.UserRating):
@@ -389,6 +404,10 @@ def update_user_rating(db: Session, username: str):
                                          rating_deviation=new_rating.rating_deviation,
                                          rating_volatility=new_rating.volatility)
     update_user_rating_in_db(db, new_user_rating)
+
+
+def get_match_record(db: Session, game_id: str):
+    return db.query(models.GameHistory).filter(models.GameHistory.game_id == game_id).first()
 
 
 def get_last_20_matches(db: Session, user: schemas.User):
