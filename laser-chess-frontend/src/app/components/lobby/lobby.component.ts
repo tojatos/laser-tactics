@@ -4,6 +4,7 @@ import { Lobby } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import * as _ from 'lodash';
 import { LobbyService } from 'src/app/services/lobby.service';
+import { webSocket } from 'rxjs/webSocket';
 
 export enum LobbyStatus {
   CREATED = "CREATED",
@@ -20,6 +21,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   constructor(private lobbyService: LobbyService, private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
+  lobbyId: string | undefined
   lobby: Lobby | undefined
   refresh = true
   player_one: string | undefined
@@ -29,14 +31,37 @@ export class LobbyComponent implements OnInit, OnDestroy {
   username = ""
   name = ""
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.route.params.subscribe(async params => {
-      this.refreshLobbyState(params.id)
+      const lobby = await this.lobbyService.getLobbyById(params.id)
+      this.refreshLobbyState(lobby)
       this.username = this.authService.getUsername()
+      this.connectWebsocket(params.id)
     })
   }
   ngOnDestroy(): void {
-    this.refresh = false
+    this.subject.complete()
+  }
+
+  private lastMessage: Lobby | undefined
+  private subject = webSocket<Lobby | any>("ws://localhost/lobby_ws")
+
+  get lastWebsocketMessage(){
+    return this.lastMessage
+  }
+
+  connectWebsocket(lobbyId: string){
+    this.subject.asObservable().subscribe(
+      msg => {
+        if((<Lobby>msg).game_id)
+          this.refreshLobbyState(msg)
+      },
+      err => {
+        console.error(err)
+      }
+    )
+
+    this.subject.next({ request: { game_id: lobbyId }} )
   }
 
   get isPlayerOne(){
@@ -44,7 +69,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   async changePlayers(){
-    if (this.lobby && this.username== this.lobby.player_one_username) {
+    if (this.lobby && this.username == this.lobby.player_one_username) {
       this.lobby.starting_position_reversed = !this.lobby.starting_position_reversed
       await this.lobbyService.updateLobby(this.lobby)
     }
@@ -86,12 +111,12 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
   }
 
-  async refreshLobbyState(gameId: string){
-    const lobbyData = await this.lobbyService.getLobbyById(gameId)
+  async refreshLobbyState(lobby: Lobby){
+    console.log(lobby)
     if(this.lobby?.lobby_status == LobbyStatus.GAME_STARTED)
       this.router.navigate(['/game', this.lobby.game_id])
 
-    this.lobby = lobbyData
+    this.lobby = lobby
     this.player_one = this.lobby.player_one_username
     this.player_two = this.lobby.player_two_username
     this.name = this.lobby.name
@@ -112,8 +137,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
       this.player_one = this.player_two
       this.player_two = p1
     }
-    if(this.refresh)
-      window.setTimeout(() => this.refreshLobbyState(gameId), 500)
   }
 
   getName() {
