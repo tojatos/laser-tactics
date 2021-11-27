@@ -343,6 +343,7 @@ def update_game(db: Session, game_state: GameState, game_id: str):
             player_two_new_rating=None
         )
         db.add(record)
+        db.commit()
         if record.is_rated:
             update_user_rating(db, player_one_rating.username)
             update_user_rating(db, player_two_rating.username)
@@ -394,6 +395,7 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
             return 0
 
     crossout_date = datetime.now() - timedelta(days=rating_period)
+    all_matches = db.query(models.GameHistory).all()
     matches_left = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date,
              models.GameHistory.is_rated == True)).all()
