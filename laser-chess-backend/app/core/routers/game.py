@@ -23,15 +23,8 @@ async def get_initial_game_state():
     return empty_game_state("", "").to_serializable()
 
 
-router = APIRouter(
-    prefix="/matches",
-    tags=["matches"],
-    responses={404: {"description": "Not found"}},
-)
-
-
-@router.get("/match/{game_id}", response_model=schemas.GameHistoryEntry)
-async def get_lobbies(game_id: str, db: Session = Depends(get_db)):
+@router.get("/history/{game_id}", response_model=schemas.GameHistoryEntry)
+async def get_match(game_id: str, db: Session = Depends(get_db)):
     return get_match_record(db=db, game_id=game_id)
 
 
