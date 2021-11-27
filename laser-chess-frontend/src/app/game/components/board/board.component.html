@@ -8,6 +8,10 @@
 <div class="float">
   <div class="boardText">
     <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations</mat-slide-toggle>
+    <div class="btns" *ngIf="isHandset">
+      <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()"><mat-icon>flag</mat-icon></button>
+      <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()"><mat-icon>volunteer_activism</mat-icon></button>
+    </div>
     <h3>{{game.playerNames[1]}}</h3>
   </div>
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">

@@ -88,16 +88,16 @@ export class Game{
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
 
+      if(this.board.playerNum == PlayerType.PLAYER_TWO)
+      this.flipBoard()
+
+      this.isInitiated = true
+
       this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)
       const myTurn = this.board.isMyTurn()
       this.gameCanvas.interactable = myTurn
 
       this.playerNames = this.gameCanvas.isReversed ? [this.board.playerTwo, this.board.playerOne] : [this.board.playerOne, this.board.playerTwo]
-
-      if(this.board.playerNum == PlayerType.PLAYER_TWO)
-        this.flipBoard()
-
-      this.isInitiated = true
     }
   }
 
