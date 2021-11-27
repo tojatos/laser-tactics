@@ -1,8 +1,13 @@
+import dataclasses
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi import status
+from fastapi.encoders import jsonable_encoder
+from pydantic.dataclasses import dataclass
 from sqlalchemy.orm import Session
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
-from app.core.dependecies import get_db, get_current_active_user
+from app.core.dependecies import get_db, get_current_active_user, lobby_manager
 from app.core.internal import schemas, crud
 from app.game_engine import game_service
 from app.game_engine.requests import GameApiRequestPath, StartGameRequest
@@ -16,7 +21,7 @@ router = APIRouter(
 
 @router.get("")
 async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    lobbies = crud.get_lobbies(db, skip=skip, limit=limit)
+    lobbies = crud.get_created_lobbies(db, skip=skip, limit=limit)
     return lobbies
 
 
@@ -31,6 +36,9 @@ async def get_lobby(game_id: str,
 
 @router.post("/create", response_model=schemas.Lobby, status_code=status.HTTP_201_CREATED)
 async def create_lobby(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    lobbys = crud.get_user_created_lobbies(db=db, user=current_user)
+    if len(lobbys) > 0:
+        raise HTTPException(status_code=403, detail="This user has already created a lobby")
     return crud.create_lobby(db=db, user=current_user)
 
 
@@ -45,7 +53,10 @@ async def join_lobby(lobbyId: schemas.LobbyId, current_user: schemas.User = Depe
         raise HTTPException(status_code=403, detail="cannot join own lobby")
     if lobby.player_one_username and lobby.player_two_username:
         raise HTTPException(status_code=403, detail="lobby already is full")
-    return crud.join_lobby(db=db, user=current_user, lobby=lobby)
+
+    return_value = crud.join_lobby(db=db, user=current_user, lobby=lobby)
+    await lobby_manager.notify(lobby.game_id, jsonable_encoder(return_value))
+    return return_value
 
 
 @router.patch("/leave", response_model=schemas.Lobby)
@@ -58,6 +69,7 @@ async def leave_lobby(lobbyId: schemas.LobbyId, current_user: schemas.User = Dep
     if lobby.player_one_username != current_user.username and lobby.player_two_username != current_user.username:
         raise HTTPException(status_code=403, detail="user already not in the lobby")
     lobby = crud.leave_lobby(db=db, user=current_user, lobby=lobby)
+    await lobby_manager.notify(lobby.game_id, jsonable_encoder(lobby))
     return lobby
 
 
@@ -72,6 +84,7 @@ async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User 
     if db_lobby.player_one_username != current_user.username:
         raise HTTPException(status_code=403, detail="only player 1 of the game can change game settings")
     lobby = crud.update_lobby(db=db, lobby=db_lobby, lobby_new_data=lobby)
+    await lobby_manager.notify(lobby.game_id, jsonable_encoder(lobby))
     return lobby
 
 
@@ -90,3 +103,39 @@ async def start_game(request: StartGameRequest,
                      current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     game_service.start_game(current_user.username, request, db)
+    await lobby_manager.notify(request.game_id, jsonable_encoder(crud.get_lobby(db, request.game_id)))
+
+
+@dataclass
+class WebsocketObserveRequest:
+    game_id: str
+
+
+@dataclass
+class WebsocketRequest:
+    request: WebsocketObserveRequest
+
+
+@dataclass
+class WebsocketResponse:
+    status_code: int
+    body: str = ""
+
+
+# noinspection PyTypeChecker
+async def lobby_websocket_endpoint(websocket: WebSocket):
+    async def send_websocket_response(status_code: int, body: str = ""):
+        await websocket.send_json(dataclasses.asdict(WebsocketResponse(status_code, body)))
+
+    await lobby_manager.connect(websocket)
+    try:
+        while True:
+            websocket_request_dict = await websocket.receive_json()
+            websocket_request: WebsocketRequest = WebsocketRequest(**websocket_request_dict)
+            lobby_manager.observe(websocket_request.request.game_id, websocket)
+            await send_websocket_response(200)
+
+    except WebSocketDisconnect:
+        print('Websocket disconnected:', websocket.client)
+        lobby_manager.disconnect(websocket)
+        pass

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
+from app.core.internal.crud import get_match_record
 from app.core.dependecies import get_db, get_current_user, manager
 from app.core.internal import schemas
 from app.game_engine import game_service
@@ -16,9 +17,22 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.get("/initial_game_state", response_model=GameStateSerializable)
 async def get_initial_game_state():
     return empty_game_state("", "").to_serializable()
+
+
+router = APIRouter(
+    prefix="/matches",
+    tags=["matches"],
+    responses={404: {"description": "Not found"}},
+)
+
+
+@router.get("/match/{game_id}", response_model=schemas.GameHistoryEntry)
+async def get_lobbies(game_id: str, db: Session = Depends(get_db)):
+    return get_match_record(db=db, game_id=game_id)
 
 
 # noinspection PyTypeChecker
@@ -74,4 +88,3 @@ async def websocket_endpoint(websocket: WebSocket,
         print('Websocked disconnected:', websocket.client)
         manager.disconnect(websocket)
         pass
-

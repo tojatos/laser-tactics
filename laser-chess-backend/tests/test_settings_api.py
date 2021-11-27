@@ -32,16 +32,16 @@ def before_all():
 
 
 def test_get_settings(tu):
-    response = tu.get_data("/users/test0/settings", tokens[0])
+    response = tu.get_data("/users/me/settings", tokens[0])
     assert response.status_code == 200
     assert response.json()["skip_animations"] == False
 
 
 def test_change_settings(tu):
-    response = tu.patch_data("/users/test0/settings", tokens[0], json={"skip_animations": True})
+    response = tu.patch_data("/users/me/settings", tokens[0], json={"skip_animations": True})
     assert response.status_code == 200
     assert response.json()["skip_animations"] == True
 
-    response = tu.get_data("/users/test0/settings", tokens[0])
+    response = tu.get_data("/users/me/settings", tokens[0])
     assert response.status_code == 200
     assert response.json()["skip_animations"] == True
