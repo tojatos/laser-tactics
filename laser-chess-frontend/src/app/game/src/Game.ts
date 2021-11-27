@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
-import { LobbyService } from "src/app/services/lobby.service";
 import { GameEvent, GameState, LaserShotEvent } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
@@ -33,6 +32,7 @@ export class Game{
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
+  initialGameState!: GameState
 
   constructor(public gameService: GameWebsocketService,
     public authService: AuthService,
@@ -62,6 +62,7 @@ export class Game{
   async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean){
     this.sizeScale = sizeScale
     this.gameId = gameId
+    this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
     this.showAnimations = animations
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
@@ -87,17 +88,16 @@ export class Game{
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
 
-      if(this.board.playerNum == PlayerType.PLAYER_TWO)
-        this.flipBoard()
-
       this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)
       const myTurn = this.board.isMyTurn()
       this.gameCanvas.interactable = myTurn
 
-      this.isInitiated = true
-
       this.playerNames = this.gameCanvas.isReversed ? [this.board.playerTwo, this.board.playerOne] : [this.board.playerOne, this.board.playerTwo]
 
+      if(this.board.playerNum == PlayerType.PLAYER_TWO)
+        this.flipBoard()
+
+      this.isInitiated = true
     }
   }
 
@@ -186,7 +186,7 @@ export class Game{
     if(this.gameCanvas){
       this.analyzeMode = analizeModes.ANALYZING
       this.gameCanvas.interactable = false
-      this.board.setInitialGameState(this.displaySize)
+      this.board.setInitialGameState(this.initialGameState, this.displaySize)
       await this.executePendingActions(gameEvents, gameEvents.length, false, false)
       if(gameEvents.slice(-1)[0].event_type == GameEvents.LASER_SHOT_EVENT || gameEvents.slice(-1)[0].event_type == GameEvents.PIECE_DESTROYED_EVENT)
         for(let i = gameEvents.length-1; i > 0; i--)

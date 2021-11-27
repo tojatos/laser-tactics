@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from "rxjs/webSocket";
-import { authWebsocketEndpoint, gameStateEndpoint, giveUpEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
+import { authWebsocketEndpoint, gameStateEndpoint, giveUpEndpoint, initalGameStateFullEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
 import { AuthService } from 'src/app/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { Coordinates, GameState } from '../../game.models';
@@ -10,6 +10,7 @@ import { EventEmitterService } from '../event-emitter.service';
 import { AbstractGameService } from './abstract-game-service';
 import Swal from 'sweetalert2'
 import { GamePhase } from '../../src/enums';
+import { HttpClient } from '@angular/common/http';
 
 type websocketRequest = {
   request_path: string,
@@ -21,7 +22,7 @@ type websocketRequest = {
 })
 export class GameWebsocketService extends AbstractGameService {
 
-  constructor(private authService: AuthService, private _snackBar: MatSnackBar, private eventEmitter: EventEmitterService){
+  constructor(private authService: AuthService, private _snackBar: MatSnackBar, private eventEmitter: EventEmitterService, private http: HttpClient){
     super()
   }
 
@@ -132,4 +133,7 @@ export class GameWebsocketService extends AbstractGameService {
     this.subject.complete()
   }
 
+  getInitialGameState(): Promise<GameState>{
+    return this.http.get<GameState>(initalGameStateFullEndpoint).toPromise()
+  }
 }

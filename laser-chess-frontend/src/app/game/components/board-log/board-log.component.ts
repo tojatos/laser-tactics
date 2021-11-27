@@ -48,6 +48,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy(){
     this.notationList = []
+    this.gameReturnEmitter.emit()
   }
 
   buildEvent(gameEvents: GameEvent[]) {
