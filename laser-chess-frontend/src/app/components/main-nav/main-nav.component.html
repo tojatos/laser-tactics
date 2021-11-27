@@ -10,7 +10,6 @@
         <a href="#" mat-button routerLink="">Home</a>
         <a href="#" mat-button [routerLink]="lobby" (click)="createLobby()">New game</a>
         <a href="/tutorial" mat-button>Tutorial</a>
-        <a href="/settings" mat-button>Settings</a>
         <a href="#" *ngIf="!isLoggedin"  mat-button routerLink="login" routerLinkActive="active">Login</a>
         <a href="#" *ngIf="!isLoggedin" mat-button mat-raised-button routerLink="register" routerLinkActive="active">Register</a>
         <a mat-button *ngIf="isLoggedin" [matMenuTriggerFor]="user">{{username}}</a>

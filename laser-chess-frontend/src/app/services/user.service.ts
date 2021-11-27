@@ -47,24 +47,24 @@ export class UserService {
   }
 
   getBlockedUsers() {
-    return this.http.get<any>(friendsFullEndpoint("me/blocked")).toPromise()
+    return this.http.get<any>(userFullEndpoint("me/blocked")).toPromise()
   }
 
   blockUser(username: string) {
-    return this.http.post<any>(userFullEndpoint("block"),{'username': username}).toPromise()
+    return this.http.post<any>(userFullEndpoint("me/block"),{'username': username}).toPromise()
   }
 
   unblockUser(username: string) {
-    return this.http.delete(userFullEndpoint("unblock"),{body:{'username': username}}).subscribe()
+    return this.http.delete(userFullEndpoint("me/unblock"),{body:{'username': username}}).subscribe()
   }
 
   getUserStats(username: string) {
     return this.http.get<any>(userFullEndpoint(`${username}/stats`)).toPromise()
   }
 
-  // getUserGameHistory(username: string) {
-  //   return this.http.get<any>(userFullEndpoint(`${username}/history `).toPromise()
-  // }
+  getUserGameHistory(username: string) {
+    return this.http.get<any>(userFullEndpoint(`${username}/history`)).toPromise()
+  }
 
 
 }

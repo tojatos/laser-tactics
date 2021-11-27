@@ -40,7 +40,7 @@ export class AuthService {
   }
 
   sendVerficationMail(username: string){
-    return this.http.post<any>(emailFullEndpoint("send_verfication_email"), {'username': username}).toPromise();
+    return this.http.post<any>(emailFullEndpoint("send_verification_email"), {'username': username}).toPromise();
 
   }
 

@@ -20,6 +20,7 @@ import { LobbyComponent } from './components/lobby/lobby.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { SettingsPasswordComponent } from './components/settings-password/settings-password.component';
 import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
+import { SettingsBlockedUsersComponent } from './components/settings-blocked-users/settings-blocked-users.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { PasswordReminderComponent } from './components/password-reminder/passwo
     LobbyComponent,
     SettingsComponent,
     SettingsPasswordComponent,
-    PasswordReminderComponent
+    PasswordReminderComponent,
+    SettingsBlockedUsersComponent,
   ],
   imports: [
     BrowserModule,
