@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FriendRequest, User, UserStats } from 'src/app/app.models';
+import { sortBy } from 'lodash';
+import { FriendRequest, User, UserHistory, UserStats } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -21,6 +23,11 @@ export class UserPageComponent {
   blocked: string[] | undefined
   friendsRequests: FriendRequest[] | undefined
   stats: UserStats | undefined
+  history: UserHistory[] | undefined
+  dataSource = new MatTableDataSource<UserHistory>();
+
+  displayedColumns = ['Date', 'Opponent', 'Result'];
+
   form = new FormGroup({
     input: new FormControl('')
   });
@@ -50,9 +57,14 @@ export class UserPageComponent {
     this.userService.getUserStats(this.username!).then(userData => {
       this.stats = userData
     })
+    this.userService.getUserGameHistory(this.username!).then(userData => {
+      const data = userData
+      this.dataSource.data = sortBy(
+        data, ['game_end_date']
+      )
+    })
     this.userService.getBlockedUsers().then(userData => {
       this.blocked = userData
-      console.log(this.blocked)
     })
     })
   }
@@ -149,7 +161,30 @@ export class UserPageComponent {
       this.sendRequest(this.form.value.input);
     }
   }
-  
+
+  getDate(date: string) {
+    const parsedDate = new Date(date)
+    return parsedDate.getDate().toString() + ' ' + parsedDate.getMonth().toString() + ' ' + parsedDate.getFullYear().toString() 
+  }
+
+  getOpponent(history: UserHistory){
+    if (this.authService.getUsername() == history.player_one_username){
+      return history.player_two_username
+    }
+    else return history.player_one_username
+  }
+
+  getResult(history: UserHistory){
+    if (this.authService.getUsername() == history.player_one_username){
+      if (history.result == "PLAYER_ONE_WIN"){
+        return "WIN"}
+      return "DEFEAT"
+    }
+    else {
+      if (history.result == "PLAYER_TWO_WIN"){
+      return "WIN"}
+    return "DEFEAT"
+  }}
 
 }
 

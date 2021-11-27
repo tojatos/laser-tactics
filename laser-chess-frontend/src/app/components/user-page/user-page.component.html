@@ -46,4 +46,25 @@
         <mat-list-item>Winrate as player 2: {{stats?.winrate_as_p2}}</mat-list-item>
         <mat-list-item>Wins: {{stats?.wins}}</mat-list-item>
     </mat-list>
+
+    <mat-table [dataSource]="dataSource" class="table-box">
+
+        <ng-container matColumnDef="Date">
+          <mat-header-cell *matHeaderCellDef > Date </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{getDate(element.game_end_date)}} </mat-cell>
+        </ng-container>
+  
+        <ng-container matColumnDef="Opponent">
+          <mat-header-cell *matHeaderCellDef > Opponent </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{getOpponent(element)}} </mat-cell>
+        </ng-container>
+  
+        <ng-container matColumnDef="Result">
+          <mat-header-cell *matHeaderCellDef > Result </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{getResult(element)}} </mat-cell>
+        </ng-container>
+  
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
     </div>

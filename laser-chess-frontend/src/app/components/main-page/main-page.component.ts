@@ -27,9 +27,10 @@ export class MainPageComponent implements OnInit {
 
   async ngOnInit() {
     const data = await this.lobbyService.getLobbies()
-
     this.dataSource.data = sortBy(
-      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED), 
+      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED
+        && ((new Date().getTime()) - new Date(res.lobby_creation_date).getTime()) < 3600000 * 2
+        ), 
       ['id']).slice(-8)
     this.fetched = true
   }
@@ -56,12 +57,12 @@ export class MainPageComponent implements OnInit {
   async refreshList(){
     this.fetched = false
     const data = await this.lobbyService.getLobbies()
-
-
     this.dataSource.data = sortBy(
-      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED), 
-      ['id']).slice(-8)    
-      this.fetched = true
+      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED
+        && ((new Date().getTime()) - new Date(res.lobby_creation_date).getTime()) < 3600000 * 2
+        ), 
+      ['id']).slice(-8)
+    this.fetched = true
   }
 
   async createLobby(){
