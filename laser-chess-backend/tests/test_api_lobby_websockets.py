@@ -32,11 +32,11 @@ def before_all():
     tu = TUtils(client, API_PREFIX)
 
     create_user_datas = list(
-        map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 4)))
+        map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 10)))
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
     for user in create_user_datas:
         verify_user(session, user["username"])
-    response = tu.post_data("/lobby/create", tokens[3])
+    response = tu.post_data("/lobby/create", tokens[9])
     assert response.status_code == 201
     global game_id
     game_id = response.json()['game_id']
@@ -86,7 +86,7 @@ def test_websocket_notify(client):
 
         ws0.close()
 
-def test_websocket_notify(client):
+def test_websocket_notify_game_start(client):
     tu = TUtils(client, API_PREFIX)
 
     with client.websocket_connect("/lobby_ws") as ws0, \
