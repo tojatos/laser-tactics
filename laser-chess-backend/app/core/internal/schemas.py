@@ -222,6 +222,10 @@ class Username(BaseModel):
     username: str
 
 
+class EmailSchema(BaseModel):
+    email: EmailStr
+
+
 class LobbyId(BaseModel):
     game_id: str
 
@@ -246,4 +250,3 @@ class Settings(BaseModel):
 
     class Config:
         orm_mode = True
-
