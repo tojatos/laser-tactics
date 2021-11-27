@@ -27,7 +27,6 @@ export class RegisterComponent implements OnInit {
     const { username, email, password } = this.form.value;
     if (!this.authService.isLoggedIn() && username && email && password) {
       this.authService.register(username, email, password).then(res => {
-        this.authService.sendVerficationMail(username)
         this.router.navigate(['/login'])
       }).catch(err => console.log(err))
     }

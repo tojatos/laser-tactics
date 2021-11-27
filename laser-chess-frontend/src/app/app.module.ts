@@ -21,6 +21,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { SettingsPasswordComponent } from './components/settings-password/settings-password.component';
 import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
 import { SettingsBlockedUsersComponent } from './components/settings-blocked-users/settings-blocked-users.component';
+import { VerifyComponent } from './components/verify/verify.component';
 
 
 @NgModule({
@@ -36,6 +37,7 @@ import { SettingsBlockedUsersComponent } from './components/settings-blocked-use
     SettingsPasswordComponent,
     PasswordReminderComponent,
     SettingsBlockedUsersComponent,
+    VerifyComponent,
   ],
   imports: [
     BrowserModule,

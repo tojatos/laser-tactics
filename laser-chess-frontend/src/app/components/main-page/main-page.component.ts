@@ -3,9 +3,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { sortBy } from 'lodash';
-import { Lobby } from 'src/app/app.models';
+import { Lobby, User } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import { LobbyService } from 'src/app/services/lobby.service';
+import { UserService } from 'src/app/services/user.service';
 import { LobbyStatus } from '../lobby/lobby.component';
 
 @Component({
@@ -20,12 +21,14 @@ export class MainPageComponent implements OnInit {
   fetched = false
   lobby: any
   ranked = false
+  user: User | undefined
   public lobbies: Lobby[] | undefined
   displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router) {}
+  constructor(private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router, private userService: UserService) {}
 
   async ngOnInit() {
+
     const data = await this.lobbyService.getLobbies()
     this.dataSource.data = sortBy(
       data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED
@@ -52,6 +55,11 @@ export class MainPageComponent implements OnInit {
     else{
       return 'Casual'
     }
+  }
+  get verified(){
+    // this.user = this.userService.getUserMe()
+    // if (this.user.)
+    return false
   }
 
   async refreshList(){
@@ -95,5 +103,9 @@ export class MainPageComponent implements OnInit {
     console.log(this.lobby)
     this.router.navigate(['/lobby', this.lobby.game_id])
       }
+
+  sendVerifyEmail(){
+    this.authService.sendVerficationMail(this.authService.getUsername())
+  }
 
 }

@@ -33,9 +33,10 @@ export interface Item {
 export interface User {
   username: string,
   email: string,
-  id: number,
   is_active: boolean,
-  items: Item[]
+  is_verified: boolean,
+  registration_date: string,
+  rating: number
 }
 
 export interface FriendRequest {

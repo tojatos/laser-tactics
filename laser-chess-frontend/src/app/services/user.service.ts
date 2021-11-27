@@ -20,7 +20,7 @@ export class UserService {
   }
 
   getUserMe() {
-    return this.http.get<User>(userFullEndpoint("me/")).toPromise()
+    return this.http.get<User>(userFullEndpoint("me/info")).toPromise()
   }
 
   getSettings(){

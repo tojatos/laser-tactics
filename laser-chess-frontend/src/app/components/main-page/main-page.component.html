@@ -1,5 +1,7 @@
 <div *ngIf="fetched" class="main-wrapper" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-evenly stretch">
+
   <div *ngIf="fetched" fxFlex="40" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" >
+    <button *ngIf="verified" mat-stroked-button color="accent" (click)="sendVerifyEmail()">Verify</button>
     <mat-table [dataSource]="dataSource" class="table-box">
 
       <ng-container matColumnDef="name">

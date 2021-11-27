@@ -49,6 +49,11 @@ export class AuthService {
 
   }
 
+  verifyUser(token: string){
+    return this.http.post<any>(userFullEndpoint(`verify/${token}`),{}).toPromise();
+
+  }
+
 private setSession(authResult: UserToken) {
     // const expiresAt = moment().add(authResult.expiresIn,'second')
     localStorage.setItem(this.idToken, authResult.access_token)
