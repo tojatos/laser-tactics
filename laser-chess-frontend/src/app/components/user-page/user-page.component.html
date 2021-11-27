@@ -1,10 +1,17 @@
-<div  class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+<div  class="main-wrapper" fxLayout="column" fxLayoutAlign="center center">
+    <mat-icon *ngIf="!isOwner" [matMenuTriggerFor]="user">more_vert</mat-icon>
+    <mat-menu class="menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
+        <button mat-menu-item (click)="sendRequest(username!)">Send friend request</button>
+        <button mat-menu-item (click)="unfriend(username!)">Unfriend</button>
+        <button mat-menu-item (click)="blockUser(username!)">Block</button>
+        <button mat-menu-item (click)="unblockUser(username!)">Unblock</button>
+      </mat-menu>
     <mat-card>{{username}}</mat-card>
-    <mat-card *ngIf="isOwner"><input class="input-box" #box (keyup.enter)="onEnter('add', box.value)" placeholder="Username">Add friend </mat-card>
+    <mat-card *ngIf="isOwner"><input class="input-box" #box (keyup.enter)="onEnter('add', box.value)" placeholder="Username"> </mat-card>
     <mat-list *ngIf="isOwner">
         <mat-list-item *ngFor="let friend of friends">
             <button mat-list-item (click)="goToProfile(friend)"> {{friend}} </button>
-            <button mat-list-item (click)="unfriend(friend)"> Unfriend </button>
+            <button mat-raised-button (click)="unfriend(friend)"> Unfriend </button>
         </mat-list-item>
     </mat-list>
     <mat-list *ngIf="isOwner">
@@ -14,5 +21,15 @@
             <button mat-list-item (click)="declineFriendRequest(request.id)"> Decline </button>
         </mat-list-item>
     </mat-list>
-    <mat-card *ngIf="isOwner"><input class="input-box" #box (keyup.enter)="onEnter('block', box.value)" placeholder="Username"> Block user</mat-card>
+    <mat-list>
+        <mat-list-item>{{stats?.drawrate}}</mat-list-item>
+        <mat-list-item>{{stats?.draws}}</mat-list-item>
+        <mat-list-item>{{stats?.loses}}</mat-list-item>
+        <mat-list-item>{{stats?.winrate}}</mat-list-item>
+        <mat-list-item>{{stats?.winrate_as_p1}}</mat-list-item>
+        <mat-list-item>{{stats?.winrate_as_p2}}</mat-list-item>
+        <mat-list-item>{{stats?.wins}}</mat-list-item>
+    </mat-list>
+
+    <!-- <mat-card *ngIf="isOwner"><input class="input-box" #box (keyup.enter)="onEnter('block', box.value)" placeholder="Username"> Block user</mat-card> -->
     </div>

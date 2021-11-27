@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { friendsFullEndpoint, userFullEndpoint } from '../api-definitions';
+import { friendsFullEndpoint, userFullEndpoint, usersFullEndpoint } from '../api-definitions';
 import { FriendRequest, User } from '../app.models';
 
 
@@ -57,5 +57,14 @@ export class UserService {
   unblockUser(username: string) {
     return this.http.delete(userFullEndpoint("unblock"),{body:{'username': username}}).subscribe()
   }
+
+  getUserStats(username: string) {
+    return this.http.get<any>(userFullEndpoint(`${username}/stats`)).toPromise()
+  }
+
+  // getUserGameHistory(username: string) {
+  //   return this.http.get<any>(userFullEndpoint(`${username}/history `).toPromise()
+  // }
+
 
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -12,11 +13,15 @@ import { UserService } from 'src/app/services/user.service';
 export class SettingsPasswordComponent implements OnInit {
   
   hide = true;
+  hide2 = true;
+  hide3 = true;
+  matcher = new MyErrorStateMatcher();
   form = new FormGroup({
       password: new FormControl('',[Validators.required]),
       new_password: new FormControl('',[Validators.required]),
       retype_new_password: new FormControl('',[Validators.required])
-    },{validators: samePasswordValidator})
+    },{validators: this.samePasswordValidator2})
+
 
   constructor(private userService: UserService, private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
@@ -25,6 +30,8 @@ export class SettingsPasswordComponent implements OnInit {
   ngOnInit(): void {
     
   }
+
+
 
   get password() { return this.form!.get('password'); }
   get new_password() { return this.form!.get('new_password'); }
@@ -46,7 +53,6 @@ export class SettingsPasswordComponent implements OnInit {
     const username = this.authService.getUsername()
     if (this.authService.isLoggedIn() && password && new_password && retype_new_password) {
       this.userService.changePassword(password, new_password).then(res => {
-        this.authService.sendPasswordChangeRequest(username)
         this.router.navigate(['/login'])
         this.authService.clearJWT()
       }).catch(err => console.log(err))
@@ -55,6 +61,13 @@ export class SettingsPasswordComponent implements OnInit {
       console.log("")
     }
   }
+  samePasswordValidator2(control: AbstractControl): ValidationErrors | null {
+    const new_password = control.get('new_password');
+    const retype_new_password = control.get('retype_new_password');
+  
+    return new_password && retype_new_password && new_password.value != retype_new_password.value ? { samePassword: true } : null;
+  };
+  
 
 }
 
@@ -62,6 +75,13 @@ export const samePasswordValidator: ValidatorFn = (control: AbstractControl): Va
   const new_password = control.get('new_password');
   const retype_new_password = control.get('retype_new_password');
 
-  return new_password && retype_new_password && new_password.value === retype_new_password.value ? { samePassword: true } : null;
+  return new_password && retype_new_password && new_password.value != retype_new_password.value ? { samePassword: true } : null;
 };
+
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+    
+}}
 

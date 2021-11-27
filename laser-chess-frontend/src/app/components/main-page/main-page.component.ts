@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forEach } from 'lodash';
+import { forEach, sortBy } from 'lodash';
 import { Lobby } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import { LobbyService } from 'src/app/services/lobby.service';
@@ -29,7 +29,9 @@ export class MainPageComponent implements OnInit {
   async ngOnInit() {
     const data = await this.lobbyService.getLobbies()
 
-    this.dataSource.data = data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED).slice(0, 8)
+    this.dataSource.data = sortBy(
+      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED), 
+      ['id']).slice(-8)
     this.fetched = true
   }
 
@@ -56,8 +58,11 @@ export class MainPageComponent implements OnInit {
     this.fetched = false
     const data = await this.lobbyService.getLobbies()
 
-    this.dataSource.data = data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED).slice(0, 8)
-    this.fetched = true
+
+    this.dataSource.data = sortBy(
+      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED), 
+      ['id']).slice(-8)    
+      this.fetched = true
   }
 
   async createLobby(){

@@ -1,3 +1,4 @@
-<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+<div class="main-wrapper" fxLayout="column" fxLayoutAlign="center center">
+    <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations</mat-slide-toggle>
     <button mat-stroked-button color="accent"routerLink="password" >Password</button>
 </div>
