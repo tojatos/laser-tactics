@@ -116,7 +116,7 @@ async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.U
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
 
-@router.get("/me", response_model=schemas.User)
+@router.get("/me/info", response_model=schemas.User)
 async def read_users_me(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
 
