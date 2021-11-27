@@ -17,6 +17,11 @@ import { RegisterComponent } from './components/register/register.component';
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 import { MainPageComponent } from './components/main-page/main-page.component';
 import { LobbyComponent } from './components/lobby/lobby.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { SettingsPasswordComponent } from './components/settings-password/settings-password.component';
+import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
+import { SettingsBlockedUsersComponent } from './components/settings-blocked-users/settings-blocked-users.component';
+
 
 @NgModule({
   declarations: [
@@ -26,7 +31,11 @@ import { LobbyComponent } from './components/lobby/lobby.component';
     UserPageComponent,
     RegisterComponent,
     MainPageComponent,
-    LobbyComponent
+    LobbyComponent,
+    SettingsComponent,
+    SettingsPasswordComponent,
+    PasswordReminderComponent,
+    SettingsBlockedUsersComponent,
   ],
   imports: [
     BrowserModule,
@@ -37,7 +46,8 @@ import { LobbyComponent } from './components/lobby/lobby.component';
     HttpClientModule,
     FlexLayoutModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
     ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, { provide: JWT_OPTIONS, useValue: JWT_OPTIONS }, JwtHelperService],
   bootstrap: [AppComponent],

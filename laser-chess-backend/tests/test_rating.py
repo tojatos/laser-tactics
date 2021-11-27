@@ -1,6 +1,6 @@
 from app.Rating import rating, schemas
 from app.Rating.schemas import PlayerMatchHistory
-from app.core.internal.crud import update_user_rating
+from app.core.internal.crud import update_user_rating, update_ratings_in_history
 import pytest
 from app.core.internal.models import GameHistory
 from app.core.internal.schemas import GameResult
@@ -31,9 +31,9 @@ def mock_match_end_in_db(db,
                          player_two_volatility,
                          result,
                          game_end_date,
-                         ):
+                         game_id):
     record = GameHistory(
-        game_id=GAME_ID,
+        game_id=game_id,
         player_one_username=player_one_username,
         player_one_rating=player_one_rating,
         player_one_deviation=player_one_deviation,
@@ -50,6 +50,7 @@ def mock_match_end_in_db(db,
     db.commit()
     update_user_rating(db, player_one_username)
     update_user_rating(db, player_two_username)
+    update_ratings_in_history(db, game_id, player_one_username, player_two_username)
 
 
 def glickman_matches_in_db(db):
@@ -64,7 +65,8 @@ def glickman_matches_in_db(db):
                          player_two_deviation=30,
                          player_two_volatility=0.06,
                          result=GameResult.PLAYER_ONE_WIN,
-                         game_end_date=datetime_object)
+                         game_end_date=datetime_object,
+                         game_id="1")
     # 2
     datetime_object = datetime.now() + timedelta(days=1)
     mock_match_end_in_db(db, player_one_username="test0",
@@ -76,7 +78,8 @@ def glickman_matches_in_db(db):
                          player_two_deviation=100,
                          player_two_volatility=0.06,
                          result=GameResult.PLAYER_TWO_WIN,
-                         game_end_date=datetime_object)
+                         game_end_date=datetime_object,
+                         game_id="2")
     # 3
     datetime_object = datetime.now() + timedelta(days=2)
     mock_match_end_in_db(db, player_one_username="test0",
@@ -88,7 +91,8 @@ def glickman_matches_in_db(db):
                          player_two_deviation=300,
                          player_two_volatility=0.06,
                          result=GameResult.PLAYER_TWO_WIN,
-                         game_end_date=datetime_object)
+                         game_end_date=datetime_object,
+                         game_id="3")
 
 
 def glickman_matches_in_db_schuffled(db):
@@ -103,7 +107,8 @@ def glickman_matches_in_db_schuffled(db):
                          player_one_deviation=30,
                          player_two_volatility=0.06,
                          result=GameResult.PLAYER_TWO_WIN,
-                         game_end_date=datetime_object)
+                         game_end_date=datetime_object,
+                         game_id="4")
     # 2
     datetime_object = datetime.now() + timedelta(days=1)
     mock_match_end_in_db(db, player_one_username="test4",
@@ -115,7 +120,8 @@ def glickman_matches_in_db_schuffled(db):
                          player_two_deviation=100,
                          player_two_volatility=0.06,
                          result=GameResult.PLAYER_TWO_WIN,
-                         game_end_date=datetime_object)
+                         game_end_date=datetime_object,
+                         game_id="5")
     # 3
     datetime_object = datetime.now() + timedelta(days=2)
     mock_match_end_in_db(db, player_two_username="test4",
@@ -127,7 +133,8 @@ def glickman_matches_in_db_schuffled(db):
                          player_one_deviation=300,
                          player_one_volatility=0.06,
                          result=GameResult.PLAYER_ONE_WIN,
-                         game_end_date=datetime_object)
+                         game_end_date=datetime_object,
+                         game_id="6")
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -184,6 +191,9 @@ def test_glickman():
     assert rating.rating == 1464
     assert rating.rating_deviation == 151.52
     assert rating.rating_volatility == 0.06
+    record = crud.get_match_record(session, "3")
+    assert record.player_one_new_rating == 1464
+
     session.rollback()
 
 
@@ -200,5 +210,7 @@ def test_glickman_schuffled():
     assert rating.rating == 1464
     assert rating.rating_deviation == 151.52
     assert rating.rating_volatility == 0.06
+    record = crud.get_match_record(session, "6")
+    assert record.player_two_new_rating == 1464
     session.rollback()
 

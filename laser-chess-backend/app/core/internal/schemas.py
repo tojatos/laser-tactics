@@ -49,6 +49,23 @@ class UserBase(BaseModel):
             raise ValueError('Username cannot be empty')
         return value
 
+    @validator('username')
+    def username_longer_than_3(cls, value):
+        if len(value) < 3:
+            raise ValueError('Username must be at least 3 characters')
+        return value
+
+    @validator('username')
+    def username_shorter_than_20(cls, value):
+        if len(value) > 20:
+            raise ValueError('Username can be max 20 characters')
+        return value
+
+    @validator('username')
+    def username_alphanumeric(cls, v):
+        assert v.isalnum(), 'must be alphanumeric'
+        return v
+
 
 class UserCreate(UserBase):
     password: str
@@ -57,6 +74,18 @@ class UserCreate(UserBase):
     def password_not_empty(cls, value):
         if not value:
             raise ValueError('Password cannot be empty')
+        return value
+
+    @validator('password')
+    def password_longer_than_3(cls, value):
+        if len(value) < 3:
+            raise ValueError('Password must be at least 3 characters')
+        return value
+
+    @validator('password')
+    def password_shorter_than_20(cls, value):
+        if len(value) > 20:
+            raise ValueError('Password can be max 20 characters')
         return value
 
 
@@ -112,6 +141,8 @@ class GameHistoryEntry(BaseModel):
     result: GameResult
     game_end_date: dt.datetime
     is_rated: bool
+    player_one_new_rating: int
+    player_two_new_rating: int
 
 
 class LobbyEditData(BaseModel):
@@ -121,6 +152,24 @@ class LobbyEditData(BaseModel):
     is_ranked: bool
     is_private: bool
     starting_position_reversed: bool
+
+    @validator('name')
+    def name_not_empty(cls, value):
+        if not value:
+            raise ValueError('Name cannot be empty')
+        return value
+
+    @validator('name')
+    def name_longer_than_3(cls, value):
+        if len(value) < 3:
+            raise ValueError('Name must be at least 3 characters')
+        return value
+
+    @validator('name')
+    def name_shorter_than_40(cls, value):
+        if len(value) > 40:
+            raise ValueError('Name can be max 20 characters')
+        return value
 
 
 class Lobby(BaseModel):
@@ -132,9 +181,28 @@ class Lobby(BaseModel):
     is_private: bool = False
     starting_position_reversed: bool = False
     lobby_status: LobbyStatus
+    lobby_creation_date: dt.datetime
 
     class Config:
         orm_mode = True
+
+    @validator('name')
+    def name_not_empty(cls, value):
+        if not value:
+            raise ValueError('Name cannot be empty')
+        return value
+
+    @validator('name')
+    def name_longer_than_3(cls, value):
+        if len(value) < 3:
+            raise ValueError('Name must be at least 3 characters')
+        return value
+
+    @validator('name')
+    def name_shorter_than_40(cls, value):
+        if len(value) > 40:
+            raise ValueError('Name can be max 20 characters')
+        return value
 
 
 class FriendRequestCreate(BaseModel):
@@ -148,13 +216,16 @@ class FriendRequest(FriendRequestCreate):
 
 
 class BlockedUsers(BaseModel):
-    id: int
     user: str
     blocked_user: str
 
 
 class Username(BaseModel):
     username: str
+
+
+class EmailSchema(BaseModel):
+    email: EmailStr
 
 
 class LobbyId(BaseModel):
@@ -181,4 +252,10 @@ class Settings(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class JoinRandomRequest(BaseModel):
+    rating_lower_bound: int
+    rating_higher_bound: int
+    is_rated: bool
 

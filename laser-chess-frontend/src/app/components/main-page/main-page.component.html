@@ -1,6 +1,11 @@
-<div *ngIf="fetched" class="main-wrapper" fxLayout="row" fxLayout.sm="column" fxLayout.xs="column" fxLayoutAlign="space-evenly stretch">
+<div *ngIf="fetched" class="main-wrapper" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-evenly stretch">
   <div *ngIf="fetched" fxFlex="40" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" >
     <mat-table [dataSource]="dataSource" class="table-box">
+
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef > Game name </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      </ng-container>
 
       <ng-container matColumnDef="player_one_username">
         <mat-header-cell *matHeaderCellDef > Player 1 </mat-header-cell>
@@ -32,10 +37,11 @@
     </mat-table>
 
   </div>
-  <div *ngIf="fetched" fxLayout="column" fxFlexAlign.sm="center" fxFlexAlign.xs="center" fxFlex="15" fxLayoutGap="30px" fxLayoutAlign="center ">
+  <div *ngIf="fetched" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="center">
     <button mat-stroked-button color="accent" (click)="createLobby()">Start game</button>
     <button mat-stroked-button color="accent" (click)="createRankedLobby()">Start ranked game</button>
     <button mat-stroked-button color="accent" (click)="createPrivateLobby()">Start private game</button>
+    <button mat-stroked-button color="accent" (click)="createPrivateRankedLobby()">Start private ranked game</button>
   </div>
 
 </div>

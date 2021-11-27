@@ -5,7 +5,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { FormControl } from '@angular/forms';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
 import { environment } from 'src/environments/environment';
-import { tokenFullEndpoint, usersFullEndpoint } from '../api-definitions';
+import { tokenFullEndpoint, usersFullEndpoint , userFullEndpoint, emailFullEndpoint} from '../api-definitions';
 // import * as moment from "moment"
 
 @Injectable({
@@ -32,6 +32,21 @@ export class AuthService {
 
   register(login:string, email:string, pass:string){
     return this.http.post<any>(usersFullEndpoint, {'username': login, 'email': email, 'password': pass}).toPromise();
+  }
+
+  changePassword(token:string, newPassword:string){
+    return this.http.post<any>(userFullEndpoint("changePassword"), {'token': token, 'newPassword': newPassword}).toPromise();
+
+  }
+
+  sendVerficationMail(username: string){
+    return this.http.post<any>(emailFullEndpoint("send_verification_email"), {'username': username}).toPromise();
+
+  }
+
+  sendPasswordChangeRequest(username: string){
+    return this.http.post<any>(emailFullEndpoint("send_password_change_request"), {'username': username}).toPromise();
+
   }
 
 private setSession(authResult: UserToken) {

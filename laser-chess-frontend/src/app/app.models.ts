@@ -37,6 +37,29 @@ export interface User {
   items: Item[]
 }
 
+export interface FriendRequest {
+  id: string,
+  user_one_username: string,
+  user_two_username: number,
+  status: RequestStatus
+}
+
+export enum RequestStatus {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  DECLINED = "DECLINED"
+}
+
+export interface UserStats {
+  drawrate: number,
+  draws: number,
+  loses: number,
+  matches: number,
+  winrate: number,
+  winrate_as_p1: number,
+  winrate_as_p2: number,
+  wins: number,
+}
 export interface Settings {
   skip_animations: boolean
 }

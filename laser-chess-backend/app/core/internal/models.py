@@ -46,6 +46,8 @@ class GameHistory(Base):
     result = Column(Enum(GameResult))
     game_end_date = Column(DateTime)
     is_rated = Column(Boolean)
+    player_one_new_rating = Column(Integer, nullable=True)
+    player_two_new_rating = Column(Integer, nullable=True)
 
 
 class Lobby(Base):
@@ -60,6 +62,7 @@ class Lobby(Base):
     is_private = Column(Boolean, default=False)
     starting_position_reversed = Column(Boolean, default=False)
     lobby_status = Column(Enum(LobbyStatus))
+    lobby_creation_date = Column(DateTime)
 
 
 class FriendRequests(Base):
