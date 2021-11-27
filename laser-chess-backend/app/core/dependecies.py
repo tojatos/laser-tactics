@@ -30,8 +30,6 @@ ALGORITHM = get_env('ALGORITHM', "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 10080)
 VERIFY_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 60 * 24)
 CHANGE_PASSWORD_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 20)
-VERIFICATION_URL = "<verification_url>"
-CHANGE_PASSWORD_URL = "<change_password_url>"
 API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
 PORT = get_env('PORT', 8000)
@@ -43,11 +41,13 @@ VERIFY_MAIL_USERNAME = get_env('VERIFY_MAIL_USERNAME', "verification@lasertactic
 VERIFY_MAIL_PASSWORD = get_env("VERIFY_MAIL_PASSWORD", "Verify123!@#")
 VERIFY_MAIL_PORT = get_env('VERIFY_MAIL_PORT', 587)
 VERIFY_MAIL_SERVER = get_env('VERIFY_MAIL_SERVER', "smtppro.zoho.eu")
+VERIFICATION_URL = get_env('VERIFY_MAIL_URL', f"{ROOT_PATH}/verify/")
 MAIL_FROM = get_env('MAIL_FROM', "lasertactics@lasertactics.online")
 MAIL_USERNAME = get_env('MAIL_USERNAME', "lasertactics@lasertactics.online")
 MAIL_PASSWORD = get_env('MAIL_PASSWORD', "r_B?KE@MU3nFnyG")
 MAIL_PORT = get_env('MAIL_PORT', 587)
 MAIL_SERVER = get_env('MAIL_SERVER', "smtppro.zoho.eu")
+CHANGE_PASSWORD_URL = get_env('VERIFY_MAIL_URL', f"{ROOT_PATH}/change_password/")
 
 
 class TokenPurpose(str, AutoNameEnum):

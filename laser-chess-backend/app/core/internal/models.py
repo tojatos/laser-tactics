@@ -45,7 +45,8 @@ class GameHistory(Base):
     player_two_volatility = Column(Float)
     result = Column(Enum(GameResult))
     game_end_date = Column(DateTime)
-    is_rated = Column(Boolean)
+    is_rated = Column(Boolean)\
+
 
 
 class Lobby(Base):
