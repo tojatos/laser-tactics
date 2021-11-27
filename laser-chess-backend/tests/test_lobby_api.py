@@ -24,9 +24,9 @@ def before_all():
 
     create_user_datas = list(
         map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 2)))
+    tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
     for user in create_user_datas:
         verify_user(session, user["username"])
-    tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
 
     session.commit()
 

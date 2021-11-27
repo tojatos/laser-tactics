@@ -1,9 +1,11 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/constants';
 import { GamePhase, PlayerType } from '../../src/enums';
 import { Game } from '../../src/Game';
+import { BoardLogComponent } from '../board-log/board-log.component';
 
 @Component({
   selector: 'app-board',
@@ -14,15 +16,20 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>
 
-  @ViewChild('gui', { static: true })
-  canvasGUI!: ElementRef<HTMLCanvasElement>
+  @ViewChild('logs', { static: true })
+  logsComponent: ElementRef<BoardLogComponent> | undefined
 
   readonly sizeScale = 0.07
+  readonly handsetSize = 835
+  readonly handsetScale = 1.5
+  readonly placeForGameLogSize = 1.35
+  readonly minWidth = 695
   animation = true
 
-  constructor(private route: ActivatedRoute, public game: Game) {}
+  constructor(private route: ActivatedRoute, private userService: UserService, public game: Game) {}
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
+    this.animation = !(await this.userService.getSettings().toPromise()).skip_animations
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
       alert("Couldn't load context")
@@ -30,7 +37,11 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
 
     this.route.params.subscribe(async params => {
-      await this.game.initGame(gameCanvasContext, this.currentSize, params.id, this.sizeScale)
+      await this.game.initGame(gameCanvasContext,
+        this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
+        params.id,
+        this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
+        this.animation)
     })
   }
 
@@ -41,11 +52,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
-    this.game.changeCurrentSize(this.currentSize)
+    this.game.changeCurrentSize(this.isHandset ? this.currentSize * this.handsetScale : this.currentSize)
   }
 
   changeAnimationShowOption(){
-    this.animation = !this.animation
     this.game.changeAnimationsShowOption(this.animation)
   }
 
@@ -69,16 +79,20 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   parseGamePhase(gamePhase: GamePhase){
     switch(gamePhase){
       case GamePhase.STARTED: {
-        if(this.game.whoseTurn == PlayerType.PLAYER_ONE) return "Tura gracza czerwonego"
-        else if(this.game.whoseTurn == PlayerType.PLAYER_TWO) return "Tura gracza niebieskiego"
-        else return "Gra rozpoczęta. Tura nieokreślona"
+        if(this.game.whoseTurn == PlayerType.PLAYER_ONE) return "Red player's turn"
+        else if(this.game.whoseTurn == PlayerType.PLAYER_TWO) return "Blue player's turn"
+        else return "Game started - turn unknown"
       }
-      case GamePhase.DRAW: return "Remis"
-      case GamePhase.PLAYER_ONE_VICTORY: return "Zwyciestwo gracza czerwonego!"
-      case GamePhase.PLAYER_TWO_VICTORY: return "Zwyciestwo gracza niebieskiego!"
-      case GamePhase.NOT_STARTED: return "Gra nierozpoczęta"
-      default: return "Pobieranie danych..."
+      case GamePhase.DRAW: return "Draw"
+      case GamePhase.PLAYER_ONE_VICTORY: return "Red player wins!"
+      case GamePhase.PLAYER_TWO_VICTORY: return "Blue player wins!"
+      case GamePhase.NOT_STARTED: return "Game not started"
+      default: return "Loading data..."
     }
+  }
+
+  get isHandset(){
+    return innerWidth <= this.handsetSize
   }
 
   get currentSize() {
@@ -86,11 +100,24 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   get containerHeight() {
-    return this.currentSize * ROWS
+    if(!this.isHandset)
+      return this.currentSize * ROWS
+    else
+      return this.currentSize * ROWS * this.handsetScale
   }
 
   get containerWidth() {
-    return this.currentSize * COLS
+    if(!this.isHandset)
+      return this.currentSize * COLS
+    else
+      return this.currentSize * COLS * this.handsetScale
+  }
+
+  get displayedContainerWidth() {
+    if(this.isHandset)
+      return this.containerWidth
+    else
+      return Math.max(this.containerWidth * this.placeForGameLogSize, this.minWidth)
   }
 
   get rotationPossibleInfo() {
@@ -103,6 +130,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   get acceptPossibleInfo() {
     return this.game.gameActions?.acceptActive
+  }
+
+  get isSpectator(){
+    return this.game.authService.getUsername() != this.game.playerNames[0] && this.game.authService.getUsername() != this.game.playerNames[1]
   }
 
 }

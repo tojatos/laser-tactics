@@ -3,7 +3,7 @@ import { cloneDeep, reject } from "lodash";
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
-import { PieceType } from "../enums";
+import { EventsColors, PieceType } from "../enums";
 import { Piece } from "../piece";
 import { Canvas } from "./Canvas/AbstractCanvas";
 import { Drawings } from "./Drawings";
@@ -35,21 +35,45 @@ export class Animations {
             destination.canvasCoordinates.y
             )
 
+        const numOfIterations = this.getTranslationValue(origin.canvasCoordinates.x, destination.canvasCoordinates.x) == 0 ?
+        Math.abs(destination.canvasCoordinates.y - origin.canvasCoordinates.y) / redrawDistance :
+        Math.abs(destination.canvasCoordinates.x - origin.canvasCoordinates.x) / redrawDistance
+
         let validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPieces(board, [origin])
-        if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+        if(destination.piece?.piece_type != PieceType.HYPER_SQUARE)
           validCellsArray = this.cellsExcludingPieces(board, [origin, destination])
 
         const intervalAction = () => {
           this.drawings.drawGame(canvas, validCellsArray, isReverse)
           this.changePosition(piece, originCoordinates, destinationCoordinates, redrawDistance, fun)
+          let color = EventsColors.MOVE_EVENT
+          if((origin.piece?.piece_type == PieceType.HYPER_CUBE || origin.piece?.piece_type == PieceType.HYPER_SQUARE) && origin.auxiliaryPiece){
+            color = EventsColors.TELEPORT_EVENT
+            this.drawings.drawPiece(canvas, origin.piece, isReverse)
+          }
+          if(destination.piece && origin.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+            color = EventsColors.PIECE_TAKEN
+          this.drawings.highlightCell(canvas, origin, isReverse, piece, color)
+          this.drawings.highlightCell(canvas, destination, isReverse, piece, color)
           this.drawings.drawPiece(canvas, piece, isReverse)
         }
 
         const lastAction = () => {
           this.drawings.drawGame(canvas, validCellsArray, isReverse)
           piece.currentCoordinates = destination.canvasCoordinates
-          if(destination.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+          if((origin.piece?.piece_type == PieceType.HYPER_CUBE || origin.piece?.piece_type == PieceType.HYPER_SQUARE) && origin.auxiliaryPiece){
+            this.drawings.drawGame(canvas, validCellsArray, isReverse)
+            this.drawings.highlightCell(canvas, origin, isReverse, origin.piece || undefined, EventsColors.TELEPORT_EVENT)
+            this.drawings.highlightCell(canvas, destination, isReverse, undefined, EventsColors.TELEPORT_EVENT)
             this.drawings.drawPiece(canvas, piece, isReverse)
+          }
+          else{
+            let color = EventsColors.MOVE_EVENT
+            if(destination.piece && origin.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+              color = EventsColors.PIECE_TAKEN
+            this.drawings.highlightCell(canvas, origin, isReverse, undefined, color)
+            this.drawings.highlightCell(canvas, destination, isReverse, piece, color)
+          }
         }
 
         if(!showAnimations)
@@ -58,10 +82,13 @@ export class Animations {
           resolve()
         })
 
+        let iteration = 0
+
         return new Promise<void>((resolve) => {
           const interval = () => {
+            iteration++
             intervalAction()
-            if(this.inVicinity(destination.canvasCoordinates, piece.currentCoordinates.x, piece.currentCoordinates.y, redrawDistance)){
+            if(iteration >= numOfIterations){
               lastAction()
               resolve()
             }
@@ -88,7 +115,7 @@ export class Animations {
       const intervalAction = () => {
         this.drawings.drawGame(canvas, validCellsArray, isReverse)
         piece.rotation_degree += degreesPerFrame
-        this.drawings.highlightCell(canvas, atCell, isReverse, piece)
+        this.drawings.highlightCell(canvas, atCell, isReverse, piece, EventsColors.ROTATE_EVENT)
         this.drawings.drawPiece(canvas, piece, isReverse)
       }
 
@@ -97,7 +124,7 @@ export class Animations {
           piece.rotation_degree = 360 + piece.rotation_degree
         piece.rotation_degree = desiredPiecePosition % 360
         this.drawings.drawGame(canvas, validCellsArray, isReverse)
-        this.drawings.highlightCell(canvas, atCell, isReverse, piece)
+        this.drawings.highlightCell(canvas, atCell, isReverse, piece, EventsColors.ROTATE_EVENT)
       }
 
       if(!showAnimations)
@@ -193,6 +220,7 @@ export class Animations {
         const pieceToDestroy = board.getCellByCoordinates(at.x, at.y)
         if(pieceToDestroy){
           this.drawings.clearSingleCell(canvas, pieceToDestroy, isReverse)
+          this.drawings.highlightCell(canvas, pieceToDestroy, isReverse, undefined, EventsColors.PIECE_DESTROYED)
           resolve()
         }
         else
@@ -202,10 +230,6 @@ export class Animations {
 
     private cellsExcludingPieces(board: Board, cells: Cell[]){
         return board.cells.filter(c => cells.every(cl => cl.piece != board.getCellByCoordinates(c.coordinates.x, c.coordinates.y)?.piece) )
-    }
-
-    private inVicinity(destination: Coordinates, currentPosX: number, currentPosY: number, vicinity: number){
-        return Math.abs(destination.x - currentPosX) < vicinity * 3 && Math.abs(destination.y - currentPosY) < vicinity * 3
     }
 
     private inRotationVicinity(currentRotation: number, desiredRotation: number, deegresPerFrame: number){

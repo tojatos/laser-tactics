@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
-import { GameEvent, GameState } from "../game.models";
+import { GameEvent, GameState, LaserShotEvent } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
@@ -9,13 +9,13 @@ import { GameActions } from "./Display/Canvas/GameActions";
 import { GameCanvas } from "./Display/Canvas/GameCanvas";
 import { Drawings } from "./Display/Drawings";
 import { Resources } from "./Display/Resources";
-import { GamePhase, PlayerType } from "./enums";
+import { GameEvents, GamePhase, PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
 enum analizeModes {
-  ANALIZING = "ANALIZING",
-  EXITING_ANALYZE_MODE = "EXITTING_ANALYZE_MODE",
-  NOT_ANALIZING = "NOT_ANALIZING"
+  ANALYZING = "ANALYZING",
+  EXITING_ANALYZE_MODE = "EXITING_ANALYZE_MODE",
+  NOT_ANALYZING = "NOT_ANALYZING"
 }
 
 @Injectable()
@@ -28,11 +28,20 @@ export class Game{
   showAnimations: boolean = true
   executingActions = false
   isInitiated = false
-  analizeMode = analizeModes.NOT_ANALIZING
+  analyzeMode = analizeModes.NOT_ANALYZING
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
+  playerNames: [string | undefined, string | undefined] = [undefined, undefined]
+  initialGameState!: GameState
 
-  constructor(public gameService: GameWebsocketService, private authService: AuthService, private eventEmitter: EventEmitterService, private eventsExecutor: EventsExecutor, private board: Board, private drawings: Drawings, private animations: Animations, private resources: Resources){
+  constructor(public gameService: GameWebsocketService,
+    public authService: AuthService,
+    private eventEmitter: EventEmitterService,
+    private eventsExecutor: EventsExecutor,
+    private board: Board,
+    private drawings: Drawings,
+    private animations: Animations,
+    private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
       this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe((value: GameState) => {
         this.refreshGameState(value);
@@ -50,11 +59,14 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean){
     this.sizeScale = sizeScale
     this.gameId = gameId
+    this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
+    this.showAnimations = animations
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
+    this.gameCanvas.showAnimations = this.showAnimations
     this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
     this.gameService.connect(this.gameId)
     this.gameCanvas.redrawGame(this.board)
@@ -77,13 +89,15 @@ export class Game{
       this.gameActions.initCanvas(this.gameCanvas)
 
       if(this.board.playerNum == PlayerType.PLAYER_TWO)
-        this.flipBoard()
+      this.flipBoard()
+
+      this.isInitiated = true
 
       this.gameService.setAnimationEventsNum(receivedGameState.game_events.length)
       const myTurn = this.board.isMyTurn()
       this.gameCanvas.interactable = myTurn
 
-      this.isInitiated = true
+      this.playerNames = this.gameCanvas.isReversed ? [this.board.playerTwo, this.board.playerOne] : [this.board.playerOne, this.board.playerTwo]
     }
   }
 
@@ -141,15 +155,15 @@ export class Game{
 
   async refreshGameState(newGameState: GameState){
     if(this.gameId && this.gameCanvas){
-      if(this.analizeMode != analizeModes.ANALIZING){
+      if(this.analyzeMode != analizeModes.ANALYZING){
           if(!this.isInitiated)
             this.loadDisplay(this.displaySize, newGameState)
-          else if(this.analizeMode == analizeModes.EXITING_ANALYZE_MODE){
+          else if(this.analyzeMode == analizeModes.EXITING_ANALYZE_MODE){
             this.loadConcreteGameState(newGameState)
-            this.analizeMode = analizeModes.NOT_ANALIZING
+            this.analyzeMode = analizeModes.NOT_ANALYZING
           }
           else
-            this.loadNewGameState(newGameState)
+            await this.loadNewGameState(newGameState)
 
         if(newGameState.game_phase != GamePhase.STARTED)
             this.gameCanvas.interactable = false
@@ -161,20 +175,33 @@ export class Game{
 
     this.gamePhase = newGameState.game_phase
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
+
+  if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
+    this.whoseTurn = PlayerType.PLAYER_ONE
+  else if(newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
+    this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
-  showGameEvent(gameEvents: GameEvent[]){
+  async showGameEvent(gameEvents: GameEvent[]){
     if(this.gameCanvas){
-      this.analizeMode = analizeModes.ANALIZING
+      this.analyzeMode = analizeModes.ANALYZING
       this.gameCanvas.interactable = false
-      this.board.setInitialGameState(this.displaySize)
-      this.executePendingActions(gameEvents, gameEvents.length, false, false)
+      this.board.setInitialGameState(this.initialGameState, this.displaySize)
+      await this.executePendingActions(gameEvents, gameEvents.length, false, false)
+      if(gameEvents.slice(-1)[0].event_type == GameEvents.LASER_SHOT_EVENT || gameEvents.slice(-1)[0].event_type == GameEvents.PIECE_DESTROYED_EVENT)
+        for(let i = gameEvents.length-1; i > 0; i--)
+          if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){
+            this.eventsExecutor.addEventsToExecute(gameEvents.slice(i, gameEvents.length))
+            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, true, 999999)
+            this.eventsExecutor.eventsQueue = []
+            i = -1
+          }
     }
   }
 
   returnToCurrentEvent(){
     if(this.gameId){
-      this.analizeMode = analizeModes.EXITING_ANALYZE_MODE
+      this.analyzeMode = analizeModes.EXITING_ANALYZE_MODE
       this.gameService.getGameState(this.gameId)
     }
   }
@@ -195,6 +222,9 @@ export class Game{
   offerDraw(){
     if(this.gameId)
       this.gameService.offerDraw(this.gameId)
+  }
+
+  async rematch(){
   }
 
   passRotation(degree: number){

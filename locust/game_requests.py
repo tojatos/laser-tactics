@@ -1,9 +1,16 @@
-from enum import Enum, auto
+from dataclasses import dataclass
+from enum import Enum
 from typing import Union
 
-from pydantic.dataclasses import dataclass
 
-from app.game_engine.models import CellCoordinatesSerializable
+@dataclass
+class CellCoordinatesSerializable:
+    x: int
+    y: int
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
 
 
 class GameApiRequestPath(str, Enum):
@@ -38,7 +45,6 @@ class StartGameRequest:
     game_id: str
     player_one_id: str
     player_two_id: str
-    is_rated: bool
 
 
 @dataclass

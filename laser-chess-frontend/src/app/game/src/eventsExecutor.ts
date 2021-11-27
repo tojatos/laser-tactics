@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { clone, groupBy, values } from "lodash";
+import { AuthService } from "src/app/auth/auth.service";
 import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
 import { Board } from "./board";
@@ -17,7 +18,7 @@ type PathInfo = {
 @Injectable()
 export class EventsExecutor{
 
-    constructor(private gameService: GameWebsocketService, private drawings: Drawings, private animations: Animations) {}
+    constructor(private gameService: GameWebsocketService, private authService: AuthService, private drawings: Drawings, private animations: Animations) {}
 
     eventsQueue : GameEvent[] = []
     eventsExecutionTimeout = 500
@@ -29,20 +30,19 @@ export class EventsExecutor{
     async executeEventsQueue(canvas: Canvas, board: Board, showAnimations: boolean = true, showLaser: boolean = true, timeout: number = this.eventsExecutionTimeout){
       for (const event of this.eventsQueue.filter(e => e.event_type != GameEvents.PIECE_DESTROYED_EVENT)){
         if(event){
-          if(showAnimations)
+          if(showAnimations && !document.hidden)
             await new Promise(resolve => setTimeout(resolve, timeout))
-          await this.getAnimationToExecute(canvas, board, event, this.eventsQueue.indexOf(event), showAnimations, showLaser)
+          await this.getAnimationToExecute(canvas, board, event, this.eventsQueue.indexOf(event), document.hidden ? false : showAnimations, showLaser)
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
-          if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum)
+          if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum && board.isPlayer(this.authService.getUsername()))
             this.gameService.showDrawOffer(board.gameId!)
-          this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
         }
       }
       this.eventsQueue = []
     }
 
-    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], eventId: number, showAnimations: boolean, showLaser: boolean){
+    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], eventId: number, showAnimations: boolean, showLaser: boolean, laserShowDuration = 1000){
       const res = values(groupBy(laserPath, 'time'))
       const allPathsToDraw: PathInfo[] = []
       const allDestroyedPieceEventsAfterLastLaserShot: GameEvent[] = []
@@ -70,10 +70,12 @@ export class EventsExecutor{
               .map(e => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>e).destroyed_on, canvas.isReversed, showAnimations)) // clears field as well so laser is cut.
             ]
             )
-        if(showLaser)
-          await new Promise(resolve => setTimeout(resolve, 1000))
+        if(showLaser && !document.hidden)
+          await new Promise(resolve => setTimeout(resolve, laserShowDuration))
         const w = canvas.ctx.canvas.width
         canvas.ctx.canvas.width = w
+        this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
+        allDestroyedPieceEventsAfterLastLaserShot.forEach(pde => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>pde).destroyed_on, canvas.isReversed, showAnimations))
         resolve()
         })
 

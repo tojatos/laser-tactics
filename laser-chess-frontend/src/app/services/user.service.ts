@@ -1,7 +1,7 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { friendsFullEndpoint, userFullEndpoint, usersFullEndpoint } from '../api-definitions';
-import { FriendRequest, User } from '../app.models';
+import { friendsFullEndpoint, settingsFullEndpoint, userFullEndpoint} from '../api-definitions';
+import { FriendRequest, Settings, User } from '../app.models';
 
 
 @Injectable({
@@ -20,7 +20,11 @@ export class UserService {
   }
 
   getUserMe() {
-    return this.http.get<User>(userFullEndpoint("me")).toPromise()
+    return this.http.get<User>(userFullEndpoint("me/")).toPromise()
+  }
+
+  getSettings(){
+    return this.http.get<Settings>(settingsFullEndpoint)
   }
 
   getUserFriends() {

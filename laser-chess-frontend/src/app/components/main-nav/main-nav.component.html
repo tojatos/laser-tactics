@@ -13,10 +13,12 @@
         <a href="#" *ngIf="!isLoggedin"  mat-button routerLink="login" routerLinkActive="active">Login</a>
         <a href="#" *ngIf="!isLoggedin" mat-button mat-raised-button routerLink="register" routerLinkActive="active">Register</a>
         <a mat-button *ngIf="isLoggedin" [matMenuTriggerFor]="user">{{username}}</a>
-        <mat-menu class="menu" #user="matMenu" xPosition="after" [overlapTrigger]="false">
-          <button mat-menu-item [routerLink]="['/users', username]">Profile</button>
-          <button mat-menu-item routerLink="settings">Settings</button>
-          <button mat-menu-item (click)="logout()">Logout</button>
+        <mat-menu class="menu" #user="matMenu" xPosition="after">
+          <span (mouseleave)="closeMenu()">
+            <button mat-menu-item [routerLink]="['/users', username]">Profile</button>
+            <button mat-menu-item routerLink="settings">Settings</button>
+            <button mat-menu-item (click)="logout()">Logout</button>
+          </span>
         </mat-menu>
       </div>
     </mat-toolbar-row>

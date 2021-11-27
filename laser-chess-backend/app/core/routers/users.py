@@ -15,6 +15,7 @@ router = APIRouter(
 )
 
 
+# TODO: test
 @router.post("/verify/{token}")
 def verify_user(token: str, db: Session = Depends(get_db)):
     try:
@@ -36,6 +37,7 @@ def verify_user(token: str, db: Session = Depends(get_db)):
     return {"detail": "Account verified successfully"}
 
 
+# TODO: test
 @router.post("/change_password")
 def change_password(change_password_schema: schemas.EmergencyChangePasswordSchema, db: Session = Depends(get_db)):
     try:
@@ -71,7 +73,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@router.get("/{username}", response_model=schemas.User)
+@router.get("/{username}", response_model=schemas.UserGet)
 def read_user(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -79,12 +81,14 @@ def read_user(username: str, db: Session = Depends(get_db)):
     return db_user
 
 
+# TODO: test
 @router.get("/me/blocked", response_model=List[schemas.Username])
 async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return crud.get_blocked_users(user=current_user, db=db)
 
 
+# TODO: test
 @router.post("/block", response_model=schemas.BlockedUsers)
 async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
@@ -95,6 +99,7 @@ async def block_user(usernameSchema: schemas.Username, current_user: schemas.Use
     return crud.create_block_record(user=current_user, user_to_block=user_to_block, db=db)
 
 
+# TODO: test
 @router.delete("/unblock")
 async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
@@ -120,3 +125,33 @@ def change_password(change_password_schema: schemas.ChangePasswordSchema,
     if not verify_password(change_password_schema.oldPassword, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid old password")
     return crud.change_password(user=current_user, new_password=change_password_schema.newPassword, db=db)
+
+
+# TODO: test
+@router.get("/{username}/history")
+def get_users_game_history(username: str, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, username=username)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    history = crud.get_last_20_matches(db=db, user=db_user)
+    return history
+
+
+# TODO: test
+@router.get("/{username}/stats")
+def get_stats(username: str, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, username=username)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return crud.get_stats(db=db, user=db_user)
+
+
+@router.get("/{username}/settings", response_model=schemas.Settings)
+def get_settings(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return crud.get_settings(db=db, user=current_user)
+
+
+@router.patch("/{username}/settings")
+def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return crud.update_settings(settings=settings, db=db, user=current_user)
+

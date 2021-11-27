@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { LoginEmitterService } from 'src/app/services/login-emitter.service';
 import { LobbyService } from 'src/app/services/lobby.service';
 import { Lobby, User } from 'src/app/app.models';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'app-main-nav',
@@ -14,6 +15,9 @@ import { Lobby, User } from 'src/app/app.models';
   styleUrls: ['./main-nav.component.scss']
 })
 export class MainNavComponent {
+
+  @ViewChild(MatMenuTrigger)
+  trigger!: MatMenuTrigger;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.HandsetPortrait, Breakpoints.Small])
     .pipe(
@@ -43,6 +47,10 @@ export class MainNavComponent {
 
     getUsername(){
       this.username = this.authService.getUsername()
+    }
+
+    closeMenu(){
+      this.trigger.closeMenu()
     }
 
 }

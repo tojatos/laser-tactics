@@ -60,3 +60,6 @@ export interface UserStats {
   winrate_as_p2: number,
   wins: number,
 }
+export interface Settings {
+  skip_animations: boolean
+}

@@ -1,9 +1,8 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatSort, Sort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forEach, sortBy } from 'lodash';
+import { sortBy } from 'lodash';
 import { Lobby } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import { LobbyService } from 'src/app/services/lobby.service';

@@ -1,5 +1,6 @@
+import datetime as dt
 from enum import Enum, auto
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, validator, EmailStr
 
@@ -20,6 +21,12 @@ class LobbyStatus(AutoNameEnum):
     ABANDONED = auto()
     GAME_STARTED = auto()
     GAME_ENDED = auto()
+
+
+class GameResult(AutoNameEnum):
+    PLAYER_ONE_WIN = auto()
+    PLAYER_TWO_WIN = auto()
+    DRAW = auto()
 
 
 class ChangePasswordSchema(BaseModel):
@@ -71,11 +78,40 @@ class VerificationTokenData(BaseModel):
 class User(UserBase):
     is_active: bool
     is_verified: bool
-
-    # rating: int
+    registration_date: dt.date
+    rating: int
 
     class Config:
         orm_mode = True
+
+
+class UserGet(BaseModel):
+    username: str
+    rating: int
+    registration_date: dt.date
+
+    class Config:
+        orm_mode = True
+
+
+class UserRating(BaseModel):
+    username: str
+    rating: int
+    rating_deviation: float
+    rating_volatility: float
+
+
+class GameHistoryEntry(BaseModel):
+    game_id: str
+    player_one_username: str
+    player_one_rating: int
+    player_one_deviation: float
+    player_two_username: str
+    player_two_rating: int
+    player_two_deviation: float
+    result: GameResult
+    game_end_date: dt.datetime
+    is_rated: bool
 
 
 class LobbyEditData(BaseModel):
@@ -127,3 +163,22 @@ class LobbyId(BaseModel):
 
 class FriendRequestId(BaseModel):
     id: str
+
+
+class Stats(BaseModel):
+    matches: int
+    wins: int
+    draws: int
+    loses: int
+    winrate: float
+    winrate_as_p1: float
+    winrate_as_p2: float
+    drawrate: float
+
+
+class Settings(BaseModel):
+    skip_animations: bool = False
+
+    class Config:
+        orm_mode = True
+
