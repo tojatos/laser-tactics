@@ -42,7 +42,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   get isPlayerOne(){
     return this.username == this.lobby?.player_one_username
   }
-  
+
   async changePlayers(){
     if (this.lobby && this.username== this.lobby.player_one_username) {
       this.lobby.starting_position_reversed = !this.lobby.starting_position_reversed
@@ -72,7 +72,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   async startGame() {
-    if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username && this.lobby.is_ranked) {
+    if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username) {
       await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, this.lobby.is_ranked)
       this.router.navigate(['/game', this.lobby.game_id])
     }
