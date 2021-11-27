@@ -1,0 +1,15 @@
+<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+    <div fxLayout="column" fxLayoutAlign="center center">
+        <a href="settings" mat-stroked-button color="accent"
+            >General settings</a>
+        <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
+        <a href="settings/password" mat-stroked-button color="accent">Password</a>
+    </div>
+    <div>
+        <mat-card class="box">
+            <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations
+            </mat-slide-toggle>
+        </mat-card>
+    </div>
+
+</div>

@@ -73,6 +73,7 @@ app.include_router(users.router, prefix=API_PREFIX)
 app.include_router(email.router, prefix=API_PREFIX)
 app.include_router(friends.router, prefix=API_PREFIX)
 app.include_router(lobby.router, prefix=API_PREFIX)
+app.include_router(game.router, prefix=API_PREFIX)
 app.add_api_websocket_route("/ws", websocket_endpoint)
 app.add_api_websocket_route("/lobby_ws", lobby_websocket_endpoint)
 

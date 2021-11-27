@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameComponent } from './game.component';
 import { BoardComponent } from './components/board/board.component';
-import { ChatComponent } from './components/chat/chat.component';
 import { Board } from './src/board';
 import { Resources } from './src/Display/Resources';
 import { EventsExecutor } from './src/eventsExecutor';
@@ -19,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from '../app-routing.module';
 
 @NgModule({
-  declarations: [GameComponent, BoardComponent, BoardActionsComponent, ChatComponent, BoardActionsComponent, BoardLogComponent],
+  declarations: [GameComponent, BoardComponent, BoardActionsComponent, BoardActionsComponent, BoardLogComponent],
   imports: [
     CommonModule,
     HttpClientModule,

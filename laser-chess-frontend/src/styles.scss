@@ -12,8 +12,9 @@ $custom-palette: (
 	50: #000000,
   	100: #217180,
   	200: #3b8ca5,
+	500: #4e4e4e,
+	400: #292929, 
 	  contrast: (
-    400: #292929, 
     500: #4a4b4b, 
     800: #f2fcff, 
     A400: #1c4f5c,
@@ -26,7 +27,7 @@ $custom-palette: (
 // hue. Available color palettes: https://material.io/design/color/
 $laser-chess-frontend-primary: mat-palette($custom-palette,100);
 $laser-chess-frontend-accent:  mat-palette($custom-palette,200);
-
+$laser-chess-frontend-contrast:  mat-palette($custom-palette,500);
 // The warn palette is optional (defaults to red).
 $laser-chess-frontend-warn: mat.define-palette(mat.$red-palette);
 
@@ -39,6 +40,7 @@ $laser-chess-frontend-theme: mat.define-light-theme((
     primary: $laser-chess-frontend-primary,
     accent: $laser-chess-frontend-accent,
     warn: $laser-chess-frontend-warn,
+	constrast: $laser-chess-frontend-contrast,
   
   background-color: mat-palette($custom-palette,50))
 ));
@@ -202,6 +204,11 @@ body {
 	border: 1px solid #103d53;
 }
 
+.mat-card-lobby-privacy {
+	cursor: pointer;
+}
+
+
 .start-game-button {
 	transform: scale(1.6);
 }
@@ -236,6 +243,33 @@ body {
   .menu {
 	border-radius: 0px;
 	margin-top: 13px;
+  }
+
+
+  input.input-box, textarea {
+	background: transparent;  
+	border-width:0px;
+	border:none;
+	color: rgb(255, 255, 255);
+ }
+ 
+ ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+	color: rgb(255, 255, 255);
+	opacity: 1; /* Firefox */
+  }
+  
+  ::-ms-input-placeholder { /* Microsoft Edge */
+	color: rgb(255, 255, 255);
+  }
+
+  mat-list {
+    flex-grow: 1;
+	max-height: 400px;
+    overflow: auto;
+}
+
+  .menu-hidden {
+	display: none;
   }
 
 

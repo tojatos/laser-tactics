@@ -1,9 +1,17 @@
-<mat-selection-list #userEvents [style.height.px]="maxHeight" (selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)" [multiple]="false">
+<h3>Game logs</h3>
+<mat-selection-list #userEvents [style.height.px]="maxHeight"
+(selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)"
+[multiple]="false">
   <mat-list-option *ngFor="let elem of notationList; let i = index" [value]="i">
     {{elem}}
   </mat-list-option>
 </mat-selection-list>
-<div class="btns">
-  <button mat-icon-button (click)="giveUp()"><mat-icon>cancel</mat-icon></button>
-  <button mat-icon-button (click)="draw()"><mat-icon>volunteer_activism</mat-icon></button>
+<div *ngIf="!isSpectator">
+<div class="btns" *ngIf="!gameFinished">
+  <button mat-icon-button matTooltip="Give up" (click)="giveUp()"><mat-icon>flag</mat-icon></button>
+  <button mat-icon-button matTooltip="Offer draw" (click)="draw()"><mat-icon>volunteer_activism</mat-icon></button>
+</div>
+<div class="btns" *ngIf="gameFinished">
+  <button mat-raised-button (click)="giveUp()">REMATCH</button>
+</div>
 </div>
