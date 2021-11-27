@@ -21,6 +21,7 @@ export const giveUpEndpoint = '/give_up'
 export const offerDrawEndpoint = '/offer_draw'
 export const authWebsocketEndpoint = '/ws_auth'
 export const observeWebsocketEndpoint = '/ws_observe'
+export const emailEndpoint = '/email'
 export const initialGameEndpoint = '/game/initial_game_state'
 
 export const usersFullEndpoint = fullEndpoint(userEndpoint)
@@ -41,4 +42,5 @@ export const gameFullEndpoint = (id: string  = "") => fullEndpoint(gameEndpoint,
 export const userFullEndpoint = (id: string  = "") => fullEndpoint(userEndpoint, id ? `/${id}` : '')
 export const giveUpFullEndpoint = fullEndpoint(giveUpEndpoint)
 export const offerDrawFullEndpoint = fullEndpoint(offerDrawEndpoint)
+export const emailFullEndpoint = (id: string  = "") => fullEndpoint(emailEndpoint, id ? `/${id}` : '')
 export const initalGameStateFullEndpoint = fullEndpoint(initialGameEndpoint)

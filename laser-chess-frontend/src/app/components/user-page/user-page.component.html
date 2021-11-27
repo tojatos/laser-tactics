@@ -1,3 +1,49 @@
-<div  *ngIf="user" class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-    <mat-card>{{user.username}}</mat-card>
+<div  class="main-wrapper" fxLayout="column" fxLayoutAlign="center center">
+    <mat-icon *ngIf="!isOwner" [matMenuTriggerFor]="user">more_vert</mat-icon>
+    <mat-menu class="menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
+        <button mat-menu-item *ngIf="!isInFriends" (click)="sendRequest(username!)">Send friend request</button>
+        <button mat-menu-item *ngIf="isInFriends" (click)="unfriend(username!)">Unfriend</button>
+        <button mat-menu-item *ngIf="!isInBlocked" (click)="blockUser(username!)">Block</button>
+        <button mat-menu-item *ngIf="isInBlocked" (click)="unblockUser(username!)">Unblock</button>
+    </mat-menu>
+    <mat-card>{{username}}</mat-card>
+    <mat-list *ngIf="isOwner">
+        <h3 matLine> Friend list </h3>
+        <mat-list-item *ngFor="let friend of friends">
+    
+            <button mat-button (click)="goToProfile(friend)"> {{friend}} </button>
+            <mat-icon [matMenuTriggerFor]="friends">more_vert</mat-icon>
+            <mat-menu class="menu" #friends="matMenu" xPosition="before" [overlapTrigger]="false">
+                <button mat-menu-item (click)="goToProfile(friend)">Profile</button>
+                <button mat-menu-item *ngIf="getIsInFriends(friend)" (click)="unfriend(friend)">Unfriend</button>
+                <button mat-menu-item *ngIf="!getIsInBlocked(friend)" (click)="blockUser(friend)">Block</button>
+                <button mat-menu-item *ngIf="getIsInBlocked(friend)" (click)="unblockUser(friend)">Unblock</button>
+            </mat-menu>
+        </mat-list-item>
+        <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+       
+            <mat-form-field class="example-full-width" appearance="fill">
+              <mat-label>Username</mat-label>
+              <input formControlName="input" matInput #box>
+        </mat-form-field>
+ 
+        <button mat-stroked-button color="accent" class="btn-block">Add friend</button>
+    </form>
+    </mat-list>
+    <mat-list *ngIf="isOwner">
+        <mat-list-item *ngFor="let request of friendsRequests">
+            <a matLine>{{request.user_one_username}}</a>
+            <button mat-list-item (click)="acceptFriendRequest(request.id)"> Accept </button>
+            <button mat-list-item (click)="declineFriendRequest(request.id)"> Decline </button>
+        </mat-list-item>
+    </mat-list>
+    <mat-list>
+        <mat-list-item>Drawrate: {{stats?.drawrate}}</mat-list-item>
+        <mat-list-item>Draws: {{stats?.draws}}</mat-list-item>
+        <mat-list-item>Loses: {{stats?.loses}}</mat-list-item>
+        <mat-list-item>Winrate: {{stats?.winrate}}</mat-list-item>
+        <mat-list-item>Winrate as player 1: {{stats?.winrate_as_p1}}</mat-list-item>
+        <mat-list-item>Winrate as player 2: {{stats?.winrate_as_p2}}</mat-list-item>
+        <mat-list-item>Wins: {{stats?.wins}}</mat-list-item>
+    </mat-list>
     </div>
