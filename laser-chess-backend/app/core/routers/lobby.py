@@ -75,6 +75,16 @@ async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User 
     return lobby
 
 
+@router.post("/join_random")
+async def join_random(joinrandom: schemas.JoinRandomRequest,
+                      current_user: schemas.User = Depends(get_current_active_user),
+                      db: Session = Depends(get_db)):
+    lobby = crud.get_random_lobby(joinrandom, db)
+    if lobby is None:
+        raise HTTPException(status_code=404, detail="No lobby with such parameters found")
+    return crud.join_lobby(db, current_user, lobby)
+
+
 @router.post(GameApiRequestPath.StartGame)
 async def start_game(request: StartGameRequest,
                      current_user: schemas.User = Depends(get_current_active_user),

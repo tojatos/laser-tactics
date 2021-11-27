@@ -23,7 +23,7 @@ def before_all():
     tu = TUtils(client, API_PREFIX)
 
     create_user_datas = list(
-        map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 2)))
+        map(lambda x: dict(username=f"test{x}", email=f"test{x}@example.com", password=f"test{x}"), range(0, 5)))
     tokens = list(map(lambda create_user_data: tu.post_create_user(create_user_data), create_user_datas))
     for user in create_user_datas:
         verify_user(session, user["username"])
@@ -224,3 +224,76 @@ def test_update_lobby_notexisting(tu):
     }
     response = tu.patch_data(f"/lobby/update", tokens[1], json=json)
     assert response.status_code == 404
+
+
+def test_join_lobby_random_unranked(tu):
+    response = tu.post_data("/lobby/create", tokens[1])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.post_data("/lobby/create", tokens[2])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.post_data("/lobby/create", tokens[3])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.post_data(f"/lobby/join_random", tokens[0],
+                            json={"is_rated": False, "rating_lower_bound": 0, "rating_higher_bound": 0})
+    assert response.status_code == 200
+    assert response.json()["player_two_username"] == "test0"
+
+
+def test_join_lobby_random_ranked(tu):
+    response = tu.post_data("/lobby/create", tokens[1])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.patch_data("/lobby/update", tokens[1],
+                             json={
+                                 "game_id": response.json()["game_id"],
+                                 "name": response.json()["name"],
+                                 "player_one_username": response.json()["player_one_username"],
+                                 "is_ranked": True,
+                                 "is_private": response.json()["is_private"],
+                                 "starting_position_reversed": response.json()["starting_position_reversed"]
+                             }
+                             )
+    assert response.status_code == 200
+
+    response = tu.post_data("/lobby/create", tokens[2])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.patch_data("/lobby/update", tokens[2],
+                             json={
+                                 "game_id": response.json()["game_id"],
+                                 "name": response.json()["name"],
+                                 "player_one_username": response.json()["player_one_username"],
+                                 "is_ranked": True,
+                                 "is_private": response.json()["is_private"],
+                                 "starting_position_reversed": response.json()["starting_position_reversed"]
+                             })
+    assert response.status_code == 200
+
+    response = tu.post_data("/lobby/create", tokens[3])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+    response = tu.patch_data("/lobby/update", tokens[3],
+                             json={
+                                 "game_id": response.json()["game_id"],
+                                 "name": response.json()["name"],
+                                 "player_one_username": response.json()["player_one_username"],
+                                 "is_ranked": True,
+                                 "is_private": response.json()["is_private"],
+                                 "starting_position_reversed": response.json()["starting_position_reversed"]
+                             }
+                             )
+    assert response.status_code == 200
+
+    response = tu.post_data(f"/lobby/join_random", tokens[0],
+                            json={"is_rated": True, "rating_lower_bound": 1400, "rating_higher_bound": 1600})
+    assert response.status_code == 200
+    assert response.json()["player_two_username"] == "test0"
