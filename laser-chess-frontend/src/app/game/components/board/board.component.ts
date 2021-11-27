@@ -29,7 +29,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   constructor(private route: ActivatedRoute, private userService: UserService, public game: Game) {}
 
   async ngAfterViewInit() {
-    this.animation = (await this.userService.getSettings().toPromise()).skip_animations
+    this.animation = !(await this.userService.getSettings().toPromise()).skip_animations
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
       alert("Couldn't load context")
