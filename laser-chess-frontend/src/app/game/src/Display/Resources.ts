@@ -12,15 +12,22 @@ export class Resources {
 
   boardImage: HTMLImageElement = new Image()
   pieceImages: Map<string, HTMLImageElement> = new Map()
+  bruh: HTMLAudioElement = new Audio()
 
   constructor(){ }
 
   async loadAssets(){
     await this.loadBoardImage()
-    await this.loadPiecesImages()  }
+    await this.loadPiecesImages()
+    await this.loadSounds()
+   }
 
   private async loadBoardImage(){
-    await this.loadImage(this.boardImage, "assets/board.svg")
+    await this.loadElement(this.boardImage, "assets/board.svg")
+  }
+
+  private async loadSounds(){
+    this.bruh.src = "assets/sounds/bruh.mp3"
   }
 
   private async loadPiecesImages(){
@@ -52,14 +59,14 @@ export class Resources {
 
     const image = new Image()
 
-    await this.loadImage(image, `assets/${name + color}.svg`)
+    await this.loadElement(image, `assets/${name + color}.svg`)
     this.pieceImages.set(JSON.stringify(newImage), image)
   }
 
-  loadImage(image: HTMLImageElement, source: string){
+  loadElement(elem: any, source: string){
     return new Promise<void>(resolve => {
-      image.onload = () => resolve();
-      image.src = source
+      elem.onload = () => resolve();
+      elem.src = source
     })
   }
 

@@ -18,6 +18,8 @@ export class Animations {
         const origin = board.getCellByCoordinates(originCoordinates.x, originCoordinates.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
 
+        canvas.resources.bruh.play()
+
         const pieceRef = origin?.auxiliaryPiece || origin?.piece
         const piece = cloneDeep(pieceRef)
 
