@@ -22,16 +22,16 @@
     </div>
     <div class="main-wrapper" fxFlex="20" fxFlexAlign="stretch" fxLayoutGap="30px" fxLayout="column"
         fxLayoutAlign="start center">
-        <button mat-stroked-button disabled="!isPlayerOne" (click)="changePlayers()"> Change players </button>
+        <button mat-stroked-button [disabled]="!isPlayerOne" (click)="changePlayers()"> Change players </button>
     </div>
     <div class="main-wrapper" fxFlexAlign="center" fxFlex="20" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
         <mat-card class="mat-card-lobby"> {{isRanked}} </mat-card>
         <mat-card>
-            <button mat-button disabled="!isPlayerOne" (click)="changePrivacy()">{{isPrivate}}</button>
+            <button mat-button [disabled]="!isPlayerOne" (click)="changePrivacy()">{{isPrivate}}</button>
              </mat-card>
     </div>
     <div class="main-wrapper" fxFlex="30" sfxLayout="column" fxLayoutAlign="center start">
-        <button mat-stroked-button disabled="!isPlayerOne" color="accent" class="start-game-button" (click)="startGame()"> Start game </button>
+        <button mat-stroked-button [disabled]="!isPlayerOne" color="accent" class="start-game-button" (click)="startGame()"> Start game </button>
     </div>
 
 </div>

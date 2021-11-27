@@ -42,6 +42,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   get isPlayerOne(){
     return this.username == this.lobby?.player_one_username
   }
+  
   async changePlayers(){
     if (this.lobby && this.username== this.lobby.player_one_username) {
       this.lobby.starting_position_reversed = !this.lobby.starting_position_reversed
