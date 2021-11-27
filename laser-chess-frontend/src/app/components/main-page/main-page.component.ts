@@ -21,6 +21,7 @@ export class MainPageComponent implements OnInit {
   fetched = false
   lobby: any
   ranked = false
+  verified = false
   user: User | undefined
   public lobbies: Lobby[] | undefined
   displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
@@ -36,6 +37,12 @@ export class MainPageComponent implements OnInit {
         ), 
       ['id']).slice(-8)
     this.fetched = true
+    this.userService.getUserMe().then(userData =>{
+      this.user = userData
+      this.verified = this.user.is_verified!
+    })
+    
+    console.log(this.verified)
   }
 
   openLobby(lobby: Lobby) {
@@ -56,10 +63,12 @@ export class MainPageComponent implements OnInit {
       return 'Casual'
     }
   }
-  get verified(){
-    // this.user = this.userService.getUserMe()
-    // if (this.user.)
-    return false
+  getVerified(){
+    this.userService.getUserMe().then(userData =>{
+      this.user = userData
+      console.log(this.user)
+    })
+    return this.user?.is_verified
   }
 
   async refreshList(){
