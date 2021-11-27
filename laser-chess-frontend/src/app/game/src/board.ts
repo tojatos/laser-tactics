@@ -143,30 +143,6 @@ export class Board implements BoardInterface {
       this.initBoard(gameState, blockSize)
   }
 
-  serialize(): GameState{
-    const boardInterface: BoardInterface = {cells: new Array<CellInterface>()}
-
-    for (const cell of this.cells){
-      const piece: PieceInterface | null = cell.piece?.serialize() || null
-      const auxiliaryPiece: PieceInterface | null = cell.auxiliaryPiece?.serialize() || null
-      boardInterface.cells.push({coordinates: cell.coordinates, piece: piece, auxiliaryPiece: auxiliaryPiece})
-    }
-
-    const gameStateSerialized: GameState = {
-      game_id: this.gameId || "unknown",
-      player_one_id: this.playerOne || PlayerType.NONE,
-      player_two_id: this.playerTwo || PlayerType.NONE,
-      board: boardInterface,
-      game_phase: GamePhase.STARTED,
-      turn_number: this.currentTurn,
-      game_events: [],
-      user_events: []
-    }
-
-    return gameStateSerialized
-
-  }
-
   removePiece(at: Coordinates) {
     const cell = this.getCellByCoordinates(at.x, at.y)
     if(cell?.piece)
