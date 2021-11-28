@@ -25,6 +25,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly placeForGameLogSize = 1.35
   readonly minWidth = 695
   animation = true
+  sounds = true
 
   constructor(private route: ActivatedRoute, private userService: UserService, public game: Game) {}
 
@@ -41,7 +42,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
         this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
         params.id,
         this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
-        this.animation)
+        this.animation, this.sounds)
     })
   }
 
@@ -59,6 +60,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     this.game.changeAnimationsShowOption(this.animation)
   }
 
+  changeSoundOption(){
+    this.game.changeSoundOption(this.sounds)
+  }
+
   buttonPressEvent(event: string){
     switch(event){
       case "left": this.game.passRotation(-90); break
@@ -68,8 +73,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  buildEvent(gameEvents: GameEvent[]){
-    this.game.showGameEvent(gameEvents)
+  buildEvent(gameEvents: GameEvent[], ){
+    this.game.showGameEvent(gameEvents, this.sounds)
   }
 
   returnToCurrentEvent(){

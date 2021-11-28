@@ -10,13 +10,13 @@ import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
 import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
 import { GameActions } from "./GameActions"
-import { EventsColors } from "../../enums"
 
 export class GameCanvas extends Canvas {
 
     hoveredCell: Cell | undefined
     mediator: GameMediator | undefined
     showAnimations: boolean = true
+    enableSounds: boolean = true
 
     constructor(gameService: GameWebsocketService,
       authService: AuthService,
@@ -70,7 +70,7 @@ export class GameCanvas extends Canvas {
       this.interactable = false
       this.drawings.drawGame(this, board.cells, this.isReversed)
       if(board.selectedCell && selectedCell && this.mediator?.currentRotation == 0){
-        await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
+        await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations, this.enableSounds)
         this.gameService.increaseAnimationEvents()
         board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
         board.currentTurn++
@@ -114,7 +114,7 @@ export class GameCanvas extends Canvas {
 
       if(selectedCell){
         this.interactable = false
-        await this.animations.rotatePiece(this, board, selectedCell, degree, this.isReversed, this.showAnimations, initialRotationDifference)
+        await this.animations.rotatePiece(this, board, selectedCell, degree, this.isReversed, this.showAnimations, this.enableSounds, initialRotationDifference)
         this.interactable = true
       }
 
@@ -149,8 +149,8 @@ export class GameCanvas extends Canvas {
       board.unselectCell()
     }
 
-    private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean): Promise<void>{
-      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, this.isReversed, showAnimations)
+    private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean, enableSounds: boolean): Promise<void>{
+      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, this.isReversed, showAnimations, enableSounds)
     }
 
 }

@@ -27,6 +27,7 @@ export class Game{
   gameId: string | undefined
   sizeScale: number = 0
   showAnimations: boolean = true
+  enableSounds: boolean = true
   executingActions = false
   isInitiated = false
   analyzeMode = analizeModes.NOT_ANALYZING
@@ -62,12 +63,13 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean){
     this.sizeScale = sizeScale
     this.gameId = gameId
     this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
     this.showAnimations = animations
+    this.enableSounds = sounds
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.gameCanvas.showAnimations = this.showAnimations
     this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
@@ -123,6 +125,13 @@ export class Game{
     }
   }
 
+  changeSoundOption(sounds: boolean){
+    if(this.gameCanvas){
+      this.enableSounds = sounds
+      this.gameCanvas.enableSounds = this.enableSounds
+    }
+  }
+
   loadConcreteGameState(gameState: GameState){
     if(this.gameCanvas){
       this.board.initBoard(gameState, this.displaySize)
@@ -146,7 +155,7 @@ export class Game{
       this.executingActions = true
       const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
       if(animationsToShow > 0)
-        await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
+        await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations, this.enableSounds)
 
       this.board.currentTurn = newGameState.turn_number
 
@@ -190,17 +199,17 @@ export class Game{
     this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
-  async showGameEvent(gameEvents: GameEvent[]){
+  async showGameEvent(gameEvents: GameEvent[], enableSounds: boolean){
     if(this.gameCanvas){
       this.analyzeMode = analizeModes.ANALYZING
       this.gameCanvas.interactable = false
       this.board.setInitialGameState(this.initialGameState, this.displaySize)
-      await this.executePendingActions(gameEvents, gameEvents.length, false, false)
+      await this.executePendingActions(gameEvents, gameEvents.length, false, false, false)
       if(gameEvents.slice(-1)[0].event_type == GameEvents.LASER_SHOT_EVENT || gameEvents.slice(-1)[0].event_type == GameEvents.PIECE_DESTROYED_EVENT)
         for(let i = gameEvents.length-1; i > 0; i--)
           if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){
             this.eventsExecutor.addEventsToExecute(gameEvents.slice(i, gameEvents.length))
-            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, true, 999999)
+            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, enableSounds, true, 999999)
             this.eventsExecutor.eventsQueue = []
             i = -1
           }
@@ -214,11 +223,11 @@ export class Game{
     }
   }
 
-  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, showLaser: boolean = true){
+  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean = true){
     if(this.gameCanvas){
       this.gameCanvas.interactable = false
       this.eventsExecutor.addEventsToExecute(events.slice(-animationsToShow))
-      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, showLaser)
+      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, enableSounds, showLaser)
     }
   }
 
