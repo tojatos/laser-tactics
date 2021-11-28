@@ -10,7 +10,6 @@ import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
 import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
 import { GameActions } from "./GameActions"
-import { EventsColors } from "../../enums"
 
 export class GameCanvas extends Canvas {
 
@@ -73,7 +72,6 @@ export class GameCanvas extends Canvas {
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
         this.gameService.increaseAnimationEvents()
         board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
-        board.currentTurn++
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
         if(board.isMyTurn())
           this.interactable = true

@@ -138,6 +138,8 @@ export class Game{
       const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
       if(animationsToShow > 0)
         await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
+      else
+        this.loadConcreteGameState(newGameState)
 
       this.board.currentTurn = newGameState.turn_number
 

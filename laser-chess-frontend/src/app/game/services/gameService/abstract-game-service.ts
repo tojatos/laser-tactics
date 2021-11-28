@@ -21,12 +21,12 @@ export abstract class AbstractGameService {
     localStorage.setItem("animationEvents", num.toString())
   }
 
-  get numOfAnimationEvents(){
+  numOfAnimationEvents(){
     return parseInt(localStorage.getItem("animationEvents") || "0")
   }
 
   animationsToShow(totalNumOfAnimations: number){
-    return totalNumOfAnimations - this.numOfAnimationEvents
+    return totalNumOfAnimations - this.numOfAnimationEvents()
   }
 
 }

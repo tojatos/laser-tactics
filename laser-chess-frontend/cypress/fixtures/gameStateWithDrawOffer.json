@@ -8,21 +8,33 @@
           "x": 0,
           "y": 0
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
           "x": 1,
           "y": 0
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
           "x": 2,
           "y": 0
         },
-        "piece": null
+        "piece": {
+          "piece_type": "HYPER_CUBE",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
@@ -36,7 +48,11 @@
           "x": 4,
           "y": 0
         },
-        "piece": null
+        "piece": {
+          "piece_type": "KING",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
@@ -54,240 +70,279 @@
           "x": 6,
           "y": 0
         },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 7,
-          "y": 0
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 8,
-          "y": 0
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 0,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 1,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 2,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 3,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 4,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 5,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 6,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 7,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 8,
-          "y": 1
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 0,
-          "y": 2
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 1,
-          "y": 2
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 2,
-          "y": 2
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 3,
-          "y": 2
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 4,
-          "y": 2
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 5,
-          "y": 2
-        },
         "piece": {
-          "piece_type": "HYPER_CUBE",
+          "piece_type": "DIAGONAL_MIRROR",
           "piece_owner": "PLAYER_ONE",
-          "rotation_degree": 0
+          "rotation_degree": 90
         }
       },
       {
         "coordinates": {
-          "x": 6,
-          "y": 2
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
           "x": 7,
-          "y": 2
+          "y": 0
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 270
+        }
       },
       {
         "coordinates": {
           "x": 8,
-          "y": 2
+          "y": 0
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 270
+        }
       },
       {
         "coordinates": {
           "x": 0,
-          "y": 3
+          "y": 1
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 270
+        }
       },
       {
         "coordinates": {
           "x": 1,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 2,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 3,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 4,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 5,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 6,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 7,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 8,
-          "y": 3
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 0,
-          "y": 4
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 1,
-          "y": 4
-        },
-        "piece": null
-      },
-      {
-        "coordinates": {
-          "x": 2,
-          "y": 4
+          "y": 1
         },
         "piece": {
           "piece_type": "BLOCK",
           "piece_owner": "PLAYER_ONE",
           "rotation_degree": 0
         }
-
+      },
+      {
+        "coordinates": {
+          "x": 2,
+          "y": 1
+        },
+        "piece": {
+          "piece_type": "BLOCK",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
+      },
+      {
+        "coordinates": {
+          "x": 3,
+          "y": 1
+        },
+        "piece": {
+          "piece_type": "MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 90
+        }
+      },
+      {
+        "coordinates": {
+          "x": 4,
+          "y": 1
+        },
+        "piece": {
+          "piece_type": "MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
+      },
+      {
+        "coordinates": {
+          "x": 5,
+          "y": 1
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 6,
+          "y": 1
+        },
+        "piece": {
+          "piece_type": "BLOCK",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
+      },
+      {
+        "coordinates": {
+          "x": 7,
+          "y": 1
+        },
+        "piece": {
+          "piece_type": "BLOCK",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
+      },
+      {
+        "coordinates": {
+          "x": 8,
+          "y": 1
+        },
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
+      },
+      {
+        "coordinates": {
+          "x": 0,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 1,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 2,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 3,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 4,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 5,
+          "y": 2
+        },
+        "piece": {
+          "piece_type": "BEAM_SPLITTER",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 90
+        }
+      },
+      {
+        "coordinates": {
+          "x": 6,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 7,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 8,
+          "y": 2
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 0,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 1,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 2,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 3,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 4,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 5,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 6,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 7,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 8,
+          "y": 3
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 0,
+          "y": 4
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 1,
+          "y": 4
+        },
+        "piece": null
+      },
+      {
+        "coordinates": {
+          "x": 2,
+          "y": 4
+        },
+        "piece": null
       },
       {
         "coordinates": {
@@ -301,7 +356,11 @@
           "x": 4,
           "y": 4
         },
-        "piece": null
+        "piece": {
+          "piece_type": "HYPER_SQUARE",
+          "piece_owner": "NONE",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
@@ -371,7 +430,11 @@
           "x": 5,
           "y": 5
         },
-        "piece": null
+        "piece": {
+          "piece_type": "DIAGONAL_MIRROR",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
@@ -462,131 +525,291 @@
           "x": 0,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 1,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "BLOCK",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 2,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "BLOCK",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 3,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "BEAM_SPLITTER",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 4,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
           "x": 5,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 90
+        }
       },
       {
         "coordinates": {
           "x": 6,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "BLOCK",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 7,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "BLOCK",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 8,
           "y": 7
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 90
+        }
       },
       {
         "coordinates": {
           "x": 0,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 90
+        }
       },
       {
         "coordinates": {
           "x": 1,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 90
+        }
       },
       {
         "coordinates": {
           "x": 2,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "DIAGONAL_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 90
+        }
       },
       {
         "coordinates": {
           "x": 3,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "LASER",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 4,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "KING",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
           "x": 5,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "HYPER_CUBE",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
           "x": 6,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "DIAGONAL_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 0
+        }
       },
       {
         "coordinates": {
           "x": 7,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       },
       {
         "coordinates": {
           "x": 8,
           "y": 8
         },
-        "piece": null
+        "piece": {
+          "piece_type": "TRIANGULAR_MIRROR",
+          "piece_owner": "PLAYER_TWO",
+          "rotation_degree": 180
+        }
       }
     ]
   },
   "game_phase": "STARTED",
-  "turn_number": 1,
-  "game_events": [],
-  "user_events": []
+  "turn_number": 4,
+  "game_events": [
+    {
+      "moved_from": {
+          "x": 5,
+          "y": 1
+      },
+      "moved_to": {
+          "x": 5,
+          "y": 2
+      },
+      "event_type": "PIECE_MOVED_EVENT"
+    },
+    {
+      "rotated_piece_at": {
+        "x": 5,
+        "y": 2
+      },
+      "rotation": 90,
+      "event_type": "PIECE_ROTATED_EVENT"
+    },
+    {
+      "moved_from": {
+          "x": 3,
+          "y": 0
+      },
+      "moved_to": {
+          "x": 2,
+          "y": 0
+      },
+      "event_type": "PIECE_MOVED_EVENT"
+    },
+    {
+      "teleported_from": {
+          "x": 2,
+          "y": 0
+      },
+      "teleported_to": {
+          "x": 5,
+          "y": 5
+      },
+      "teleported_by": {
+          "piece_type": "HYPER_CUBE",
+          "piece_owner": "PLAYER_ONE",
+          "rotation_degree": 0
+      },
+      "event_type": "TELEPORT_EVENT"
+  },
+  {
+    "player": "PLAYER_TWO",
+    "turn_number": 4,
+    "event_type": "OFFER_DRAW_EVENT"
+  }
+  ],
+  "user_events": [
+    {
+      "moved_from": {
+          "x": 5,
+          "y": 1
+      },
+      "moved_to": {
+          "x": 5,
+          "y": 2
+      },
+      "event_type": "PIECE_MOVED_EVENT"
+    },
+    {
+      "rotated_piece_at": {
+        "x": 5,
+        "y": 2
+      },
+      "rotation": 90,
+      "event_type": "PIECE_ROTATED_EVENT"
+    },
+    {
+      "moved_from": {
+        "x": 3,
+        "y": 0
+      },
+      "moved_to": {
+        "x": 2,
+        "y": 0
+      },
+      "event_type": "PIECE_MOVED_EVENT"
+    },
+    {
+      "player": "PLAYER_TWO",
+      "turn_number": 4,
+      "event_type": "OFFER_DRAW_EVENT"
+    }
+  ]
 }
