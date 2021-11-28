@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { clone, groupBy, values } from "lodash";
+import { groupBy, values } from "lodash";
 import { AuthService } from "src/app/auth/auth.service";
 import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
 import { GameWebsocketService } from "../services/gameService/game-websocket.service";
@@ -30,13 +30,13 @@ export class EventsExecutor{
     async executeEventsQueue(canvas: Canvas, board: Board, showAnimations: boolean = true, showLaser: boolean = true, timeout: number = this.eventsExecutionTimeout){
       for (const event of this.eventsQueue.filter(e => e.event_type != GameEvents.PIECE_DESTROYED_EVENT)){
         if(event){
-          if(showAnimations && !document.hidden)
-            await new Promise(resolve => setTimeout(resolve, timeout))
           await this.getAnimationToExecute(canvas, board, event, this.eventsQueue.indexOf(event), document.hidden ? false : showAnimations, showLaser)
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
           if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum && board.isPlayer(this.authService.getUsername()))
             this.gameService.showDrawOffer(board.gameId!)
+          if(showAnimations && !document.hidden)
+            await new Promise(resolve => setTimeout(resolve, timeout))
         }
       }
       this.eventsQueue = []

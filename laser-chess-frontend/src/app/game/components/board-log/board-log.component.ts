@@ -22,7 +22,6 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   @Output() gameReturnEmitter = new EventEmitter()
   @Output() giveUpEmitter = new EventEmitter()
   @Output() drawEmitter = new EventEmitter()
-  @Output() rematchEmitter = new EventEmitter()
 
   notationList: string[] = []
   validGameState: GameState | undefined
@@ -116,10 +115,6 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
 
   draw(){
     this.drawEmitter.emit()
-  }
-
-  rematch(){
-    this.rematchEmitter.emit()
   }
 
   isUserEvent(gameEvent: GameEvent | undefined){
