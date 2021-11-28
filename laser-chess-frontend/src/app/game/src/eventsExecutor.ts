@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { groupBy, values } from "lodash";
 import { AuthService } from "src/app/auth/auth.service";
 import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
-import { GameWebsocketService } from "../services/gameService/game-websocket.service";
+import { GameWebsocketService } from "../services/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
 import { Canvas } from "./Display/Canvas/AbstractCanvas";

@@ -1,5 +1,5 @@
 import { AuthService } from "src/app/auth/auth.service"
-import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
+import { GameWebsocketService } from "src/app/game/services/game.service"
 import { COLS, ROWS } from "../../constants"
 import { Animations } from "../Animations"
 import { Drawings } from "../Drawings"

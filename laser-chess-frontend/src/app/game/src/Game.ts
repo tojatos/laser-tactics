@@ -3,7 +3,7 @@ import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { UserService } from "src/app/services/user.service";
 import { GameEvent, GameState, LaserShotEvent } from "../game.models";
-import { GameWebsocketService } from "../services/gameService/game-websocket.service";
+import { GameWebsocketService } from "../services/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
 import { GameActions } from "./Display/Canvas/GameActions";
@@ -35,6 +35,7 @@ export class Game{
   whoseTurn: PlayerType = PlayerType.NONE
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
   playerRankings: [number, number] = [0, 0]
+  playerRankingsChanges : [number | undefined, number | undefined] = [undefined, undefined]
   initialGameState!: GameState
 
   constructor(public gameService: GameWebsocketService,
@@ -106,6 +107,8 @@ export class Game{
       const p1 = await this.userService.getUserByUsername(this.playerNames[0]!)
       const p2 = await this.userService.getUserByUsername(this.playerNames[1]!)
 
+      await this.gameRankingChanges(receivedGameState)
+
       this.playerRankings[0] = p1.rating
       this.playerRankings[1] = p2.rating
     }
@@ -165,8 +168,28 @@ export class Game{
 
       this.executingActions = false
 
+      await this.gameRankingChanges(newGameState)
+
       if(this.gameService.lastMessage?.game_events && this.gameService.lastMessage != newGameState)
         this.refreshGameState(this.gameService.lastMessage)
+    }
+  }
+
+  async gameRankingChanges(gameState: GameState){
+    if(gameState.game_phase != GamePhase.NOT_STARTED && gameState.game_phase != GamePhase.STARTED){
+      const info = await this.gameService.getGameInfo(this.gameId!)
+      if(info.player_one_rating && info.player_one_new_rating && info.player_two_rating && info.player_two_new_rating){
+        const newRating1 = info.player_one_rating - info.player_one_new_rating
+        const newRating2 = info.player_two_rating - info.player_two_new_rating
+        if(info.player_one_username == this.playerNames[0]){
+          this.playerRankingsChanges[0] = newRating1
+          this.playerRankingsChanges[1] = newRating2
+        }
+        else if(info.player_two_username == this.playerNames[0]){
+          this.playerRankingsChanges[1] = newRating1
+          this.playerRankingsChanges[0] = newRating2
+        }
+      }
     }
   }
 
@@ -239,9 +262,6 @@ export class Game{
   offerDraw(){
     if(this.gameId)
       this.gameService.offerDraw(this.gameId)
-  }
-
-  async rematch(){
   }
 
   passRotation(degree: number){

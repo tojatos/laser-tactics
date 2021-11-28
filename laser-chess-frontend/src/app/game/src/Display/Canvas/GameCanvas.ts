@@ -8,7 +8,7 @@ import { Resources } from "../Resources"
 import { Canvas } from "./AbstractCanvas"
 import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
-import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
+import { GameWebsocketService } from "src/app/game/services/game.service"
 import { GameActions } from "./GameActions"
 
 export class GameCanvas extends Canvas {

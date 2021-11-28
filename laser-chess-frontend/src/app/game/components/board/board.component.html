@@ -15,14 +15,24 @@
       <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()"><mat-icon>flag</mat-icon></button>
       <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()"><mat-icon>volunteer_activism</mat-icon></button>
     </div>
-    <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[1]]">{{game.playerNames[1]}}</a></i> ({{game.playerRankings[1]}})</h3>
+    <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[1]]">{{game.playerNames[1]}}</a></i>
+      ({{game.playerRankings[1]}})
+      <span *ngIf="game.playerRankingsChanges[1]" [ngStyle]="{'color': game.playerRankingsChanges[1] < 0 ? 'red' : 'green'}">
+        {{game.playerRankingsChanges[1] < 0 ? "▼" + -game.playerRankingsChanges[1] : "▲" + game.playerRankingsChanges[0]}}
+      </span>
+    </h3>
   </div>
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
   <canvas #canvas class="gameCanvas"></canvas>
 </div>
 <div class="boardText">
   <p></p>
-<h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[0]]">{{game.playerNames[0]}}</a></i> ({{game.playerRankings[0]}})</h3>
+<h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[0]]">{{game.playerNames[0]}}</a></i>
+  ({{game.playerRankings[0]}})
+  <span *ngIf="game.playerRankingsChanges[0]" [ngStyle]="{'color': game.playerRankingsChanges[0] < 0 ? 'red' : 'green'}">
+    {{game.playerRankingsChanges[0] < 0 ? "▼" + -game.playerRankingsChanges[0] : "▲" + game.playerRankingsChanges[0]}}
+  </span>
+</h3>
 </div>
 <div *ngIf="this.game.isInitiated">
 <app-board-actions
