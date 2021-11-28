@@ -232,7 +232,7 @@ export class Game{
         for(let i = gameEvents.length-1; i > 0; i--)
           if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){
             this.eventsExecutor.addEventsToExecute(gameEvents.slice(i, gameEvents.length))
-            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, enableSounds, true, 999999)
+            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, false, true, 999999)
             this.eventsExecutor.eventsQueue = []
             i = -1
           }
