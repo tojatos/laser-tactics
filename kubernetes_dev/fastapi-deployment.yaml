@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: E:\bin\kompose.exe convert -f .\docker-compose.yml
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: fastapi
+  name: fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: fastapi
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: E:\bin\kompose.exe convert -f .\docker-compose.yml
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: fastapi
+    spec:
+      containers:
+        - args:
+            - python
+            - -m
+            - app.main
+          env:
+            - name: HOST
+              value: 0.0.0.0
+            - name: PORT
+              value: "80"
+            - name: ROOT_PATH
+            - name: SQLALCHEMY_DATABASE_URL
+              value: postgresql://postgres:admin@db:5432/laserchess
+          image: tojatos/laser-tactics-backend-dev
+          name: fastapi
+          ports:
+            - containerPort: 80
+          resources: {}
+      restartPolicy: Always
+status: {}
