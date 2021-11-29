@@ -259,8 +259,8 @@ def test_give_up_p1(ws, tu):
     game_state = get_game_state(ws)
     assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
 
-    response = tu.get_data("/users/test0/history")
-    record = response.json()[0]
+    response = tu.get_data(f"/game/history/{game_id}")
+    record = response.json()
     assert record["player_one_username"] == "test0"
     assert record["player_one_rating"] == 1500
     assert record["player_one_deviation"] == 200
@@ -280,8 +280,8 @@ def test_give_up_p2(ws, tu):
     game_state = get_game_state(ws)
     assert game_state.game_phase is GamePhase.PLAYER_ONE_VICTORY
 
-    response = tu.get_data("/users/test0/history")
-    record = response.json()[0]
+    response = tu.get_data(f"/game/history/{game_id}")
+    record = response.json()
     assert record["player_one_username"] == "test0"
     assert record["player_one_rating"] == 1500
     assert record["player_one_deviation"] == 200

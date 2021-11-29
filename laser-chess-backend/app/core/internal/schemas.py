@@ -135,14 +135,19 @@ class GameHistoryEntry(BaseModel):
     player_one_username: str
     player_one_rating: int
     player_one_deviation: float
+    player_one_volatility: float
     player_two_username: str
     player_two_rating: int
     player_two_deviation: float
+    player_two_volatility: float
     result: GameResult
     game_end_date: dt.datetime
     is_rated: bool
     player_one_new_rating: int
     player_two_new_rating: int
+
+    class Config:
+        orm_mode = True
 
 
 class LobbyEditData(BaseModel):
