@@ -254,6 +254,7 @@ class Stats(BaseModel):
 
 class Settings(BaseModel):
     skip_animations: bool = False
+    sound_on: bool = True
 
     class Config:
         orm_mode = True

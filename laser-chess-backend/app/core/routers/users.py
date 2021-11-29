@@ -81,14 +81,12 @@ def read_user(username: str, db: Session = Depends(get_db)):
     return db_user
 
 
-# TODO: test
 @router.get("/me/blocked")
 async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return crud.get_blocked_users(user=current_user, db=db)
 
 
-# TODO: test
 @router.post("/me/block")
 async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
@@ -130,7 +128,6 @@ def change_password(change_password_schema: schemas.ChangePasswordSchema,
     return crud.change_password(user=current_user, new_password=change_password_schema.newPassword, db=db)
 
 
-# TODO: test
 @router.get("/{username}/history")
 def get_users_game_history(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)

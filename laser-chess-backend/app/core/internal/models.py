@@ -87,4 +87,5 @@ class UserSettings(Base):
 
     username = Column(String, primary_key=True)
     skip_animations = Column(Boolean, default=False)
+    sound_on = Column(Boolean, default=True)
 
