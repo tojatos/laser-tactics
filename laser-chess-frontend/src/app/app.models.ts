@@ -63,6 +63,7 @@ export interface UserStats {
 }
 export interface Settings {
   skip_animations: boolean
+  sound_on: boolean
 }
 
 export interface UserHistory {
