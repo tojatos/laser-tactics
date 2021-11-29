@@ -27,13 +27,34 @@ for line in USER_CREDENTIALS:
     })
 """
 
+# tokens
+tokens = []
+
+# get tokens
+for username, email, password in USER_CREDENTIALS:
+    user_exists = requests.get(f"http://localhost/api/v1/users/{username}").status_code == 200
+    if not user_exists:
+        logging.info(f"Creating user {username}")
+        response = requests.post("http://localhost/api/v1/users", json={
+            "username": username, "email": email, "password": password
+        })
+        assert response.status_code == 200
+    logging.info(f"Login with {username} username and {password} password")
+
+    response = requests.post("http://localhost/api/v1/token",
+                             headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                             data={"username": username, "password": password})
+    assert response.status_code == 200
+    token = response.json()['access_token']
+    tokens.append(token)
+
 
 # this one is kinda useless
 class RegisterWithUniqueUsersSteps(TaskSet):
 
     def on_start(self):
         if len(USER_CREDENTIALS) > 0:
-            self.username, self.email, self.password = USER_CREDENTIALS.pop()
+            self.username, self.email, self.password = choice(USER_CREDENTIALS)
 
     @task
     def register(self):
@@ -50,13 +71,9 @@ class FriendsModule(TaskSet):
 
     def on_start(self):
         if len(USER_CREDENTIALS) > 0:
-            self.username, self.email, self.password = USER_CREDENTIALS.pop()
+            self.username, self.email, self.password = choice(USER_CREDENTIALS)
             logging.info('Login with %s username and %s password', self.username, self.password)
-            with self.client.post("/token",
-                                  headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                                  data={"username": self.username, "password": self.password
-                                        }) as response:
-                self.token = response.json()['access_token']
+            self.token = choice(tokens)
 
     @task(10)
     def get_friends(self):
@@ -115,7 +132,7 @@ class LoginWithUniqueUsersSteps(TaskSet):
 
     def on_start(self):
         if len(USER_CREDENTIALS) > 0:
-            self.username, self.email, self.password = USER_CREDENTIALS.pop()
+            self.username, self.email, self.password = choice(USER_CREDENTIALS)
 
     @task
     def login(self):
@@ -133,6 +150,7 @@ class LoginWithUniqueUsersSteps(TaskSet):
             except KeyError:
                 response.failure("Response did not contain expected key 'access_token'")
 
+
 """
 class LoginWithUniqueUsersTest(HttpUser):
     wait_time = between(1, 5)
@@ -140,6 +158,7 @@ class LoginWithUniqueUsersTest(HttpUser):
     host = "http://localhost/api/v1"
     sock = None
 """
+
 
 class FriendsTest(HttpUser):
     wait_time = between(1, 5)
@@ -156,7 +175,7 @@ class RegisterWithUniqueUsersTest(HttpUser):
     sock = None
 """
 
-"""
+
 class LaserTacticsGuestUser(HttpUser):
     @task
     def users(self):
@@ -166,4 +185,37 @@ class LaserTacticsGuestUser(HttpUser):
     def lobby(self):
         self.client.get("/lobby?skip=0&limit=100")
 
+    """
+    @task
+    def history(self):
+        username = choice(USERNAMES)
+        self.client.get(f"/users/{username}/history")
+
+    @task
+    def profile(self):
+        username = choice(USERNAMES)
+        self.client.get(f"/users/{username}")
 """
+
+
+class Lobby(TaskSet):
+
+    def on_start(self):
+        self.token = choice(tokens)
+
+    @task(10)
+    def get_lobbys(self):
+        self.client.get(
+            "/lobby",
+            headers={"authorization": "Bearer " + self.token})
+
+    @task(1)
+    def stop(self):
+        self.interrupt()
+
+
+class LobbyTest(HttpUser):
+    wait_time = between(1, 5)
+    tasks = {Lobby: 5}
+    host = "http://localhost/api/v1"
+    sock = None
