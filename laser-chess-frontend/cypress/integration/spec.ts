@@ -10,20 +10,29 @@ describe('Gameplay tests', () => {
   before(() => {
     cy.fixture("userSettings.json").then(settings => {
       cy.fixture("userInfo.json").then(userInfo => {
-    cy.intercept(
-      'GET', '/api/v1/users/me/settings',
-      {
-        statusCode: 200,
-        body: settings
-      }
-    )
-    cy.intercept(
-      'GET', '/api/v1/users/*',
-      {
-        statusCode: 200,
-        body: userInfo
-      }
-    )
+        cy.fixture("initialGameState.json").then(initState => {
+          cy.intercept(
+            'GET', '/api/v1/users/me/settings',
+            {
+              statusCode: 200,
+              body: settings
+            }
+          )
+          cy.intercept(
+            'GET', '/api/v1/users/*',
+            {
+              statusCode: 200,
+              body: userInfo
+            }
+          )
+          cy.intercept(
+            'GET', '/api/v1/game/initial_game_state',
+            {
+              statusCode: 200,
+              body: initState
+            }
+          )
+        })
       })
     })
 
@@ -46,7 +55,7 @@ describe('Gameplay tests', () => {
           })
     })
   }).then(() => {
-    cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar').click() //disable animations
+    cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar').should('not.be.checked')
     .then(() => {
       cy.fixture('initialGameState.json').then((data) => {
         subject.next(data)
@@ -249,20 +258,29 @@ it('Test laser', () => {
 
   cy.fixture("userSettings.json").then(settings => {
     cy.fixture("userInfo.json").then(userInfo => {
-  cy.intercept(
-    'GET', '/api/v1/users/me/settings',
-    {
-      statusCode: 200,
-      body: settings
-    }
-  )
-  cy.intercept(
-    'GET', '/api/v1/users/*',
-    {
-      statusCode: 200,
-      body: userInfo
-    }
-  )
+      cy.fixture("initialGameState.json").then(initState => {
+        cy.intercept(
+          'GET', '/api/v1/users/me/settings',
+          {
+            statusCode: 200,
+            body: settings
+          }
+        )
+        cy.intercept(
+          'GET', '/api/v1/users/*',
+          {
+            statusCode: 200,
+            body: userInfo
+          }
+        )
+        cy.intercept(
+          'GET', '/api/v1/game/initial_game_state',
+          {
+            statusCode: 200,
+            body: initState
+          }
+        )
+      })
     })
   })
 
@@ -285,7 +303,7 @@ it('Test laser', () => {
         })
       })
     }).then(() => {
-      cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar').click() //disable animations
+      cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar').should('not.be.checked')
       .then(() => {
         cy.fixture('laserTestCase.json').then((data) => {
           subject.next(data)
