@@ -17,8 +17,8 @@
     </div>
     <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[1]]">{{game.playerNames[1]}}</a></i>
       ({{game.playerRankings[1]}})
-      <span *ngIf="game.playerRankingsChanges[1]" [ngStyle]="{'color': game.playerRankingsChanges[1] < 0 ? 'red' : 'green'}">
-        {{game.playerRankingsChanges[1] < 0 ? "▼" + -game.playerRankingsChanges[1] : "▲" + game.playerRankingsChanges[0]}}
+      <span *ngIf="game.playerRankingsChanges[1]" [ngStyle]="{'color': game.playerRankingsChanges[1] < 0 ? 'green' : 'red'}">
+        {{game.playerRankingsChanges[1] < 0 ? "▲" + (game.playerRankingsChanges[1] * -1) : "▼" + game.playerRankingsChanges[1]}}
       </span>
     </h3>
   </div>
@@ -29,8 +29,8 @@
   <p></p>
 <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[0]]">{{game.playerNames[0]}}</a></i>
   ({{game.playerRankings[0]}})
-  <span *ngIf="game.playerRankingsChanges[0]" [ngStyle]="{'color': game.playerRankingsChanges[0] < 0 ? 'red' : 'green'}">
-    {{game.playerRankingsChanges[0] < 0 ? "▼" + -game.playerRankingsChanges[0] : "▲" + game.playerRankingsChanges[0]}}
+  <span *ngIf="game.playerRankingsChanges[0]" [ngStyle]="{'color': game.playerRankingsChanges[0] < 0 ? 'green' : 'red'}">
+    {{game.playerRankingsChanges[0] < 0 ? "▲" + (game.playerRankingsChanges[0] * -1) : "▼" + game.playerRankingsChanges[0]}}
   </span>
 </h3>
 </div>
