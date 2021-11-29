@@ -9,6 +9,7 @@ from tests.utils import *
 
 tokens = []
 game_id = "some_id"
+game_id_2 = "some_other_id"
 
 
 @pytest.fixture(autouse=True)
@@ -46,10 +47,22 @@ def before_all():
     )
     assert start_game_response.status_code == 200
 
+    start_game_unrated_request = StartGameRequest(game_id_2, create_user_datas[0]['username'],
+                                                  create_user_datas[1]['username'],
+                                                  False)
+
+    start_game_unrated_response = tu.post_data(
+        "/lobby/start_game",
+        tokens[0],
+        json=dataclasses.asdict(start_game_unrated_request),
+    )
+    assert start_game_unrated_response.status_code == 200
+
     session.commit()
 
 
 get_game_state_request = GetGameStateRequest(game_id)
+get_game_state_unrated_request = GetGameStateRequest(game_id_2)
 shoot_laser_request = ShootLaserRequest(game_id)
 p1_laser_coordinates = (5, 0)
 p2_laser_coordinates = (3, 8)
@@ -59,6 +72,15 @@ p2_king_coordinates = (4, 8)
 
 def get_game_state(ws: WebSocket):
     request = WebsocketRequest(GameApiRequestPath.GetGameState, get_game_state_request)
+    ws.send_json(dataclasses.asdict(request))
+    game_state_dict = ws.receive_json()
+    game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
+    game_state = game_state_serializable.to_normal()
+    return game_state
+
+
+def get_game_state_unrated(ws: WebSocket):
+    request = WebsocketRequest(GameApiRequestPath.GetGameState, get_game_state_unrated_request)
     ws.send_json(dataclasses.asdict(request))
     game_state_dict = ws.receive_json()
     game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)
@@ -90,6 +112,13 @@ def observe(ws: WebSocket, game_id: str):
 def give_up(ws: WebSocket, token_num: int):
     auth(ws, token_num)
     request = WebsocketRequest(GameApiRequestPath.GiveUp, GiveUpRequest(game_id))
+    send_dataclass(ws, request)
+    return receive_ws_response(ws)
+
+
+def give_up_unrated(ws: WebSocket, token_num: int):
+    auth(ws, token_num)
+    request = WebsocketRequest(GameApiRequestPath.GiveUp, GiveUpRequest(game_id_2))
     send_dataclass(ws, request)
     return receive_ws_response(ws)
 
@@ -294,3 +323,45 @@ def test_give_up_p2(ws, tu):
     assert record["game_id"] == game_id
     assert record["player_one_new_rating"] == 1578
     assert record["player_two_new_rating"] == 1421
+
+
+def test_give_up_unrated_p1(ws, tu):
+    assert give_up_unrated(ws, 0).status_code == 200
+    game_state = get_game_state_unrated(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_TWO_VICTORY
+
+    response = tu.get_data(f"/game/history/{game_id_2}")
+    record = response.json()
+    assert record["player_one_username"] == "test0"
+    assert record["player_one_rating"] == 1500
+    assert record["player_one_deviation"] == 200
+    assert record["player_one_volatility"] == 0.06
+    assert record["player_two_username"] == "test1"
+    assert record["player_two_rating"] == 1500
+    assert record["player_two_deviation"] == 200
+    assert record["player_two_volatility"] == 0.06
+    assert record["result"] == "PLAYER_TWO_WIN"
+    assert record["game_id"] == game_id_2
+    assert record["player_one_new_rating"] is None
+    assert record["player_two_new_rating"] is None
+
+
+def test_give_up_unrated_p2(ws, tu):
+    assert give_up_unrated(ws, 1).status_code == 200
+    game_state = get_game_state_unrated(ws)
+    assert game_state.game_phase is GamePhase.PLAYER_ONE_VICTORY
+
+    response = tu.get_data(f"/game/history/{game_id_2}")
+    record = response.json()
+    assert record["player_one_username"] == "test0"
+    assert record["player_one_rating"] == 1500
+    assert record["player_one_deviation"] == 200
+    assert record["player_one_volatility"] == 0.06
+    assert record["player_two_username"] == "test1"
+    assert record["player_two_rating"] == 1500
+    assert record["player_two_deviation"] == 200
+    assert record["player_two_volatility"] == 0.06
+    assert record["result"] == "PLAYER_ONE_WIN"
+    assert record["game_id"] == game_id_2
+    assert record["player_one_new_rating"] is None
+    assert record["player_two_new_rating"] is None

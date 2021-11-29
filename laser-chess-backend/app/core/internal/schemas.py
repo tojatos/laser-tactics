@@ -143,8 +143,8 @@ class GameHistoryEntry(BaseModel):
     result: GameResult
     game_end_date: dt.datetime
     is_rated: bool
-    player_one_new_rating: int
-    player_two_new_rating: int
+    player_one_new_rating: Optional[int]
+    player_two_new_rating: Optional[int]
 
     class Config:
         orm_mode = True
