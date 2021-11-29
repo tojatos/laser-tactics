@@ -1,0 +1,34 @@
+<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+    <div fxLayout="column" fxLayoutAlign="center center">
+        <a href="settings" mat-stroked-button color="accent"
+            >General settings</a>
+        <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
+        <a href="settings/password" mat-stroked-button color="accent">Password</a>
+    </div>
+    <div>
+        <mat-card class="box">
+            <mat-list>
+                <h3 matLine> Blocked users list </h3>
+                <mat-list-item *ngFor="let users of blocked">
+            
+                    <button mat-button (click)="goToProfile(users)"> {{blocked}} </button>
+                    <mat-icon [matMenuTriggerFor]="blocked">more_vert</mat-icon>
+                    <mat-menu class="menu" #blocked="matMenu" xPosition="before" [overlapTrigger]="false">
+                        <button mat-menu-item (click)="goToProfile(users)">Profile</button>
+                        <button mat-menu-item *ngIf="getIsInBlocked(users)" (click)="unblockUser(users)">Unblock</button>
+                    </mat-menu>
+                </mat-list-item>
+                <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+               
+                    <mat-form-field class="example-full-width" appearance="fill">
+                      <mat-label>Username</mat-label>
+                      <input formControlName="input" matInput #box>
+                </mat-form-field>
+         
+                <button mat-stroked-button color="accent" class="btn-block">Block user</button>
+            </form>
+            </mat-list>
+        </mat-card>
+    </div>
+
+</div>

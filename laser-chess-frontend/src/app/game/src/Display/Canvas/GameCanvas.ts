@@ -8,7 +8,7 @@ import { Resources } from "../Resources"
 import { Canvas } from "./AbstractCanvas"
 import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
-import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
+import { GameWebsocketService } from "src/app/game/services/game.service"
 import { GameActions } from "./GameActions"
 
 export class GameCanvas extends Canvas {
@@ -16,6 +16,7 @@ export class GameCanvas extends Canvas {
     hoveredCell: Cell | undefined
     mediator: GameMediator | undefined
     showAnimations: boolean = true
+    enableSounds: boolean = true
 
     constructor(gameService: GameWebsocketService,
       authService: AuthService,
@@ -42,7 +43,7 @@ export class GameCanvas extends Canvas {
     async onClickEvent(mousePos: Coordinates, board: Board){
       if(!this.interactable)
         return
-
+      this.drawings.drawGame(this, board.cells, this.isReversed)
       const selectedCell = board.getSelectableCellByCoordinates(mousePos.x, mousePos.y, this.currentPlayer)
       this.interactable = false
 
@@ -68,8 +69,8 @@ export class GameCanvas extends Canvas {
     private async selectableCellEvent(selectedCell: Cell | undefined, board: Board){
       this.interactable = false
       this.drawings.drawGame(this, board.cells, this.isReversed)
-      if(board.selectedCell && selectedCell){
-        await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations)
+      if(board.selectedCell && selectedCell && this.mediator?.currentRotation == 0){
+        await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations, this.enableSounds)
         this.gameService.increaseAnimationEvents()
         board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
@@ -112,7 +113,7 @@ export class GameCanvas extends Canvas {
 
       if(selectedCell){
         this.interactable = false
-        await this.animations.rotatePiece(this, board, selectedCell, degree, this.isReversed, this.showAnimations, initialRotationDifference)
+        await this.animations.rotatePiece(this, board, selectedCell, degree, this.isReversed, this.showAnimations, this.enableSounds, initialRotationDifference)
         this.interactable = true
       }
 
@@ -147,8 +148,8 @@ export class GameCanvas extends Canvas {
       board.unselectCell()
     }
 
-    private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean): Promise<void>{
-      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, this.isReversed, showAnimations)
+    private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean, enableSounds: boolean): Promise<void>{
+      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, this.isReversed, showAnimations, enableSounds)
     }
 
 }

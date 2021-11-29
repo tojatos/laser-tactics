@@ -12,15 +12,23 @@ export class Resources {
 
   boardImage: HTMLImageElement = new Image()
   pieceImages: Map<string, HTMLImageElement> = new Map()
+  move: () => HTMLAudioElement = () => new Audio("assets/sounds/move.wav")
+  laser: () => HTMLAudioElement = () => new Audio("assets/sounds/laser.mp3")
+  teleport: () => HTMLAudioElement = () => new Audio("assets/sounds/teleport.mp3")
+  destroy: () => HTMLAudioElement = () => new Audio("assets/sounds/destroy.mp3")
+  take: () => HTMLAudioElement = () => new Audio("assets/sounds/take.mp3")
+  rotate: () => HTMLAudioElement = () => new Audio("assets/sounds/rotate.wav")
+  deflect: () => HTMLAudioElement = () => new Audio("assets/sounds/deflect.mp3")
 
   constructor(){ }
 
   async loadAssets(){
     await this.loadBoardImage()
-    await this.loadPiecesImages()  }
+    await this.loadPiecesImages()
+   }
 
   private async loadBoardImage(){
-    await this.loadImage(this.boardImage, "assets/board.svg")
+    await this.loadElement(this.boardImage, "assets/board.svg")
   }
 
   private async loadPiecesImages(){
@@ -52,14 +60,14 @@ export class Resources {
 
     const image = new Image()
 
-    await this.loadImage(image, `assets/${name + color}.svg`)
+    await this.loadElement(image, `assets/${name + color}.svg`)
     this.pieceImages.set(JSON.stringify(newImage), image)
   }
 
-  loadImage(image: HTMLImageElement, source: string){
+  loadElement(elem: any, source: string){
     return new Promise<void>(resolve => {
-      image.onload = () => resolve();
-      image.src = source
+      elem.onload = () => resolve();
+      elem.src = source
     })
   }
 

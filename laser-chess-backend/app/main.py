@@ -15,6 +15,8 @@ from app.core.routers import friends, users, email, game, lobby
 from app.core.routers.game import websocket_endpoint
 from sqlalchemy.orm import Session
 
+from app.core.routers.lobby import lobby_websocket_endpoint
+
 app = FastAPI(root_path=ROOT_PATH, openapi_url=f"{API_PREFIX}/openapi.json")
 
 origins = [
@@ -70,9 +72,10 @@ app.include_router(router)
 app.include_router(users.router, prefix=API_PREFIX)
 app.include_router(email.router, prefix=API_PREFIX)
 app.include_router(friends.router, prefix=API_PREFIX)
-app.include_router(game.router, prefix=API_PREFIX)
 app.include_router(lobby.router, prefix=API_PREFIX)
+app.include_router(game.router, prefix=API_PREFIX)
 app.add_api_websocket_route("/ws", websocket_endpoint)
+app.add_api_websocket_route("/lobby_ws", lobby_websocket_endpoint)
 
 if __name__ == "__main__":
     # models.Base.metadata.drop_all(bind=engine)

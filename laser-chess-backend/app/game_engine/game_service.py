@@ -22,10 +22,9 @@ def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerial
     return g
 
 
-def start_game(user_id: string, request: StartGameRequest, db: Session):
-    # TODO: validate request
-
-    # TODO: move this to lobby creation
+def start_game(username: str, request: StartGameRequest, db: Session):
+    if username != request.player_two_id and username != request.player_one_id:
+        raise HTTPException(status_code=403, detail="User need to participate in Game in order to start it")
     initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id)
     crud.start_game(db, initial_state, request)
 
@@ -50,6 +49,10 @@ def give_up(user_id: string, request: GiveUpRequest, db: Session):
         raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
 
     game = Game(game_state)
+
+    can_move, error = game.validate_give_up()
+    if not can_move:
+        raise HTTPException(status_code=403, detail=f"Unable to give up. {error}")
 
     game.give_up(player)
     crud.update_game(db, game.game_state, request.game_id)
