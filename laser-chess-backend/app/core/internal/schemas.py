@@ -218,7 +218,7 @@ class FriendRequest(FriendRequestCreate):
     id: str
     user_one_username: str
     status: FriendRequestStatus
-    
+
     class Config:
         orm_mode = True
 
