@@ -510,6 +510,7 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     db_settings = get_settings(db, user)
     # change settings here
     db_settings.skip_animations = settings.skip_animations
+    db_settings.sound_on = settings.sound_on
     # ------------------------------------------
     db.commit()
     db.refresh(db_settings)
