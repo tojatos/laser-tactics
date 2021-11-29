@@ -7,7 +7,7 @@ describe('Gameplay tests', () => {
   let angular: any
   let gameComponent: any
 
-  before(() => {
+  const beforeMethod = (fixture: string) => {
     cy.fixture("userSettings.json").then(settings => {
       cy.fixture("userInfo.json").then(userInfo => {
         cy.fixture("initialGameState.json").then(initState => {
@@ -36,37 +36,39 @@ describe('Gameplay tests', () => {
       })
     })
 
-      cy.fixture('token.txt').then((data) => {
+    return cy.fixture('token.txt').then((data) => {
         cy.setLocalStorage("access_token", data)
         cy.saveLocalStorage()
-      }).then(() => {
-      cy.visit("/game/cypressTest")
-      cy.get('canvas')
-      .then(() => {
-        cy.window().then(win => { //get component
-          angular = (win as any).ng
-        })
-        .then(() => cy.document()).wait(500)
-        .then((doc) => {
-            gameComponent = angular.getComponent(doc.querySelector("app-board"))
-            gameComponent.game.gameService.getSubject().unsubscribe()
-            cy.stub(gameComponent.game.gameService, "getSubject").returns(subject)
-            gameComponent.game.gameService.connect("test")
-          })
-    })
-  }).then(() => {
-    cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar').should('not.be.checked')
-    .then(() => {
-      cy.fixture('initialGameState.json').then((data) => {
-        subject.next(data)
-        expect(gameComponent.game.board.cells).to.have.length.greaterThan(0)
-      }).then(() => {
-        const pressPosition = getCell(gameComponent, 5, 1)
-        cy.get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
       })
+      .visit("/game/cypressTest")
+      .get('canvas')
+      .wait(100)
+      .window()
+      .then(win => { //get component
+          angular = (win as any).ng
+      })
+      .then(() => cy.document()).wait(500)
+      .then((doc) => {
+        gameComponent = angular.getComponent(doc.querySelector("app-board"))
+        gameComponent.game.gameService.getSubject().unsubscribe()
+        cy.stub(gameComponent.game.gameService, "getSubject").returns(subject)
+        gameComponent.game.gameService.connect("test")
+      })
+    .then(() => {
+    cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
+    .should('not.be.checked')
+    .fixture(fixture).then((data) => {
+        subject.next(data)
+    }).then(() => {
+      cy.get(gameComponent.game.board.cells).should('have.length.above', 0)
+      .get('app-board-actions').should('be.visible')
+    })
   })
+  }
+
+  before(() => {
+    beforeMethod("initialGameState.json")
   })
-})
 
   beforeEach(() => {
     cy.restoreLocalStorage()
@@ -88,7 +90,7 @@ it('Test moving', () => {
       cy.spy(gameComponent.game.board, "movePiece")
       cy.stub(gameComponent.game.gameService, "animationsToShow").returns("1")
 
-      cy.get('canvas').wait(500).click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
+      cy.get('canvas')
       .click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
       .click(pressPositionNext.canvasCoordinates.x, pressPositionNext.canvasCoordinates.y)
       .then(() => {
@@ -111,7 +113,8 @@ it('Test rotation', () => {
     cy.spy(gameComponent.game.gameService, "rotatePiece")
     cy.spy(gameComponent.game.board, "rotatePiece")
 
-    cy.get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y).then(() => {
+    cy.get('.mat-selection-list').click()
+    .get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y).then(() => {
       cy.get('app-board-actions > :nth-child(1)').click().then(() => {
         expect(gameComponent.game.gameActions.rotation).to.be.equal(270)
       })
@@ -256,72 +259,16 @@ it('Test draw offer recieve', () => {
 
 it('Test laser', () => {
 
-  cy.fixture("userSettings.json").then(settings => {
-    cy.fixture("userInfo.json").then(userInfo => {
-      cy.fixture("initialGameState.json").then(initState => {
-        cy.intercept(
-          'GET', '/api/v1/users/me/settings',
-          {
-            statusCode: 200,
-            body: settings
-          }
-        )
-        cy.intercept(
-          'GET', '/api/v1/users/*',
-          {
-            statusCode: 200,
-            body: userInfo
-          }
-        )
-        cy.intercept(
-          'GET', '/api/v1/game/initial_game_state',
-          {
-            statusCode: 200,
-            body: initState
-          }
-        )
-      })
-    })
-  })
-
-    cy.fixture('token.txt').then((data) => {
-      cy.setLocalStorage("access_token", data)
-      cy.saveLocalStorage()
-    }).then(() => {
-    cy.visit("/game/cypressTest")
-    cy.get('canvas')
-    .then(() => {
-      cy.window().then(win => { //get component
-        angular = (win as any).ng
-      })
-      .then(() => cy.document()).wait(500)
-      .then((doc) => {
-          gameComponent = angular.getComponent(doc.querySelector("app-board"))
-          gameComponent.game.gameService.getSubject().unsubscribe()
-          cy.stub(gameComponent.game.gameService, "getSubject").returns(subject)
-          gameComponent.game.gameService.connect("test")
-        })
-      })
-    }).then(() => {
-      cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar').should('not.be.checked')
-      .then(() => {
-        cy.fixture('laserTestCase.json').then((data) => {
-          subject.next(data)
-          expect(gameComponent.game.board.cells).to.have.length.greaterThan(0)
-        }).then(() => {
-          const pressPosition = getCell(gameComponent, 5, 1)
-          cy.get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
-        })
-    })
-    }).then(() => {
-
+  beforeMethod("laserTestCase.json").then(() => {
     const laserPosition = getCell(gameComponent, 5, 0)
     expect(laserPosition.piece.piece_type).to.be.equal("LASER")
     cy.spy(gameComponent.game.gameService, "shootLaser")
     cy.spy(gameComponent.game.board, "removePiece")
     cy.stub(gameComponent.game.gameService, "animationsToShow").returns("2")
 
-    cy.get('app-board-actions > :nth-child(2)').click().then(() => {
+    cy.wait(500).get('canvas').click(laserPosition.canvasCoordinates.x, laserPosition.canvasCoordinates.y)
+    .get('.mat-selection-list').click()
+    .get('app-board-actions > :nth-child(2)').click().then(() => {
       cy.fixture("laserShoot.json").then(data => {
         subject.next(data)
       }).then(() => {
