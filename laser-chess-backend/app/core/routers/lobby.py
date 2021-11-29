@@ -88,7 +88,7 @@ async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User 
     return lobby
 
 
-@router.post("/join_random")
+@router.post("/join_random", response_model=schemas.Lobby)
 async def join_random(joinrandom: schemas.JoinRandomRequest,
                       current_user: schemas.User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):

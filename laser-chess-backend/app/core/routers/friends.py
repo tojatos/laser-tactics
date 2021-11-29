@@ -14,20 +14,20 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get("", response_model=List[str])
 async def get_users_friends(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return crud.get_users_friends(user=current_user, db=db)
 
 
 # TODO: think about: refactor response>
-@router.get("/requests")
+@router.get("/requests", response_model=List[schemas.FriendRequest])
 async def get_pending_requests(current_user: schemas.User = Depends(get_current_active_user),
                                db: Session = Depends(get_db)):
     return crud.get_users_pending_friend_requests(user=current_user, db=db)
 
 
-@router.post("/requests/send", status_code=status.HTTP_201_CREATED)
+@router.post("/requests/send", status_code=status.HTTP_201_CREATED, response_model=schemas.FriendRequest)
 async def send_friend_request(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                               db: Session = Depends(get_db)):
     friend_username = usernameSchema.username
@@ -50,7 +50,7 @@ async def send_friend_request(usernameSchema: schemas.Username, current_user: sc
     return crud.create_friend_request(user_sending=current_user, user_sent_to=friend_to_be, db=db)
 
 
-@router.post("/requests/accept")
+@router.post("/requests/accept", response_model=schemas.FriendRequest)
 async def accept_friend_request(request_id: schemas.FriendRequestId, current_user: schemas.User = Depends(get_current_active_user),
                                 db: Session = Depends(get_db)):
     request = crud.get_pending_friend_request(id=request_id.id, db=db)
@@ -61,7 +61,7 @@ async def accept_friend_request(request_id: schemas.FriendRequestId, current_use
     return crud.accept_friend_request(friend_request=request, db=db)
 
 
-@router.post("/requests/decline")
+@router.post("/requests/decline", response_model=schemas.FriendRequest)
 async def decline_friend_request(request_id: schemas.FriendRequestId, current_user: schemas.User = Depends(get_current_active_user),
                                  db: Session = Depends(get_db)):
     request = crud.get_pending_friend_request(id=request_id.id, db=db)

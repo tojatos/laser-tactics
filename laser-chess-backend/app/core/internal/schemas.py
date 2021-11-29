@@ -218,11 +218,17 @@ class FriendRequest(FriendRequestCreate):
     id: str
     user_one_username: str
     status: FriendRequestStatus
+    
+    class Config:
+        orm_mode = True
 
 
 class BlockedUsers(BaseModel):
     user: str
     blocked_user: str
+
+    class Config:
+        orm_mode = True
 
 
 class Username(BaseModel):
