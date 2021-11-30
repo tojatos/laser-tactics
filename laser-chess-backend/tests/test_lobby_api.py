@@ -342,3 +342,38 @@ def test_join_lobby_random_ranked(tu):
                             json={"is_rated": True, "rating_lower_bound": 1400, "rating_higher_bound": 1600})
     assert response.status_code == 200
     assert response.json()["player_two_username"] == "test0"
+
+
+def test_create_multipe_lobbys(tu):
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 201
+    response = tu.patch_data(f"/lobby/join", tokens[1], json={"game_id": response.json()['game_id']})
+    assert response.status_code == 200
+    response = tu.patch_data(f"/lobby/leave", tokens[0], json={"game_id": response.json()['game_id']})
+    assert response.status_code == 200
+    response = tu.post_data("/lobby/create", tokens[1])
+    assert response.status_code == 403
+
+
+def test_create_multipe_lobbys_2(tu):
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 201
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+
+
+def test_join_multipe_lobbys(tu):
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 201
+    response = tu.post_data("/lobby/create", tokens[1])
+    assert response.status_code == 201
+    response = tu.patch_data(f"/lobby/join", tokens[3], json={"game_id": response.json()['game_id']})
+    assert response.status_code == 200
+    response = tu.patch_data(f"/lobby/join", tokens[3], json={"game_id": response.json()['game_id']})
+    assert response.status_code == 403
+    response = tu.post_data("/lobby/create", tokens[3])
+    assert response.status_code == 403

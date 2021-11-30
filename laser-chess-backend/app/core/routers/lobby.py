@@ -36,15 +36,18 @@ async def get_lobby(game_id: str,
 
 @router.post("/create", response_model=schemas.Lobby, status_code=status.HTTP_201_CREATED)
 async def create_lobby(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
-    lobbys = crud.get_user_created_lobbies(db=db, user=current_user)
+    lobbys = crud.get_user_in_created_lobbies(db=db, user=current_user)
     if len(lobbys) > 0:
-        raise HTTPException(status_code=403, detail="This user has already created a lobby")
+        raise HTTPException(status_code=403, detail="This user already is in a lobby")
     return crud.create_lobby(db=db, user=current_user)
 
 
 @router.patch("/join", response_model=schemas.Lobby)
 async def join_lobby(lobbyId: schemas.LobbyId, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
+    lobbys = crud.get_user_in_created_lobbies(db=db, user=current_user)
+    if len(lobbys) > 0:
+        raise HTTPException(status_code=403, detail="This user already is in a lobby")
     lobby_id = lobbyId.game_id
     lobby = crud.get_lobby(db, lobby_id)
     if lobby is None:
@@ -88,10 +91,13 @@ async def update_lobby(lobby: schemas.LobbyEditData, current_user: schemas.User 
     return lobby
 
 
-@router.post("/join_random")
+@router.post("/join_random", response_model=schemas.Lobby)
 async def join_random(joinrandom: schemas.JoinRandomRequest,
                       current_user: schemas.User = Depends(get_current_active_user),
                       db: Session = Depends(get_db)):
+    lobbys = crud.get_user_in_created_lobbies(db=db, user=current_user)
+    if len(lobbys) > 0:
+        raise HTTPException(status_code=403, detail="This user already is in a lobby")
     lobby = crud.get_random_lobby(joinrandom, db)
     if lobby is None:
         raise HTTPException(status_code=404, detail="No lobby with such parameters found")

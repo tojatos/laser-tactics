@@ -86,6 +86,7 @@ def test_websocket_notify(client):
 
         ws0.close()
 
+
 def test_websocket_notify_game_start(client):
     tu = TUtils(client, API_PREFIX)
 
@@ -101,8 +102,17 @@ def test_websocket_notify_game_start(client):
         assert response.status_code == 200
 
         lobby_dict = ws0.receive_json()
+
+        json = response.json()
+        json["starting_position_reversed"] = True
+
+        response = tu.patch_data(f"/lobby/update", tokens[9], json=json)
+        assert response.status_code == 200
+
+        lobby_dict = ws0.receive_json()
         assert lobby_dict["player_one_username"] is not None
         assert lobby_dict["player_two_username"] is not None
+        assert lobby_dict["starting_position_reversed"] is True
 
         start_game_request = StartGameRequest(game_id, "test0", "test1", False)
         start_game_response = tu.post_data(

@@ -95,9 +95,9 @@ def get_created_lobbies(db: Session, skip: int = 0, limit: int = 100):
     return lobbies
 
 
-def get_user_created_lobbies(db: Session, user: schemas.User):
+def get_user_in_created_lobbies(db: Session, user: schemas.User):
     lobbies = db.query(models.Lobby).filter(
-        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.player_one_username == user.username)).all()
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, or_(models.Lobby.player_one_username == user.username, models.Lobby.player_two_username == user.username))).all()
     return lobbies
 
 
@@ -343,6 +343,7 @@ def update_game(db: Session, game_state: GameState, game_id: str):
             player_two_new_rating=None
         )
         db.add(record)
+        db.commit()
         if record.is_rated:
             update_user_rating(db, player_one_rating.username)
             update_user_rating(db, player_two_rating.username)
@@ -394,6 +395,7 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
             return 0
 
     crossout_date = datetime.now() - timedelta(days=rating_period)
+    all_matches = db.query(models.GameHistory).all()
     matches_left = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date,
              models.GameHistory.is_rated == True)).all()
@@ -480,11 +482,11 @@ def get_stats(db: Session, user: schemas.User):
     matches = list(sorted(matches_sum, key=lambda match: match.game_end_date))
     no_matches = len(matches)
     draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
-    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN, matches))
-    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN, matches))
+    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN and match.player_one_username == user.username, matches))
+    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN and match.player_two_username == user.username, matches))
     winrate = len(wins_as_p1 + wins_as_p2) / no_matches
-    winrate_as_p1 = len(games_as_p1) / len(games_as_p1)
-    winrate_as_p2 = len(games_as_p2) / len(games_as_p2)
+    winrate_as_p1 = len(wins_as_p1) / len(games_as_p1) if games_as_p1 else 0
+    winrate_as_p2 = len(wins_as_p2) / len(games_as_p2) if games_as_p2 else 0
     no_wins = len(wins_as_p1 + wins_as_p2)
     no_draws = len(draws)
     drawrate = len(draws) / no_matches
@@ -493,10 +495,10 @@ def get_stats(db: Session, user: schemas.User):
         wins=no_wins,
         draws=no_draws,
         loses=no_matches - (no_wins + no_draws),
-        winrate=winrate,
-        winrate_as_p1=winrate_as_p1,
-        winrate_as_p2=winrate_as_p2,
-        drawrate=drawrate
+        winrate=round(winrate, 2),
+        winrate_as_p1=round(winrate_as_p1, 2),
+        winrate_as_p2=round(winrate_as_p2, 2),
+        drawrate=round(drawrate, 2)
     )
 
 
@@ -508,6 +510,7 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     db_settings = get_settings(db, user)
     # change settings here
     db_settings.skip_animations = settings.skip_animations
+    db_settings.sound_on = settings.sound_on
     # ------------------------------------------
     db.commit()
     db.refresh(db_settings)

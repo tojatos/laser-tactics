@@ -35,13 +35,16 @@ def test_get_settings(tu):
     response = tu.get_data("/users/me/settings", tokens[0])
     assert response.status_code == 200
     assert response.json()["skip_animations"] == False
+    assert response.json()["sound_on"] == True
 
 
 def test_change_settings(tu):
-    response = tu.patch_data("/users/me/settings", tokens[0], json={"skip_animations": True})
+    response = tu.patch_data("/users/me/settings", tokens[0], json={"skip_animations": True, "sound_on" : False})
     assert response.status_code == 200
     assert response.json()["skip_animations"] == True
+    assert response.json()["sound_on"] == False
 
     response = tu.get_data("/users/me/settings", tokens[0])
     assert response.status_code == 200
     assert response.json()["skip_animations"] == True
+    assert response.json()["sound_on"] == False

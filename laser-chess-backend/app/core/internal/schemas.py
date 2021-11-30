@@ -135,14 +135,19 @@ class GameHistoryEntry(BaseModel):
     player_one_username: str
     player_one_rating: int
     player_one_deviation: float
+    player_one_volatility: float
     player_two_username: str
     player_two_rating: int
     player_two_deviation: float
+    player_two_volatility: float
     result: GameResult
     game_end_date: dt.datetime
     is_rated: bool
-    player_one_new_rating: int
-    player_two_new_rating: int
+    player_one_new_rating: Optional[int]
+    player_two_new_rating: Optional[int]
+
+    class Config:
+        orm_mode = True
 
 
 class LobbyEditData(BaseModel):
@@ -214,10 +219,16 @@ class FriendRequest(FriendRequestCreate):
     user_one_username: str
     status: FriendRequestStatus
 
+    class Config:
+        orm_mode = True
+
 
 class BlockedUsers(BaseModel):
     user: str
     blocked_user: str
+
+    class Config:
+        orm_mode = True
 
 
 class Username(BaseModel):
@@ -249,6 +260,7 @@ class Stats(BaseModel):
 
 class Settings(BaseModel):
     skip_animations: bool = False
+    sound_on: bool = True
 
     class Config:
         orm_mode = True

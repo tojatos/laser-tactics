@@ -53,6 +53,21 @@ def mock_match_end_in_db(db,
     update_ratings_in_history(db, game_id, player_one_username, player_two_username)
 
 
+def single_in_db(db):
+    datetime_object = datetime.now()
+    mock_match_end_in_db(db, player_one_username="test8",
+                         player_one_rating=1500,
+                         player_one_deviation=200,
+                         player_one_volatility=0.06,
+                         player_two_username="test9",
+                         player_two_rating=1500,
+                         player_two_deviation=200,
+                         player_two_volatility=0.06,
+                         result=GameResult.PLAYER_TWO_WIN,
+                         game_end_date=datetime_object,
+                         game_id="100")
+
+
 def glickman_matches_in_db(db):
     # 1
     datetime_object = datetime.now()
@@ -164,8 +179,8 @@ def test_og_calc():
     player, matches = glickman()
     new_rating = rating.update_rating(player, matches)
     assert new_rating.rating == 1464
-    assert new_rating.rating_deviation == 151.52
-    assert new_rating.volatility == 0.06
+    assert new_rating.rating_deviation == 151.51651
+    assert new_rating.volatility == 0.05999
 
 
 def test_empty():
@@ -173,7 +188,7 @@ def test_empty():
     matches = PlayerMatchHistory(matches=[])
     new_rating = rating.update_rating(player, matches)
     assert new_rating.rating == 1500
-    assert new_rating.rating_deviation == 200.27
+    assert new_rating.rating_deviation == 200.27142
     assert new_rating.volatility == 0.06
 
 
@@ -189,8 +204,8 @@ def test_glickman():
     glickman_matches_in_db(session)
     rating = crud.get_player_rating(session, "test0")
     assert rating.rating == 1464
-    assert rating.rating_deviation == 151.52
-    assert rating.rating_volatility == 0.06
+    assert rating.rating_deviation == 151.51651
+    assert rating.rating_volatility == 0.05999
     record = crud.get_match_record(session, "3")
     assert record.player_one_new_rating == 1464
 
@@ -208,9 +223,42 @@ def test_glickman_schuffled():
     glickman_matches_in_db_schuffled(session)
     rating = crud.get_player_rating(session, "test4")
     assert rating.rating == 1464
-    assert rating.rating_deviation == 151.52
-    assert rating.rating_volatility == 0.06
+    assert rating.rating_deviation == 151.51651
+    assert rating.rating_volatility == 0.05999
     record = crud.get_match_record(session, "6")
     assert record.player_two_new_rating == 1464
     session.rollback()
 
+
+def test_single():
+    connection = engine.connect()
+    session = TestingSessionLocal(bind=connection)
+
+    def override_get_db():
+        yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+    single_in_db(session)
+    rating = crud.get_player_rating(session, "test8")
+    assert rating.rating == 1421
+    assert rating.rating_deviation == 180.07829
+    assert rating.rating_volatility == 0.06
+    rating = crud.get_player_rating(session, "test9")
+    assert rating.rating == 1578
+    assert rating.rating_deviation == 180.07829
+    assert rating.rating_volatility == 0.06
+    record = crud.get_match_record(session, "100")
+    assert record.player_one_username == "test8"
+    assert record.player_one_rating == 1500
+    assert record.player_one_deviation == 200
+    assert record.player_one_volatility == 0.06
+    assert record.player_two_username == "test9"
+    assert record.player_two_rating == 1500
+    assert record.player_two_deviation == 200
+    assert record.player_two_volatility == 0.06
+    assert record.result == GameResult.PLAYER_TWO_WIN
+    assert record.game_id == "100"
+    assert record.player_one_new_rating == 1421
+    assert record.player_two_new_rating == 1578
+
+    session.rollback()
