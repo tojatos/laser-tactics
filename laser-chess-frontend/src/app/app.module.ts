@@ -21,6 +21,9 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { SettingsPasswordComponent } from './components/settings-password/settings-password.component';
 import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
 import { SettingsBlockedUsersComponent } from './components/settings-blocked-users/settings-blocked-users.component';
+import { VerifyComponent } from './components/verify/verify.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
+import { RankingComponent } from './components/ranking/ranking.component';
 import { RulesComponent } from './components/rules/rules.component';
 
 
@@ -37,6 +40,9 @@ import { RulesComponent } from './components/rules/rules.component';
     SettingsPasswordComponent,
     PasswordReminderComponent,
     SettingsBlockedUsersComponent,
+    VerifyComponent,
+    ChangePasswordComponent,
+    RankingComponent,
     RulesComponent,
   ],
   imports: [
@@ -54,6 +60,6 @@ import { RulesComponent } from './components/rules/rules.component';
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, { provide: JWT_OPTIONS, useValue: JWT_OPTIONS }, JwtHelperService],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
-  
+
 })
 export class AppModule { }

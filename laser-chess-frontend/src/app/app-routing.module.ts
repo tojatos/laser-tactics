@@ -10,6 +10,10 @@ import { AuthGuard } from './guards/auth.guard';
 import { SettingsPasswordComponent } from './components/settings-password/settings-password.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { SettingsBlockedUsersComponent } from './components/settings-blocked-users/settings-blocked-users.component';
+import { VerifyComponent } from './components/verify/verify.component';
+import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
+import { RankingComponent } from './components/ranking/ranking.component';
 import { RulesComponent } from './components/rules/rules.component';
 
 const routes: Routes = [
@@ -18,8 +22,16 @@ const routes: Routes = [
     component: LoginComponent
   },
   {
+    path: 'login/forgot',
+    component: PasswordReminderComponent
+  },
+  {
     path: 'register',
     component: RegisterComponent
+  },
+  {
+    path: 'change_password/:id',
+    component: ChangePasswordComponent
   },
   {
     path: 'game/:id',
@@ -36,6 +48,10 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'ranking',
+    component: RankingComponent,
+  },
+  {
     path: 'settings/password',
     component: SettingsPasswordComponent,
     canActivate: [AuthGuard]
@@ -48,6 +64,10 @@ const routes: Routes = [
   {
     path: 'lobby/:id',
     component: LobbyComponent
+  },
+  {
+    path: 'verify/:id',
+    component: VerifyComponent
   },
   {
     path: 'rules',

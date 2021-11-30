@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { friendsFullEndpoint, settingsFullEndpoint, userFullEndpoint} from '../api-definitions';
-import { FriendRequest, Settings, User } from '../app.models';
+import { FriendRequest, Ranking, Settings, User, UserHistory } from '../app.models';
 
 
 @Injectable({
@@ -15,16 +15,25 @@ export class UserService {
     return this.http.post<any>(userFullEndpoint("me/change_password"), {'oldPassword': oldPassword, 'newPassword': newPassword}).toPromise()
   }
 
+  changePasswordWithToken(token: string, newPassword: string){
+    return this.http.post<any>(userFullEndpoint("change_password"), {'token': token, 'newPassword': newPassword}).toPromise()
+  }
+
+
   getUserByUsername(username: string) {
     return this.http.get<User>(userFullEndpoint(username)).toPromise()
   }
 
   getUserMe() {
-    return this.http.get<User>(userFullEndpoint("me/")).toPromise()
+    return this.http.get<User>(userFullEndpoint("me/info")).toPromise()
   }
 
   getSettings(){
     return this.http.get<Settings>(settingsFullEndpoint)
+  }
+
+  updateSettings(settings: Settings){
+    return this.http.patch<Settings>(settingsFullEndpoint, settings).toPromise()
   }
 
   getUserFriends() {
@@ -67,7 +76,11 @@ export class UserService {
   }
 
   getUserGameHistory(username: string) {
-    return this.http.get<any>(userFullEndpoint(`${username}/history`)).toPromise()
+    return this.http.get<UserHistory[]>(userFullEndpoint(`${username}/history`)).toPromise()
+  }
+
+  getTopRanking() {
+    return this.http.get<Ranking[]>(userFullEndpoint("ranking/top")).toPromise()
   }
 
 

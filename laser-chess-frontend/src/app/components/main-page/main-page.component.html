@@ -1,5 +1,15 @@
-<div *ngIf="fetched" class="main-wrapper" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-evenly stretch">
-  <div *ngIf="fetched" fxFlex="40" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center center" >
+<div *ngIf="fetched" class="main-wrapper" fxLayout="column" fxLayout.gt-sm="column" fxLayoutGap="20px" fxLayoutAlign="start stretch">
+  <div *ngIf="!verified&&isLoggedin" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="20px" fxLayoutAlign="center">
+  <h1 class = "text">You need to verify your account </h1>
+  <button  mat-stroked-button (click)="sendVerifyEmail()">Click to send email</button>
+</div>
+<div *ngIf="verified&&isLoggedin" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="20px" fxLayoutAlign="center">
+</div>
+<div *ngIf="!isLoggedin" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="20px" fxLayoutAlign="center">
+</div>
+<div *ngIf="fetched" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-evenly stretch">
+
+  <div *ngIf="fetched" fxFlex="40" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="start center" >
     <mat-table [dataSource]="dataSource" class="table-box">
 
       <ng-container matColumnDef="name">
@@ -37,11 +47,12 @@
     </mat-table>
 
   </div>
-  <div *ngIf="fetched" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="center">
+  <div *ngIf="fetched" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="start">
     <button mat-stroked-button color="accent" (click)="createLobby()">Start game</button>
     <button mat-stroked-button color="accent" (click)="createRankedLobby()">Start ranked game</button>
     <button mat-stroked-button color="accent" (click)="createPrivateLobby()">Start private game</button>
     <button mat-stroked-button color="accent" (click)="createPrivateRankedLobby()">Start private ranked game</button>
   </div>
 
+</div>
 </div>

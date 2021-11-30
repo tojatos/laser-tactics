@@ -1,11 +1,13 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { sortBy } from 'lodash';
-import { Lobby } from 'src/app/app.models';
+import { Lobby, User } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
 import { LobbyService } from 'src/app/services/lobby.service';
+import { UserService } from 'src/app/services/user.service';
 import { LobbyStatus } from '../lobby/lobby.component';
 
 @Component({
@@ -20,18 +22,38 @@ export class MainPageComponent implements OnInit {
   fetched = false
   lobby: any
   ranked = false
+  verified = false
+  user: User | undefined
   public lobbies: Lobby[] | undefined
   displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router) {}
+  constructor(private _snackBar: MatSnackBar, private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router, private userService: UserService) {}
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, "", {
+      duration: 1000
+    });
+  }
+
+  get isLoggedin(){
+    return this.authService.isLoggedIn()
+  }
 
   async ngOnInit() {
-    const data = await this.lobbyService.getLobbies()
 
+    const data = await this.lobbyService.getLobbies()
     this.dataSource.data = sortBy(
-      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED), 
+      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED
+        && ((new Date().getTime()) - new Date(res.lobby_creation_date).getTime()) < 3600000 * 2
+        ), 
       ['id']).slice(-8)
     this.fetched = true
+    if (this.isLoggedin){
+    this.userService.getUserMe().then(userData =>{
+      this.user = userData
+      this.verified = this.user.is_verified!
+    })
+    }
   }
 
   openLobby(lobby: Lobby) {
@@ -52,16 +74,23 @@ export class MainPageComponent implements OnInit {
       return 'Casual'
     }
   }
+  getVerified(){
+    this.userService.getUserMe().then(userData =>{
+      this.user = userData
+      console.log(this.user)
+    })
+    return this.user?.is_verified
+  }
 
   async refreshList(){
     this.fetched = false
     const data = await this.lobbyService.getLobbies()
-
-
     this.dataSource.data = sortBy(
-      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED), 
-      ['id']).slice(-8)    
-      this.fetched = true
+      data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED
+        && ((new Date().getTime()) - new Date(res.lobby_creation_date).getTime()) < 3600000 * 2
+        ), 
+      ['id']).slice(-8)
+    this.fetched = true
   }
 
   async createLobby(){
@@ -94,5 +123,11 @@ export class MainPageComponent implements OnInit {
     console.log(this.lobby)
     this.router.navigate(['/lobby', this.lobby.game_id])
       }
+
+  sendVerifyEmail(){
+    this.openSnackBar("Email sent")
+    this.authService.sendVerficationMail(this.authService.getUsername())
+    
+  }
 
 }

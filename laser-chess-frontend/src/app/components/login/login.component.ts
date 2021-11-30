@@ -25,6 +25,9 @@ export class LoginComponent {
 
     get f() { return this.form.controls; }
 
+    g(){
+      
+    }
     onSubmit(): void {
       const { username, password } = this.form.value;
       if (!this.authService.isLoggedIn() && username && password) {
