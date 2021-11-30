@@ -196,13 +196,21 @@ export class UserPageComponent {
     if (this.authService.getUsername() == history.player_one_username){
       if (history.result == "PLAYER_ONE_WIN"){
         return "WIN"}
+      if (history.result == "DRAW"){
+        return "DRAW"
+      }
       return "DEFEAT"
     }
-    else {
+    else if (this.authService.getUsername() == history.player_two_username){
       if (history.result == "PLAYER_TWO_WIN"){
       return "WIN"}
-    return "DEFEAT"
-  }}
+      if (history.result == "DRAW"){
+        return "DRAW"
+      }
+      return "DEFEAT"
+    }
+    return ""
+  }
 
   goToGame(history: UserHistory){
     this.router.navigate(['game', history.game_id])
