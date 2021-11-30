@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 
@@ -14,8 +15,13 @@ export class PasswordReminderComponent implements OnInit {
   form = new FormGroup({
     email: new FormControl('',[Validators.required, Validators.email])
   });
-  constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
+  constructor(private _snackBar: MatSnackBar,private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
+  openSnackBar(message: string) {
+    this._snackBar.open(message, "", {
+      duration: 1000
+    });
+  }
 
   ngOnInit(): void {
   }
@@ -26,7 +32,7 @@ export class PasswordReminderComponent implements OnInit {
     const {email} = this.form.value;
     if (!this.authService.isLoggedIn() &&  email ) {
       this.authService.sendPasswordChangeRequest(email).then(res => {
-        this.router.navigate(['/login'])
+        this.openSnackBar("Email sent")
       }).catch(err => console.log(err))
     }
     else {

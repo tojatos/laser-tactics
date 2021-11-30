@@ -19,7 +19,8 @@ export interface Lobby {
   is_ranked: boolean,
   is_private: boolean,
   starting_position_reversed: boolean,
-  lobby_status: LobbyStatus
+  lobby_status: LobbyStatus,
+  lobby_creation_date: string
 }
 
 export interface Item {
@@ -82,4 +83,13 @@ export interface UserHistory {
   player_two_username: string | null,
   player_two_deviation: number | null,
   result: string | null,
+}
+
+export interface Ranking {
+  username: string,
+  email: string,
+  is_active: boolean,
+  is_verified: boolean,
+  registration_date: string,
+  rating: number
 }

@@ -23,6 +23,7 @@ services:
       - HOST=0.0.0.0
       - PORT=80
       - ROOT_PATH=
+      - FE_HOST=localhost::8080
 
   db:
     restart: always

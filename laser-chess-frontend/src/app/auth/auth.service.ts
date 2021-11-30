@@ -44,8 +44,13 @@ export class AuthService {
 
   }
 
-  sendPasswordChangeRequest(username: string){
-    return this.http.post<any>(emailFullEndpoint("send_password_change_request"), {'username': username}).toPromise();
+  sendPasswordChangeRequest(email: string){
+    return this.http.post<any>(emailFullEndpoint("send_password_change_request"), {'email': email}).toPromise();
+
+  }
+
+  verifyUser(token: string){
+    return this.http.post<any>(userFullEndpoint(`verify/${token}`),{}).toPromise();
 
   }
 
