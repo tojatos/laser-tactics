@@ -25,7 +25,7 @@ calculations.
 class PlayerMatchResult(BaseModel):
     player2_rating: int
     player2_rating_deviation: float
-    result: int
+    result: float
 
 
 """

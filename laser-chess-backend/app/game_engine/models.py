@@ -349,7 +349,7 @@ class GameState:
         )
 
 
-def empty_game_state(player_one_id, player_two_id) -> GameState:
+def empty_game_state(player_one_id, player_two_id, is_rated=False) -> GameState:
     board: Board = Board(cells={
         (0, 0): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE),
         (1, 0): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE),
@@ -444,4 +444,4 @@ def empty_game_state(player_one_id, player_two_id) -> GameState:
     game_phase: GamePhase = GamePhase.NOT_STARTED
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], False)
+    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated)

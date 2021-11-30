@@ -2,6 +2,7 @@ version: '3.7'
 services:
   angular:
     build: ./laser-chess-frontend
+    image: tojatos/laser-tactics-frontend-dev
     restart: always
     ports:
       - '8080:8080'
@@ -10,6 +11,7 @@ services:
 
   fastapi:
     build: ./laser-chess-backend
+    image: tojatos/laser-tactics-backend-dev
     restart: always
     command: python -m app.main
     ports:

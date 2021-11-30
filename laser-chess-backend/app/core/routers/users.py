@@ -81,26 +81,29 @@ def read_user(username: str, db: Session = Depends(get_db)):
     return db_user
 
 
-# TODO: test
-@router.get("/me/blocked", response_model=List[schemas.Username])
+@router.get("/me/blocked", response_model=List[str])
 async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return crud.get_blocked_users(user=current_user, db=db)
 
 
-# TODO: test
-@router.post("/block", response_model=schemas.BlockedUsers)
+@router.post("/me/block", response_model=schemas.BlockedUsers)
 async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     username = usernameSchema.username
     user_to_block = crud.get_user(username=username, db=db)
     if not user_to_block:
         raise HTTPException(status_code=404, detail="User not found")
+    blocked = crud.get_blocked_users(current_user, db)
+    if user_to_block.username == current_user.username:
+        raise HTTPException(status_code=403, detail="Cannot block yourself")
+    if username in blocked:
+        raise HTTPException(status_code=403, detail="User already blocked")
     return crud.create_block_record(user=current_user, user_to_block=user_to_block, db=db)
 
 
 # TODO: test
-@router.delete("/unblock")
+@router.delete("/me/unblock")
 async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                        db: Session = Depends(get_db)):
     username = usernameSchema.username
@@ -109,11 +112,11 @@ async def unblock_user(usernameSchema: schemas.Username, current_user: schemas.U
     if not user_to_unblock:
         raise HTTPException(status_code=404, detail="User not found")
     if user_to_unblock.username not in blocked:
-        raise HTTPException(status_code=404, detail="User not blocked")
+        raise HTTPException(status_code=403, detail="User not blocked")
     return crud.remove_block_record(user=current_user, blocked_user=user_to_unblock, db=db)
 
 
-@router.get("/me", response_model=schemas.User)
+@router.get("/me/info", response_model=schemas.User)
 async def read_users_me(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
 
@@ -127,8 +130,7 @@ def change_password(change_password_schema: schemas.ChangePasswordSchema,
     return crud.change_password(user=current_user, new_password=change_password_schema.newPassword, db=db)
 
 
-# TODO: test
-@router.get("/{username}/history")
+@router.get("/{username}/history", response_model=List[schemas.GameHistoryEntry])
 def get_users_game_history(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -137,8 +139,7 @@ def get_users_game_history(username: str, db: Session = Depends(get_db)):
     return history
 
 
-# TODO: test
-@router.get("/{username}/stats")
+@router.get("/{username}/stats", response_model=schemas.Stats)
 def get_stats(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -146,12 +147,18 @@ def get_stats(username: str, db: Session = Depends(get_db)):
     return crud.get_stats(db=db, user=db_user)
 
 
-@router.get("/{username}/settings", response_model=schemas.Settings)
+@router.get("/me/settings", response_model=schemas.Settings)
 def get_settings(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     return crud.get_settings(db=db, user=current_user)
 
 
-@router.patch("/{username}/settings")
-def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+@router.patch("/me/settings", response_model=schemas.Settings)
+def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user),
+                    db: Session = Depends(get_db)):
     return crud.update_settings(settings=settings, db=db, user=current_user)
 
+
+@router.get("/ranking/top", response_model=List[schemas.User])
+def get_top_ranked(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = crud.get_users_by_rating(db, skip=skip, limit=limit)
+    return users

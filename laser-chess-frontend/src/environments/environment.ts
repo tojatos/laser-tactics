@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   API_URL: "http://localhost",
   WEBSOCKET_URL: "ws://localhost/ws",
+  LOBBY_WEBSOCKET_URL: "ws://localhost/lobby_ws",
   API_PREFIX: "/api/v1"
 };
 

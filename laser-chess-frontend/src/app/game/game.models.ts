@@ -10,6 +10,7 @@ export interface GameState {
   board: BoardInterface
   game_phase: GamePhase
   turn_number: number
+  is_rated: boolean
   game_events: GameEvent[]
   user_events: UserEvent[]
 }

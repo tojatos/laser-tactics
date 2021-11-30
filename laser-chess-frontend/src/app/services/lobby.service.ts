@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { createLobbyFullEndpoint, leaveLobbyFullEndpoint, joinLobbyFullEndpoint, lobbyFullEndpoint, startGameFullEndpoint, updateLobbyFullEndpoint, joinRandomLobbyFullEndpoint } from '../api-definitions';
 import { Lobby } from '../app.models';
+import { StartGameRequest } from '../game/game.request.models';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,16 @@ export class LobbyService {
   }
 
   startGame(game_id: string, player_one_id: string, player_two_id: string, is_rated: boolean){
-    return this.http.post<any>(startGameFullEndpoint, {'game_id': game_id, 'player_one_id': player_one_id, 'player_two_id': player_two_id, "is_rated": is_rated}).toPromise()
+    const req: StartGameRequest = {
+      game_id: game_id,
+      player_one_id: player_one_id,
+      player_two_id: player_two_id,
+      is_rated: is_rated
+    }
+
+    console.log(req)
+    
+    return this.http.post<any>(startGameFullEndpoint, req).toPromise()
   }
 
   joinLobby(lobby_id: string){

@@ -19,6 +19,6 @@ def update_rating(player_data: PlayerRatingUpdate, match_history: PlayerMatchHis
         player.update_player(ratings, rds, results)
     else:
         player.did_not_compete()
-    updated_player_rating = PlayerRatingUpdate(rating=round(player.rating, 2), rating_deviation=round(player.rd, 2), volatility=round(player.vol, 2))
+    updated_player_rating = PlayerRatingUpdate(rating=round(player.rating, 2), rating_deviation=round(player.rd, 5), volatility=round(player.vol, 5))
     return updated_player_rating
 

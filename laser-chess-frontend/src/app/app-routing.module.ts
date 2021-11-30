@@ -14,6 +14,7 @@ import { VerifyComponent } from './components/verify/verify.component';
 import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { RankingComponent } from './components/ranking/ranking.component';
+import { RulesComponent } from './components/rules/rules.component';
 
 const routes: Routes = [
   {
@@ -67,6 +68,10 @@ const routes: Routes = [
   {
     path: 'verify/:id',
     component: VerifyComponent
+  },
+  {
+    path: 'rules',
+    component: RulesComponent
   },
   {
     path: '**',
