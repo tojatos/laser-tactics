@@ -212,6 +212,45 @@ def test_unfriend_multiple(tu):
     assert response.status_code == 404
 
 
+def test_friend_each_other(tu):
+    response = tu.post_data("/users/me/friends/requests/send", tokens[0], json={"username": "test2"})
+    assert response.status_code == 201
+
+    response = tu.get_data("/users/me/friends/requests", tokens[2])
+    assert response.status_code == 200
+
+    pending_requests_of_2 = list(response.json())
+    assert len(pending_requests_of_2) > 0
+
+    response = tu.post_data("/users/me/friends/requests/send", tokens[2], json={"username": "test0"})
+    assert response.status_code == 201
+
+    response = tu.get_data("/users/me/friends/requests", tokens[0])
+    assert response.status_code == 200
+
+    pending_requests_of_1 = list(response.json())
+    assert len(pending_requests_of_1) == 0
+
+    response = tu.post_data(f"/users/me/friends/requests/accept", tokens[2],
+                            json={"id": pending_requests_of_2[0]['id']})
+    assert response.status_code == 404
+
+    response = tu.get_data("/users/me/friends/requests", tokens[2])
+    assert response.status_code == 200
+
+    pending_requests = list(response.json())
+    assert len(pending_requests) == 0
+
+    response = tu.get_data("/users/me/friends", tokens[0])
+    user_1_friends = list(response.json())
+
+    response = tu.get_data("/users/me/friends", tokens[2])
+    user_2_friends = list(response.json())
+
+    assert "test0" in user_2_friends
+    assert "test2" in user_1_friends
+
+
 def test_block_user(tu):
     response = tu.post_data("/users/me/block", tokens[0], json={"username": "test2"})
     assert response.status_code == 200
