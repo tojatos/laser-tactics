@@ -95,6 +95,8 @@ async def block_user(usernameSchema: schemas.Username, current_user: schemas.Use
     if not user_to_block:
         raise HTTPException(status_code=404, detail="User not found")
     blocked = crud.get_blocked_users(current_user, db)
+    if user_to_block.username == current_user.username:
+        raise HTTPException(status_code=403, detail="Cannot block yourself")
     if username in blocked:
         raise HTTPException(status_code=403, detail="User already blocked")
     return crud.create_block_record(user=current_user, user_to_block=user_to_block, db=db)
