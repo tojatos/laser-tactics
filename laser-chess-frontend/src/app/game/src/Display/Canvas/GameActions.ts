@@ -1,5 +1,5 @@
 import { EventEmitterService } from "src/app/game/services/event-emitter.service"
-import { GameWebsocketService } from "src/app/game/services/gameService/game-websocket.service"
+import { GameWebsocketService } from "src/app/game/services/game.service"
 import { Board } from "../../board"
 import { PieceType } from "../../enums"
 import { GameMediator } from "./CanvasMediator"
