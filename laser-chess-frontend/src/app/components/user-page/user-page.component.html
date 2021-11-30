@@ -1,5 +1,5 @@
 <div  class="main-wrapper" fxLayout="column" fxLayoutAlign="center" fxLayoutGap="30px">
-      
+
   <div *ngIf="!isOwner" fxLayout="row" fxLayoutAlign="end start" fxFlex="20">
     <mat-icon [matMenuTriggerFor]="user">more_vert</mat-icon>
     <mat-menu class="menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
@@ -16,7 +16,7 @@
     </div>
   <div fxLayout="row"  fxLayoutAlign="space-evenly strech">
 
-    <mat-card class="box" > 
+    <mat-card class="box" >
     <mat-list>
       <h3 matLine *ngIf="!empty"> Statistics </h3>
         <mat-list-item>Drawrate: {{stats?.drawrate}}</mat-list-item>
@@ -28,7 +28,7 @@
         <mat-list-item>Wins: {{stats?.wins}}</mat-list-item>
     </mat-list>
   </mat-card>
-  <mat-card class="box" > 
+  <mat-card class="box" >
     <h3 matLine > Game history  </h3>
     <mat-table [dataSource]="dataSource" class="table">
 
@@ -36,25 +36,25 @@
           <mat-header-cell *matHeaderCellDef > Date </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{getDate(element.game_end_date)}} </mat-cell>
         </ng-container>
-  
+
         <ng-container matColumnDef="Opponent">
           <mat-header-cell *matHeaderCellDef > Opponent </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{getOpponent(element)}} </mat-cell>
         </ng-container>
-  
+
         <ng-container matColumnDef="Result">
           <mat-header-cell *matHeaderCellDef > Result </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{getResult(element)}} </mat-cell>
         </ng-container>
-  
+
         <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="goToGame(row)"></mat-row>
       </mat-table>
       </mat-card>
     </div>
         <div *ngIf="isOwner" fxLayout="row" fxLayoutAlign="space-evenly strech">
- 
-          <mat-card class="box" > 
+
+          <mat-card class="box" >
         <mat-list class="list">
           <h3 matLine *ngIf="!empty"> Friend list  </h3>
           <h3 matLine *ngIf="empty"> Friend list empty</h3>
@@ -69,14 +69,14 @@
                 </mat-menu>
             </mat-list-item>
           </mat-list>
-        
+
             <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-           
+
                 <mat-form-field class="example-full-width" appearance="fill">
                   <mat-label>Username</mat-label>
                   <input formControlName="input" matInput #box>
             </mat-form-field>
-          
+
             <button mat-stroked-button color="accent" class="btn-block">Add friend</button>
         </form></mat-card>
 
@@ -91,7 +91,7 @@
             </mat-list-item>
         </mat-list>
       </mat-card>
-    
+
       </div>
       <div *ngIf="!isOwner" fxFlex="20" fxLayout="row" fxLayoutAlign="space-evenly strech"></div>
   </div>

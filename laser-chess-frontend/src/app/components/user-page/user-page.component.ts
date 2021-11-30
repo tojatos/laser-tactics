@@ -62,7 +62,7 @@ export class UserPageComponent {
         this.isInFriends
     })
       this.userService.getUserFriendsRequests().then(userData => {
-      this.friendsRequests = userData 
+      this.friendsRequests = userData
       if (this.friendsRequests?.length != 0) {
         this.empty_req = false
       }
@@ -182,7 +182,7 @@ export class UserPageComponent {
 
   getDate(date: string) {
     const parsedDate = new Date(date)
-    return parsedDate.getDate().toString() + ' ' + parsedDate.getMonth().toString() + ' ' + parsedDate.getFullYear().toString() 
+    return parsedDate.getDate().toString() + ' ' + parsedDate.getMonth().toString() + ' ' + parsedDate.getFullYear().toString()
   }
 
   getOpponent(history: UserHistory){
@@ -203,6 +203,14 @@ export class UserPageComponent {
       return "WIN"}
     return "DEFEAT"
   }}
+
+  goToGame(history: UserHistory){
+    this.router.navigate(['game', history.game_id])
+  }
+
+  getGameId(history: UserHistory){
+    return history.game_id
+  }
 
 }
 
