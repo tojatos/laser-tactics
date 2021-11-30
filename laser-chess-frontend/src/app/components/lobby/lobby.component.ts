@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import * as _ from 'lodash';
 import { LobbyService } from 'src/app/services/lobby.service';
 import { webSocket } from 'rxjs/webSocket';
+import { environment } from 'src/environments/environment';
 
 export enum LobbyStatus {
   CREATED = "CREATED",
@@ -44,7 +45,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   private lastMessage: Lobby | undefined
-  private subject = webSocket<Lobby | any>("ws://localhost/lobby_ws")
+  private subject = webSocket<Lobby | any>(environment.LOBBY_WEBSOCKET_URL)
 
   get lastWebsocketMessage(){
     return this.lastMessage
