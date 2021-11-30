@@ -91,14 +91,12 @@ export class LobbyComponent implements OnInit, OnDestroy {
         this.isPrivate = "Private"
         this.lobby.is_private = true
       }
-      console.log(this.lobby)
       await this.lobbyService.updateLobby(this.lobby)
     }
   }
 
   async startGame() {
     if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username) {
-      console.log(this.lobby.is_ranked)
       await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, this.lobby.is_ranked)
       this.router.navigate(['/game', this.lobby.game_id])
     }
@@ -113,7 +111,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   async refreshLobbyState(lobby: Lobby){
-    console.log(lobby)
     this.lobby = lobby
     if(this.lobby?.lobby_status == LobbyStatus.GAME_STARTED)
       this.router.navigate(['/game', this.lobby.game_id])
