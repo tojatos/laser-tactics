@@ -23,8 +23,9 @@ def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerial
 
 
 def start_game(username: str, request: StartGameRequest, db: Session):
-    # TODO verify user is in game
-    initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id)
+    if username != request.player_two_id and username != request.player_one_id:
+        raise HTTPException(status_code=403, detail="User need to participate in Game in order to start it")
+    initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id, is_rated=request.is_rated)
     crud.start_game(db, initial_state, request)
 
     game = Game(initial_state)

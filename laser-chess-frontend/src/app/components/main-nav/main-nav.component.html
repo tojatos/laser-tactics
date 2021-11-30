@@ -11,7 +11,7 @@
         <a href="#" mat-button routerLink="ranking">Ranking</a>
         <a href="#" mat-button [routerLink]="lobby" (click)="joinRandomLobby(false)">Join game</a>
         <a href="#" mat-button [routerLink]="lobby" (click)="joinRandomLobby(true)">Join ranked game</a>
-        <a href="/tutorial" mat-button>Tutorial</a>
+        <a href="#" mat-button routerLink="rules">Rules</a>
         <a href="#" *ngIf="!isLoggedin"  mat-button routerLink="login" routerLinkActive="active">Login</a>
         <a href="#" *ngIf="!isLoggedin" mat-button mat-raised-button routerLink="register" routerLinkActive="active">Register</a>
         <a mat-button *ngIf="isLoggedin" [matMenuTriggerFor]="user">{{username}}</a>
@@ -33,7 +33,7 @@
         <a href="#" mat-list-item routerLink="ranking" (click)="sidenav.toggle()">Ranking</a>
         <a href="#" mat-list-item  [routerLink]="lobby" (click)="joinRandomLobby(false)" (click)="sidenav.toggle()">Join game</a>
         <a href="#" mat-list-item  [routerLink]="lobby" (click)="joinRandomLobby(true)" (click)="sidenav.toggle()">Join ranked game</a>
-        <a href="#" mat-list-item routerLink="/tutorial" (click)="sidenav.toggle()">Tutorial</a>
+        <a href="#" mat-list-item routerLink="rules" (click)="sidenav.toggle()">Rules</a>
         <a href="#" *ngIf="!isLoggedin" mat-list-item routerLink="login" routerLinkActive="active" (click)="sidenav.toggle()">Login</a>
         <a href="#" *ngIf="!isLoggedin" mat-list-item routerLink="register" routerLinkActive="active" (click)="sidenav.toggle()" >Register</a>
         <a href="#" *ngIf="isLoggedin" mat-list-item [routerLink]="['/users', username]" (click)="sidenav.toggle()" >Profile</a>

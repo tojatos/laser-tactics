@@ -3,7 +3,8 @@ import { Coordinates } from "./game.models";
 export interface StartGameRequest {
   game_id: string,
   player_one_id: string,
-  player_two_id: string
+  player_two_id: string,
+  is_rated: boolean
 }
 
 export interface MovePieceRequest {

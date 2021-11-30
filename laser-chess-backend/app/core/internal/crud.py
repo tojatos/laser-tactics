@@ -38,6 +38,10 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
+def get_users_by_rating(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.User).order_by(models.User.rating.desc()).offset(skip).limit(limit).all()
+
+
 def verify_user(user: schemas.User, db: Session):
     user.is_verified = True
     user.verification_date = datetime.now()
@@ -73,7 +77,7 @@ def change_password(user: schemas.User, new_password: str, db: Session):
 
 def create_lobby(db: Session, user: schemas.User):
     db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username,
-                            lobby_status=LobbyStatus.CREATED)
+                            lobby_status=LobbyStatus.CREATED, lobby_creation_date=datetime.now())
     db.add(db_lobby)
     db.commit()
     db.refresh(db_lobby)
@@ -82,6 +86,18 @@ def create_lobby(db: Session, user: schemas.User):
 
 def get_lobbies(db: Session, skip: int = 0, limit: int = 100):
     lobbies = db.query(models.Lobby).offset(skip).limit(limit).all()
+    return lobbies
+
+
+def get_created_lobbies(db: Session, skip: int = 0, limit: int = 100):
+    lobbies = db.query(models.Lobby).filter(models.Lobby.lobby_status == LobbyStatus.CREATED).offset(skip).limit(
+        limit).all()
+    return lobbies
+
+
+def get_user_in_created_lobbies(db: Session, user: schemas.User):
+    lobbies = db.query(models.Lobby).filter(
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, or_(models.Lobby.player_one_username == user.username, models.Lobby.player_two_username == user.username))).all()
     return lobbies
 
 
@@ -134,10 +150,11 @@ def get_friend_request(id: str, db: Session):
 
 
 def get_friend_record(user: schemas.User, friend: schemas.User, db: Session):
-    return db.query(models.FriendRequests).filter(or_(and_(models.FriendRequests.user_two_username == friend.username,
-                                                           models.FriendRequests.user_one_username == user.username),
-                                                      and_((models.FriendRequests.user_two_username == user.username,
-                                                            models.FriendRequests.user_one_username == friend.username)))).first()
+    return db.query(models.FriendRequests).filter(
+        or_(False, and_(models.FriendRequests.user_two_username == friend.username,
+                        models.FriendRequests.user_one_username == user.username),
+            and_(models.FriendRequests.user_two_username == user.username,
+                 models.FriendRequests.user_one_username == friend.username))).first()
 
 
 def get_pending_friend_request(id: str, db: Session):
@@ -199,6 +216,24 @@ def create_block_record(user: schemas.User, user_to_block: schemas.User, db: Ses
     db.commit()
     db.refresh(record)
     return record
+
+
+def get_random_lobby(params: schemas.JoinRandomRequest, db: Session):
+    def rating_in_bounds(params: schemas.JoinRandomRequest, lobby: models.Lobby):
+        opponent = get_user(db, lobby.player_one_username)
+        if not params.is_rated:
+            return True
+        elif params.rating_lower_bound < opponent.rating < params.rating_higher_bound:
+            return True
+        else:
+            return False
+
+    lobbys = db.query(models.Lobby).filter(
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.is_ranked == params.is_rated, models.Lobby.player_two_username == None)).all()
+    for lobby in lobbys:
+        if rating_in_bounds(params, lobby):
+            return lobby
+    return None
 
 
 def remove_block_record(user: schemas.User, blocked_user: schemas.User, db: Session):
@@ -304,15 +339,31 @@ def update_game(db: Session, game_state: GameState, game_id: str):
             result=map_gameResult(game_state.game_phase),
             game_end_date=datetime.now(),
             is_rated=game_state.is_rated,
+            player_one_new_rating=None,
+            player_two_new_rating=None
         )
         db.add(record)
+        db.commit()
         if record.is_rated:
             update_user_rating(db, player_one_rating.username)
             update_user_rating(db, player_two_rating.username)
+            update_ratings_in_history(db, game_id, player_one_rating.username, player_two_rating.username)
+
         lobby = get_lobby(db, game_id)
         if lobby is not None:
             lobby.lobby_status = LobbyStatus.GAME_ENDED
     db.commit()
+
+
+def update_ratings_in_history(db: Session, game_id: str, player_one_username: str, player_two_username: str):
+    record = db.query(models.GameHistory).filter(models.GameHistory.game_id == game_id).first()
+    if record:
+        player_one_rating = get_user(db, player_one_username).rating
+        player_two_rating = get_user(db, player_two_username).rating
+        record.player_one_new_rating = player_one_rating
+        record.player_two_new_rating = player_two_rating
+        db.commit()
+        db.refresh(record)
 
 
 def update_user_rating_in_db(db: Session, rating: schemas.UserRating):
@@ -344,6 +395,7 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
             return 0
 
     crossout_date = datetime.now() - timedelta(days=rating_period)
+    all_matches = db.query(models.GameHistory).all()
     matches_left = db.query(models.GameHistory).filter(
         and_(models.GameHistory.player_one_username == user.username, models.GameHistory.game_end_date > crossout_date,
              models.GameHistory.is_rated == True)).all()
@@ -372,6 +424,10 @@ def update_user_rating(db: Session, username: str):
                                          rating_deviation=new_rating.rating_deviation,
                                          rating_volatility=new_rating.volatility)
     update_user_rating_in_db(db, new_user_rating)
+
+
+def get_match_record(db: Session, game_id: str):
+    return db.query(models.GameHistory).filter(models.GameHistory.game_id == game_id).first()
 
 
 def get_last_20_matches(db: Session, user: schemas.User):
@@ -426,11 +482,11 @@ def get_stats(db: Session, user: schemas.User):
     matches = list(sorted(matches_sum, key=lambda match: match.game_end_date))
     no_matches = len(matches)
     draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
-    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN, matches))
-    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN, matches))
+    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN and match.player_one_username == user.username, matches))
+    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN and match.player_two_username == user.username, matches))
     winrate = len(wins_as_p1 + wins_as_p2) / no_matches
-    winrate_as_p1 = len(games_as_p1) / len(games_as_p1)
-    winrate_as_p2 = len(games_as_p2) / len(games_as_p2)
+    winrate_as_p1 = len(wins_as_p1) / len(games_as_p1) if games_as_p1 else 0
+    winrate_as_p2 = len(wins_as_p2) / len(games_as_p2) if games_as_p2 else 0
     no_wins = len(wins_as_p1 + wins_as_p2)
     no_draws = len(draws)
     drawrate = len(draws) / no_matches
@@ -439,10 +495,10 @@ def get_stats(db: Session, user: schemas.User):
         wins=no_wins,
         draws=no_draws,
         loses=no_matches - (no_wins + no_draws),
-        winrate=winrate,
-        winrate_as_p1=winrate_as_p1,
-        winrate_as_p2=winrate_as_p2,
-        drawrate=drawrate
+        winrate=round(winrate, 2),
+        winrate_as_p1=round(winrate_as_p1, 2),
+        winrate_as_p2=round(winrate_as_p2, 2),
+        drawrate=round(drawrate, 2)
     )
 
 
@@ -454,8 +510,8 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     db_settings = get_settings(db, user)
     # change settings here
     db_settings.skip_animations = settings.skip_animations
+    db_settings.sound_on = settings.sound_on
     # ------------------------------------------
     db.commit()
     db.refresh(db_settings)
     return db_settings
-

@@ -4,7 +4,6 @@ import asyncio
 import collections
 from typing import Set
 
-
 from fastapi import Depends, HTTPException
 from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
@@ -31,15 +30,25 @@ ALGORITHM = get_env('ALGORITHM', "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = get_env('ACCESS_TOKEN_EXPIRE_MINUTES', 10080)
 VERIFY_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 60 * 24)
 CHANGE_PASSWORD_TOKEN_EXPIRE_MINUTES = get_env('VERIFY_TOKEN_EXPIRE_MINUTES', 20)
-VERIFICATION_URL = "<verification_url>"
-CHANGE_PASSWORD_URL = "<change_password_url>"
 API_PREFIX = get_env('API_PREFIX', "/api/v1")
 HOST = get_env('HOST', "localhost")
 PORT = get_env('PORT', 8000)
+FE_HOST = get_env('FE_HOST', "localhost::8080")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ROOT_PATH = get_env('ROOT_PATH', "")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{ROOT_PATH}{API_PREFIX}/token")
-
+VERIFY_MAIL_FROM = get_env('VERIFY_MAIL_FROM', "verification@lasertactics.online")
+VERIFY_MAIL_USERNAME = get_env('VERIFY_MAIL_USERNAME', "verification@lasertactics.online")
+VERIFY_MAIL_PASSWORD = get_env("VERIFY_MAIL_PASSWORD", "Verify123!@#")
+VERIFY_MAIL_PORT = get_env('VERIFY_MAIL_PORT', 587)
+VERIFY_MAIL_SERVER = get_env('VERIFY_MAIL_SERVER', "smtppro.zoho.eu")
+VERIFICATION_URL = get_env('VERIFY_MAIL_URL', f"//{FE_HOST}/verify/")
+MAIL_FROM = get_env('MAIL_FROM', "lasertactics@lasertactics.online")
+MAIL_USERNAME = get_env('MAIL_USERNAME', "lasertactics@lasertactics.online")
+MAIL_PASSWORD = get_env('MAIL_PASSWORD', "r_B?KE@MU3nFnyG")
+MAIL_PORT = get_env('MAIL_PORT', 587)
+MAIL_SERVER = get_env('MAIL_SERVER', "smtppro.zoho.eu")
+CHANGE_PASSWORD_URL = get_env('VERIFY_MAIL_URL', f"//{FE_HOST}/change_password/")
 
 
 class TokenPurpose(str, AutoNameEnum):
@@ -160,3 +169,4 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
+lobby_manager = ConnectionManager()

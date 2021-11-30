@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/constants';
@@ -25,11 +26,16 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly placeForGameLogSize = 1.35
   readonly minWidth = 695
   animation = true
+  sounds = true
 
-  constructor(private route: ActivatedRoute, private userService: UserService, public game: Game) {}
+  constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
 
   async ngAfterViewInit() {
-    this.animation = !(await this.userService.getSettings().toPromise()).skip_animations
+    if(this.authService.isLoggedIn()){
+      const settings = await this.userService.getSettings().toPromise()
+      this.animation = !settings.skip_animations
+      this.sounds = settings.sound_on
+    }
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
       alert("Couldn't load context")
@@ -41,7 +47,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
         this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
         params.id,
         this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
-        this.animation)
+        this.animation, this.sounds)
     })
   }
 
@@ -59,6 +65,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     this.game.changeAnimationsShowOption(this.animation)
   }
 
+  changeSoundOption(){
+    this.game.changeSoundOption(this.sounds)
+  }
+
   buttonPressEvent(event: string){
     switch(event){
       case "left": this.game.passRotation(-90); break
@@ -69,7 +79,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   buildEvent(gameEvents: GameEvent[]){
-    this.game.showGameEvent(gameEvents)
+    this.game.showGameEvent(gameEvents, this.sounds)
   }
 
   returnToCurrentEvent(){

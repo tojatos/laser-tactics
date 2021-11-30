@@ -24,6 +24,7 @@ import { SettingsBlockedUsersComponent } from './components/settings-blocked-use
 import { VerifyComponent } from './components/verify/verify.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { RankingComponent } from './components/ranking/ranking.component';
+import { RulesComponent } from './components/rules/rules.component';
 
 
 @NgModule({
@@ -42,6 +43,7 @@ import { RankingComponent } from './components/ranking/ranking.component';
     VerifyComponent,
     ChangePasswordComponent,
     RankingComponent,
+    RulesComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +60,6 @@ import { RankingComponent } from './components/ranking/ranking.component';
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, { provide: JWT_OPTIONS, useValue: JWT_OPTIONS }, JwtHelperService],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
-  
+
 })
 export class AppModule { }
