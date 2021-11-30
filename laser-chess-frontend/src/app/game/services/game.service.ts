@@ -31,7 +31,6 @@ export class GameWebsocketService {
   connect(gameId: string){
     this.subject.asObservable().subscribe(
       msg => {
-        console.log(msg)
         if(msg.status_code && msg.status_code != 200){
           this.showSnackbar(msg.body)
           if(this.lastMessage)

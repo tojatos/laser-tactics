@@ -44,15 +44,13 @@ export class MainNavComponent {
 
   getRating() {
     this.userService.getUserMe().then(userData => {
-      console.log(userData)
       this.rating = userData.rating
     })
   }
 
   async joinRandomLobby(isRanked = false) {
-    
+
     await this.userService.getUserMe().then(userData => {
-      console.log(userData)
       this.rating = userData.rating
     })
 
@@ -62,7 +60,7 @@ export class MainNavComponent {
     else if (this.rating) {
       this.lobby = await this.lobbyService.joinRandom(this.rating - 300, this.rating + 300, isRanked)
     }
-    
+
     this.router.navigate(['/lobby', this.lobby.game_id])
   }
 
