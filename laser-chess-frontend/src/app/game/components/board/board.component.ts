@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/constants';
@@ -27,12 +28,14 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   animation = true
   sounds = true
 
-  constructor(private route: ActivatedRoute, private userService: UserService, public game: Game) {}
+  constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
 
   async ngAfterViewInit() {
-    const settings = await this.userService.getSettings().toPromise()
-    this.animation = !settings.skip_animations
-    this.sounds = settings.sound_on
+    if(this.authService.isLoggedIn()){
+      const settings = await this.userService.getSettings().toPromise()
+      this.animation = !settings.skip_animations
+      this.sounds = settings.sound_on
+    }
     const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
     if(!gameCanvasContext){
       alert("Couldn't load context")
