@@ -32,7 +32,7 @@ async def send_friend_request(usernameSchema: schemas.Username, current_user: sc
                               db: Session = Depends(get_db)):
     friend_username = usernameSchema.username
     if friend_username == current_user.username:
-        raise HTTPException(status_code=404, detail="Cannot send request to yourself")
+        raise HTTPException(status_code=403, detail="Cannot send request to yourself")
     friend_to_be = crud.get_user(username=friend_username, db=db)
     if friend_to_be is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -47,6 +47,10 @@ async def send_friend_request(usernameSchema: schemas.Username, current_user: sc
     # ???? do this better?
     if current_user.username in blocked:
         raise HTTPException(status_code=403, detail="That user has blocked this user")
+    my_requests = crud.get_users_pending_friend_requests(user=current_user, db=db)
+    filtered = list(filter(lambda d: d.user_two_username == current_user.username, my_requests))
+    if len(filtered) > 0:
+        return crud.accept_friend_request(friend_request=filtered[0], db=db)
     return crud.create_friend_request(user_sending=current_user, user_sent_to=friend_to_be, db=db)
 
 
