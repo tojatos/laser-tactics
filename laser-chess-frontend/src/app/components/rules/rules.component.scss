@@ -1,0 +1,40 @@
+.main-wrapper{
+  padding: 20px;
+  height: 250%;
+  overflow: hidden;
+  scrollbar-width: none;
+}
+
+.card-element{
+  float:left;
+  width:fit-content;
+}
+
+.image {
+  margin-top: 10px;
+  width: 100px;
+  margin-left: 40px;
+  margin-right: 30px;
+}
+
+.name{
+  width: 200px;
+}
+
+mat-card{
+  margin: 20px;
+}
+
+h1{
+  margin-top: 35px;
+}
+
+img {
+  margin-top: 10px;
+  height: 50px;
+  width: 50px;
+}
+
+.description{
+  font-size: 16px;
+}
