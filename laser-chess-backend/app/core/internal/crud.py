@@ -95,9 +95,9 @@ def get_created_lobbies(db: Session, skip: int = 0, limit: int = 100):
     return lobbies
 
 
-def get_user_created_lobbies(db: Session, user: schemas.User):
+def get_user_in_created_lobbies(db: Session, user: schemas.User):
     lobbies = db.query(models.Lobby).filter(
-        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.player_one_username == user.username)).all()
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, or_(models.Lobby.player_one_username == user.username, models.Lobby.player_two_username == user.username))).all()
     return lobbies
 
 
