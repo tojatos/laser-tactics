@@ -81,13 +81,13 @@ def read_user(username: str, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.get("/me/blocked")
+@router.get("/me/blocked", response_model=List[str])
 async def get_users_blocked(current_user: schemas.User = Depends(get_current_active_user),
                             db: Session = Depends(get_db)):
     return crud.get_blocked_users(user=current_user, db=db)
 
 
-@router.post("/me/block")
+@router.post("/me/block", response_model=schemas.BlockedUsers)
 async def block_user(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
                      db: Session = Depends(get_db)):
     username = usernameSchema.username
@@ -128,7 +128,7 @@ def change_password(change_password_schema: schemas.ChangePasswordSchema,
     return crud.change_password(user=current_user, new_password=change_password_schema.newPassword, db=db)
 
 
-@router.get("/{username}/history")
+@router.get("/{username}/history", response_model=List[schemas.GameHistoryEntry])
 def get_users_game_history(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -137,8 +137,7 @@ def get_users_game_history(username: str, db: Session = Depends(get_db)):
     return history
 
 
-# TODO: test
-@router.get("/{username}/stats")
+@router.get("/{username}/stats", response_model=schemas.Stats)
 def get_stats(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
     if db_user is None:
@@ -151,7 +150,7 @@ def get_settings(current_user: schemas.User = Depends(get_current_active_user), 
     return crud.get_settings(db=db, user=current_user)
 
 
-@router.patch("/me/settings")
+@router.patch("/me/settings", response_model=schemas.Settings)
 def update_settings(settings: schemas.Settings, current_user: schemas.User = Depends(get_current_active_user),
                     db: Session = Depends(get_db)):
     return crud.update_settings(settings=settings, db=db, user=current_user)
