@@ -63,4 +63,23 @@ export interface UserStats {
 }
 export interface Settings {
   skip_animations: boolean
+  sound_on: boolean
+}
+
+export interface UserHistory {
+  is_rated: boolean,
+  id: number,
+  player_two_new_rating: number | null,
+  game_id: string,
+  player_one_rating: number | null,
+  player_one_volatility: number | null,
+  player_two_rating: number | null,
+  player_two_volatility: number | null,
+  game_end_date: string | null,
+  player_one_new_rating: number | null,
+  player_one_username: string | null,
+  player_one_deviation: number | null,
+  player_two_username: string | null,
+  player_two_deviation: number | null,
+  result: string | null,
 }

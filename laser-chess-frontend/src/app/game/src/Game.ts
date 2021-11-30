@@ -3,7 +3,7 @@ import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { UserService } from "src/app/services/user.service";
 import { GameEvent, GameState, LaserShotEvent } from "../game.models";
-import { GameWebsocketService } from "../services/gameService/game-websocket.service";
+import { GameWebsocketService } from "../services/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
 import { GameActions } from "./Display/Canvas/GameActions";
@@ -27,6 +27,7 @@ export class Game{
   gameId: string | undefined
   sizeScale: number = 0
   showAnimations: boolean = true
+  enableSounds: boolean = true
   executingActions = false
   isInitiated = false
   analyzeMode = analizeModes.NOT_ANALYZING
@@ -34,6 +35,7 @@ export class Game{
   whoseTurn: PlayerType = PlayerType.NONE
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
   playerRankings: [number, number] = [0, 0]
+  playerRankingsChanges : [number | undefined, number | undefined] = [undefined, undefined]
   initialGameState!: GameState
 
   constructor(public gameService: GameWebsocketService,
@@ -62,12 +64,13 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean){
     this.sizeScale = sizeScale
     this.gameId = gameId
     this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
     this.showAnimations = animations
+    this.enableSounds = sounds
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.gameCanvas.showAnimations = this.showAnimations
     this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
@@ -104,6 +107,8 @@ export class Game{
       const p1 = await this.userService.getUserByUsername(this.playerNames[0]!)
       const p2 = await this.userService.getUserByUsername(this.playerNames[1]!)
 
+      await this.gameRankingChanges(receivedGameState)
+
       this.playerRankings[0] = p1.rating
       this.playerRankings[1] = p2.rating
     }
@@ -120,6 +125,13 @@ export class Game{
     if(this.gameCanvas){
       this.showAnimations = show
       this.gameCanvas.showAnimations = this.showAnimations
+    }
+  }
+
+  changeSoundOption(sounds: boolean){
+    if(this.gameCanvas){
+      this.enableSounds = sounds
+      this.gameCanvas.enableSounds = this.enableSounds
     }
   }
 
@@ -146,7 +158,7 @@ export class Game{
       this.executingActions = true
       const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
       if(animationsToShow > 0)
-        await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations)
+        await this.executePendingActions(newGameState.game_events, animationsToShow, this.showAnimations, this.enableSounds)
 
       this.board.currentTurn = newGameState.turn_number
 
@@ -156,8 +168,28 @@ export class Game{
 
       this.executingActions = false
 
+      await this.gameRankingChanges(newGameState)
+
       if(this.gameService.lastMessage?.game_events && this.gameService.lastMessage != newGameState)
         this.refreshGameState(this.gameService.lastMessage)
+    }
+  }
+
+  async gameRankingChanges(gameState: GameState){
+    if(gameState.game_phase != GamePhase.NOT_STARTED && gameState.game_phase != GamePhase.STARTED){
+      const info = await this.gameService.getGameInfo(this.gameId!)
+      if(info.player_one_rating && info.player_one_new_rating && info.player_two_rating && info.player_two_new_rating){
+        const newRating1 = info.player_one_rating - info.player_one_new_rating
+        const newRating2 = info.player_two_rating - info.player_two_new_rating
+        if(info.player_one_username == this.playerNames[0]){
+          this.playerRankingsChanges[0] = newRating1
+          this.playerRankingsChanges[1] = newRating2
+        }
+        else if(info.player_two_username == this.playerNames[0]){
+          this.playerRankingsChanges[1] = newRating1
+          this.playerRankingsChanges[0] = newRating2
+        }
+      }
     }
   }
 
@@ -190,17 +222,17 @@ export class Game{
     this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
-  async showGameEvent(gameEvents: GameEvent[]){
+  async showGameEvent(gameEvents: GameEvent[], enableSounds: boolean){
     if(this.gameCanvas){
       this.analyzeMode = analizeModes.ANALYZING
       this.gameCanvas.interactable = false
       this.board.setInitialGameState(this.initialGameState, this.displaySize)
-      await this.executePendingActions(gameEvents, gameEvents.length, false, false)
+      await this.executePendingActions(gameEvents, gameEvents.length, false, false, false)
       if(gameEvents.slice(-1)[0].event_type == GameEvents.LASER_SHOT_EVENT || gameEvents.slice(-1)[0].event_type == GameEvents.PIECE_DESTROYED_EVENT)
         for(let i = gameEvents.length-1; i > 0; i--)
           if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){
             this.eventsExecutor.addEventsToExecute(gameEvents.slice(i, gameEvents.length))
-            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, true, 999999)
+            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, false, true, 999999)
             this.eventsExecutor.eventsQueue = []
             i = -1
           }
@@ -214,11 +246,11 @@ export class Game{
     }
   }
 
-  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, showLaser: boolean = true){
+  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean = true){
     if(this.gameCanvas){
       this.gameCanvas.interactable = false
       this.eventsExecutor.addEventsToExecute(events.slice(-animationsToShow))
-      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, showLaser)
+      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, enableSounds, showLaser)
     }
   }
 
@@ -230,9 +262,6 @@ export class Game{
   offerDraw(){
     if(this.gameId)
       this.gameService.offerDraw(this.gameId)
-  }
-
-  async rematch(){
   }
 
   passRotation(degree: number){

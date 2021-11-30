@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { cloneDeep, reject } from "lodash";
+import { from } from "rxjs";
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
@@ -13,12 +14,10 @@ export class Animations {
 
     constructor(private drawings: Drawings){}
 
-    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates, isReverse: boolean, showAnimations: boolean): Promise<void>{
+    async movePiece(canvas: Canvas, board: Board, originCoordinates: Coordinates, destinationCoordinates: Coordinates, isReverse: boolean, showAnimations: boolean, enableSounds: boolean): Promise<void>{
 
         const origin = board.getCellByCoordinates(originCoordinates.x, originCoordinates.y)
         const destination = board.getCellByCoordinates(destinationCoordinates.x, destinationCoordinates.y)
-
-        canvas.resources.bruh.play()
 
         const pieceRef = origin?.auxiliaryPiece || origin?.piece
         const piece = cloneDeep(pieceRef)
@@ -44,6 +43,15 @@ export class Animations {
         let validCellsArray = origin.auxiliaryPiece ? board.cells : this.cellsExcludingPieces(board, [origin])
         if(destination.piece?.piece_type != PieceType.HYPER_SQUARE)
           validCellsArray = this.cellsExcludingPieces(board, [origin, destination])
+
+        if(enableSounds){
+          if((origin.piece?.piece_type == PieceType.HYPER_CUBE || origin.piece?.piece_type == PieceType.HYPER_SQUARE) && origin.auxiliaryPiece)
+            canvas.resources.teleport().play()
+          else if(destination.piece && origin.piece?.piece_type != PieceType.HYPER_CUBE && destination.piece?.piece_type != PieceType.HYPER_SQUARE)
+            canvas.resources.take().play()
+          else
+            canvas.resources.move().play()
+        }
 
         const intervalAction = () => {
           this.drawings.drawGame(canvas, validCellsArray, isReverse)
@@ -102,7 +110,7 @@ export class Animations {
 
     }
 
-    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, isReverse: boolean, showAnimations: boolean, initialRotationDifference: number = 0): Promise<void>{
+    async rotatePiece(canvas: Canvas, board: Board, atCell: Cell | undefined, byDegrees: number, isReverse: boolean, showAnimations: boolean, enableSounds: boolean, initialRotationDifference: number = 0): Promise<void>{
       const piece = cloneDeep(atCell?.piece)
 
       if(!piece || !atCell)
@@ -113,6 +121,9 @@ export class Animations {
 
       const validCellsArray = this.cellsExcludingPieces(board, [atCell])
       const desiredPiecePosition = piece.rotation_degree + byDegrees
+
+      if(enableSounds)
+        canvas.resources.rotate().play()
 
       const intervalAction = () => {
         this.drawings.drawGame(canvas, validCellsArray, isReverse)
@@ -162,9 +173,25 @@ export class Animations {
 
   }
 
-    async laserAnimation(canvas: Canvas, board: Board, positions: [Coordinates, Coordinates][], isReverse: boolean, showAnimations: boolean): Promise<void> {
+    async laserAnimation(canvas: Canvas, board: Board, positions: [Coordinates, Coordinates][], isReverse: boolean, showAnimations: boolean, enableSounds: boolean): Promise<void> {
       const laserIncrementPerFrame = 10
       let laserIncrement = laserIncrementPerFrame
+
+      const fromCell = board.getCellByCoordinates(positions[0][0].x, positions[0][0].y)
+
+      if(enableSounds){
+
+        if(fromCell?.piece?.piece_type == PieceType.LASER)
+          canvas.resources.deflect().play()
+
+        if(showAnimations && (
+          fromCell?.piece?.piece_type == PieceType.BEAM_SPLITTER ||
+          fromCell?.piece?.piece_type == PieceType.DIAGONAL_MIRROR ||
+          fromCell?.piece?.piece_type == PieceType.MIRROR ||
+          fromCell?.piece?.piece_type == PieceType.TRIANGULAR_MIRROR ||
+          fromCell?.piece?.piece_type == PieceType.BLOCK))
+            canvas.resources.deflect().play()
+      }
 
         const lastAction = () => {
           for(const position of positions){
@@ -217,7 +244,11 @@ export class Animations {
         })
       }
 
-    async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, isReverse: boolean, showAnimations: boolean){
+    async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, isReverse: boolean, showAnimations: boolean, enableSounds: boolean){
+
+      if(enableSounds && showAnimations)
+        canvas.resources.destroy().play()
+
       return new Promise<void>((resolve) => {
         const pieceToDestroy = board.getCellByCoordinates(at.x, at.y)
         if(pieceToDestroy){

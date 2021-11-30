@@ -23,6 +23,7 @@ export const authWebsocketEndpoint = '/ws_auth'
 export const observeWebsocketEndpoint = '/ws_observe'
 export const emailEndpoint = '/email'
 export const initialGameEndpoint = '/game/initial_game_state'
+export const gameHistoryEndpoint = '/game/history'
 
 export const usersFullEndpoint = fullEndpoint(userEndpoint)
 export const tokenFullEndpoint = fullEndpoint(tokenEndpoint)
@@ -44,3 +45,4 @@ export const giveUpFullEndpoint = fullEndpoint(giveUpEndpoint)
 export const offerDrawFullEndpoint = fullEndpoint(offerDrawEndpoint)
 export const emailFullEndpoint = (id: string  = "") => fullEndpoint(emailEndpoint, id ? `/${id}` : '')
 export const initalGameStateFullEndpoint = fullEndpoint(initialGameEndpoint)
+export const gameHistoryFullEndpoint = (id: string  = "") => fullEndpoint(gameHistoryEndpoint, id ? `/${id}` : '')

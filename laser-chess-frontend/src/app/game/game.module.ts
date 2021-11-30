@@ -5,11 +5,10 @@ import { BoardComponent } from './components/board/board.component';
 import { Board } from './src/board';
 import { Resources } from './src/Display/Resources';
 import { EventsExecutor } from './src/eventsExecutor';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { Game } from './src/Game';
 import { Animations } from './src/Display/Animations';
 import { Drawings } from './src/Display/Drawings';
-import { GameServiceInterceptor } from './services/game-service.interceptor';
 import { MaterialModule } from '../material/material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BoardActionsComponent } from './components/board-actions/board-actions.component';
@@ -28,6 +27,6 @@ import { AppRoutingModule } from '../app-routing.module';
     AppRoutingModule
   ],
   exports: [GameComponent],
-  providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor, { provide: HTTP_INTERCEPTORS, useClass: GameServiceInterceptor, multi: true }]
+  providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor]
 })
 export class GameModule { }
