@@ -137,7 +137,6 @@ def get_users_game_history(username: str, db: Session = Depends(get_db)):
     return history
 
 
-# TODO: test
 @router.get("/{username}/stats", response_model=schemas.Stats)
 def get_stats(username: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=username)
