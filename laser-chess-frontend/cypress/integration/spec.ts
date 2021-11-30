@@ -171,7 +171,7 @@ it('Test teleport', () => {
   .then(() => {
     cy.fixture("teleportGameState.json").then(data => {
       subject.next(data)
-      cy.then(() => {
+      cy.wait(100).then(() => {
         expect(pressPosition1.piece).to.be.not.ok
         expect(pressPosition2.piece).to.be.ok
         expect(pressPosition2.piece.piece_type).to.be.equal("HYPER_CUBE")
