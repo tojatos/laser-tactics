@@ -452,7 +452,6 @@ def get_last_20_matches(db: Session, user: schemas.User):
     return matches
 
 
-# TODO test
 def get_stats(db: Session, user: schemas.User):
     crossout_date = datetime.now() - timedelta(days=HISTORY_MATCH_GET_LIMIT)
     games_as_p1 = db.query(models.GameHistory).filter(
