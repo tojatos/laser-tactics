@@ -34,6 +34,17 @@ services:
       - HOST=0.0.0.0
       - PORT=80
       - ROOT_PATH=/laser-tactics-api
+      - FE_HOST=www.lasertactics.online
+      - VERIFY_MAIL_FROM = verification@lasertactics.online
+      - VERIFY_MAIL_USERNAME = verification@lasertactics.online
+      - VERIFY_MAIL_PASSWORD = Verify123!@#
+      - VERIFY_MAIL_PORT = 587
+      - VERIFY_MAIL_SERVER = smtppro.zoho.eu
+      - MAIL_FROM = lasertactics@lasertactics.online
+      - MAIL_USERNAME = lasertactics@lasertactics.online
+      - MAIL_PASSWORD = r_B?KE@MU3nFnyG
+      - MAIL_PORT = 587
+      - MAIL_SERVER = smtppro.zoho.eu
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.laser-tactics-api-stripprefix.stripPrefix.prefixes=/laser-tactics-api"
