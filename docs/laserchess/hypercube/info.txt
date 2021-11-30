@@ -1,3 +1,0 @@
-Invulnerable to laser
-Laser goes through it
-Teleports pieces to random empty field - once per turn

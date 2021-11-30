@@ -24,9 +24,9 @@ class GameStateTable(Base):
     __tablename__ = "game_state"
 
     id = Column(Integer, primary_key=True, index=True)
-    player_one_id = Column(String, ForeignKey('users.id'))
-    player_two_id = Column(String, ForeignKey('users.id'))
-    game_id = Column(String, ForeignKey('lobby.game_id'))
+    player_one_id = Column(String)
+    player_two_id = Column(String)
+    game_id = Column(String)
     game_state_json = Column(String)
 
 
@@ -34,12 +34,12 @@ class GameHistory(Base):
     __tablename__ = "game_history"
 
     id = Column(Integer, primary_key=True, index=True)
-    game_id = Column(String, ForeignKey('game_state.game_id'))
-    player_one_username = Column(String, ForeignKey('users.id'))
+    game_id = Column(String)
+    player_one_username = Column(String)
     player_one_rating = Column(Integer)
     player_one_deviation = Column(Float)
     player_one_volatility = Column(Float)
-    player_two_username = Column(String, ForeignKey('users.id'))
+    player_two_username = Column(String)
     player_two_rating = Column(Integer)
     player_two_deviation = Column(Float)
     player_two_volatility = Column(Float)
@@ -55,8 +55,8 @@ class Lobby(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    player_one_username = Column(String, ForeignKey('users.id'), nullable=True)
-    player_two_username = Column(String, ForeignKey('users.id'), nullable=True)
+    player_one_username = Column(String, nullable=True)
+    player_two_username = Column(String, nullable=True)
     game_id = Column(String)
     is_ranked = Column(Boolean, default=False)
     is_private = Column(Boolean, default=False)
@@ -69,8 +69,8 @@ class FriendRequests(Base):
     __tablename__ = "friend_requests"
 
     id = Column(String, primary_key=True, index=True)
-    user_one_username = Column(String, ForeignKey('users.id'))
-    user_two_username = Column(String, ForeignKey('users.id'))
+    user_one_username = Column(String)
+    user_two_username = Column(String)
     status = Column(Enum(FriendRequestStatus))
 
 
@@ -78,14 +78,14 @@ class BlockedUsers(Base):
     __tablename__ = "blocked_users"
 
     id = Column(Integer, primary_key=True, index=True)
-    user = Column(String, ForeignKey('users.id'))
+    user = Column(String)
     blocked_user = Column(String)
 
 
 class UserSettings(Base):
     __tablename__ = "user_settings"
 
-    username = Column(String, ForeignKey('users.id'), primary_key=True)
+    username = Column(String, primary_key=True)
     skip_animations = Column(Boolean, default=False)
     sound_on = Column(Boolean, default=True)
 

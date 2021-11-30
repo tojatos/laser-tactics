@@ -8,7 +8,7 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent {
 
   hide = true;
   form = new FormGroup({
@@ -18,9 +18,6 @@ export class RegisterComponent implements OnInit {
   });
   constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
-  ngOnInit(): void {
-  }
-
   get f() { return this.form.controls; }
 
   onSubmit(): void {
@@ -28,10 +25,7 @@ export class RegisterComponent implements OnInit {
     if (!this.authService.isLoggedIn() && username && email && password) {
       this.authService.register(username, email, password).then(res => {
         this.router.navigate(['/login'])
-      }).catch(err => console.log(err))
-    }
-    else {
-      console.log("")
+      }).catch(err => console.error(err))
     }
   }
   get loggedIn() {

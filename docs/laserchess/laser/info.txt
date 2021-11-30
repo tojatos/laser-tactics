@@ -1,3 +1,0 @@
-Vulnerable to laser
-May rotate
-Cannot move

@@ -1,2 +1,0 @@
-Can deflect laser in two positions
-Vulnerable to laser in two positions

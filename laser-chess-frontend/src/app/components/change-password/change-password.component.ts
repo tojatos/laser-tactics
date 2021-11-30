@@ -21,7 +21,7 @@ export class ChangePasswordComponent implements OnInit {
 
   constructor(private userService: UserService, private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
-  
+
   ngOnInit(): void {
     this.route.params.subscribe(params =>
       {
@@ -40,11 +40,8 @@ export class ChangePasswordComponent implements OnInit {
       this.userService.changePasswordWithToken(this.token, new_password).then(res => {
         this.router.navigate(['/login'])
         this.authService.clearJWT()
-      }).catch(err => console.log(err))
-    }
-    else {
-      console.log("")
+      }).catch(err => console.error(err))
     }
   }
-  
+
 }

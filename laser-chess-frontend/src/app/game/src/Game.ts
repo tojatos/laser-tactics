@@ -84,6 +84,12 @@ export class Game{
     this.gameCanvas = undefined
     this.gameActions = undefined
     this.isInitiated = false
+    this.analyzeMode = analizeModes.NOT_ANALYZING
+    this.gamePhase = GamePhase.NOT_STARTED
+    this.whoseTurn = PlayerType.NONE
+    this.playerNames = [undefined, undefined]
+    this.playerRankings = [0, 0]
+    this.playerRankingsChanges = [undefined, undefined]
   }
 
   async loadDisplay(displaySize: number, receivedGameState: GameState){

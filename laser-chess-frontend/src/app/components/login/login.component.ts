@@ -26,17 +26,16 @@ export class LoginComponent {
     get f() { return this.form.controls; }
 
     g(){
-      
+
     }
     onSubmit(): void {
       const { username, password } = this.form.value;
       if (!this.authService.isLoggedIn() && username && password) {
         this.authService.login(username, password).then(
                   res => {
-                      console.log(`User with token ${res.access_token} is logged in`);
                       this.router.navigate(['/'])
                   }
-              ).catch(err => console.log(err))
+              ).catch(err => console.error(err))
       }
     }
 

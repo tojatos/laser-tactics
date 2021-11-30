@@ -45,7 +45,7 @@ export class MainPageComponent implements OnInit {
     this.dataSource.data = sortBy(
       data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED
         && ((new Date().getTime()) - new Date(res.lobby_creation_date).getTime()) < 3600000 * 2
-        ), 
+        ),
       ['id']).slice(-8)
     this.fetched = true
     if (this.isLoggedin){
@@ -57,7 +57,6 @@ export class MainPageComponent implements OnInit {
   }
 
   openLobby(lobby: Lobby) {
-    console.log(lobby)
     this.router.navigate(['/lobby', lobby.game_id])
   }
 
@@ -77,7 +76,6 @@ export class MainPageComponent implements OnInit {
   getVerified(){
     this.userService.getUserMe().then(userData =>{
       this.user = userData
-      console.log(this.user)
     })
     return this.user?.is_verified
   }
@@ -88,14 +86,13 @@ export class MainPageComponent implements OnInit {
     this.dataSource.data = sortBy(
       data.filter(res => !res.is_private && res.lobby_status == LobbyStatus.CREATED
         && ((new Date().getTime()) - new Date(res.lobby_creation_date).getTime()) < 3600000 * 2
-        ), 
+        ),
       ['id']).slice(-8)
     this.fetched = true
   }
 
   async createLobby(){
     this.lobby = await this.lobbyService.createLobby()
-    console.log(this.lobby)
     this.router.navigate(['/lobby', this.lobby.game_id])
       }
 
@@ -103,7 +100,6 @@ export class MainPageComponent implements OnInit {
     this.lobby = await this.lobbyService.createLobby()
     this.lobby.is_private = true
     this.lobbyService.updateLobby(this.lobby)
-    console.log(this.lobby)
     this.router.navigate(['/lobby', this.lobby.game_id])
       }
 
@@ -111,7 +107,6 @@ export class MainPageComponent implements OnInit {
     this.lobby = await this.lobbyService.createLobby()
     this.lobby.is_ranked = true
     this.lobbyService.updateLobby(this.lobby)
-    console.log(this.lobby)
     this.router.navigate(['/lobby', this.lobby.game_id])
       }
 
@@ -120,14 +115,13 @@ export class MainPageComponent implements OnInit {
     this.lobby.is_ranked = true
     this.lobby.is_private = true
     this.lobbyService.updateLobby(this.lobby)
-    console.log(this.lobby)
     this.router.navigate(['/lobby', this.lobby.game_id])
       }
 
   sendVerifyEmail(){
     this.openSnackBar("Email sent")
     this.authService.sendVerficationMail(this.authService.getUsername())
-    
+
   }
 
 }

@@ -1,4 +1,0 @@
-Absorbs laser
-Teleports pieces to random empty field
-Doesnt belong to anyone
-Cannot be removed
