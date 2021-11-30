@@ -42,12 +42,11 @@ describe('Gameplay tests', () => {
       })
       .visit("/game/cypressTest")
       .get('canvas')
-      .wait(100)
       .window()
       .then(win => { //get component
           angular = (win as any).ng
       })
-      .then(() => cy.document()).wait(500)
+      .then(() => cy.document()).wait(200)
       .then((doc) => {
         gameComponent = angular.getComponent(doc.querySelector("app-board"))
         gameComponent.game.gameService.getSubject().unsubscribe()
@@ -57,6 +56,7 @@ describe('Gameplay tests', () => {
     .then(() => {
     cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
     .should('not.be.checked')
+    .get('#mat-slide-toggle-2 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
     .fixture(fixture).then((data) => {
         subject.next(data)
     }).then(() => {
@@ -94,7 +94,7 @@ it('Test moving', () => {
       .click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
       .click(pressPositionNext.canvasCoordinates.x, pressPositionNext.canvasCoordinates.y)
       .then(() => {
-        cy.wait(1000).then(() => {
+        cy.then(() => {
             cy.fixture('firstMoveGameState.json').then((data) => {
               subject.next(data)
               expect(pressPosition.piece).to.be.not.ok
@@ -170,7 +170,7 @@ it('Test teleport', () => {
   .then(() => {
     cy.fixture("teleportGameState.json").then(data => {
       subject.next(data)
-      cy.wait(100).then(() => {
+      cy.then(() => {
         expect(pressPosition1.piece).to.be.not.ok
         expect(pressPosition2.piece).to.be.ok
         expect(pressPosition2.piece.piece_type).to.be.equal("HYPER_CUBE")
@@ -197,7 +197,7 @@ it('Test logs', () => {
   expect(beamSplitterPosition.piece.piece_type).to.be.equal("BEAM_SPLITTER")
   expect(beamSplitterPosition.piece.rotation_degree).to.be.equal(90)
 
-  cy.get('[ng-reflect-value="0"] > .mat-list-item-content').click().wait(100).then(() => {
+  cy.get('[ng-reflect-value="0"] > .mat-list-item-content').click().then(() => {
 
     const teleportPosition = getCell(gameComponent, 5, 5)
     const teleportOrigin = getCell(gameComponent, 2, 0)
@@ -249,7 +249,7 @@ it('Test draw offer recieve', () => {
 
   cy.fixture("gameStateWithDrawOffer.json").then(res => {
     subject.next(res)
-    cy.wait(100).get(".swal2-confirm").click().then(() => {
+    cy.get(".swal2-confirm").click().then(() => {
       expect(gameComponent.game.gameService.showDrawOffer).to.be.calledOnce
       expect(gameComponent.game.gameService.offerDraw).to.be.calledOnce
     })
@@ -259,20 +259,21 @@ it('Test draw offer recieve', () => {
 
 it('Test laser', () => {
 
-  beforeMethod("laserTestCase.json").then(() => {
+  cy.fixture("laserTestCase.json").then(firstStep => {
+    subject.next(firstStep)
     const laserPosition = getCell(gameComponent, 5, 0)
     expect(laserPosition.piece.piece_type).to.be.equal("LASER")
     cy.spy(gameComponent.game.gameService, "shootLaser")
     cy.spy(gameComponent.game.board, "removePiece")
     cy.stub(gameComponent.game.gameService, "animationsToShow").returns("2")
 
-    cy.wait(500).get('canvas').click(laserPosition.canvasCoordinates.x, laserPosition.canvasCoordinates.y)
+    cy.get('canvas').click(laserPosition.canvasCoordinates.x, laserPosition.canvasCoordinates.y)
     .get('.mat-selection-list').click()
     .get('app-board-actions > :nth-child(2)').click().then(() => {
-      cy.fixture("laserShoot.json").then(data => {
-        subject.next(data)
+      cy.fixture("laserShoot.json").then(secondStep => {
+        subject.next(secondStep)
       }).then(() => {
-      cy.wait(100).then(() => {
+      cy.then(() => {
         expect(gameComponent.game.gameService.shootLaser).to.have.been.calledOnce
         expect(gameComponent.game.board.removePiece).to.have.been.calledOnce
       })
