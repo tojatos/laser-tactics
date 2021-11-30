@@ -42,11 +42,12 @@ describe('Gameplay tests', () => {
       })
       .visit("/game/cypressTest")
       .get('canvas')
+      .wait(100)
       .window()
       .then(win => { //get component
           angular = (win as any).ng
       })
-      .then(() => cy.document()).wait(200)
+      .then(() => cy.document()).wait(500)
       .then((doc) => {
         gameComponent = angular.getComponent(doc.querySelector("app-board"))
         gameComponent.game.gameService.getSubject().unsubscribe()
