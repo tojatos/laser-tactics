@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { createLobbyFullEndpoint, leaveLobbyFullEndpoint, joinLobbyFullEndpoint, lobbyFullEndpoint, startGameFullEndpoint, updateLobbyFullEndpoint } from '../api-definitions';
+import { createLobbyFullEndpoint, leaveLobbyFullEndpoint, joinLobbyFullEndpoint, lobbyFullEndpoint, startGameFullEndpoint, updateLobbyFullEndpoint, joinRandomLobbyFullEndpoint } from '../api-definitions';
 import { Lobby } from '../app.models';
 
 @Injectable({
@@ -36,6 +36,10 @@ export class LobbyService {
 
   leaveLobby(lobby_id: string){
     return this.http.patch<any>(leaveLobbyFullEndpoint(), {game_id: lobby_id}).toPromise()
+  }
+
+  joinRandom(rating_lower_bound: number, rating_higher_bound: number, is_rated: boolean){
+    return this.http.post<any>(joinRandomLobbyFullEndpoint(), {'rating_lower_bound': rating_lower_bound, 'rating_higher_bound': rating_higher_bound, "is_rated": is_rated}).toPromise()
   }
 
 }

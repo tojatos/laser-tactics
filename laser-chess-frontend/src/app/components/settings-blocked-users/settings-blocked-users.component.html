@@ -1,16 +1,19 @@
-<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-    <div fxLayout="column" fxLayoutAlign="center center">
+<div class="main-wrapper" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-evenly stretch">
+    <div fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="center">
         <a href="settings" mat-stroked-button color="accent"
             >General settings</a>
         <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
         <a href="settings/password" mat-stroked-button color="accent">Password</a>
     </div>
-    <div>
+    <div fxLayout="column" fxLayoutAlign="center center">
         <mat-card class="box">
+            <mat-card-header>
+                <mat-card-title>Blocked users</mat-card-title>
+            </mat-card-header>
             <mat-list>
-                <h3 matLine> Blocked users list </h3>
+                <h3 matLine *ngIf="!empty"> Blocked users list </h3>
+                <h3 matLine *ngIf="empty"> Blocked users list empty!</h3>
                 <mat-list-item *ngFor="let users of blocked">
-            
                     <button mat-button (click)="goToProfile(users)"> {{blocked}} </button>
                     <mat-icon [matMenuTriggerFor]="blocked">more_vert</mat-icon>
                     <mat-menu class="menu" #blocked="matMenu" xPosition="before" [overlapTrigger]="false">
@@ -19,9 +22,8 @@
                     </mat-menu>
                 </mat-list-item>
                 <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-               
                     <mat-form-field class="example-full-width" appearance="fill">
-                      <mat-label>Username</mat-label>
+                      <mat-label>Username to block</mat-label>
                       <input formControlName="input" matInput #box>
                 </mat-form-field>
          

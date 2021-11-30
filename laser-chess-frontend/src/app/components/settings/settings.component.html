@@ -1,13 +1,18 @@
-<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-    <div fxLayout="column" fxLayoutAlign="center center">
+<div class="main-wrapper" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-evenly stretch">
+    <div fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="center">
         <a href="settings" mat-stroked-button color="accent"
             >General settings</a>
         <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
         <a href="settings/password" mat-stroked-button color="accent">Password</a>
     </div>
-    <div>
-        <mat-card class="box">
+    <div fxLayout="column" fxLayoutAlign="center center">
+        <mat-card class="box"  fxLayoutGap="30px" fxLayout="column" >
+            <mat-card-header>
+                <mat-card-title>General settings</mat-card-title>
+            </mat-card-header>
             <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations
+            </mat-slide-toggle>
+            <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sound">Sounds
             </mat-slide-toggle>
         </mat-card>
     </div>

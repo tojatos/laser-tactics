@@ -63,7 +63,8 @@ export interface UserStats {
   wins: number,
 }
 export interface Settings {
-  skip_animations: boolean
+  skip_animations: boolean,
+  sound_on: boolean
 }
 
 export interface UserHistory {

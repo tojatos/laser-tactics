@@ -20,9 +20,11 @@ export class SettingsBlockedUsersComponent implements OnInit {
   form = new FormGroup({
     input: new FormControl('')
   });
+  empty = true
+
   openSnackBar(message: string) {
     this._snackBar.open(message, "", {
-      duration: 1000
+      duration: 1500
     });
   }
   
@@ -35,6 +37,9 @@ export class SettingsBlockedUsersComponent implements OnInit {
     this.userService.getBlockedUsers().then(userData => {
       this.blocked = userData
       console.log(this.blocked)
+      if (this.blocked?.length != 0) {
+        this.empty =false
+      }
     })
     })
   }
@@ -64,13 +69,13 @@ export class SettingsBlockedUsersComponent implements OnInit {
   }
   
   async blockUser(name: string){
-    this.openSnackBar("Blocked user")
+    this.openSnackBar(`Blocked user ${name}`)
     await this.userService.blockUser(name)
     this.loadData()
   }
 
   async unblockUser(name: string){
-    this.openSnackBar("Unblocked user")
+    this.openSnackBar(`Unblocked user ${name}`)
     this.userService.unblockUser(name)
     this.loadData()
   }

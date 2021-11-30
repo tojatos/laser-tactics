@@ -19,7 +19,7 @@ export class SettingsPasswordComponent implements OnInit {
   form = new FormGroup({
       password: new FormControl('',[Validators.required]),
       new_password: new FormControl('',[Validators.required]),
-      retype_new_password: new FormControl('',[Validators.required])
+      // retype_new_password: new FormControl('',[Validators.required])
     },{validators: this.samePasswordValidator2})
 
 
@@ -49,9 +49,9 @@ export class SettingsPasswordComponent implements OnInit {
   // }
 
   onSubmit(): void {
-    const { password, new_password, retype_new_password } = this.form!.value;
+    const { password, new_password } = this.form!.value;
     const username = this.authService.getUsername()
-    if (this.authService.isLoggedIn() && password && new_password && retype_new_password) {
+    if (this.authService.isLoggedIn() && password && new_password) {
       this.userService.changePassword(password, new_password).then(res => {
         this.router.navigate(['/login'])
         this.authService.clearJWT()

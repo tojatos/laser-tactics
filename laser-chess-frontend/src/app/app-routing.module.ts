@@ -11,6 +11,8 @@ import { SettingsPasswordComponent } from './components/settings-password/settin
 import { SettingsComponent } from './components/settings/settings.component';
 import { SettingsBlockedUsersComponent } from './components/settings-blocked-users/settings-blocked-users.component';
 import { VerifyComponent } from './components/verify/verify.component';
+import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
 
 const routes: Routes = [
   {
@@ -18,8 +20,16 @@ const routes: Routes = [
     component: LoginComponent
   },
   {
+    path: 'login/forgot',
+    component: PasswordReminderComponent
+  },
+  {
     path: 'register',
     component: RegisterComponent
+  },
+  {
+    path: 'change_password/:id',
+    component: ChangePasswordComponent
   },
   {
     path: 'game/:id',

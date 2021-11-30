@@ -15,6 +15,11 @@ export class UserService {
     return this.http.post<any>(userFullEndpoint("me/change_password"), {'oldPassword': oldPassword, 'newPassword': newPassword}).toPromise()
   }
 
+  changePasswordWithToken(token: string, newPassword: string){
+    return this.http.post<any>(userFullEndpoint("change_password"), {'token': token, 'newPassword': newPassword}).toPromise()
+  }
+
+
   getUserByUsername(username: string) {
     return this.http.get<User>(userFullEndpoint(username)).toPromise()
   }
@@ -25,6 +30,10 @@ export class UserService {
 
   getSettings(){
     return this.http.get<Settings>(settingsFullEndpoint)
+  }
+
+  updateSettings(settings: Settings){
+    return this.http.patch<Settings>(settingsFullEndpoint, settings).toPromise()
   }
 
   getUserFriends() {

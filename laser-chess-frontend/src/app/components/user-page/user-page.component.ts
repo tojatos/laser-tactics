@@ -49,6 +49,7 @@ export class UserPageComponent {
     })
       this.userService.getUserFriends().then(userData => {
         this.friends = userData
+        console.log(this.friends)
         this.isInFriends
     })
       this.userService.getUserFriendsRequests().then(userData => {

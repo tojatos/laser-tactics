@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class VerifyComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute, private authService: AuthService) {}
+  constructor(private route: ActivatedRoute, private authService: AuthService, private router: Router) {}
   
   token: string | undefined
   ngOnInit(): void {
@@ -21,6 +21,7 @@ export class VerifyComponent implements OnInit {
 
   verifyUser(){
     this.authService.verifyUser(this.token!)
+    this.router.navigate([''])
   }
 
 }

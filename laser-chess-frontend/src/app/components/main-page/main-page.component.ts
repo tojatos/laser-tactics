@@ -1,5 +1,6 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { sortBy } from 'lodash';
@@ -26,7 +27,17 @@ export class MainPageComponent implements OnInit {
   public lobbies: Lobby[] | undefined
   displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router, private userService: UserService) {}
+  constructor(private _snackBar: MatSnackBar, private _liveAnnouncer: LiveAnnouncer, private authService: AuthService, private route: ActivatedRoute, private lobbyService: LobbyService, private router: Router, private userService: UserService) {}
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, "", {
+      duration: 1000
+    });
+  }
+
+  get isLoggedin(){
+    return this.authService.isLoggedIn()
+  }
 
   async ngOnInit() {
 
@@ -37,11 +48,12 @@ export class MainPageComponent implements OnInit {
         ), 
       ['id']).slice(-8)
     this.fetched = true
+    if (this.isLoggedin){
     this.userService.getUserMe().then(userData =>{
       this.user = userData
       this.verified = this.user.is_verified!
     })
-    
+    }
     console.log(this.verified)
   }
 
@@ -114,7 +126,9 @@ export class MainPageComponent implements OnInit {
       }
 
   sendVerifyEmail(){
+    this.openSnackBar("Email sent")
     this.authService.sendVerficationMail(this.authService.getUsername())
+    
   }
 
 }
