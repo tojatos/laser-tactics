@@ -47,7 +47,7 @@ describe('Gameplay tests', () => {
       .then(win => { //get component
           angular = (win as any).ng
       })
-      .then(() => cy.document()).wait(500)
+      .then(() => cy.document()).wait(2000)
       .then((doc) => {
         gameComponent = angular.getComponent(doc.querySelector("app-board"))
         gameComponent.game.gameService.getSubject().unsubscribe()
@@ -115,7 +115,9 @@ it('Test rotation', () => {
     cy.spy(gameComponent.game.board, "rotatePiece")
 
     cy.get('.mat-selection-list').click()
-    .get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y).then(() => {
+    .get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
+    .get('.mat-selection-list').click()
+    .then(() => {
       cy.get('app-board-actions > :nth-child(1)').click().then(() => {
         expect(gameComponent.game.gameActions.rotation).to.be.equal(270)
       })
