@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { friendsFullEndpoint, settingsFullEndpoint, userFullEndpoint} from '../api-definitions';
-import { FriendRequest, Settings, User, UserHistory } from '../app.models';
+import { FriendRequest, Ranking, Settings, User, UserHistory } from '../app.models';
 
 
 @Injectable({
@@ -77,6 +77,10 @@ export class UserService {
 
   getUserGameHistory(username: string) {
     return this.http.get<UserHistory[]>(userFullEndpoint(`${username}/history`)).toPromise()
+  }
+
+  getTopRanking() {
+    return this.http.get<Ranking[]>(userFullEndpoint("ranking/top")).toPromise()
   }
 
 

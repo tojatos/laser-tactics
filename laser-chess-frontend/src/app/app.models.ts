@@ -84,3 +84,12 @@ export interface UserHistory {
   player_two_deviation: number | null,
   result: string | null,
 }
+
+export interface Ranking {
+  username: string,
+  email: string,
+  is_active: boolean,
+  is_verified: boolean,
+  registration_date: string,
+  rating: number
+}

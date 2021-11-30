@@ -54,7 +54,6 @@ export class MainPageComponent implements OnInit {
       this.verified = this.user.is_verified!
     })
     }
-    console.log(this.verified)
   }
 
   openLobby(lobby: Lobby) {

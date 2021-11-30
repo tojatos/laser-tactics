@@ -13,6 +13,7 @@ import { SettingsBlockedUsersComponent } from './components/settings-blocked-use
 import { VerifyComponent } from './components/verify/verify.component';
 import { PasswordReminderComponent } from './components/password-reminder/password-reminder.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
+import { RankingComponent } from './components/ranking/ranking.component';
 
 const routes: Routes = [
   {
@@ -44,6 +45,10 @@ const routes: Routes = [
     path: 'settings',
     component: SettingsComponent,
     canActivate: [AuthGuard],
+  },
+  {
+    path: 'ranking',
+    component: RankingComponent,
   },
   {
     path: 'settings/password',
