@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/auth/auth.service';
   templateUrl: './password-reminder.component.html',
   styleUrls: ['./password-reminder.component.scss']
 })
-export class PasswordReminderComponent implements OnInit {
+export class PasswordReminderComponent {
 
   hide = true;
   form = new FormGroup({
@@ -22,10 +22,6 @@ export class PasswordReminderComponent implements OnInit {
       duration: 1000
     });
   }
-
-  ngOnInit(): void {
-  }
-
   get f() { return this.form.controls; }
 
   onSubmit(): void {
@@ -33,10 +29,7 @@ export class PasswordReminderComponent implements OnInit {
     if (!this.authService.isLoggedIn() &&  email ) {
       this.authService.sendPasswordChangeRequest(email).then(res => {
         this.openSnackBar("Email sent")
-      }).catch(err => console.log(err))
-    }
-    else {
-      console.log("")
+      }).catch(err => console.error(err))
     }
   }
   get loggedIn() {

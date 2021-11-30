@@ -35,8 +35,6 @@ export class LobbyService {
       is_rated: is_rated
     }
 
-    console.log(req)
-    
     return this.http.post<any>(startGameFullEndpoint, req).toPromise()
   }
 

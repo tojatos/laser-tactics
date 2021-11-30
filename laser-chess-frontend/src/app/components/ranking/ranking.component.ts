@@ -15,7 +15,7 @@ export class RankingComponent implements OnInit {
   displayedColumns = ['position', 'username', 'rating'];
   dataSource = new MatTableDataSource<Ranking>();
   fetched = false
-  
+
   constructor(private router: Router, private userService: UserService) { }
 
   async ngOnInit() {
@@ -25,7 +25,6 @@ export class RankingComponent implements OnInit {
   }
 
   openProfile(user: Ranking) {
-    console.log(user)
     this.router.navigate(['/users', user.username])
   }
 

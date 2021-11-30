@@ -10,8 +10,8 @@ import { UserService } from 'src/app/services/user.service';
   templateUrl: './settings-password.component.html',
   styleUrls: ['./settings-password.component.scss']
 })
-export class SettingsPasswordComponent implements OnInit {
-  
+export class SettingsPasswordComponent {
+
   hide = true;
   hide2 = true;
   hide3 = true;
@@ -24,13 +24,6 @@ export class SettingsPasswordComponent implements OnInit {
 
 
   constructor(private userService: UserService, private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
-
-  
-
-  ngOnInit(): void {
-    
-  }
-
 
 
   get password() { return this.form!.get('password'); }
@@ -50,24 +43,20 @@ export class SettingsPasswordComponent implements OnInit {
 
   onSubmit(): void {
     const { password, new_password } = this.form!.value;
-    const username = this.authService.getUsername()
     if (this.authService.isLoggedIn() && password && new_password) {
       this.userService.changePassword(password, new_password).then(res => {
         this.router.navigate(['/login'])
         this.authService.clearJWT()
-      }).catch(err => console.log(err))
-    }
-    else {
-      console.log("")
+      }).catch(err => console.error(err))
     }
   }
   samePasswordValidator2(control: AbstractControl): ValidationErrors | null {
     const new_password = control.get('new_password');
     const retype_new_password = control.get('retype_new_password');
-  
+
     return new_password && retype_new_password && new_password.value != retype_new_password.value ? { samePassword: true } : null;
   };
-  
+
 
 }
 
@@ -82,6 +71,6 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-    
+
 }}
 
