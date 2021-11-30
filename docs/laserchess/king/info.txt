@@ -1,4 +1,0 @@
-Vulnerable to laser
-Cannot rotate
-Most important piece - game ends when destroyed
-Can capture pieces - once per turn
