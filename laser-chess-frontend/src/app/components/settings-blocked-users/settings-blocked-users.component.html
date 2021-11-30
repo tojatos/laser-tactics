@@ -6,21 +6,22 @@
         <a href="settings/password" mat-stroked-button color="accent">Password</a>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center">
-        <mat-card class="box">
+        <mat-card class="box" >
             <mat-card-header>
                 <mat-card-title>Blocked users</mat-card-title>
             </mat-card-header>
-            <mat-list>
+            <mat-list class="list">
                 <h3 matLine *ngIf="!empty"> Blocked users list </h3>
                 <h3 matLine *ngIf="empty"> Blocked users list empty!</h3>
-                <mat-list-item *ngFor="let users of blocked">
-                    <button mat-button (click)="goToProfile(users)"> {{blocked}} </button>
-                    <mat-icon [matMenuTriggerFor]="blocked">more_vert</mat-icon>
+                <mat-list-item  *ngFor="let user of blocked">
+                    <button mat-button (click)="goToProfile(user)"> {{user}} </button>
+                    <mat-icon class="icon-right" [matMenuTriggerFor]="blocked">more_vert</mat-icon>
                     <mat-menu class="menu" #blocked="matMenu" xPosition="before" [overlapTrigger]="false">
-                        <button mat-menu-item (click)="goToProfile(users)">Profile</button>
-                        <button mat-menu-item *ngIf="getIsInBlocked(users)" (click)="unblockUser(users)">Unblock</button>
+                        <button mat-menu-item (click)="goToProfile(user)">Profile</button>
+                        <button mat-menu-item *ngIf="getIsInBlocked(user)" (click)="unblockUser(user)">Unblock</button>
                     </mat-menu>
                 </mat-list-item>
+                </mat-list>
                 <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
                     <mat-form-field class="example-full-width" appearance="fill">
                       <mat-label>Username to block</mat-label>
@@ -29,7 +30,7 @@
          
                 <button mat-stroked-button color="accent" class="btn-block">Block user</button>
             </form>
-            </mat-list>
+            
         </mat-card>
     </div>
 

@@ -36,7 +36,6 @@ export class SettingsBlockedUsersComponent implements OnInit {
     this.route.params.subscribe(async params => {
     this.userService.getBlockedUsers().then(userData => {
       this.blocked = userData
-      console.log(this.blocked)
       if (this.blocked?.length != 0) {
         this.empty =false
       }

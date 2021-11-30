@@ -25,6 +25,9 @@ export class UserPageComponent {
   stats: UserStats | undefined
   history: UserHistory[] | undefined
   dataSource = new MatTableDataSource<UserHistory>();
+  empty = true
+  empty_req = true
+  rating = 0
 
   displayedColumns = ['Date', 'Opponent', 'Result'];
 
@@ -46,14 +49,26 @@ export class UserPageComponent {
       this.username = params.username
       this.userService.getUserByUsername(params.username).then(userData => {
         this.user = userData
+        this.rating = this.user.rating
     })
       this.userService.getUserFriends().then(userData => {
         this.friends = userData
-        console.log(this.friends)
+        if (this.friends?.length != 0) {
+          this.empty = false
+        }
+        if (this.friends?.length == 0) {
+          this.empty = true
+        }
         this.isInFriends
     })
       this.userService.getUserFriendsRequests().then(userData => {
-      this.friendsRequests = userData
+      this.friendsRequests = userData 
+      if (this.friendsRequests?.length != 0) {
+        this.empty_req = false
+      }
+      if (this.friendsRequests?.length == 0) {
+        this.empty_req = true
+      }
     })
     this.userService.getUserStats(this.username!).then(userData => {
       this.stats = userData
@@ -73,7 +88,8 @@ export class UserPageComponent {
   get isOwner(){
     if (this.authService.getUsername() == this.username){
       return true}
-    else return false
+    else {
+    return false}
   }
 
   get isInFriends() {
@@ -160,6 +176,7 @@ export class UserPageComponent {
   onSubmit(): void {
     if (this.authService.isLoggedIn() && this.form.value.input) {
       this.sendRequest(this.form.value.input);
+      this.loadData()
     }
   }
 
