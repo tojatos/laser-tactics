@@ -75,7 +75,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  buildEvent(gameEvents: GameEvent[], ){
+  buildEvent(gameEvents: GameEvent[]){
     this.game.showGameEvent(gameEvents, this.sounds)
   }
 

@@ -11,7 +11,7 @@
       <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations</mat-slide-toggle> <br />
       <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds">Sounds</mat-slide-toggle>
     </div>
-    <div class="btns" *ngIf="isHandset">
+    <div class="btns" *ngIf="isHandset && game.gamePhase == 'STARTED'">
       <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()"><mat-icon>flag</mat-icon></button>
       <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()"><mat-icon>volunteer_activism</mat-icon></button>
     </div>
