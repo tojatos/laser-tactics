@@ -99,6 +99,32 @@ export class Drawings {
       canvas.ctx.restore()
     }
 
+    getPieceIndividualPixels(canvas: Canvas, cell: Cell, size: number){
+
+      type Pixel = {
+        originCoordinates: Coordinates,
+        image: ImageData
+      }
+
+      const pixels: Pixel[][] = []
+
+      for (let i = 0; i < canvas.blockSize * PIECE_SIZE_SCALE; i+=size){
+        pixels.push([])
+        for (let j = 0; j < canvas.blockSize * PIECE_SIZE_SCALE; j+=size){
+          const x = cell.canvasCoordinates.x + this.pieceDrawingOriginCoordinates(canvas.blockSize).x + j
+          const y = cell.canvasCoordinates.y + this.pieceDrawingOriginCoordinates(canvas.blockSize).y + i
+          pixels[i/size].push({
+            originCoordinates: {
+                x: x,
+                y: y
+              },
+            image: canvas.ctx.getImageData(x, y, size, size)
+          })
+        }
+      }
+      return pixels
+    }
+
     cellDrawingOriginCoordinates(blockSize: number): Coordinates {
         return {x: - blockSize / 2, y: - blockSize / 2}
     }

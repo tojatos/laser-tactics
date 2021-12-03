@@ -6,6 +6,7 @@ import { GameEvent, GameState, LaserShotEvent } from "../game.models";
 import { GameWebsocketService } from "../services/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
+import { Canvas } from "./Display/Canvas/AbstractCanvas";
 import { GameActions } from "./Display/Canvas/GameActions";
 import { GameCanvas } from "./Display/Canvas/GameCanvas";
 import { Drawings } from "./Display/Drawings";
@@ -23,6 +24,7 @@ enum analizeModes {
 export class Game{
 
   gameCanvas: GameCanvas | undefined
+  animationCanvas: Canvas | undefined
   gameActions: GameActions | undefined
   gameId: string | undefined
   sizeScale: number = 0
@@ -64,15 +66,17 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, animationCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean){
     this.sizeScale = sizeScale
     this.gameId = gameId
     this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
     this.showAnimations = animations
     this.enableSounds = sounds
+    this.animationCanvas = new Canvas(this.gameService, this.authService, animationCanvasContext, blockSize, this.animations, this.drawings, this.resources, gameId)
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.gameCanvas.showAnimations = this.showAnimations
+    this.animationCanvas.showAnimations = this.showAnimations
     this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
     this.gameService.connect(this.gameId)
     this.gameCanvas.redrawGame(this.board)
@@ -117,6 +121,11 @@ export class Game{
 
       this.playerRankings[0] = p1.rating
       this.playerRankings[1] = p2.rating
+
+      this.drawings.clearBoard(this.gameCanvas)
+
+      await this.animations.thanosEffect(this.animationCanvas!, this.board, {x: 1, y: 1}, false, true, false)
+
     }
   }
 
@@ -253,10 +262,10 @@ export class Game{
   }
 
   private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean = true){
-    if(this.gameCanvas){
+    if(this.animationCanvas && this.gameCanvas){
       this.gameCanvas.interactable = false
       this.eventsExecutor.addEventsToExecute(events.slice(-animationsToShow))
-      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, enableSounds, showLaser)
+      await this.eventsExecutor.executeEventsQueue(this.animationCanvas, this.board, showAnimations, enableSounds, showLaser)
     }
   }
 

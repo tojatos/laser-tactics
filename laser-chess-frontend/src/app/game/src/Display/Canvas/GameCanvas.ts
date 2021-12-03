@@ -15,7 +15,6 @@ export class GameCanvas extends Canvas {
 
     hoveredCell: Cell | undefined
     mediator: GameMediator | undefined
-    showAnimations: boolean = true
     enableSounds: boolean = true
 
     constructor(gameService: GameWebsocketService,

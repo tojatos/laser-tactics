@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { cloneDeep, reject } from "lodash";
-import { from } from "rxjs";
+import { cloneDeep, random } from "lodash";
 import { Coordinates } from "../../game.models";
 import { Board } from "../board";
 import { Cell } from "../cell";
@@ -8,6 +7,7 @@ import { EventsColors, PieceType } from "../enums";
 import { Piece } from "../piece";
 import { Canvas } from "./Canvas/AbstractCanvas";
 import { Drawings } from "./Drawings";
+import * as Chance from "chance"
 
 @Injectable()
 export class Animations {
@@ -259,6 +259,34 @@ export class Animations {
         else
           console.error("There is no piece to destroy")
       })
+    }
+
+
+    async thanosEffect(canvas: Canvas, board: Board, at: Coordinates, isReverse: boolean, showAnimations: boolean, enableSounds: boolean){
+
+      const pixelSize = 3
+      const cell = board.getCellByCoordinates(1, 1)
+      this.drawings.drawPiece(canvas, cell!.piece!, false)
+      const cellData = this.drawings.getPieceIndividualPixels(canvas, cell!, pixelSize)
+      const intervals = 30
+
+      for(let k = 0; k < intervals; k++){
+      await new Promise(resolve => setTimeout(resolve, 50));
+      let rowId = 0
+      for (const row of cellData){
+        rowId++
+        for(const pixel of row){
+          const positionX = Math.round(Math.abs(Chance().normal({mean: 0, dev: Math.max(k * 2, row.length-rowId * 2 + k * 2)})))
+          const positionY = Math.round(Math.abs(Chance().normal({mean: 0, dev: Math.max(k * 2, row.length-rowId * 2 + k * 2)})))
+          pixel.originCoordinates.x += positionX
+          pixel.originCoordinates.y -= positionY
+          canvas.ctx.putImageData(pixel.image, pixel.originCoordinates.x, pixel.originCoordinates.y)
+          canvas.ctx.canvas.style.opacity = (1 - 1 / (intervals / (k + 1))).toString()
+          canvas.ctx.clearRect(pixel.originCoordinates.x - positionX, pixel.originCoordinates.y + positionY, pixelSize, pixelSize)
+        }
+      }
+    }
+
     }
 
     private cellsExcludingPieces(board: Board, cells: Cell[]){
