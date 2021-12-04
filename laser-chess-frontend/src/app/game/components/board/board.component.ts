@@ -17,9 +17,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>
 
-  @ViewChild('animCanvas', { static: true })
-  canvasAnim!: ElementRef<HTMLCanvasElement>
-
   @ViewChild('logs', { static: true })
   logsComponent: ElementRef<BoardLogComponent> | undefined
 
@@ -39,15 +36,14 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       this.animation = !settings.skip_animations
       this.sounds = settings.sound_on
     }
-    const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
-    const animCanvasContext = this.canvasAnim.nativeElement.getContext('2d')
-    if(!gameCanvasContext || !animCanvasContext){
+
+    if(!this.canvasGame.nativeElement.getContext('2d')){
       alert("Couldn't load context")
       return
     }
 
     this.route.params.subscribe(async params => {
-      await this.game.initGame(gameCanvasContext, animCanvasContext,
+      await this.game.initGame(this.canvasGame.nativeElement,
         this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
         params.id,
         this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,

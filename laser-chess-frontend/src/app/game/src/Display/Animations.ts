@@ -5,7 +5,7 @@ import { Board } from "../board";
 import { Cell } from "../cell";
 import { EventsColors, PieceType } from "../enums";
 import { Piece } from "../piece";
-import { Canvas } from "./Canvas/AbstractCanvas";
+import { Canvas } from "./Canvas/Canvas";
 import { Drawings } from "./Drawings";
 import * as Chance from "chance"
 
@@ -246,8 +246,18 @@ export class Animations {
 
     async pieceDestroyedAnimation(canvas: Canvas, board: Board, at: Coordinates, isReverse: boolean, showAnimations: boolean, enableSounds: boolean){
 
-      if(enableSounds && showAnimations)
-        canvas.resources.destroy().play()
+      if(showAnimations){
+
+        if(enableSounds)
+          canvas.resources.destroy().play()
+
+        const newAnimationCanvas = canvas.createAdditionalCanvasElement()
+        const cell = board.getCellByCoordinates(at.x, at.y)
+
+        if(newAnimationCanvas && cell?.piece)
+          this.thanosEffect(newAnimationCanvas, cell, isReverse)
+
+      }
 
       return new Promise<void>((resolve) => {
         const pieceToDestroy = board.getCellByCoordinates(at.x, at.y)
@@ -262,31 +272,36 @@ export class Animations {
     }
 
 
-    async thanosEffect(canvas: Canvas, board: Board, at: Coordinates, isReverse: boolean, showAnimations: boolean, enableSounds: boolean){
+    async thanosEffect(canvas: Canvas, cell: Cell, isReverse: boolean){
 
       const pixelSize = 3
-      const cell = board.getCellByCoordinates(1, 1)
-      this.drawings.drawPiece(canvas, cell!.piece!, false)
-      const cellData = this.drawings.getPieceIndividualPixels(canvas, cell!, pixelSize)
+      this.drawings.drawPiece(canvas, cell.piece!, isReverse)
+      const cellData = this.drawings.getPieceIndividualPixels(canvas, cell!, pixelSize, isReverse)
       const intervals = 30
 
       for(let k = 0; k < intervals; k++){
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 50))
       let rowId = 0
       for (const row of cellData){
         rowId++
         for(const pixel of row){
-          const positionX = Math.round(Math.abs(Chance().normal({mean: 0, dev: Math.max(k * 2, row.length-rowId * 2 + k * 2)})))
-          const positionY = Math.round(Math.abs(Chance().normal({mean: 0, dev: Math.max(k * 2, row.length-rowId * 2 + k * 2)})))
-          pixel.originCoordinates.x += positionX
-          pixel.originCoordinates.y -= positionY
-          canvas.ctx.putImageData(pixel.image, pixel.originCoordinates.x, pixel.originCoordinates.y)
-          canvas.ctx.canvas.style.opacity = (1 - 1 / (intervals / (k + 1))).toString()
-          canvas.ctx.clearRect(pixel.originCoordinates.x - positionX, pixel.originCoordinates.y + positionY, pixelSize, pixelSize)
+          const standardDev = cellData.length-rowId * 2 + k * 2
+          if(standardDev > 0){
+            canvas.ctx.clearRect(pixel.originCoordinates.x, pixel.originCoordinates.y, pixelSize, pixelSize)
+            const positionX = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
+            const positionY = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
+            canvas.ctx.canvas.style.opacity = (1 - 1 / (intervals / (k + 1))).toString()
+            if(positionX != 0 && positionY != 0){
+              canvas.ctx.clearRect(pixel.originCoordinates.x, pixel.originCoordinates.y, pixelSize, pixelSize)
+              pixel.originCoordinates.x += positionX
+              pixel.originCoordinates.y -= positionY
+              canvas.ctx.putImageData(pixel.image, pixel.originCoordinates.x, pixel.originCoordinates.y)
+            }
+          }
         }
       }
     }
-
+      canvas.deleteSelf()
     }
 
     private cellsExcludingPieces(board: Board, cells: Cell[]){
