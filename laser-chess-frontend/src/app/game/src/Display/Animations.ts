@@ -255,7 +255,7 @@ export class Animations {
         const cell = board.getCellByCoordinates(at.x, at.y)
 
         if(newAnimationCanvas && cell?.piece)
-          this.thanosEffect(newAnimationCanvas, cell, isReverse)
+          this.incinerationEffect(newAnimationCanvas, cell, isReverse)
 
       }
 
@@ -272,7 +272,7 @@ export class Animations {
     }
 
 
-    async thanosEffect(canvas: Canvas, cell: Cell, isReverse: boolean){
+    async incinerationEffect(canvas: Canvas, cell: Cell, isReverse: boolean){
 
       const pixelSize = 3
       this.drawings.drawPiece(canvas, cell.piece!, isReverse)
@@ -291,7 +291,7 @@ export class Animations {
             const positionX = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
             const positionY = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
             canvas.ctx.canvas.style.opacity = (1 - 1 / (intervals / (k + 1))).toString()
-            if(positionX != 0 && positionY != 0){
+            if(positionX != 0 && positionY != 0 && this.isInCanvasBoundaries(canvas, pixel.originCoordinates)){
               canvas.ctx.clearRect(pixel.originCoordinates.x, pixel.originCoordinates.y, pixelSize, pixelSize)
               pixel.originCoordinates.x += positionX
               pixel.originCoordinates.y -= positionY
@@ -336,6 +336,10 @@ export class Animations {
 
     private getTranslationValue(n1: number, n2: number){
       return n1 > n2 ? 1 : n1 < n2 ? -1 : 0
+    }
+
+    isInCanvasBoundaries(canvas: Canvas, coor: Coordinates){
+      return coor.x >= 0 && coor.x <= canvas.canvas.width && coor.y >= 0 && coor.y <= canvas.canvas.height
     }
 
     private getDistanceBetweenPoints(x1: number, y1: number, x2: number, y2: number){
