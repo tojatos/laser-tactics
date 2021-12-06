@@ -11,5 +11,9 @@
     "API_PREFIX": "/api/v1",
     "LOGIN_URL": "/token",
     "START_GAME_URL": "/start_game"
+  },
+  "component": {
+    "componentFolder": "src/app",
+    "testFiles": "**/*spec.ts"
   }
 }

@@ -17,3 +17,4 @@
 // import './commands';
 import 'cypress-mouse-position/commands';
 import "cypress-localstorage-commands"
+import 'core-js/es/reflect'
