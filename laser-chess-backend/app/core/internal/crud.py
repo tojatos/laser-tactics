@@ -241,7 +241,7 @@ def get_random_lobby(params: schemas.JoinRandomRequest, db: Session):
 def dispose_abandoned_lobby(db: Session):
     lobbys = db.query(models.Lobby).filter(and_(models.Lobby.lobby_status == LobbyStatus.CREATED,
                                                 (datetime.now() - models.Lobby.lobby_creation_date) > timedelta(
-                                                    hours=3)))
+                                                    hours=3))).all()
     for lobby in lobbys:
         lobby.lobby_status = LobbyStatus.ABANDONED
     db.commit()
