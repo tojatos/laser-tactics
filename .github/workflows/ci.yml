@@ -27,3 +27,8 @@ jobs:
           coverage run -m pytest tests
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v1
+      - name: Python Linter
+        uses: sunnysid3up/python-linter@v0.1-beta.7
+        with:
+             source: "laser-chess-backend"
+             mypy-options: "--ignore-missing-imports --show-error-codes"
