@@ -14,7 +14,7 @@ from app.game_engine.models import GameStateSerializable, empty_game_state
 router = APIRouter(
     prefix="/game",
     tags=["game"],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"error": "Not found"}, 422: {"error": "Invalid input data"}},
 )
 
 
