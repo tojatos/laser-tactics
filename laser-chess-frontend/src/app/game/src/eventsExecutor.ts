@@ -76,7 +76,7 @@ export class EventsExecutor{
         }
 
         this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
-        allDestroyedPieceEventsAfterLastLaserShot.forEach(pde => void this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>pde).destroyed_on, canvas.isReversed, showAnimations, false))
+        allDestroyedPieceEventsAfterLastLaserShot.forEach(pde => void this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>pde).destroyed_on, canvas.isReversed, false, false))
           resolve()
         })()
         })

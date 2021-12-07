@@ -31,7 +31,8 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     if(changes.gameState){
       this.notationList = []
       this.userEventChains = []
-      if((<GameState>changes.gameState.currentValue).game_events.length > 0){
+      const newChange = <GameState>changes.gameState.currentValue
+      if(newChange && newChange.game_events.length > 0){
         this.validGameState = cloneDeep(this.gameState)
         if(this.validGameState){
         this.validGameState.user_events = this.validGameState.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
