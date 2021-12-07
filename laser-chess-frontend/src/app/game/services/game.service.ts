@@ -12,9 +12,14 @@ import { GamePhase } from '../src/enums';
 import { HttpClient } from '@angular/common/http';
 import { UserHistory } from 'src/app/app.models';
 
+type websocketResponse = {
+  status_code: number,
+  body: string
+}
+
 type websocketRequest = {
   request_path: string,
-  request: any
+  request: unknown
 }
 
 @Injectable({
@@ -24,29 +29,29 @@ export class GameWebsocketService {
 
   constructor(private authService: AuthService, private _snackBar: MatSnackBar, private eventEmitter: EventEmitterService, private http: HttpClient){}
 
-  private subject = webSocket<GameState | any>(environment.WEBSOCKET_URL);
+  private subject = webSocket<unknown>(environment.WEBSOCKET_URL);
 
   lastMessage: GameState | undefined = undefined
 
-  connect(gameId: string){
+  connect(gameId: string): void{
     this.subject.asObservable().subscribe(
       msg => {
-        if(msg.status_code && msg.status_code != 200){
-          this.showSnackbar(msg.body)
+        if((<websocketResponse>msg).status_code && (<websocketResponse>msg).status_code != 200){
+          this.showSnackbar((<websocketResponse>msg).body)
           if(this.lastMessage)
             this.eventEmitter.invokeRollback(this.lastMessage)
         }
         else if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
-          this.lastMessage = msg
-          this.eventEmitter.invokeRefresh(msg)
+          this.lastMessage = <GameState>msg
+          this.eventEmitter.invokeRefresh(<GameState>msg)
         }
       },
       err => {
         console.error(err)
         this.showSnackbar("Connection error ocurred. Maybe there is no such game?")
       },
-      () => this.showSnackbar("Connection to the server closed.")
+      () => this.showSnackbar("Connection to the game server closed.")
     )
 
     this.sendRequest(observeWebsocketEndpoint, {game_id: gameId})
@@ -64,18 +69,18 @@ export class GameWebsocketService {
     })
   }
 
-  private sendRequest(path: string, request: any){
+  private sendRequest(path: string, request: unknown){
     const value: websocketRequest = { request_path: path, request: request}
     this.subject.next(value)
   }
 
-  getGameState(gameId: string) {
+  getGameState(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(gameStateEndpoint, request)
   }
 
-  movePiece(gameId: string, from: Coordinates, to: Coordinates){
+  movePiece(gameId: string, from: Coordinates, to: Coordinates): void{
     const movePieceRequest: MovePieceRequest = {
       game_id: gameId,
       move_from: from,
@@ -85,7 +90,7 @@ export class GameWebsocketService {
     this.sendRequest(movePieceEndpoint, movePieceRequest)
   }
 
-  rotatePiece(gameId: string, at: Coordinates, angle: number) {
+  rotatePiece(gameId: string, at: Coordinates, angle: number): void {
     const rotatePieceRequest: RotatePieceRequest = {
       game_id: gameId,
       rotate_at: at,
@@ -95,27 +100,27 @@ export class GameWebsocketService {
     this.sendRequest(rotatePieceEndpoint, rotatePieceRequest)
   }
 
-  shootLaser(gameId: string) {
+  shootLaser(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(shootLaserEndpoint, request)
   }
 
-  giveUp(gameId: string) {
+  giveUp(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(giveUpEndpoint, request)
   }
 
-  offerDraw(gameId: string) {
+  offerDraw(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(offerDrawEndpoint, request)
   }
 
-  showDrawOffer(gameId: string){
+  showDrawOffer(gameId: string): void{
     if(this.lastMessage?.game_phase == GamePhase.STARTED)
-      Swal.fire({
+      void Swal.fire({
         title: "Draw offer",
         text: "Player offers draw",
         icon: 'question',
@@ -127,7 +132,7 @@ export class GameWebsocketService {
 
   }
 
-  closeConnection(){
+  closeConnection(): void{
     this.subject.complete()
   }
 
@@ -139,20 +144,20 @@ export class GameWebsocketService {
     return this.http.get<UserHistory>(gameHistoryFullEndpoint(gameId)).toPromise()
   }
 
-  increaseAnimationEvents(){
+  increaseAnimationEvents(): void{
     const num = parseInt(localStorage.getItem("animationEvents") || "0") + 1
     localStorage.setItem("animationEvents", num.toString())
   }
 
-  setAnimationEventsNum(num: number){
+  setAnimationEventsNum(num: number): void{
     localStorage.setItem("animationEvents", num.toString())
   }
 
-  get numOfAnimationEvents(){
+  get numOfAnimationEvents(): number{
     return parseInt(localStorage.getItem("animationEvents") || "0")
   }
 
-  animationsToShow(totalNumOfAnimations: number){
+  animationsToShow(totalNumOfAnimations: number): number{
     return totalNumOfAnimations - this.numOfAnimationEvents
   }
 }

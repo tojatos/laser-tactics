@@ -10,13 +10,14 @@ import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
 import { GameWebsocketService } from "src/app/game/services/game.service"
 import { GameActions } from "./GameActions"
+import { EventsColors } from "../../enums"
 
 export class GameCanvas extends Canvas {
 
     hoveredCell: Cell | undefined
     mediator: GameMediator | undefined
-    showAnimations: boolean = true
-    enableSounds: boolean = true
+    showAnimations = true
+    enableSounds = true
 
     constructor(gameService: GameWebsocketService,
       authService: AuthService,
@@ -29,7 +30,7 @@ export class GameCanvas extends Canvas {
         super(gameService, authService, ctx, blockSize, animations, drawings, resources, gameId)
     }
 
-    initCanvas(board: Board, gameActions: GameActions){
+    initCanvas(board: Board, gameActions: GameActions): void{
       this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
       this.drawings.drawGame(this, board.cells, this.isReversed)
@@ -37,10 +38,10 @@ export class GameCanvas extends Canvas {
     }
 
     private canvasOnclick(event: MouseEvent, board: Board) {
-      this.onClickEvent(this.getMousePos(event), board)
+      void this.onClickEvent(this.getMousePos(event), board)
     }
 
-    async onClickEvent(mousePos: Coordinates, board: Board){
+    async onClickEvent(mousePos: Coordinates, board: Board): Promise<void>{
       if(!this.interactable)
         return
       this.drawings.drawGame(this, board.cells, this.isReversed)
@@ -72,7 +73,7 @@ export class GameCanvas extends Canvas {
       if(board.selectedCell && selectedCell && this.mediator?.currentRotation == 0){
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations, this.enableSounds)
         this.gameService.increaseAnimationEvents()
-        board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
+        board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
         board.currentTurn++
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
         if(board.isMyTurn())
@@ -90,18 +91,18 @@ export class GameCanvas extends Canvas {
       this.hoverEvent(this.getMousePos(event), board)
     }
 
-    hoverEvent(mousePos: Coordinates, board: Board){
+    hoverEvent(mousePos: Coordinates, board: Board): void{
       if(board.selectedCell && this.interactable && this.mediator?.currentRotation == 0){
         const hoveredOver = board.getCellByCoordinates(mousePos.x, mousePos.y)
         if(hoveredOver && hoveredOver != this.hoveredCell){
           if(board.selectedCell.possibleMoves(board)?.includes(hoveredOver)){
             this.drawings.drawSingleCell(this, hoveredOver, this.isReversed)
-            this.drawings.highlightCell(this, hoveredOver, this.isReversed, hoveredOver.piece || undefined)
+            this.drawings.highlightCell(this, hoveredOver, this.isReversed, hoveredOver.piece || undefined, EventsColors.MOVE_EVENT)
           }
           else {
             if(this.hoveredCell && board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)){
               this.drawings.drawSingleCell(this, this.hoveredCell, this.isReversed)
-              this.drawings.showPossibleMove(this, this.hoveredCell, this.isReversed)
+              this.drawings.showPossibleMove(this, this.hoveredCell, this.isReversed, EventsColors.MOVE_EVENT)
             }
           }
           this.hoveredCell = hoveredOver
@@ -109,7 +110,7 @@ export class GameCanvas extends Canvas {
       }
     }
 
-    async rotationButtonPressed(board: Board, degree: number, initialRotationDifference: number){
+    async rotationButtonPressed(board: Board, degree: number, initialRotationDifference: number): Promise<void>{
       const selectedCell = board.selectedCell
 
       if(selectedCell){
@@ -120,27 +121,27 @@ export class GameCanvas extends Canvas {
 
     }
 
-    changeBlockSize(newSize: number, board: Board){
+    changeBlockSize(newSize: number, board: Board): void{
       this.blockSize = newSize
       this.ctx.canvas.width = COLS * this.blockSize
       this.ctx.canvas.height = ROWS * this.blockSize
       this.drawings.drawGame(this, board.cells, this.isReversed)
     }
 
-    redrawGame(board: Board){
+    redrawGame(board: Board): void{
       this.drawings.drawGame(this, board.cells, this.isReversed)
       this.interactable = true
     }
 
-    private selectCellEvent(selectedCell: Cell, board: Board){
+    private selectCellEvent(selectedCell: Cell, board: Board): void{
       board.selectCell(selectedCell)
-      this.drawings.highlightCell(this, selectedCell, this.isReversed, selectedCell.piece || undefined)
-      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.isReversed))
+      this.drawings.highlightCell(this, selectedCell, this.isReversed, selectedCell.piece || undefined, EventsColors.MOVE_EVENT)
+      selectedCell.piece?.getPossibleMoves(board, selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.isReversed, EventsColors.MOVE_EVENT))
     }
 
-    highlightPossibleMoves(board: Board){
+    highlightPossibleMoves(board: Board): void{
       if(board.selectedCell)
-        board.selectedCell.piece?.getPossibleMoves(board, board.selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.isReversed))
+        board.selectedCell.piece?.getPossibleMoves(board, board.selectedCell).forEach(c => this.drawings.showPossibleMove(this, c, this.isReversed, EventsColors.MOVE_EVENT))
     }
 
     private unselectCellEvent(board: Board){
@@ -149,8 +150,10 @@ export class GameCanvas extends Canvas {
       board.unselectCell()
     }
 
-    private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean, enableSounds: boolean): Promise<void>{
-      return this.animations.movePiece(this, board, board.selectedCell!.coordinates, coor, this.isReversed, showAnimations, enableSounds)
+    private makeAMoveEvent(coor: Coordinates, board: Board, showAnimations: boolean, enableSounds: boolean): Promise<void> | undefined{
+      if(board.selectedCell)
+        return this.animations.movePiece(this, board, board.selectedCell.coordinates, coor, this.isReversed, showAnimations, enableSounds)
+      return undefined
     }
 
 }

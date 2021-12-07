@@ -13,7 +13,7 @@ import { Resources } from "./Display/Resources";
 import { GameEvents, GamePhase, PlayerType } from "./enums";
 import { EventsExecutor } from "./eventsExecutor";
 
-enum analizeModes {
+enum analyzeModes {
   ANALYZING = "ANALYZING",
   EXITING_ANALYZE_MODE = "EXITING_ANALYZE_MODE",
   NOT_ANALYZING = "NOT_ANALYZING"
@@ -25,12 +25,12 @@ export class Game{
   gameCanvas: GameCanvas | undefined
   gameActions: GameActions | undefined
   gameId: string | undefined
-  sizeScale: number = 0
-  showAnimations: boolean = true
-  enableSounds: boolean = true
+  sizeScale = 0
+  showAnimations= true
+  enableSounds = true
   executingActions = false
   isInitiated = false
-  analyzeMode = analizeModes.NOT_ANALYZING
+  analyzeMode = analyzeModes.NOT_ANALYZING
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
@@ -49,7 +49,7 @@ export class Game{
     private resources: Resources){
     if (this.eventEmitter.subsRefresh == undefined) {
       this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe((value: GameState) => {
-        this.refreshGameState(value);
+        void this.refreshGameState(value);
       });
     }
 
@@ -60,11 +60,11 @@ export class Game{
     }
   }
 
-  get displaySize(){
+  get displaySize(): number{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean){
+  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean): Promise<void>{
     this.sizeScale = sizeScale
     this.gameId = gameId
     this.initialGameState = await this.gameService.getInitialGameState()
@@ -73,18 +73,18 @@ export class Game{
     this.enableSounds = sounds
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
     this.gameCanvas.showAnimations = this.showAnimations
-    this.gameActions = new GameActions(this.gameService, this.eventEmitter, gameId)
+    this.gameActions = new GameActions(this.gameService, gameId)
     this.gameService.connect(this.gameId)
     this.gameCanvas.redrawGame(this.board)
   }
 
-  destroyGame(){
+  destroyGame(): void{
     this.sizeScale = 0
     this.gameId = ""
     this.gameCanvas = undefined
     this.gameActions = undefined
     this.isInitiated = false
-    this.analyzeMode = analizeModes.NOT_ANALYZING
+    this.analyzeMode = analyzeModes.NOT_ANALYZING
     this.gamePhase = GamePhase.NOT_STARTED
     this.whoseTurn = PlayerType.NONE
     this.playerNames = [undefined, undefined]
@@ -92,7 +92,7 @@ export class Game{
     this.playerRankingsChanges = [undefined, undefined]
   }
 
-  async loadDisplay(displaySize: number, receivedGameState: GameState){
+  async loadDisplay(displaySize: number, receivedGameState: GameState): Promise<void>{
 
     if(this.gameCanvas && this.gameActions){
 
@@ -110,38 +110,40 @@ export class Game{
       this.gameCanvas.interactable = myTurn
 
       this.playerNames = this.gameCanvas.isReversed ? [this.board.playerTwo, this.board.playerOne] : [this.board.playerOne, this.board.playerTwo]
-      const p1 = await this.userService.getUserByUsername(this.playerNames[0]!)
-      const p2 = await this.userService.getUserByUsername(this.playerNames[1]!)
+      const p1 = await this.userService.getUserByUsername(this.playerNames[0])
+      const p2 = await this.userService.getUserByUsername(this.playerNames[1])
 
       await this.gameRankingChanges(receivedGameState)
 
-      this.playerRankings[0] = p1.rating
-      this.playerRankings[1] = p2.rating
+      if(p1 && p2){
+        this.playerRankings[0] = p1.rating
+        this.playerRankings[1] = p2.rating
+      }
     }
   }
 
-  changeCurrentSize(newSize: number){
+  changeCurrentSize(newSize: number): void{
     if(this.gameCanvas){
       this.board.changeCellCoordinates(newSize)
       this.gameCanvas?.changeBlockSize(newSize, this.board)
     }
   }
 
-  changeAnimationsShowOption(show: boolean){
+  changeAnimationsShowOption(show: boolean): void{
     if(this.gameCanvas){
       this.showAnimations = show
       this.gameCanvas.showAnimations = this.showAnimations
     }
   }
 
-  changeSoundOption(sounds: boolean){
+  changeSoundOption(sounds: boolean): void{
     if(this.gameCanvas){
       this.enableSounds = sounds
       this.gameCanvas.enableSounds = this.enableSounds
     }
   }
 
-  loadConcreteGameState(gameState: GameState){
+  loadConcreteGameState(gameState: GameState): void{
     if(this.gameCanvas){
       this.board.initBoard(gameState, this.displaySize)
       this.board.currentTurn = gameState.turn_number
@@ -152,14 +154,14 @@ export class Game{
     }
   }
 
-  loadStaticGameState(gameState: GameState){
+  loadStaticGameState(gameState: GameState): void{
     if(this.gameCanvas){
       this.board.initBoard(gameState, this.displaySize)
       this.gameCanvas.redrawGame(this.board)
     }
   }
 
-  async loadNewGameState(newGameState: GameState){
+  async loadNewGameState(newGameState: GameState): Promise<void>{
     if(this.gameCanvas){
       this.executingActions = true
       const animationsToShow = this.gameService.animationsToShow(newGameState.game_events.length)
@@ -177,13 +179,13 @@ export class Game{
       await this.gameRankingChanges(newGameState)
 
       if(this.gameService.lastMessage?.game_events && this.gameService.lastMessage != newGameState)
-        this.refreshGameState(this.gameService.lastMessage)
+        void this.refreshGameState(this.gameService.lastMessage)
     }
   }
 
-  async gameRankingChanges(gameState: GameState){
-    if(gameState.game_phase != GamePhase.NOT_STARTED && gameState.game_phase != GamePhase.STARTED){
-      const info = await this.gameService.getGameInfo(this.gameId!)
+  async gameRankingChanges(gameState: GameState): Promise<void>{
+    if(this.gameId && gameState.game_phase != GamePhase.NOT_STARTED && gameState.game_phase != GamePhase.STARTED){
+      const info = await this.gameService.getGameInfo(this.gameId)
       if(info.player_one_rating && info.player_one_new_rating && info.player_two_rating && info.player_two_new_rating){
         const newRating1 = info.player_one_rating - info.player_one_new_rating
         const newRating2 = info.player_two_rating - info.player_two_new_rating
@@ -199,14 +201,14 @@ export class Game{
     }
   }
 
-  async refreshGameState(newGameState: GameState){
+  async refreshGameState(newGameState: GameState): Promise<void>{
     if(this.gameId && this.gameCanvas){
-      if(this.analyzeMode != analizeModes.ANALYZING){
+      if(this.analyzeMode != analyzeModes.ANALYZING){
           if(!this.isInitiated)
-            this.loadDisplay(this.displaySize, newGameState)
-          else if(this.analyzeMode == analizeModes.EXITING_ANALYZE_MODE){
+            void this.loadDisplay(this.displaySize, newGameState)
+          else if(this.analyzeMode == analyzeModes.EXITING_ANALYZE_MODE){
             this.loadConcreteGameState(newGameState)
-            this.analyzeMode = analizeModes.NOT_ANALYZING
+            this.analyzeMode = analyzeModes.NOT_ANALYZING
           }
           else
             await this.loadNewGameState(newGameState)
@@ -228,9 +230,9 @@ export class Game{
     this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
-  async showGameEvent(gameEvents: GameEvent[], enableSounds: boolean){
+  async showGameEvent(gameEvents: GameEvent[]): Promise<void>{
     if(this.gameCanvas){
-      this.analyzeMode = analizeModes.ANALYZING
+      this.analyzeMode = analyzeModes.ANALYZING
       this.gameCanvas.interactable = false
       this.board.setInitialGameState(this.initialGameState, this.displaySize)
       await this.executePendingActions(gameEvents, gameEvents.length, false, false, false)
@@ -238,21 +240,21 @@ export class Game{
         for(let i = gameEvents.length-1; i > 0; i--)
           if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){
             this.eventsExecutor.addEventsToExecute(gameEvents.slice(i, gameEvents.length))
-            this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, false, true, 999999)
+            void this.eventsExecutor.executeLaserAnimations(this.gameCanvas, this.board, (<unknown>gameEvents[i] as LaserShotEvent).laser_path, 0, false, false, true, 999999)
             this.eventsExecutor.eventsQueue = []
             i = -1
           }
     }
   }
 
-  returnToCurrentEvent(){
+  returnToCurrentEvent(): void{
     if(this.gameId){
-      this.analyzeMode = analizeModes.EXITING_ANALYZE_MODE
+      this.analyzeMode = analyzeModes.EXITING_ANALYZE_MODE
       this.gameService.getGameState(this.gameId)
     }
   }
 
-  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean = true){
+  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, enableSounds: boolean, showLaser = true){
     if(this.gameCanvas){
       this.gameCanvas.interactable = false
       this.eventsExecutor.addEventsToExecute(events.slice(-animationsToShow))
@@ -260,36 +262,36 @@ export class Game{
     }
   }
 
-  giveUp(){
+  giveUp(): void{
     if(this.gameId)
       this.gameService.giveUp(this.gameId)
   }
 
-  offerDraw(){
+  offerDraw(): void{
     if(this.gameId)
       this.gameService.offerDraw(this.gameId)
   }
 
-  passRotation(degree: number){
+  passRotation(degree: number): void{
     if(this.gameActions)
-      this.gameActions.rotationPressed(this.board, degree)
+      void this.gameActions.rotationPressed(this.board, degree)
   }
 
-  passLaserShoot(){
+  passLaserShoot(): void{
     if(this.gameActions)
       this.gameActions.laserButtonPressed(this.board)
   }
 
-  passAccept(){
+  passAccept(): void{
     if(this.gameActions)
       this.gameActions.acceptRotationButtonPressed(this.board)
   }
 
-  closeWebsocketConnection(){
+  closeWebsocketConnection(): void{
     this.gameService.closeConnection()
   }
 
-  flipBoard(){
+  flipBoard(): void{
     if(this.gameCanvas){
       this.gameCanvas.isReversed = !this.gameCanvas.isReversed
       this.gameCanvas.redrawGame(this.board)

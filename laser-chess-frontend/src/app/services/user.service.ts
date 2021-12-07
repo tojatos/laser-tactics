@@ -20,8 +20,10 @@ export class UserService {
   }
 
 
-  getUserByUsername(username: string) {
-    return this.http.get<User>(userFullEndpoint(username)).toPromise()
+  getUserByUsername(username: string | undefined) {
+    if(username)
+      return this.http.get<User>(userFullEndpoint(username)).toPromise()
+    return undefined
   }
 
   getUserMe() {

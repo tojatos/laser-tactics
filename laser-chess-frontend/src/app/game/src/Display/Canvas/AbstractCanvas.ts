@@ -1,4 +1,5 @@
 import { AuthService } from "src/app/auth/auth.service"
+import { Coordinates } from "src/app/game/game.models"
 import { GameWebsocketService } from "src/app/game/services/game.service"
 import { COLS, ROWS } from "../../constants"
 import { Animations } from "../Animations"
@@ -7,16 +8,16 @@ import { Resources } from "../Resources"
 
 export abstract class Canvas {
 
-  interactable: boolean = false
+  interactable = false
   currentPlayer = this.authService.getCurrentJwtInfo()?.sub
-  isReversed: boolean = false
+  isReversed = false
 
   constructor(protected readonly gameService: GameWebsocketService, protected readonly authService: AuthService, public readonly ctx: CanvasRenderingContext2D, public blockSize: number, protected readonly animations: Animations, protected readonly drawings: Drawings, public readonly resources: Resources, protected readonly gameId: string) {
       this.ctx.canvas.width = COLS * this.blockSize
       this.ctx.canvas.height = ROWS * this.blockSize
   }
 
-  protected getMousePos(event: MouseEvent){
+  protected getMousePos(event: MouseEvent): Coordinates{
     const rect = this.ctx.canvas.getBoundingClientRect();
 
     if(this.isReversed)
@@ -31,7 +32,7 @@ export abstract class Canvas {
     }
   }
 
-  protected getRawMousePos(event: MouseEvent){
+  protected getRawMousePos(event: MouseEvent): Coordinates{
     const rect = this.ctx.canvas.getBoundingClientRect();
 
     return {

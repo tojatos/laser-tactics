@@ -47,7 +47,7 @@ export class UserPageComponent {
   loadData() {
     this.route.params.subscribe(async params => {
       this.username = params.username
-      this.userService.getUserByUsername(params.username).then(userData => {
+      this.userService.getUserByUsername(params.username)?.then(userData => {
         this.user = userData
         this.rating = this.user.rating
     })

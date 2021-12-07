@@ -7,6 +7,10 @@ mat-selection-list {
     scrollbar-width: none
 }
 
+mat-selection-list::-webkit-scrollbar {
+  display: none;
+}
+
 button {
     margin: 2%;
 }
