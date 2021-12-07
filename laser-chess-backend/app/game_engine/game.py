@@ -1,8 +1,10 @@
+import random
 from copy import deepcopy
 from queue import Queue
-import random
 
-from .models import *
+from .models import auto, CellCoordinates, Enum, GamePhase, GameState, GiveUpEvent, LaserShotEvent, List, \
+    OfferDrawEvent, Optional, PieceDestroyedEvent, PieceMovedEvent, PieceRotatedEvent, PieceTakenEvent, PieceType, \
+    Player, ShootLaserEvent, TeleportEvent, Tuple
 
 
 class Direction(str, Enum):
@@ -266,7 +268,8 @@ class Game:
         self.game_state.turn_number += 1
         self.check_victory()
 
-    def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> Tuple[bool, Optional[str]]:
+    def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> Tuple[
+        bool, Optional[str]]:
         if not self.is_game_started():
             return False, "The game has not started yet."
 
@@ -334,7 +337,8 @@ class Game:
 
         return False, "You cannot make another draw offer so soon."
 
-    def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int)-> Tuple[bool, Optional[str]]:
+    def validate_rotation(self, player: Player, rotated_piece_at: CellCoordinates, rotation: int) -> Tuple[
+        bool, Optional[str]]:
         if not self.is_game_started():
             return False, "The game has not started yet."
 

@@ -1,11 +1,11 @@
 from typing import List
 
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi import status
 from sqlalchemy.orm import Session
 
 from app.core.dependecies import get_current_active_user, get_db
-from app.core.internal import schemas, crud
+from app.core.internal import crud, schemas
 
 router = APIRouter(
     prefix="/users/me/friends",
@@ -28,7 +28,8 @@ async def get_pending_requests(current_user: schemas.User = Depends(get_current_
 
 
 @router.post("/requests/send", status_code=status.HTTP_201_CREATED, response_model=schemas.FriendRequest)
-async def send_friend_request(usernameSchema: schemas.Username, current_user: schemas.User = Depends(get_current_active_user),
+async def send_friend_request(usernameSchema: schemas.Username,
+                              current_user: schemas.User = Depends(get_current_active_user),
                               db: Session = Depends(get_db)):
     friend_username = usernameSchema.username
     if friend_username == current_user.username:
@@ -55,7 +56,8 @@ async def send_friend_request(usernameSchema: schemas.Username, current_user: sc
 
 
 @router.post("/requests/accept", response_model=schemas.FriendRequest)
-async def accept_friend_request(request_id: schemas.FriendRequestId, current_user: schemas.User = Depends(get_current_active_user),
+async def accept_friend_request(request_id: schemas.FriendRequestId,
+                                current_user: schemas.User = Depends(get_current_active_user),
                                 db: Session = Depends(get_db)):
     request = crud.get_pending_friend_request(id=request_id.id, db=db)
     if request is None:
@@ -66,7 +68,8 @@ async def accept_friend_request(request_id: schemas.FriendRequestId, current_use
 
 
 @router.post("/requests/decline", response_model=schemas.FriendRequest)
-async def decline_friend_request(request_id: schemas.FriendRequestId, current_user: schemas.User = Depends(get_current_active_user),
+async def decline_friend_request(request_id: schemas.FriendRequestId,
+                                 current_user: schemas.User = Depends(get_current_active_user),
                                  db: Session = Depends(get_db)):
     request = crud.get_pending_friend_request(id=request_id.id, db=db)
     if request is None:

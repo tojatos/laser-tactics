@@ -1,29 +1,20 @@
-import os
-from datetime import datetime, timedelta
 import asyncio
 import collections
+from datetime import datetime, timedelta
 from typing import Set
 
 from fastapi import Depends, HTTPException
 from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jose import jwt, JWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket
 
-from app.core.internal import schemas, crud
+from app.core.internal import crud, schemas
+from app.core.internal.database import get_env
 from app.core.internal.database import SessionLocal
 from app.game_engine.models import *
-from app.game_engine.requests import *
-
-
-def get_env(key, fallback):
-    try:
-        return os.environ[key]
-    except KeyError:
-        return fallback
-
 
 SECRET_KEY = get_env('SECRET_KEY', "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
 ALGORITHM = get_env('ALGORITHM', "HS256")

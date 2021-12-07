@@ -1,7 +1,7 @@
-from sqlalchemy import Boolean, Column, Integer, String, Enum, DateTime, Float, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, Enum, Float, Integer, String
 
 from .database import Base
-from .schemas import FriendRequestStatus, LobbyStatus, GameResult
+from .schemas import FriendRequestStatus, GameResult, LobbyStatus
 
 
 class User(Base):
@@ -88,4 +88,3 @@ class UserSettings(Base):
     username = Column(String, primary_key=True)
     skip_animations = Column(Boolean, default=False)
     sound_on = Column(Boolean, default=True)
-

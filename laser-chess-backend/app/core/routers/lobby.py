@@ -7,8 +7,8 @@ from pydantic.dataclasses import dataclass
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
-from app.core.dependecies import get_db, get_current_active_user, lobby_manager
-from app.core.internal import schemas, crud
+from app.core.dependecies import get_current_active_user, get_db, lobby_manager
+from app.core.internal import crud, schemas
 from app.game_engine import game_service
 from app.game_engine.requests import GameApiRequestPath, StartGameRequest
 
@@ -144,4 +144,3 @@ async def lobby_websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         print('Websocket disconnected:', websocket.client)
         lobby_manager.disconnect(websocket)
-        pass

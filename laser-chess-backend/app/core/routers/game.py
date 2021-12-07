@@ -4,12 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
-from app.core.internal.crud import get_match_record
-from app.core.dependecies import get_db, get_current_user, manager
+from app.core.dependecies import get_current_user, get_db, manager
 from app.core.internal import schemas
+from app.core.internal.crud import get_match_record
 from app.game_engine import game_service
+from app.game_engine.models import empty_game_state, GameStateSerializable
 from app.game_engine.requests import *
-from app.game_engine.models import GameStateSerializable, empty_game_state
 
 router = APIRouter(
     prefix="/game",

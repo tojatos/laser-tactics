@@ -1,11 +1,11 @@
-from fastapi import Depends, HTTPException, APIRouter
-from fastapi_mail import MessageSchema, FastMail
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi_mail import FastMail, MessageSchema
 from sqlalchemy.orm import Session
 
-from app.core.dependecies import generate_verification_token, VERIFICATION_URL, get_db, generate_change_password_token, \
-    CHANGE_PASSWORD_URL, get_current_active_user
+from app.core.dependecies import CHANGE_PASSWORD_URL, generate_change_password_token, generate_verification_token, \
+    get_current_active_user, get_db, VERIFICATION_URL
 from app.core.internal import crud, schemas
-from app.core.internal.email import EmailSchema, verification_template, conf, change_password_template, verify_conf
+from app.core.internal.email import change_password_template, conf, EmailSchema, verification_template, verify_conf
 
 router = APIRouter(
     prefix="/email",
@@ -15,7 +15,8 @@ router = APIRouter(
 
 
 @router.post("/send_verification_email")
-async def send_verification_email(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+async def send_verification_email(current_user: schemas.User = Depends(get_current_active_user),
+                                  db: Session = Depends(get_db)):
     username = current_user.username
     db_user = crud.get_user(db, username=username)
     if not db_user:
@@ -26,9 +27,9 @@ async def send_verification_email(current_user: schemas.User = Depends(get_curre
     token = generate_verification_token(db_user.email)
     verification_url = VERIFICATION_URL + token
     email = EmailSchema(email=[db_user.email], body={
-          "username": username,
-          "verification_url": verification_url
-        })
+        "username": username,
+        "verification_url": verification_url
+    })
     message = MessageSchema(
         subject="Verify your LaserTactics account",
         recipients=email.dict().get("email"),
@@ -52,9 +53,9 @@ async def send_password_change_email(emailSchema: schemas.EmailSchema, db: Sessi
     token = generate_change_password_token(username)
     url = CHANGE_PASSWORD_URL + token
     email = EmailSchema(email=[db_user.email], body={
-          "username": username,
-          "url": url
-        })
+        "username": username,
+        "url": url
+    })
     message = MessageSchema(
         subject="Your LaserTactics account password change",
         recipients=email.dict().get("email"),
