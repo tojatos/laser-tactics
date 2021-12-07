@@ -7,9 +7,9 @@ import { Component, Input,  Output, EventEmitter  } from '@angular/core';
 })
 export class BoardActionsComponent {
 
-  @Input() containerWidth: number = 0;
+  @Input() containerWidth = 0;
 
-  @Input() containerHeight: number = 0;
+  @Input() containerHeight = 0;
 
   @Input() rotationPossible: boolean | undefined
 
@@ -21,17 +21,15 @@ export class BoardActionsComponent {
 
   private readonly scale = .2
 
-  constructor() { }
-
-  get height(){
+  get height(): number{
     return this.containerHeight * this.scale
   }
 
-  get width(){
+  get width(): number{
     return this.containerWidth * this.scale
   }
 
-  sendButtonPressInfo(value: string) {
+  sendButtonPressInfo(value: string): void {
     this.buttonPressEmitter.emit(value);
   }
 

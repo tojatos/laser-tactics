@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -30,7 +30,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
 
-  async ngAfterViewInit() {
+  async ngAfterViewInit(): Promise<void> {
     if(this.authService.isLoggedIn()){
       const settings = await this.userService.getSettings().toPromise()
       this.animation = !settings.skip_animations
@@ -42,34 +42,40 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       return
     }
 
-    this.route.params.subscribe(async params => {
-      await this.game.initGame(gameCanvasContext,
-        this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
-        params.id,
-        this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
-        this.animation, this.sounds)
-    })
+    type urlModel = {
+      id: string
+    }
+
+    this.route.params.subscribe(params => {
+      void (async () => {
+        await this.game.initGame(gameCanvasContext,
+          this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
+          (<urlModel>params).id,
+          this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
+          this.animation, this.sounds)
+      })()
+  })
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.game.closeWebsocketConnection()
     this.game.destroyGame()
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event: UIEvent) {
+  onResize(): void {
     this.game.changeCurrentSize(this.isHandset ? this.currentSize * this.handsetScale : this.currentSize)
   }
 
-  changeAnimationShowOption(){
+  changeAnimationShowOption(): void{
     this.game.changeAnimationsShowOption(this.animation)
   }
 
-  changeSoundOption(){
+  changeSoundOption(): void{
     this.game.changeSoundOption(this.sounds)
   }
 
-  buttonPressEvent(event: string){
+  buttonPressEvent(event: string): void{
     switch(event){
       case "left": this.game.passRotation(-90); break
       case "right": this.game.passRotation(90); break
@@ -78,15 +84,15 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  buildEvent(gameEvents: GameEvent[]){
-    this.game.showGameEvent(gameEvents, this.sounds)
+  buildEvent(gameEvents: GameEvent[]): void{
+    void this.game.showGameEvent(gameEvents)
   }
 
-  returnToCurrentEvent(){
-    this.game.returnToCurrentEvent()
+  returnToCurrentEvent(): void{
+    void this.game.returnToCurrentEvent()
   }
 
-  parseGamePhase(gamePhase: GamePhase){
+  parseGamePhase(gamePhase: GamePhase): string{
     switch(gamePhase){
       case GamePhase.STARTED: {
         if(this.game.whoseTurn == PlayerType.PLAYER_ONE) return "Red player's turn"
@@ -101,48 +107,48 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  get isHandset(){
+  get isHandset(): boolean{
     return innerWidth <= this.handsetSize
   }
 
-  get currentSize() {
+  get currentSize(): number{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  get containerHeight() {
+  get containerHeight(): number {
     if(!this.isHandset)
       return this.currentSize * ROWS
     else
       return this.currentSize * ROWS * this.handsetScale
   }
 
-  get containerWidth() {
+  get containerWidth(): number {
     if(!this.isHandset)
       return this.currentSize * COLS
     else
       return this.currentSize * COLS * this.handsetScale
   }
 
-  get displayedContainerWidth() {
+  get displayedContainerWidth(): number {
     if(this.isHandset)
       return this.containerWidth
     else
       return Math.max(this.containerWidth * this.placeForGameLogSize, this.minWidth)
   }
 
-  get rotationPossibleInfo() {
+  get rotationPossibleInfo(): boolean | undefined {
     return this.game.gameActions?.rotationActive
   }
 
-  get laserPossibleInfo() {
+  get laserPossibleInfo(): boolean | undefined {
     return this.game.gameActions?.laserActive
   }
 
-  get acceptPossibleInfo() {
+  get acceptPossibleInfo(): boolean | undefined {
     return this.game.gameActions?.acceptActive
   }
 
-  get isSpectator(){
+  get isSpectator(): boolean {
     return this.game.authService.getUsername() != this.game.playerNames[0] && this.game.authService.getUsername() != this.game.playerNames[1]
   }
 

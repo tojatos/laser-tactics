@@ -17,17 +17,15 @@ export class EventEmitterService {
   invokeToggleObservator = new EventEmitter()
   subsObservator: Subscription | undefined
 
-  constructor() { }
-
-  invokeRefresh(gameState: GameState){
+  invokeRefresh(gameState: GameState): void{
     this.invokeRefreshGameState.emit(gameState)
   }
 
-  invokeRollback(gameState: GameState){
+  invokeRollback(gameState: GameState): void{
     this.invokeMoveRollback.emit(gameState)
   }
 
-  invokeObservator(){
+  invokeObservator(): void{
     this.invokeToggleObservator.emit()
   }
 

@@ -1,4 +1,3 @@
-import { EventEmitterService } from "src/app/game/services/event-emitter.service"
 import { GameWebsocketService } from "src/app/game/services/game.service"
 import { Board } from "../../board"
 import { PieceType } from "../../enums"
@@ -7,20 +6,20 @@ import { GameCanvas } from "./GameCanvas"
 
 export class GameActions {
 
-  rotation: number = 0
+  rotation = 0
   mediator!: GameMediator
 
   rotationActive = false
   acceptActive = false
   laserActive = false
 
-  constructor(private gameService: GameWebsocketService, private eventEmitter: EventEmitterService, private gameId: string) {}
+  constructor(private gameService: GameWebsocketService, private gameId: string) {}
 
-  initCanvas(gameCanvas: GameCanvas){
+  initCanvas(gameCanvas: GameCanvas): void {
     this.mediator = new GameMediator(gameCanvas, this)
   }
 
-  newCellSelectedEvent(board: Board){
+  newCellSelectedEvent(board: Board): void{
     const selectedCell = board.selectedCell
 
     if(selectedCell?.piece){
@@ -37,7 +36,7 @@ export class GameActions {
     }
   }
 
-  async rotationPressed(board: Board, degree: number){
+  async rotationPressed(board: Board, degree: number): Promise<void>{
 
     this.disableButtons()
 
@@ -61,7 +60,7 @@ export class GameActions {
 
   }
 
-  acceptRotationButtonPressed(board: Board){
+  acceptRotationButtonPressed(board: Board): void{
     const selectedCell = board.selectedCell
 
     if(selectedCell){
@@ -84,7 +83,7 @@ export class GameActions {
     board.unselectCell()
   }
 
-  laserButtonPressed(board: Board){
+  laserButtonPressed(board: Board): void{
     const laserCell = board.getMyLaser()
     if(laserCell){
       this.mediator.sendLaserShotInfo(board)
@@ -95,13 +94,13 @@ export class GameActions {
     this.disableButtons()
   }
 
-  disableButtons(){
+  disableButtons(): void{
     this.rotationActive = false
     this.laserActive = false
     this.acceptActive = false
   }
 
-  async rotatePieceToInitialPosition(board: Board){
+  async rotatePieceToInitialPosition(board: Board): Promise<void>{
     if(this.rotation != 0){
       await this.mediator.sendRotationInfo(board, this.rotation < 180 ? -this.rotation : 360 - this.rotation, this.rotation)
       this.rotation = 0
