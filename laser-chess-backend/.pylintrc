@@ -1,4 +1,10 @@
 [pylint]
 disable=
-    import-error,
-    too-many-arguments
+    too-many-arguments,
+    missing-docstring,
+    line-too-long,
+    invalid-name
+ignore=
+    schemas.py,
+    models.py
+
