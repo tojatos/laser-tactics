@@ -5,7 +5,7 @@ import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } fro
 import { GameWebsocketService } from "../services/game.service";
 import { Board } from "./board";
 import { Animations } from "./Display/Animations";
-import { Canvas } from "./Display/Canvas/AbstractCanvas";
+import { Canvas } from "./Display/Canvas/Canvas";
 import { Drawings } from "./Display/Drawings";
 import { GameEvents } from "./enums";
 
@@ -54,11 +54,6 @@ export class EventsExecutor{
           break
       }
 
-      for (const pd of allDestroyedPieceEventsAfterLastLaserShot){
-        board.executeEvent(pd)
-        this.gameService.increaseAnimationEvents()
-      }
-
         this.startPath(res[1], res.flat(), res[0][0], allPathsToDraw)
         const allPaths = values(groupBy(allPathsToDraw, 'time'))
 
@@ -75,6 +70,11 @@ export class EventsExecutor{
           await new Promise(resolve => setTimeout(resolve, laserShowDuration))
         const w = canvas.ctx.canvas.width
         canvas.ctx.canvas.width = w
+        for (const pd of allDestroyedPieceEventsAfterLastLaserShot){
+          board.executeEvent(pd)
+          this.gameService.increaseAnimationEvents()
+        }
+
         this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
         allDestroyedPieceEventsAfterLastLaserShot.forEach(pde => void this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>pde).destroyed_on, canvas.isReversed, showAnimations, false))
           resolve()

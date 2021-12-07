@@ -3,7 +3,7 @@ import { Coordinates } from "../../game.models"
 import { Cell } from "../cell"
 import { PIECE_SIZE_SCALE } from "../constants"
 import { Piece } from "../piece"
-import { Canvas } from "./Canvas/AbstractCanvas"
+import { Canvas } from "./Canvas/Canvas"
 
 @Injectable()
 export class Drawings {
@@ -98,6 +98,34 @@ export class Drawings {
       canvas.ctx.fillStyle = "red";
       canvas.ctx.fillRect(-this.laserThickness / 2, -this.laserThickness / 2, this.laserThickness, this.laserThickness)
       canvas.ctx.restore()
+    }
+
+    getPieceIndividualPixels(canvas: Canvas, cell: Cell, size: number, isReverse: boolean){
+
+      type Pixel = {
+        originCoordinates: Coordinates,
+        image: ImageData
+      }
+
+      const cellCoordinates = isReverse ? this.flipPosition(cell.canvasCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : cell.canvasCoordinates
+
+      const pixels: Pixel[][] = []
+
+      for (let i = 0; i < canvas.blockSize * PIECE_SIZE_SCALE; i+=size){
+        pixels.push([])
+        for (let j = 0; j < canvas.blockSize * PIECE_SIZE_SCALE; j+=size){
+          const x = cellCoordinates.x + this.pieceDrawingOriginCoordinates(canvas.blockSize).x + j
+          const y = cellCoordinates.y + this.pieceDrawingOriginCoordinates(canvas.blockSize).y + i
+          pixels[i/size].push({
+            originCoordinates: {
+                x: x,
+                y: y
+              },
+            image: canvas.ctx.getImageData(x, y, size, size)
+          })
+        }
+      }
+      return pixels
     }
 
     cellDrawingOriginCoordinates(blockSize: number): Coordinates {

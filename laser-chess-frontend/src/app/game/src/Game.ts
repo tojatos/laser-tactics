@@ -64,14 +64,14 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(gameCanvasContext: CanvasRenderingContext2D, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean): Promise<void>{
+  async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean): Promise<void>{
     this.sizeScale = sizeScale
     this.gameId = gameId
     this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
     this.showAnimations = animations
     this.enableSounds = sounds
-    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, gameCanvasContext, blockSize, this.resources, gameId)
+    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, canvas, blockSize, this.resources, gameId)
     this.gameCanvas.showAnimations = this.showAnimations
     this.gameActions = new GameActions(this.gameService, gameId)
     this.gameService.connect(this.gameId)

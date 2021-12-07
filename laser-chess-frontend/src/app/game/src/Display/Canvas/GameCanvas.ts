@@ -5,7 +5,7 @@ import { Cell } from "../../cell"
 import { Animations } from "../Animations"
 import { Drawings } from "../Drawings"
 import { Resources } from "../Resources"
-import { Canvas } from "./AbstractCanvas"
+import { Canvas } from "./Canvas"
 import { GameMediator } from "./CanvasMediator"
 import { COLS, ROWS } from "../../constants"
 import { GameWebsocketService } from "src/app/game/services/game.service"
@@ -16,18 +16,18 @@ export class GameCanvas extends Canvas {
 
     hoveredCell: Cell | undefined
     mediator: GameMediator | undefined
-    showAnimations = true
     enableSounds = true
+    currentPlayer = this.authService.getUsername()
 
-    constructor(gameService: GameWebsocketService,
-      authService: AuthService,
-      animations: Animations,
-      drawings: Drawings,
-      ctx: CanvasRenderingContext2D,
-       blockSize: number,
-       resources: Resources,
-       gameId: string) {
-        super(gameService, authService, ctx, blockSize, animations, drawings, resources, gameId)
+    constructor(private gameService: GameWebsocketService,
+      private authService: AuthService,
+      private animations: Animations,
+      private drawings: Drawings,
+      canvas: HTMLCanvasElement,
+      blockSize: number,
+      resources: Resources,
+      private gameId: string) {
+        super(canvas, blockSize, resources)
     }
 
     initCanvas(board: Board, gameActions: GameActions): void{
@@ -155,5 +155,30 @@ export class GameCanvas extends Canvas {
         return this.animations.movePiece(this, board, board.selectedCell.coordinates, coor, this.isReversed, showAnimations, enableSounds)
       return undefined
     }
+
+    private getMousePos(event: MouseEvent){
+      const rect = this.ctx.canvas.getBoundingClientRect();
+
+      if(this.isReversed)
+        return {
+          x: COLS - 1 - Math.floor((event.clientX - rect.left) / this.blockSize),
+          y: Math.floor((event.clientY - rect.top) / this.blockSize)
+        }
+
+      return {
+        x: Math.floor((event.clientX - rect.left) / this.blockSize),
+        y: ROWS - 1 - Math.floor((event.clientY - rect.top) / this.blockSize)
+      }
+    }
+
+    private getRawMousePos(event: MouseEvent){
+      const rect = this.ctx.canvas.getBoundingClientRect();
+
+      return {
+        x: Math.floor((event.clientX - rect.left)),
+        y: Math.floor((event.clientY - rect.top))
+      }
+    }
+
 
 }

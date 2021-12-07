@@ -36,8 +36,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       this.animation = !settings.skip_animations
       this.sounds = settings.sound_on
     }
-    const gameCanvasContext = this.canvasGame.nativeElement.getContext('2d')
-    if(!gameCanvasContext){
+
+    if(!this.canvasGame.nativeElement.getContext('2d')){
       alert("Couldn't load context")
       return
     }
@@ -48,7 +48,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
     this.route.params.subscribe(params => {
       void (async () => {
-        await this.game.initGame(gameCanvasContext,
+        await this.game.initGame(this.canvasGame.nativeElement,
           this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
           (<urlModel>params).id,
           this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
