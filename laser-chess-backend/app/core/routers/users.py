@@ -11,7 +11,7 @@ from app.game_engine.models import *
 router = APIRouter(
     prefix="/users",
     tags=["users"],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"error": "Not found"}, 422: {"error": "Invalid input data"}},
 )
 
 
@@ -22,9 +22,10 @@ def verify_user(token: str, db: Session = Depends(get_db)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         purpose = payload.get("purpose")
+        is_verifed = payload.get("hash")
         if email is None or purpose != TokenPurpose.ACCOUNT_VERIFICATION:
             raise HTTPException(status_code=400, detail="The verification link is invalid or has expired.")
-        token_data = schemas.VerificationTokenData(email=email, purpose=purpose)
+        token_data = schemas.VerificationTokenData(email=email, purpose=purpose, hash=is_verifed)
     except JWTError:
         raise HTTPException(status_code=400, detail="The verification link is invalid or has expired.")
     user = crud.get_user_by_email(db, token_data.email)
@@ -45,13 +46,16 @@ def change_password(change_password_schema: schemas.EmergencyChangePasswordSchem
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         purpose = payload.get("purpose")
+        hash = payload.get("hash")
         if username is None or purpose != TokenPurpose.CHANGE_PASSWORD:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-        token_data = schemas.TokenData(username=username, purpose=purpose)
+        token_data = schemas.TokenData(username=username, purpose=purpose, hash=hash)
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
     user = crud.get_user(db, token_data.username)
     if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    if user.hashed_password != hash:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
     return crud.change_password(user, change_password_schema.newPassword, db)
 
