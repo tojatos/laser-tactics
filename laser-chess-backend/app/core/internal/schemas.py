@@ -1,8 +1,8 @@
 import datetime as dt
-from enum import Enum, auto
+from enum import auto, Enum
 from typing import Optional
 
-from pydantic import BaseModel, validator, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 
 
 class AutoNameEnum(Enum):
@@ -270,4 +270,3 @@ class JoinRandomRequest(BaseModel):
     rating_lower_bound: int
     rating_higher_bound: int
     is_rated: bool
-

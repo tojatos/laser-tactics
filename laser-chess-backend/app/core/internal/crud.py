@@ -1,19 +1,19 @@
 import dataclasses
 import json
 from datetime import datetime, timedelta
-
-from pydantic import EmailStr
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
-from app.core.internal import schemas, models
-from passlib.context import CryptContext
-
-from app.core.internal.schemas import LobbyStatus, GameResult
-from app.game_engine.models import GameState, GamePhase
-from app.game_engine.requests import StartGameRequest
 from uuid import uuid4
-from app.Rating.schemas import PlayerMatchResult, PlayerMatchHistory, PlayerRatingUpdate
+
+from passlib.context import CryptContext
+from pydantic import EmailStr
+from sqlalchemy import and_, or_
+from sqlalchemy.orm import Session
+
+from app.core.internal import models, schemas
+from app.core.internal.schemas import GameResult, LobbyStatus
+from app.game_engine.models import GamePhase, GameState
+from app.game_engine.requests import StartGameRequest
 from app.Rating.rating import get_starting_rating, update_rating
+from app.Rating.schemas import PlayerMatchHistory, PlayerMatchResult, PlayerRatingUpdate
 
 RATING_PERIOD = 30
 # max days we get matches from
@@ -97,7 +97,8 @@ def get_created_lobbies(db: Session, skip: int = 0, limit: int = 100):
 
 def get_user_in_created_lobbies(db: Session, user: schemas.User):
     lobbies = db.query(models.Lobby).filter(
-        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, or_(models.Lobby.player_one_username == user.username, models.Lobby.player_two_username == user.username))).all()
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, or_(models.Lobby.player_one_username == user.username,
+                                                                   models.Lobby.player_two_username == user.username))).all()
     return lobbies
 
 
@@ -229,7 +230,8 @@ def get_random_lobby(params: schemas.JoinRandomRequest, db: Session):
             return False
 
     lobbys = db.query(models.Lobby).filter(
-        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.is_ranked == params.is_rated, models.Lobby.player_two_username == None)).all()
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.is_ranked == params.is_rated,
+             models.Lobby.player_two_username == None)).all()
     for lobby in lobbys:
         if rating_in_bounds(params, lobby):
             return lobby
@@ -289,11 +291,11 @@ def get_users_last_rating(db: Session, username: str, rating_period: int = RATIN
         return PlayerRatingUpdate(rating=rating.rating,
                                   rating_deviation=rating.rating_deviation,
                                   volatility=rating.rating_volatility)
-    elif match_left is None:
+    if match_left is None:
         return PlayerRatingUpdate(rating=match_right.player_two_rating,
                                   rating_deviation=match_right.player_two_deviation,
                                   volatility=match_right.player_two_volatility)
-    elif match_right is None:
+    if match_right is None:
         return PlayerRatingUpdate(rating=match_left.player_one_rating,
                                   rating_deviation=match_left.player_one_deviation,
                                   volatility=match_left.player_one_volatility)
@@ -316,9 +318,9 @@ def update_game(db: Session, game_state: GameState, game_id: str):
     def map_gameResult(game_phase: GamePhase):
         if game_phase == GamePhase.DRAW:
             return schemas.GameResult.DRAW
-        elif game_phase == GamePhase.PLAYER_ONE_VICTORY:
+        if game_phase == GamePhase.PLAYER_ONE_VICTORY:
             return schemas.GameResult.PLAYER_ONE_WIN
-        elif game_phase == GamePhase.PLAYER_TWO_VICTORY:
+        if game_phase == GamePhase.PLAYER_TWO_VICTORY:
             return schemas.GameResult.PLAYER_TWO_WIN
         else:
             return None
@@ -381,7 +383,7 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
     def determine_result_player_one(result):
         if result == GameResult.PLAYER_ONE_WIN:
             return 1
-        elif result == GameResult.DRAW:
+        if result == GameResult.DRAW:
             return 0.5
         else:
             return 0
@@ -389,7 +391,7 @@ def get_user_matches(db: Session, user: schemas.User, rating_period: int):
     def determine_result_player_two(result):
         if result == GameResult.PLAYER_TWO_WIN:
             return 1
-        elif result == GameResult.DRAW:
+        if result == GameResult.DRAW:
             return 0.5
         else:
             return 0
@@ -482,8 +484,12 @@ def get_stats(db: Session, user: schemas.User):
     matches = list(sorted(matches_sum, key=lambda match: match.game_end_date))
     no_matches = len(matches)
     draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
-    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN and match.player_one_username == user.username, matches))
-    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN and match.player_two_username == user.username, matches))
+    wins_as_p1 = list(
+        filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN and match.player_one_username == user.username,
+               matches))
+    wins_as_p2 = list(
+        filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN and match.player_two_username == user.username,
+               matches))
     winrate = len(wins_as_p1 + wins_as_p2) / no_matches
     winrate_as_p1 = len(wins_as_p1) / len(games_as_p1) if games_as_p1 else 0
     winrate_as_p2 = len(wins_as_p2) / len(games_as_p2) if games_as_p2 else 0

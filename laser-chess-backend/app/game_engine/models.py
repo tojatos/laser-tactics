@@ -1,6 +1,7 @@
-from pydantic.dataclasses import dataclass
-from enum import Enum, auto
+from enum import auto, Enum
 from typing import Dict, List, Optional, Tuple, Union
+
+from pydantic.dataclasses import dataclass
 
 CellCoordinates = Tuple[int, int]
 

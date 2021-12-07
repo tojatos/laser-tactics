@@ -13,6 +13,7 @@ class PlayerRatingUpdate(BaseModel):
     rating_deviation: float
     volatility: float
 
+
 """
 We now want to update the rating of a player with (Glicko-2) rating µ, rating deviation
 φ, and volatility σ. He plays against m opponents with ratings µ1, . . . , µm, rating

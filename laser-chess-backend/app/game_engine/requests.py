@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 from typing import Union
 
 from pydantic.dataclasses import dataclass

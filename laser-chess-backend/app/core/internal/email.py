@@ -1,12 +1,11 @@
 from pathlib import Path
-from pprint import pprint
-from typing import List, Dict
+from typing import Dict, List
 
 from fastapi_mail import ConnectionConfig
 from pydantic import BaseModel, EmailStr
 
-from app.core.dependecies import VERIFY_MAIL_FROM, VERIFY_MAIL_USERNAME, VERIFY_MAIL_PASSWORD, VERIFY_MAIL_PORT, \
-    VERIFY_MAIL_SERVER, MAIL_FROM, MAIL_USERNAME, MAIL_PASSWORD, MAIL_PORT, MAIL_SERVER
+from app.core.dependecies import MAIL_FROM, MAIL_PASSWORD, MAIL_PORT, MAIL_SERVER, MAIL_USERNAME, VERIFY_MAIL_FROM, \
+    VERIFY_MAIL_PASSWORD, VERIFY_MAIL_PORT, VERIFY_MAIL_SERVER, VERIFY_MAIL_USERNAME
 
 
 class EmailSchema(BaseModel):

@@ -1,11 +1,11 @@
+from fastapi import APIRouter, status
 from fastapi import Depends, HTTPException
-from fastapi import status, APIRouter
-from jose import JWTError, jwt
+from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
-from app.core.dependecies import get_db, SECRET_KEY, ALGORITHM, TokenPurpose, get_current_active_user, get_current_user, \
+from app.core.dependecies import ALGORITHM, get_current_active_user, get_current_user, get_db, SECRET_KEY, TokenPurpose, \
     verify_password
-from app.core.internal import schemas, crud
+from app.core.internal import crud, schemas
 from app.game_engine.models import *
 
 router = APIRouter(

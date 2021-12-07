@@ -5,16 +5,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
 from starlette import status
 
-from app.core.dependecies import API_PREFIX, HOST, PORT, get_db, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, \
-    create_access_token, TokenPurpose, ROOT_PATH
+from app.core.dependecies import ACCESS_TOKEN_EXPIRE_MINUTES, API_PREFIX, authenticate_user, create_access_token, \
+    get_db, HOST, PORT, ROOT_PATH, TokenPurpose
 from app.core.internal import models, schemas
 from app.core.internal.database import engine
-from app.core.routers import friends, users, email, game, lobby
+from app.core.routers import email, friends, game, lobby, users
 from app.core.routers.game import websocket_endpoint
-from sqlalchemy.orm import Session
-
 from app.core.routers.lobby import lobby_websocket_endpoint
 
 app = FastAPI(root_path=ROOT_PATH, openapi_url=f"{API_PREFIX}/openapi.json")
