@@ -1,6 +1,6 @@
 import { environment } from "src/environments/environment";
 
-export const fullEndpoint = (endpoint: String, sub: String = "") => `${environment.API_URL}${environment.API_PREFIX}${endpoint}${sub}`
+export const fullEndpoint = (endpoint: string, sub = ""): string => `${environment.API_URL}${environment.API_PREFIX}${endpoint}${sub}`
 
 export const userEndpoint = '/users'
 export const friendsEndpoint = '/users/me/friends'
@@ -32,19 +32,19 @@ export const gameStateFullEndpoint = fullEndpoint(gameStateEndpoint)
 export const movePieceFullEndpoint = fullEndpoint(movePieceEndpoint)
 export const rotatePieceFullEndpoint = fullEndpoint(rotatePieceEndpoint)
 export const shootLaserFullEndpoint = fullEndpoint(shootLaserEndpoint)
-export const leaveLobbyFullEndpoint = (id: string = "") => fullEndpoint(leaveLobbyEndpoint, id ? `/${id}` : '')
+export const leaveLobbyFullEndpoint = (id = ""): string => fullEndpoint(leaveLobbyEndpoint, id ? `/${id}` : '')
 export const startGameFullEndpoint = fullEndpoint(startGameEndpoint)
-export const friendsFullEndpoint = (id: string  = "") => fullEndpoint(friendsEndpoint, id ? `/${id}` : '')
-export const lobbyFullEndpoint = (id: string = "") => fullEndpoint(lobbyEndpoint, id ? `/${id}` : '')
+export const friendsFullEndpoint = (id  = ""): string => fullEndpoint(friendsEndpoint, id ? `/${id}` : '')
+export const lobbyFullEndpoint = (id = ""): string => fullEndpoint(lobbyEndpoint, id ? `/${id}` : '')
 export const settingsFullEndpoint = fullEndpoint(settingsEndpoint)
-export const updateLobbyFullEndpoint = (id: string = "") => fullEndpoint(updateLobbyEndpoint, id ? `/${id}` : '')
-export const createLobbyFullEndpoint = (id: string = "") => fullEndpoint(createLobbyEndpoint, id ? `/${id}` : '')
-export const joinLobbyFullEndpoint = (id: string = "") => fullEndpoint(joinLobbyEndpoint, id ? `/${id}` : '')
-export const joinRandomLobbyFullEndpoint = (id: string = "") => fullEndpoint(joinRandomLobbyEndpoint, id ? `/${id}` : '')
-export const gameFullEndpoint = (id: string  = "") => fullEndpoint(gameEndpoint, id ? `/${id}` : '')
-export const userFullEndpoint = (id: string  = "") => fullEndpoint(userEndpoint, id ? `/${id}` : '')
+export const updateLobbyFullEndpoint = (id = ""): string => fullEndpoint(updateLobbyEndpoint, id ? `/${id}` : '')
+export const createLobbyFullEndpoint = (id = ""): string => fullEndpoint(createLobbyEndpoint, id ? `/${id}` : '')
+export const joinLobbyFullEndpoint = (id = ""): string => fullEndpoint(joinLobbyEndpoint, id ? `/${id}` : '')
+export const joinRandomLobbyFullEndpoint = (id = ""): string => fullEndpoint(joinRandomLobbyEndpoint, id ? `/${id}` : '')
+export const gameFullEndpoint = (id  = ""): string => fullEndpoint(gameEndpoint, id ? `/${id}` : '')
+export const userFullEndpoint = (id  = ""): string => fullEndpoint(userEndpoint, id ? `/${id}` : '')
 export const giveUpFullEndpoint = fullEndpoint(giveUpEndpoint)
 export const offerDrawFullEndpoint = fullEndpoint(offerDrawEndpoint)
-export const emailFullEndpoint = (id: string  = "") => fullEndpoint(emailEndpoint, id ? `/${id}` : '')
+export const emailFullEndpoint = (id  = ""): string => fullEndpoint(emailEndpoint, id ? `/${id}` : '')
 export const initalGameStateFullEndpoint = fullEndpoint(initialGameEndpoint)
-export const gameHistoryFullEndpoint = (id: string  = "") => fullEndpoint(gameHistoryEndpoint, id ? `/${id}` : '')
+export const gameHistoryFullEndpoint = (id  = ""): string => fullEndpoint(gameHistoryEndpoint, id ? `/${id}` : '')

@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
-import { BoardInterface, CellInterface, Coordinates, GameEvent, GameState, PieceInterface, PieceMovedEvent } from "../game.models"
+import { BoardInterface, Coordinates, GameEvent, GameState } from "../game.models"
 import { Cell } from "./cell"
-import { GameEvents, GamePhase, PieceType, PlayerType } from "./enums"
+import { GameEvents, PieceType, PlayerType } from "./enums"
 
 @Injectable()
 export class Board implements BoardInterface {
@@ -17,7 +17,7 @@ export class Board implements BoardInterface {
 
   constructor(private authService: AuthService){}
 
-  initBoard(gameState: GameState, blockSize: number) {
+  initBoard(gameState: GameState, blockSize: number): void {
     this.blockSize = blockSize
     this.gameId = gameState.game_id
     this.cells = []
@@ -27,12 +27,12 @@ export class Board implements BoardInterface {
     gameState.board.cells.forEach(c => this.cells.push(new Cell(c.coordinates, c.piece, c.auxiliaryPiece, blockSize)) )
   }
 
-  selectCell(cell: Cell | undefined) {
+  selectCell(cell: Cell | undefined): void  {
     if(cell && this.cells.includes(cell) && cell.piece)
       this.selectedCell = cell
   }
 
-  unselectCell(){
+  unselectCell(): void {
     this.selectedCell = undefined
   }
 
@@ -43,10 +43,10 @@ export class Board implements BoardInterface {
   getSelectableCellByCoordinates(x: number, y: number, owner: string | undefined): Cell | undefined {
     if(!this.selectedCell)
       return this.cells.find(c => c.coordinates.x == x && c.coordinates.y == y && c.piece?.piece_owner == this.parsePlayerIdToPlayerNumber(owner))
-    return this.selectedCell.piece?.getPossibleMoves(this, this.selectedCell).find(c => c.coordinates.x == x && c.coordinates.y == y)
+    return this.selectedCell.piece?.getPossibleMoves(this, this.selectedCell).find(c => c?.coordinates.x == x && c.coordinates.y == y)
   }
 
-    movePiece(origin: Coordinates, destination: Coordinates){
+    movePiece(origin: Coordinates, destination: Coordinates): void {
     const originCell = this.getCellByCoordinates(origin.x, origin.y)
     const destinationCell = this.getCellByCoordinates(destination.x, destination.y)
     if(originCell && destinationCell && originCell.piece){
@@ -63,7 +63,7 @@ export class Board implements BoardInterface {
     }
   }
 
-  rotatePiece(at: Coordinates, angle: number){
+  rotatePiece(at: Coordinates, angle: number): void {
     const cell = this.getCellByCoordinates(at.x, at.y)
     if(cell?.piece){
       const newDegree = (cell.piece.rotation_degree + angle) % 360
@@ -72,23 +72,23 @@ export class Board implements BoardInterface {
   }
 
 
-  changeCellCoordinates(newSize: number){
+  changeCellCoordinates(newSize: number): void {
     this.cells.forEach(c => c.changeCanvasCoordinates(newSize))
   }
 
-  getMyLaser(){
+  getMyLaser(): Cell | undefined {
     const player = this.authService.getCurrentJwtInfo()?.sub
     return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
   }
 
-  getLaserCell(){
+  getLaserCell(): Cell | undefined{
     const player = this.authService.getCurrentJwtInfo()?.sub
     if(this.isMyTurn())
       return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player))
     return this.cells.find(c => c.piece?.piece_type == PieceType.LASER && c.piece.piece_owner != this.parsePlayerIdToPlayerNumber(player))
   }
 
-  executeEvent(gameEvent: GameEvent){
+  executeEvent(gameEvent: GameEvent): void{
     switch(gameEvent.event_type){
       case GameEvents.PIECE_ROTATED_EVENT : this.rotatePiece(gameEvent.rotated_piece_at, gameEvent.rotation); break
       case GameEvents.PIECE_MOVED_EVENT : this.movePiece(gameEvent.moved_from, gameEvent.moved_to); break
@@ -97,12 +97,12 @@ export class Board implements BoardInterface {
     }
   }
 
-  get turnOfPlayer(){
+  get turnOfPlayer(): PlayerType {
     const turnOfPlayer = Math.round(this.currentTurn / 2) % 2 == 0 ? this.playerTwo : this.playerOne
     return this.parsePlayerIdToPlayerNumber(turnOfPlayer)
   }
 
-  get playerNum(){
+  get playerNum(): PlayerType {
     const player = this.authService.getCurrentJwtInfo()?.sub
 
     if(player == this.playerOne)
@@ -114,36 +114,36 @@ export class Board implements BoardInterface {
     return PlayerType.NONE
   }
 
-  isPlayer(username: string){
+  isPlayer(username: string): boolean {
     return this.playerOne == username || this.playerTwo == username
   }
 
-  isMyTurn() {
+  isMyTurn(): boolean {
     const player = this.authService.getCurrentJwtInfo()?.sub
     const turnOfPlayer = Math.round(this.currentTurn / 2) % 2 == 0 ? this.playerTwo : this.playerOne
     return player != undefined && turnOfPlayer != undefined && player == turnOfPlayer
   }
 
-  parsePlayerIdToPlayerNumber(playerId: string | undefined){
+  parsePlayerIdToPlayerNumber(playerId: string | undefined): PlayerType{
 
     if(playerId == this.playerOne)
       return PlayerType.PLAYER_ONE
     else if (playerId == this.playerTwo)
       return PlayerType.PLAYER_TWO
 
-    return undefined
+    return PlayerType.NONE
   }
 
-  setInitialGameState(initialGameState: GameState, blockSize: number){
+  setInitialGameState(initialGameState: GameState, blockSize: number): void{
     this.setGameState(initialGameState, blockSize)
   }
 
-  setGameState(gameState: GameState, blockSize: number){
+  setGameState(gameState: GameState, blockSize: number): void{
     if(this.blockSize)
       this.initBoard(gameState, blockSize)
   }
 
-  removePiece(at: Coordinates) {
+  removePiece(at: Coordinates): void {
     const cell = this.getCellByCoordinates(at.x, at.y)
     if(cell?.piece)
       cell.piece = null

@@ -1,5 +1,4 @@
 import dataclasses
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi import status
 from fastapi.encoders import jsonable_encoder
@@ -15,8 +14,11 @@ from app.game_engine.requests import GameApiRequestPath, StartGameRequest
 router = APIRouter(
     prefix="/lobby",
     tags=["lobby"],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"error": "Not found"}, 422: {"error": "Invalid input data"}},
 )
+
+
+
 
 
 @router.get("")

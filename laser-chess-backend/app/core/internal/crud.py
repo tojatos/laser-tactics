@@ -97,7 +97,8 @@ def get_created_lobbies(db: Session, skip: int = 0, limit: int = 100):
 
 def get_user_in_created_lobbies(db: Session, user: schemas.User):
     lobbies = db.query(models.Lobby).filter(
-        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, or_(models.Lobby.player_one_username == user.username, models.Lobby.player_two_username == user.username))).all()
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, or_(models.Lobby.player_one_username == user.username,
+                                                                   models.Lobby.player_two_username == user.username))).all()
     return lobbies
 
 
@@ -229,11 +230,21 @@ def get_random_lobby(params: schemas.JoinRandomRequest, db: Session):
             return False
 
     lobbys = db.query(models.Lobby).filter(
-        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.is_ranked == params.is_rated, models.Lobby.player_two_username == None)).all()
+        and_(models.Lobby.lobby_status == LobbyStatus.CREATED, models.Lobby.is_ranked == params.is_rated,
+             models.Lobby.player_two_username == None)).all()
     for lobby in lobbys:
         if rating_in_bounds(params, lobby):
             return lobby
     return None
+
+
+def dispose_abandoned_lobby(db: Session):
+    lobbys = db.query(models.Lobby).filter(and_(models.Lobby.lobby_status == LobbyStatus.CREATED,
+                                                (datetime.now() - models.Lobby.lobby_creation_date) > timedelta(
+                                                    hours=3))).all()
+    for lobby in lobbys:
+        lobby.lobby_status = LobbyStatus.ABANDONED
+    db.commit()
 
 
 def remove_block_record(user: schemas.User, blocked_user: schemas.User, db: Session):
@@ -482,8 +493,12 @@ def get_stats(db: Session, user: schemas.User):
     matches = list(sorted(matches_sum, key=lambda match: match.game_end_date))
     no_matches = len(matches)
     draws = list(filter(lambda match: match.result == GameResult.DRAW, matches))
-    wins_as_p1 = list(filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN and match.player_one_username == user.username, matches))
-    wins_as_p2 = list(filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN and match.player_two_username == user.username, matches))
+    wins_as_p1 = list(
+        filter(lambda match: match.result == GameResult.PLAYER_ONE_WIN and match.player_one_username == user.username,
+               matches))
+    wins_as_p2 = list(
+        filter(lambda match: match.result == GameResult.PLAYER_TWO_WIN and match.player_two_username == user.username,
+               matches))
     winrate = len(wins_as_p1 + wins_as_p2) / no_matches
     winrate_as_p1 = len(wins_as_p1) / len(games_as_p1) if games_as_p1 else 0
     winrate_as_p2 = len(wins_as_p2) / len(games_as_p2) if games_as_p2 else 0

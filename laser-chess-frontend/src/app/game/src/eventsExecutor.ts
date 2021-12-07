@@ -23,18 +23,18 @@ export class EventsExecutor{
     eventsQueue : GameEvent[] = []
     eventsExecutionTimeout = 500
 
-    addEventsToExecute(events: GameEvent[]){
+    addEventsToExecute(events: GameEvent[]): void{
         this.eventsQueue.push(...events)
     }
 
-    async executeEventsQueue(canvas: Canvas, board: Board, showAnimations: boolean = true, enableSounds: boolean = true, showLaser: boolean = true, timeout: number = this.eventsExecutionTimeout){
+    async executeEventsQueue(canvas: Canvas, board: Board, showAnimations = true, enableSounds = true, showLaser = true, timeout: number = this.eventsExecutionTimeout): Promise<void>{
       for (const event of this.eventsQueue.filter(e => e.event_type != GameEvents.PIECE_DESTROYED_EVENT)){
         if(event){
           await this.getAnimationToExecute(canvas, board, event, this.eventsQueue.indexOf(event), document.hidden ? false : showAnimations, enableSounds, showLaser)
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)
-          if(event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum && board.isPlayer(this.authService.getUsername()))
-            this.gameService.showDrawOffer(board.gameId!)
+          if(board.gameId && event.event_type == GameEvents.OFFER_DRAW_EVENT && event.player != board.playerNum && board.isPlayer(this.authService.getUsername()))
+            this.gameService.showDrawOffer(board.gameId)
           if(showAnimations && !document.hidden)
             await new Promise(resolve => setTimeout(resolve, timeout))
         }
@@ -42,7 +42,7 @@ export class EventsExecutor{
       this.eventsQueue = []
     }
 
-    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], eventId: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean, laserShowDuration = 1000){
+    async executeLaserAnimations(canvas: Canvas, board: Board, laserPath: LaserShotEventEntity[], eventId: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean, laserShowDuration = 1000) : Promise<void>{
       const res = values(groupBy(laserPath, 'time'))
       const allPathsToDraw: PathInfo[] = []
       const allDestroyedPieceEventsAfterLastLaserShot: GameEvent[] = []
@@ -57,7 +57,8 @@ export class EventsExecutor{
         this.startPath(res[1], res.flat(), res[0][0], allPathsToDraw)
         const allPaths = values(groupBy(allPathsToDraw, 'time'))
 
-        return new Promise<void>(async resolve => {
+        return new Promise<void>(resolve => {
+          void (async () => {
           for (const path of allPaths)
             await Promise.all([
               this.animations.laserAnimation(canvas, board, path.map(p => [p.from, p.to]), canvas.isReversed, showAnimations, enableSounds),
@@ -75,13 +76,14 @@ export class EventsExecutor{
         }
 
         this.drawings.drawGame(canvas, board.cells, canvas.isReversed)
-        allDestroyedPieceEventsAfterLastLaserShot.forEach(pde => this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>pde).destroyed_on, canvas.isReversed, false, false))
-        resolve()
+        allDestroyedPieceEventsAfterLastLaserShot.forEach(pde => void this.animations.pieceDestroyedAnimation(canvas, board, (<PieceDestroyedEvent>pde).destroyed_on, canvas.isReversed, showAnimations, false))
+          resolve()
+        })()
         })
 
     }
 
-    getAnimationToExecute(canvas: Canvas, board: Board, gameEvent: GameEvent, eventId: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean){
+    getAnimationToExecute(canvas: Canvas, board: Board, gameEvent: GameEvent, eventId: number, showAnimations: boolean, enableSounds: boolean, showLaser: boolean): Promise<void> | undefined{
       switch(gameEvent.event_type){
         case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(canvas, board,
           board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y),

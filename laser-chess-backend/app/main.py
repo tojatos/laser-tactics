@@ -14,7 +14,8 @@ from app.core.internal.database import engine
 from app.core.routers import friends, users, email, game, lobby
 from app.core.routers.game import websocket_endpoint
 from sqlalchemy.orm import Session
-
+from fastapi_utils.tasks import repeat_every
+from app.core.internal.crud import dispose_abandoned_lobby
 from app.core.routers.lobby import lobby_websocket_endpoint
 
 app = FastAPI(root_path=ROOT_PATH, openapi_url=f"{API_PREFIX}/openapi.json")
@@ -40,6 +41,13 @@ router = APIRouter(
 
     responses={404: {"description": "Not found"}},
 )
+
+
+# every 3 hours
+@app.on_event("startup")
+@repeat_every(seconds=60 * 60 * 3)
+def clear_abandoned_lobbies(db: Session = Depends(get_db)):
+    dispose_abandoned_lobby(db)
 
 
 @router.post("/token", response_model=schemas.Token)

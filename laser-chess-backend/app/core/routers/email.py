@@ -23,7 +23,7 @@ async def send_verification_email(current_user: schemas.User = Depends(get_curre
     if db_user.is_verified:
         raise HTTPException(status_code=400, detail="User already verified")
 
-    token = generate_verification_token(db_user.email)
+    token = generate_verification_token(db_user.email, db_user.is_verified)
     verification_url = VERIFICATION_URL + token
     email = EmailSchema(email=[db_user.email], body={
           "username": username,
@@ -49,7 +49,7 @@ async def send_password_change_email(emailSchema: schemas.EmailSchema, db: Sessi
         return {'detail': "Verification email sent"}
 
     username = db_user.username
-    token = generate_change_password_token(username)
+    token = generate_change_password_token(username, db_user.hashed_password)
     url = CHANGE_PASSWORD_URL + token
     email = EmailSchema(email=[db_user.email], body={
           "username": username,

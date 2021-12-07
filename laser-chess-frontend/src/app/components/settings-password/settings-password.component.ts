@@ -26,10 +26,10 @@ export class SettingsPasswordComponent {
   constructor(private userService: UserService, private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
 
 
-  get password() { return this.form!.get('password'); }
-  get new_password() { return this.form!.get('new_password'); }
-  get retype_new_password() { return this.form!.get('retype_new_password'); }
-  get f() { return this.form!.controls; }
+  get password() { return this.form.get('password'); }
+  get new_password() { return this.form.get('new_password'); }
+  get retype_new_password() { return this.form.get('retype_new_password'); }
+  get f() { return this.form.controls; }
   get loggedIn() {
     return this.authService.isLoggedIn()
   }
@@ -42,7 +42,7 @@ export class SettingsPasswordComponent {
   // }
 
   onSubmit(): void {
-    const { password, new_password } = this.form!.value;
+    const { password, new_password } = this.form.value;
     if (this.authService.isLoggedIn() && password && new_password) {
       this.userService.changePassword(password, new_password).then(res => {
         this.router.navigate(['/login'])
@@ -55,7 +55,7 @@ export class SettingsPasswordComponent {
     const retype_new_password = control.get('retype_new_password');
 
     return new_password && retype_new_password && new_password.value != retype_new_password.value ? { samePassword: true } : null;
-  };
+  }
 
 
 }

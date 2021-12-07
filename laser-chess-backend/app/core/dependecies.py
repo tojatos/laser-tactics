@@ -65,23 +65,23 @@ def get_db():
         db.close()
 
 
-def generate_verification_token(email: str):
+def generate_verification_token(email: str, is_verifed: str):
     token_expires = timedelta(minutes=VERIFY_TOKEN_EXPIRE_MINUTES)
 
     token = create_access_token(
 
-        data={"sub": email, "purpose": TokenPurpose.ACCOUNT_VERIFICATION}, expires_delta=token_expires
+        data={"sub": email, "purpose": TokenPurpose.ACCOUNT_VERIFICATION, "is_verified": is_verifed}, expires_delta=token_expires
 
     )
     return token
 
 
-def generate_change_password_token(username: str):
+def generate_change_password_token(username: str, hash: str):
     token_expires = timedelta(minutes=CHANGE_PASSWORD_TOKEN_EXPIRE_MINUTES)
 
     token = create_access_token(
 
-        data={"sub": username, "purpose": TokenPurpose.CHANGE_PASSWORD}, expires_delta=token_expires
+        data={"sub": username, "purpose": TokenPurpose.CHANGE_PASSWORD,  "hash": hash}, expires_delta=token_expires
 
     )
     return token
