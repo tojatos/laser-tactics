@@ -47,17 +47,14 @@ export class Game{
     private drawings: Drawings,
     private animations: Animations,
     private resources: Resources){
-    if (this.eventEmitter.subsRefresh == undefined) {
-      this.eventEmitter.subsRefresh = this.eventEmitter.invokeRefreshGameState.subscribe((value: GameState) => {
-        void this.refreshGameState(value);
-      });
-    }
 
-    if (this.eventEmitter.subsRollback == undefined) {
-      this.eventEmitter.subsRollback = this.eventEmitter.invokeMoveRollback.subscribe((value: GameState) => {
-          this.loadStaticGameState(value)
-      });
-    }
+    this.eventEmitter.subsRefresh.asObservable().subscribe(gameState => {
+      void this.refreshGameState(<GameState>gameState)
+    })
+
+    this.eventEmitter.subsRollback.asObservable().subscribe(gameState => {
+      this.loadStaticGameState(<GameState>gameState)
+    })
   }
 
   get displaySize(): number{
