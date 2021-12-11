@@ -2,16 +2,16 @@ import { Injectable } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { UserService } from "src/app/services/user.service";
-import { GameEvent, GameState, LaserShotEvent } from "../game.models";
-import { GameWebsocketService } from "../services/game.service";
-import { Board } from "./board";
-import { Animations } from "./Display/Animations";
-import { GameActions } from "./Display/Canvas/GameActions";
-import { GameCanvas } from "./Display/Canvas/GameCanvas";
-import { Drawings } from "./Display/Drawings";
-import { Resources } from "./Display/Resources";
-import { GameEvents, GamePhase, PlayerType } from "./enums";
-import { EventsExecutor } from "./eventsExecutor";
+import { GameEvent, GameState, LaserShotEvent } from "../../game.models";
+import { GameWebsocketService } from "../../services/game.service";
+import { Board } from "../GameStateData/Board";
+import { Animations } from "../Display/Animations";
+import { GameActions } from "../Display/Canvas/GameActions";
+import { GameCanvas } from "../Display/Canvas/GameCanvas";
+import { Drawings } from "../Display/Drawings";
+import { Resources } from "../Display/Resources";
+import { GameEvents, GamePhase, PlayerType } from "../Utils/Enums";
+import { EventsExecutor } from "./EventsExecutor";
 
 enum analyzeModes {
   ANALYZING = "ANALYZING",

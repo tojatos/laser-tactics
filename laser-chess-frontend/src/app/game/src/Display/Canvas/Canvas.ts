@@ -1,4 +1,4 @@
-import { COLS, ROWS } from "../../constants"
+import { COLS, ROWS } from "../../Utils/Constants"
 import { Resources } from "../Resources"
 
 export class Canvas {

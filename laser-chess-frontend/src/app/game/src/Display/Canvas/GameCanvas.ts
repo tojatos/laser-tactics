@@ -1,16 +1,16 @@
 import { AuthService } from "src/app/auth/auth.service"
 import { Coordinates } from "../../../game.models"
-import { Board } from "../../board"
-import { Cell } from "../../cell"
+import { Board } from "../../GameStateData/Board"
+import { Cell } from "../../GameStateData/Cell"
 import { Animations } from "../Animations"
 import { Drawings } from "../Drawings"
 import { Resources } from "../Resources"
 import { Canvas } from "./Canvas"
 import { GameMediator } from "./CanvasMediator"
-import { COLS, ROWS } from "../../constants"
+import { COLS, ROWS } from "../../Utils/Constants"
 import { GameWebsocketService } from "src/app/game/services/game.service"
 import { GameActions } from "./GameActions"
-import { EventsColors } from "../../enums"
+import { EventsColors } from "../../Utils/Enums"
 
 export class GameCanvas extends Canvas {
 

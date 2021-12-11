@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { PieceColors, PieceType, PlayerType } from "../enums";
-import { Piece } from "../piece";
+import { PieceColors, PieceType, PlayerType } from "../Utils/Enums";
+import { Piece } from "../GameStateData/Piece";
 
 export type PieceImageElement = {
   name: string,

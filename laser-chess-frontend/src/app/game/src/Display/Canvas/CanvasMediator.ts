@@ -1,4 +1,4 @@
-import { Board } from "../../board";
+import { Board } from "../../GameStateData/Board";
 import { GameActions } from "./GameActions";
 import { GameCanvas } from "./GameCanvas";
 

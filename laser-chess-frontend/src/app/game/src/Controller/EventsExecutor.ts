@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 import { groupBy, values } from "lodash";
 import { AuthService } from "src/app/auth/auth.service";
-import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../game.models";
-import { GameWebsocketService } from "../services/game.service";
-import { Board } from "./board";
-import { Animations } from "./Display/Animations";
-import { Canvas } from "./Display/Canvas/Canvas";
-import { Drawings } from "./Display/Drawings";
-import { GameEvents } from "./enums";
+import { Coordinates, GameEvent, LaserShotEventEntity, PieceDestroyedEvent } from "../../game.models";
+import { GameWebsocketService } from "../../services/game.service";
+import { Board } from "../GameStateData/Board";
+import { Animations } from "../Display/Animations";
+import { Canvas } from "../Display/Canvas/Canvas";
+import { Drawings } from "../Display/Drawings";
+import { GameEvents } from "../Utils/Enums";
 
 type PathInfo = {
   from: Coordinates,

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleCha
 import { MatSelectionList } from '@angular/material/list';
 import { cloneDeep } from 'lodash';
 import { GameEvent, GameState } from '../../game.models';
-import { GameEvents } from '../../src/enums';
+import { GameEvents } from '../../src/Utils/Enums';
 
 @Component({
   selector: 'app-board-log',

@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core"
 import { Coordinates } from "../../game.models"
-import { Cell } from "../cell"
-import { PIECE_SIZE_SCALE } from "../constants"
-import { Piece } from "../piece"
+import { Cell } from "../GameStateData/Cell"
+import { PIECE_SIZE_SCALE } from "../Utils/Constants"
+import { Piece } from "../GameStateData/Piece"
 import { Canvas } from "./Canvas/Canvas"
 
 @Injectable()

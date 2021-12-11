@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { cloneDeep } from "lodash";
 import { Coordinates } from "../../game.models";
-import { Board } from "../board";
-import { Cell } from "../cell";
-import { EventsColors, PieceType } from "../enums";
-import { Piece } from "../piece";
+import { Board } from "../GameStateData/Board";
+import { Cell } from "../GameStateData/Cell";
+import { EventsColors, PieceType } from "../Utils/Enums";
+import { Piece } from "../GameStateData/Piece";
 import { Canvas } from "./Canvas/Canvas";
 import { Drawings } from "./Drawings";
 import * as Chance from "chance"

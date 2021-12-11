@@ -1,6 +1,6 @@
 import { GameWebsocketService } from "src/app/game/services/game.service"
-import { Board } from "../../board"
-import { PieceType } from "../../enums"
+import { Board } from "../../GameStateData/Board"
+import { PieceType } from "../../Utils/Enums"
 import { GameMediator } from "./CanvasMediator"
 import { GameCanvas } from "./GameCanvas"
 

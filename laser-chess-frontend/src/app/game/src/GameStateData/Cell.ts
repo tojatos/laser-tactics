@@ -1,8 +1,8 @@
-import { Coordinates, CellInterface, PieceInterface } from "../game.models";
-import { Board } from "./board";
-import { ROWS } from "./constants";
-import { PieceType } from "./enums";
-import { Piece } from "./piece";
+import { Coordinates, CellInterface, PieceInterface } from "../../game.models";
+import { Board } from "./Board";
+import { ROWS } from "../Utils/Constants";
+import { PieceType } from "../Utils/Enums";
+import { Piece } from "./Piece";
 
 export class Cell implements CellInterface {
   coordinates!: Coordinates

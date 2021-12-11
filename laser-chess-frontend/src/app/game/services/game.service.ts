@@ -8,7 +8,7 @@ import { Coordinates, GameState } from '../game.models';
 import { MovePieceRequest, RotatePieceRequest } from '../game.request.models';
 import { EventEmitterService } from './event-emitter.service';
 import Swal from 'sweetalert2'
-import { GamePhase } from '../src/enums';
+import { GamePhase } from '../src/Utils/Enums';
 import { HttpClient } from '@angular/common/http';
 import { UserHistory } from 'src/app/app.models';
 
