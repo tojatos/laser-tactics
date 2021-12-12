@@ -128,8 +128,8 @@ export class Drawings {
             const y = cellCoordinates.y + this.pieceDrawingOriginCoordinates(canvas.blockSize).y + i
             pixels[i/size].push({
               originCoordinates: {
-                  x: x,
-                  y: y
+                  x: Math.round(x),
+                  y: Math.round(y)
                 },
               image: canvas.ctx.getImageData(x, y, size, size)
             })

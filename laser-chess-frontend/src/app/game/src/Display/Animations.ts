@@ -289,7 +289,6 @@ export class Animations {
         for(const pixel of row){
           const standardDev = cellData.length-rowId * 2 + k * 2
           if(standardDev > 0 && canvas.ctx){
-            canvas.ctx.clearRect(pixel.originCoordinates.x, pixel.originCoordinates.y, pixelSize, pixelSize)
             const positionX = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
             const positionY = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
             canvas.ctx.canvas.style.opacity = (1 - 1 / (intervals / (k + 1))).toString()
