@@ -60,7 +60,7 @@ def change_password(change_password_schema: schemas.EmergencyChangePasswordSchem
     return crud.change_password(user, change_password_schema.newPassword, db)
 
 
-@router.post("", response_model=schemas.UserGet)
+@router.post("", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
