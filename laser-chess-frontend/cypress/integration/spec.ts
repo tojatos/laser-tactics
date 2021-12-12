@@ -47,9 +47,10 @@ describe('Gameplay tests', () => {
       .then(win => { //get component
           angular = (win as any).ng
       })
-      .then(() => cy.document()).wait(2000)
+      .then(() => cy.document()).wait(1000)
       .then((doc) => {
         gameComponent = angular.getComponent(doc.querySelector("app-board"))
+        gameComponent.game.gameService.closeConnection()
         gameComponent.game.gameService.getSubject().unsubscribe()
         cy.stub(gameComponent.game.gameService, "getSubject").returns(subject)
         gameComponent.game.gameService.connect("test")
@@ -114,8 +115,7 @@ it('Test rotation', () => {
     cy.spy(gameComponent.game.gameService, "rotatePiece")
     cy.spy(gameComponent.game.board, "rotatePiece")
 
-    cy.get('.mat-selection-list').click()
-    .get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
+    cy.get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
     .get('.mat-selection-list').click()
     .then(() => {
       cy.get('app-board-actions > :nth-child(1)').click().then(() => {
@@ -271,14 +271,13 @@ it('Test laser', () => {
     cy.stub(gameComponent.game.gameService, "animationsToShow").returns("2")
 
     cy.get('canvas').click(laserPosition.canvasCoordinates.x, laserPosition.canvasCoordinates.y)
-    .get('.mat-selection-list').click()
     .get('app-board-actions > :nth-child(2)').click().then(() => {
       cy.fixture("laserShoot.json").then(secondStep => {
         subject.next(secondStep)
       }).then(() => {
       cy.then(() => {
         expect(gameComponent.game.gameService.shootLaser).to.have.been.calledOnce
-        expect(gameComponent.game.board.removePiece).to.have.been.calledOnce
+        cy.wrap(gameComponent.game.board.removePiece, {timeout: 2000}).should(fun => expect(fun).to.be.calledOnce)
       })
     })
   })
