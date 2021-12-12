@@ -1,7 +1,7 @@
-import { Coordinates, PieceInterface } from "../game.models"
-import { Board } from "./board"
-import { Cell } from "./cell"
-import { PieceType } from "./enums"
+import { Coordinates, PieceInterface } from "../../game.models"
+import { Board } from "./Board"
+import { Cell } from "./Cell"
+import { PieceType } from "../Utils/Enums"
 
 export class Piece implements PieceInterface {
   piece_type: PieceType

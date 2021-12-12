@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core"
 import { AuthService } from "src/app/auth/auth.service"
-import { BoardInterface, Coordinates, GameEvent, GameState } from "../game.models"
-import { Cell } from "./cell"
-import { GameEvents, PieceType, PlayerType } from "./enums"
+import { BoardInterface, Coordinates, GameEvent, GameState } from "../../game.models"
+import { Cell } from "./Cell"
+import { GameEvents, PieceType, PlayerType } from "../Utils/Enums"
 
 @Injectable()
 export class Board implements BoardInterface {

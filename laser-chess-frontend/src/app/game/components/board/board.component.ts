@@ -3,9 +3,9 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
-import { COLS, ROWS } from '../../src/constants';
-import { GamePhase, PlayerType } from '../../src/enums';
-import { Game } from '../../src/Game';
+import { COLS, ROWS } from '../../src/Utils/Constants';
+import { GamePhase, PlayerType } from '../../src/Utils/Enums';
+import { Game } from '../../src/Controller/Game';
 import { BoardLogComponent } from '../board-log/board-log.component';
 
 @Component({
