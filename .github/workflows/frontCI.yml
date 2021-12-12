@@ -15,4 +15,5 @@ jobs:
           build: npm run build
           start: npm start
       - name: lint game frontend
+        working-directory: ./laser-chess-frontend
         run: npm run lint
