@@ -10,7 +10,7 @@ from app.core.internal import schemas, crud
 router = APIRouter(
     prefix="/users/me/friends",
     tags=["friends"],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"error": "Not found"}, 422: {"error": "Invalid input data"}},
 )
 
 

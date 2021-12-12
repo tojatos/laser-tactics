@@ -7,6 +7,11 @@ $imagePath: "/assets/board.svg";
   position: absolute;
 }
 
+.animCanvas {
+  z-index: 2;
+  position: absolute;
+}
+
 .guiCanvas {
 
   position: absolute;

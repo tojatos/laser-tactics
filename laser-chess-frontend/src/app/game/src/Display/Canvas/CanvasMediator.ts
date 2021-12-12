@@ -1,5 +1,4 @@
-import { Coordinates } from "src/app/game/game.models";
-import { Board } from "../../board";
+import { Board } from "../../GameStateData/Board";
 import { GameActions } from "./GameActions";
 import { GameCanvas } from "./GameCanvas";
 
@@ -7,40 +6,40 @@ export class GameMediator {
 
   constructor(public gameCanvas: GameCanvas, public gameActions: GameActions){}
 
-  sendLaserShotInfo(board: Board){
+  sendLaserShotInfo(board: Board): void{
     this.gameCanvas.redrawGame(board)
     this.gameCanvas.interactable = false
   }
 
-  async sendRotationInfo(board: Board, rotation: number, initialRotationDifference: number = 0){
+  async sendRotationInfo(board: Board, rotation: number, initialRotationDifference = 0): Promise<void>{
     await this.gameCanvas.rotationButtonPressed(board, rotation, initialRotationDifference)
   }
 
-  sendPossibleMovesShowRequest(board: Board){
+  sendPossibleMovesShowRequest(board: Board): void{
     this.gameCanvas.highlightPossibleMoves(board)
   }
 
-  sendSelectionInfoToActionPanel(board: Board){
+  sendSelectionInfoToActionPanel(board: Board): void{
     this.gameActions.newCellSelectedEvent(board)
   }
 
-  drawGameOnGameCanvas(board: Board){
+  drawGameOnGameCanvas(board: Board): void{
     this.gameCanvas.redrawGame(board)
   }
 
-  disableGameActionsButtons(){
+  disableGameActionsButtons(): void{
     this.gameActions.disableButtons()
   }
 
-  rotatePieceToInitPosition(board: Board){
-    this.gameActions.rotatePieceToInitialPosition(board)
+  rotatePieceToInitPosition(board: Board): void{
+    void this.gameActions.rotatePieceToInitialPosition(board)
   }
 
-  showPossibleMoves(board: Board){
+  showPossibleMoves(board: Board): void{
     this.gameCanvas.highlightPossibleMoves(board)
   }
 
-  get currentRotation(){
+  get currentRotation(): number{
     return this.gameActions.rotation
   }
 

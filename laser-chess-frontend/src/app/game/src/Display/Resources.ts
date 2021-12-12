@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { PieceColors, PieceType, PlayerType } from "../enums";
-import { Piece } from "../piece";
+import { PieceColors, PieceType, PlayerType } from "../Utils/Enums";
+import { Piece } from "../GameStateData/Piece";
 
 export type PieceImageElement = {
   name: string,
@@ -20,21 +20,19 @@ export class Resources {
   rotate: () => HTMLAudioElement = () => new Audio("assets/sounds/rotate.wav")
   deflect: () => HTMLAudioElement = () => new Audio("assets/sounds/deflect.mp3")
 
-  constructor(){ }
-
-  async loadAssets(){
+  async loadAssets(): Promise<void>{
     await this.loadBoardImage()
     await this.loadPiecesImages()
    }
 
-  private async loadBoardImage(){
+  private async loadBoardImage(): Promise<void> {
     await this.loadElement(this.boardImage, "assets/board.svg")
   }
 
-  private async loadPiecesImages(){
+  private async loadPiecesImages(): Promise<void>{
 
     Object.values(PieceColors).forEach(p => {
-      Promise.all([
+      void Promise.all([
         this.loadPieceElement(PieceType.BEAM_SPLITTER, p),
         this.loadPieceElement(PieceType.BLOCK, p),
         this.loadPieceElement(PieceType.DIAGONAL_MIRROR, p),
@@ -51,7 +49,7 @@ export class Resources {
 
   }
 
-  private async loadPieceElement(name: string, color: string){
+  private async loadPieceElement(name: string, color: string): Promise<void> {
 
     const newImage: PieceImageElement = ({
       name: name,
@@ -64,15 +62,15 @@ export class Resources {
     this.pieceImages.set(JSON.stringify(newImage), image)
   }
 
-  loadElement(elem: any, source: string){
+  loadElement(elem: HTMLImageElement, source: string): Promise<void>{
     return new Promise<void>(resolve => {
       elem.onload = () => resolve();
       elem.src = source
     })
   }
 
-  getPieceFromMap(piece: Piece){
-    const unknownPiece = this.pieceImages.get(JSON.stringify({name: PieceType.UNKNOWN, color: ""}))!
+  getPieceFromMap(piece: Piece): HTMLImageElement | undefined {
+    const unknownPiece = this.pieceImages.get(JSON.stringify({name: PieceType.UNKNOWN, color: ""}))
     return this.pieceImages.get(JSON.stringify({name: piece.piece_type, color: piece.piece_owner == PlayerType.PLAYER_ONE ? PieceColors.RED : piece.piece_owner == PlayerType.PLAYER_TWO ? PieceColors.BLUE : ""})) || unknownPiece
   }
 

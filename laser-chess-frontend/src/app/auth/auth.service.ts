@@ -19,11 +19,11 @@ export class AuthService {
 
 
   async login(login:string, pass:string): Promise<UserToken> {
-    let options = {
+    const options = {
       headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
     }
 
-    let body = new URLSearchParams()
+    const body = new URLSearchParams()
     body.set('username', login)
     body.set('password', pass)
 

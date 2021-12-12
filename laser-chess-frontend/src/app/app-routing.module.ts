@@ -39,8 +39,7 @@ const routes: Routes = [
   },
   {
     path: 'users/:username',
-    component: UserPageComponent,
-    canActivate: [AuthGuard]
+    component: UserPageComponent
   },
   {
     path: 'settings',

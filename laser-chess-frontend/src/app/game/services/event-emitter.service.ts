@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { EventEmitter } from '@angular/core';
+import { Subject } from 'rxjs';
 import { GameState } from '../game.models';
 
 @Injectable({
@@ -8,27 +7,15 @@ import { GameState } from '../game.models';
 })
 export class EventEmitterService {
 
-  invokeRefreshGameState = new EventEmitter()
-  subsRefresh: Subscription | undefined
+  subsRefresh = new Subject()
+  subsRollback = new Subject()
 
-  invokeMoveRollback = new EventEmitter()
-  subsRollback: Subscription | undefined
-
-  invokeToggleObservator = new EventEmitter()
-  subsObservator: Subscription | undefined
-
-  constructor() { }
-
-  invokeRefresh(gameState: GameState){
-    this.invokeRefreshGameState.emit(gameState)
+  invokeRefresh(gameState: GameState): void{
+    this.subsRefresh.next(gameState)
   }
 
-  invokeRollback(gameState: GameState){
-    this.invokeMoveRollback.emit(gameState)
-  }
-
-  invokeObservator(){
-    this.invokeToggleObservator.emit()
+  invokeRollback(gameState: GameState): void{
+    this.subsRollback.next(gameState)
   }
 
 }

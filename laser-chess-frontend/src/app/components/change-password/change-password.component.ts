@@ -29,13 +29,13 @@ export class ChangePasswordComponent implements OnInit {
       })
   }
 
-  get f() { return this.form!.controls; }
+  get f() { return this.form.controls; }
   get loggedIn() {
     return this.authService.isLoggedIn()
   }
 
   onSubmit(): void {
-    const  { new_password } = this.form!.value;
+    const  { new_password } = this.form.value;
     if (new_password && this.token) {
       this.userService.changePasswordWithToken(this.token, new_password).then(res => {
         this.router.navigate(['/login'])

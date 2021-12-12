@@ -1,4 +1,4 @@
-import { GameEvents, GamePhase, PieceType } from "./src/enums";
+import { GameEvents, GamePhase, PieceType } from "./src/Utils/Enums";
 
 export type GameEvent = PieceRotatedEvent | PieceMovedEvent | TeleportEvent | LaserShotEvent | TakeEvent | PieceDestroyedEvent | DrawEvent | GiveUpEvent
 export type UserEvent = PieceRotatedEvent | PieceMovedEvent | LaserShotEvent | DrawEvent | GiveUpEvent

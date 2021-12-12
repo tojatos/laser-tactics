@@ -102,6 +102,7 @@ class TokenData(BaseModel):
 class VerificationTokenData(BaseModel):
     email: Optional[str] = None
     purpose: Optional[str] = None
+    hash: Optional[str] = None
 
 
 class User(UserBase):

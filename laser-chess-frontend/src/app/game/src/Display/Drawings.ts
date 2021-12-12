@@ -1,40 +1,41 @@
 import { Injectable } from "@angular/core"
 import { Coordinates } from "../../game.models"
-import { Cell } from "../cell"
-import { COLS, PIECE_SIZE_SCALE, ROWS } from "../constants"
-import { Piece } from "../piece"
-import { Canvas } from "./Canvas/AbstractCanvas"
+import { Cell } from "../GameStateData/Cell"
+import { PIECE_SIZE_SCALE } from "../Utils/Constants"
+import { Piece } from "../GameStateData/Piece"
+import { Canvas } from "./Canvas/Canvas"
 
 @Injectable()
 export class Drawings {
 
-    highlightColor: string = "yellow"
     laserThickness = 5
 
-    drawGame(canvas: Canvas, cells: Cell[], isReversed: boolean){
+    drawGame(canvas: Canvas, cells: Cell[], isReversed: boolean): void{
         this.clearBoard(canvas)
         cells.forEach(c => { if(c.piece) this.drawPiece(canvas, c.piece, isReversed) })
     }
 
-    clearBoard(canvas: Canvas){
+    clearBoard(canvas: Canvas): void{
         canvas.ctx.save()
         canvas.ctx.translate(0, 0)
         canvas.ctx.clearRect(0, 0, canvas.ctx.canvas.width, canvas.ctx.canvas.height);
         canvas.ctx.restore()
     }
 
-    drawPiece(canvas: Canvas, piece: Piece, isReverse: boolean){
+    drawPiece(canvas: Canvas, piece: Piece, isReverse: boolean): void{
       canvas.ctx.save()
       const position = isReverse ? this.flipPosition(piece.currentCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : piece.currentCoordinates
       const rotation = isReverse ? (piece.rotation_degree + 180) % 360 : piece.rotation_degree
       canvas.ctx.translate(position.x, position.y)
       canvas.ctx.rotate(rotation / 180 * Math.PI)
-      canvas.ctx.drawImage(canvas.resources.getPieceFromMap(piece), this.pieceDrawingOriginCoordinates(canvas.blockSize).x, this.pieceDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize * PIECE_SIZE_SCALE, canvas.blockSize * PIECE_SIZE_SCALE)
+      const pieceImage = canvas.resources.getPieceFromMap(piece)
+      if(pieceImage)
+        canvas.ctx.drawImage(pieceImage, this.pieceDrawingOriginCoordinates(canvas.blockSize).x, this.pieceDrawingOriginCoordinates(canvas.blockSize).y, canvas.blockSize * PIECE_SIZE_SCALE, canvas.blockSize * PIECE_SIZE_SCALE)
       canvas.ctx.restore()
     }
 
 
-    highlightCell(canvas: Canvas, cell: Cell | undefined, isReverse: boolean, piece: Piece | undefined = undefined, color: string = this.highlightColor){
+    highlightCell(canvas: Canvas, cell: Cell | undefined, isReverse: boolean, piece: Piece | undefined = undefined, color: string): void{
         if(cell) {
           canvas.ctx.save()
           canvas.ctx.globalAlpha = 0.5;
@@ -50,13 +51,13 @@ export class Drawings {
         }
     }
 
-    drawSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean){
+    drawSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean): void{
       this.clearSingleCell(canvas, cell, isReverse)
       if(cell.piece)
         this.drawPiece(canvas, cell.piece, isReverse)
     }
 
-    clearSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean){
+    clearSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean): void{
       canvas.ctx.save()
       const cellCoor = isReverse ? this.flipPosition(cell.canvasCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : cell.canvasCoordinates
       canvas.ctx.translate(cellCoor.x, cellCoor.y)
@@ -64,7 +65,7 @@ export class Drawings {
       canvas.ctx.restore()
     }
 
-    showPossibleMove(canvas: Canvas, cell: Cell | undefined, isReverse: boolean, color: string = this.highlightColor){
+    showPossibleMove(canvas: Canvas, cell: Cell | undefined, isReverse: boolean, color: string): void{
       if(cell) {
           canvas.ctx.save()
           canvas.ctx.globalAlpha = 0.5;
@@ -78,7 +79,7 @@ export class Drawings {
       }
     }
 
-    drawLaserLine(canvas: Canvas, from: Coordinates, to: Coordinates, isReverse: boolean){
+    drawLaserLine(canvas: Canvas, from: Coordinates, to: Coordinates, isReverse: boolean): void{
       from = isReverse ? this.flipPosition(from, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : from
       to = isReverse ? this.flipPosition(to, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : to
       canvas.ctx.save()
@@ -90,13 +91,41 @@ export class Drawings {
       canvas.ctx.stroke()
     }
 
-    drawLaserCorner(canvas: Canvas, at: Coordinates, isReverse: boolean){
+    drawLaserCorner(canvas: Canvas, at: Coordinates, isReverse: boolean): void{
       canvas.ctx.save()
       at = isReverse ? this.flipPosition(at, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : at
       canvas.ctx.translate(at.x, at.y)
       canvas.ctx.fillStyle = "red";
       canvas.ctx.fillRect(-this.laserThickness / 2, -this.laserThickness / 2, this.laserThickness, this.laserThickness)
       canvas.ctx.restore()
+    }
+
+    getPieceIndividualPixels(canvas: Canvas, cell: Cell, size: number, isReverse: boolean){
+
+      type Pixel = {
+        originCoordinates: Coordinates,
+        image: ImageData
+      }
+
+      const cellCoordinates = isReverse ? this.flipPosition(cell.canvasCoordinates, canvas.ctx.canvas.width, canvas.ctx.canvas.height) : cell.canvasCoordinates
+
+      const pixels: Pixel[][] = []
+
+      for (let i = 0; i < canvas.blockSize * PIECE_SIZE_SCALE; i+=size){
+        pixels.push([])
+        for (let j = 0; j < canvas.blockSize * PIECE_SIZE_SCALE; j+=size){
+          const x = cellCoordinates.x + this.pieceDrawingOriginCoordinates(canvas.blockSize).x + j
+          const y = cellCoordinates.y + this.pieceDrawingOriginCoordinates(canvas.blockSize).y + i
+          pixels[i/size].push({
+            originCoordinates: {
+                x: x,
+                y: y
+              },
+            image: canvas.ctx.getImageData(x, y, size, size)
+          })
+        }
+      }
+      return pixels
     }
 
     cellDrawingOriginCoordinates(blockSize: number): Coordinates {
@@ -107,7 +136,7 @@ export class Drawings {
         return {x: - blockSize * PIECE_SIZE_SCALE / 2, y: - blockSize * PIECE_SIZE_SCALE / 2}
     }
 
-    flipPosition(coor: Coordinates, maxX: number, maxY: number){
+    flipPosition(coor: Coordinates, maxX: number, maxY: number): Coordinates{
       return {x: maxX - coor.x, y: maxY - coor.y }
     }
 

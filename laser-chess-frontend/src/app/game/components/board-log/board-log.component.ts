@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleCha
 import { MatSelectionList } from '@angular/material/list';
 import { cloneDeep } from 'lodash';
 import { GameEvent, GameState } from '../../game.models';
-import { GameEvents } from '../../src/enums';
+import { GameEvents } from '../../src/Utils/Enums';
 
 @Component({
   selector: 'app-board-log',
@@ -15,9 +15,9 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   logList: MatSelectionList | undefined
 
   @Input() gameState: GameState | undefined
-  @Input() maxHeight: number = 300
-  @Input() gameFinished: boolean = false
-  @Input() isSpectator: boolean = false
+  @Input() maxHeight = 300
+  @Input() gameFinished = false
+  @Input() isSpectator = false
   @Output() gameLogEmitter = new EventEmitter<GameEvent[]>()
   @Output() gameReturnEmitter = new EventEmitter()
   @Output() giveUpEmitter = new EventEmitter()
@@ -27,39 +27,40 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   validGameState: GameState | undefined
   userEventChains: GameEvent[][] = []
 
-  constructor() {}
-
-  ngOnChanges(changes: SimpleChanges){
+  ngOnChanges(changes: SimpleChanges): void{
     if(changes.gameState){
       this.notationList = []
       this.userEventChains = []
-      if(changes.gameState.currentValue?.game_events.length > 0){
+      const newChange = <GameState>changes.gameState.currentValue
+      if(newChange && newChange.game_events.length > 0){
         this.validGameState = cloneDeep(this.gameState)
-        this.validGameState!.user_events = this.validGameState!.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
-        this.validGameState!.game_events = this.validGameState!.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
+        if(this.validGameState){
+        this.validGameState.user_events = this.validGameState.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
+        this.validGameState.game_events = this.validGameState.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
         this.divideArrayOnUserEventChains()
-        this.validGameState!.user_events.forEach((_, i) => {
+        this.validGameState.user_events.forEach((_, i) => {
           this.notationList.push(this.eventNotation(i))
         })
+      }
     }
   }
   }
 
-  ngOnDestroy(){
+  ngOnDestroy(): void{
     this.notationList = []
     this.gameReturnEmitter.emit()
   }
 
-  buildEvent(gameEvents: GameEvent[]) {
+  buildEvent(gameEvents: GameEvent[]): void {
     this.gameLogEmitter.emit(gameEvents)
   }
 
-  returnToCurrentEvent(){
+  returnToCurrentEvent(): void{
     this.logList?.deselectAll()
     this.gameReturnEmitter.emit()
   }
 
-  onSelection(e: number){
+  onSelection(e: number): void{
     if(this.validGameState){
     if(e == this.userEventChains.length-1)
       this.returnToCurrentEvent()
@@ -68,19 +69,21 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     }
   }
 
-  divideArrayOnUserEventChains(){
-    this.validGameState?.user_events.forEach(_ => {
+  divideArrayOnUserEventChains(): void{
+    this.validGameState?.user_events.forEach(() => {
       let search = 0
       let iterator = 0
-      while(search < 2 && iterator < this.validGameState!.game_events.length + 1){
+      if(this.validGameState){
+      while(search < 2 && iterator < this.validGameState.game_events.length + 1){
         if(this.isUserEvent(this.validGameState?.game_events[iterator++]))
           search++
       }
-      this.userEventChains.push(this.validGameState!.game_events.splice(0, iterator-1))
+      this.userEventChains.push(this.validGameState.game_events.splice(0, iterator-1))
+    }
     })
   }
 
-  eventNotation(place: number){
+  eventNotation(place: number): string{
     const lastEvents = this.userEventChains[place]
     const subEventTeleport = lastEvents?.find(le => le.event_type == GameEvents.TELEPORT_EVENT)
     const subEventTaken = lastEvents?.find(le => le.event_type == GameEvents.PIECE_TAKEN_EVENT)
@@ -109,15 +112,15 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
 
   }
 
-  giveUp(){
+  giveUp(): void{
     this.giveUpEmitter.emit()
   }
 
-  draw(){
+  draw(): void{
     this.drawEmitter.emit()
   }
 
-  isUserEvent(gameEvent: GameEvent | undefined){
+  isUserEvent(gameEvent: GameEvent | undefined): boolean{
     return gameEvent?.event_type == GameEvents.PIECE_MOVED_EVENT
         || gameEvent?.event_type == GameEvents.PIECE_ROTATED_EVENT
         || gameEvent?.event_type == GameEvents.LASER_SHOT_EVENT

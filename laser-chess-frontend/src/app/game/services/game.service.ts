@@ -8,13 +8,18 @@ import { Coordinates, GameState } from '../game.models';
 import { MovePieceRequest, RotatePieceRequest } from '../game.request.models';
 import { EventEmitterService } from './event-emitter.service';
 import Swal from 'sweetalert2'
-import { GamePhase } from '../src/enums';
+import { GamePhase } from '../src/Utils/Enums';
 import { HttpClient } from '@angular/common/http';
 import { UserHistory } from 'src/app/app.models';
 
+type websocketResponse = {
+  status_code: number,
+  body: string
+}
+
 type websocketRequest = {
   request_path: string,
-  request: any
+  request: unknown
 }
 
 @Injectable({
@@ -24,7 +29,7 @@ export class GameWebsocketService {
 
   constructor(private authService: AuthService, private _snackBar: MatSnackBar, private eventEmitter: EventEmitterService, private http: HttpClient){}
 
-  subject = webSocket<GameState | any>(environment.WEBSOCKET_URL)
+  subject = webSocket<unknown>(environment.WEBSOCKET_URL)
 
   getSubject = () => this.subject
 
@@ -33,22 +38,22 @@ export class GameWebsocketService {
   connect(gameId: string){
     this.getSubject().asObservable().subscribe(
       msg => {
-        if(msg.status_code && msg.status_code != 200){
-          this.showSnackbar(msg.body)
+        if((<websocketResponse>msg).status_code && (<websocketResponse>msg).status_code != 200){
+          this.showSnackbar((<websocketResponse>msg).body)
           if(this.lastMessage)
             this.eventEmitter.invokeRollback(this.lastMessage)
         }
         else if((<GameState>msg).game_events){
           (<GameState>msg).game_id = gameId
-          this.lastMessage = msg
-          this.eventEmitter.invokeRefresh(msg)
+          this.lastMessage = <GameState>msg
+          this.eventEmitter.invokeRefresh(<GameState>msg)
         }
       },
       err => {
         console.error(err)
         this.showSnackbar("Connection error ocurred. Maybe there is no such game?")
       },
-      () => this.showSnackbar("Connection to the server closed.")
+      () => this.showSnackbar("Connection to the game server closed.")
     )
 
     this.sendRequest(observeWebsocketEndpoint, {game_id: gameId})
@@ -66,18 +71,18 @@ export class GameWebsocketService {
     })
   }
 
-  private sendRequest(path: string, request: any){
+  private sendRequest(path: string, request: unknown){
     const value: websocketRequest = { request_path: path, request: request}
     this.getSubject().next(value)
   }
 
-  getGameState(gameId: string) {
+  getGameState(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(gameStateEndpoint, request)
   }
 
-  movePiece(gameId: string, from: Coordinates, to: Coordinates){
+  movePiece(gameId: string, from: Coordinates, to: Coordinates): void{
     const movePieceRequest: MovePieceRequest = {
       game_id: gameId,
       move_from: from,
@@ -87,7 +92,7 @@ export class GameWebsocketService {
     this.sendRequest(movePieceEndpoint, movePieceRequest)
   }
 
-  rotatePiece(gameId: string, at: Coordinates, angle: number) {
+  rotatePiece(gameId: string, at: Coordinates, angle: number): void {
     const rotatePieceRequest: RotatePieceRequest = {
       game_id: gameId,
       rotate_at: at,
@@ -97,27 +102,27 @@ export class GameWebsocketService {
     this.sendRequest(rotatePieceEndpoint, rotatePieceRequest)
   }
 
-  shootLaser(gameId: string) {
+  shootLaser(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(shootLaserEndpoint, request)
   }
 
-  giveUp(gameId: string) {
+  giveUp(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(giveUpEndpoint, request)
   }
 
-  offerDraw(gameId: string) {
+  offerDraw(gameId: string): void {
     const request = { game_id: gameId }
 
     this.sendRequest(offerDrawEndpoint, request)
   }
 
-  showDrawOffer(gameId: string){
+  showDrawOffer(gameId: string): void{
     if(this.lastMessage?.game_phase == GamePhase.STARTED)
-      Swal.fire({
+      void Swal.fire({
         title: "Draw offer",
         text: "Player offers draw",
         icon: 'question',
@@ -129,8 +134,8 @@ export class GameWebsocketService {
 
   }
 
-  closeConnection(){
-    this.getSubject().complete()
+  closeConnection(): void{
+    this.subject.complete()
   }
 
   getInitialGameState(): Promise<GameState>{
@@ -141,16 +146,16 @@ export class GameWebsocketService {
     return this.http.get<UserHistory>(gameHistoryFullEndpoint(gameId)).toPromise()
   }
 
-  increaseAnimationEvents(){
+  increaseAnimationEvents(): void{
     const num = parseInt(localStorage.getItem("animationEvents") || "0") + 1
     localStorage.setItem("animationEvents", num.toString())
   }
 
-  setAnimationEventsNum(num: number){
+  setAnimationEventsNum(num: number): void{
     localStorage.setItem("animationEvents", num.toString())
   }
 
-  numOfAnimationEvents(){
+  numOfAnimationEvents(): number{
     return parseInt(localStorage.getItem("animationEvents") || "0")
   }
 
