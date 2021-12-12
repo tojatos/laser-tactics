@@ -48,13 +48,16 @@ describe('Gameplay tests', () => {
       .then(win => { //get component
           angular = (win as any).ng
       })
-      .then(() => cy.document()).wait(1000)
+      .then(() => cy.document()).wait(500)
       .then((doc) => {
+        cy.get('.mat-snack-bar-container').then(sb => {
+        sb.hide()
         gameComponent = angular.getComponent(doc.querySelector("app-board"))
         gameComponent.game.gameService.closeConnection()
         gameComponent.game.gameService.getSubject().unsubscribe()
         cy.stub(gameComponent.game.gameService, "getSubject").returns(subject)
         gameComponent.game.gameService.connect("test")
+      })
       })
     .then(() => {
     cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
