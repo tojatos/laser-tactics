@@ -87,7 +87,7 @@ export class EventsExecutor{
       switch(gameEvent.event_type){
         case GameEvents.PIECE_ROTATED_EVENT : return this.animations.rotatePiece(canvas, board,
           board.getCellByCoordinates(gameEvent.rotated_piece_at.x, gameEvent.rotated_piece_at.y),
-          gameEvent.rotation > 180 ? gameEvent.rotation - 360 : gameEvent.rotation, canvas.isReversed, enableSounds, showAnimations)
+          gameEvent.rotation > 180 ? gameEvent.rotation - 360 : gameEvent.rotation, canvas.isReversed, showAnimations, enableSounds)
         case GameEvents.PIECE_MOVED_EVENT : return this.animations.movePiece(canvas, board, gameEvent.moved_from, gameEvent.moved_to, canvas.isReversed, showAnimations, enableSounds)
         case GameEvents.TELEPORT_EVENT : return this.animations.movePiece(canvas, board, gameEvent.teleported_from, gameEvent.teleported_to, canvas.isReversed, showAnimations, enableSounds)
         case GameEvents.LASER_SHOT_EVENT : return this.executeLaserAnimations(canvas, board, gameEvent.laser_path, eventId, showAnimations, enableSounds, showLaser)
