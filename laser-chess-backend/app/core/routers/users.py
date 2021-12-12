@@ -60,7 +60,7 @@ def change_password(change_password_schema: schemas.EmergencyChangePasswordSchem
     return crud.change_password(user, change_password_schema.newPassword, db)
 
 
-@router.post("", response_model=schemas.User)
+@router.post("", response_model=schemas.UserGet)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -71,7 +71,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@router.get("", response_model=List[schemas.User])
+@router.get("", response_model=List[schemas.UserGet])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
@@ -162,7 +162,7 @@ def update_settings(settings: schemas.Settings, current_user: schemas.User = Dep
     return crud.update_settings(settings=settings, db=db, user=current_user)
 
 
-@router.get("/ranking/top", response_model=List[schemas.User])
+@router.get("/ranking/top", response_model=List[schemas.UserGet])
 def get_top_ranked(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users_by_rating(db, skip=skip, limit=limit)
     return users
