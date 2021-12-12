@@ -10,7 +10,7 @@ from starlette import status
 from app.core.dependecies import API_PREFIX, HOST, PORT, get_db, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, \
     create_access_token, TokenPurpose, ROOT_PATH
 from app.core.internal import models, schemas
-from app.core.internal.database import engine
+from app.core.internal.database import engine, SessionLocal
 from app.core.routers import friends, users, email, game, lobby
 from app.core.routers.game import websocket_endpoint
 from sqlalchemy.orm import Session
@@ -45,9 +45,10 @@ router = APIRouter(
 
 # every 3 hours
 @app.on_event("startup")
-@repeat_every(seconds=60 * 60 * 3)
-def clear_abandoned_lobbies(db: Session = Depends(get_db)):
-    dispose_abandoned_lobby(db)
+@repeat_every(seconds=3 * 60 * 60)
+async def clear_abandoned_lobbies():
+    with SessionLocal() as db:
+        dispose_abandoned_lobby(db)
 
 
 @router.post("/token", response_model=schemas.Token)
