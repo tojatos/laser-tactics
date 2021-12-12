@@ -68,8 +68,10 @@ export class EventsExecutor{
             )
         if(showLaser && !document.hidden)
           await new Promise(resolve => setTimeout(resolve, laserShowDuration))
-        const w = canvas.ctx.canvas.width
-        canvas.ctx.canvas.width = w
+        if(canvas.ctx){
+          const w = canvas.ctx.canvas.width
+          canvas.ctx.canvas.width = w
+        }
         for (const pd of allDestroyedPieceEventsAfterLastLaserShot){
           board.executeEvent(pd)
           this.gameService.increaseAnimationEvents()

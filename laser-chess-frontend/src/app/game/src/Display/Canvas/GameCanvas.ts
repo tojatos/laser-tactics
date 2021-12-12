@@ -31,10 +31,12 @@ export class GameCanvas extends Canvas {
     }
 
     initCanvas(board: Board, gameActions: GameActions): void{
-      this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
-      this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
-      this.drawings.drawGame(this, board.cells, this.isReversed)
-      this.mediator = new GameMediator(this, gameActions)
+      if(this.ctx){
+        this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false)
+        this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false)
+        this.drawings.drawGame(this, board.cells, this.isReversed)
+        this.mediator = new GameMediator(this, gameActions)
+      }
     }
 
     private canvasOnclick(event: MouseEvent, board: Board) {
@@ -73,7 +75,7 @@ export class GameCanvas extends Canvas {
       if(board.selectedCell && selectedCell && this.mediator?.currentRotation == 0){
         await this.makeAMoveEvent(selectedCell.coordinates, board, this.showAnimations, this.enableSounds)
         this.gameService.increaseAnimationEvents()
-        board.movePiece(board.selectedCell!.coordinates, selectedCell.coordinates)
+        board.movePiece(board.selectedCell.coordinates, selectedCell.coordinates)
         this.gameService.movePiece(this.gameId, board.selectedCell.coordinates, selectedCell.coordinates)
         if(board.isMyTurn())
           this.interactable = true
@@ -121,10 +123,12 @@ export class GameCanvas extends Canvas {
     }
 
     changeBlockSize(newSize: number, board: Board): void{
-      this.blockSize = newSize
-      this.ctx.canvas.width = COLS * this.blockSize
-      this.ctx.canvas.height = ROWS * this.blockSize
-      this.drawings.drawGame(this, board.cells, this.isReversed)
+      if(this.ctx){
+        this.blockSize = newSize
+        this.ctx.canvas.width = COLS * this.blockSize
+        this.ctx.canvas.height = ROWS * this.blockSize
+        this.drawings.drawGame(this, board.cells, this.isReversed)
+      }
     }
 
     redrawGame(board: Board): void{
@@ -156,28 +160,18 @@ export class GameCanvas extends Canvas {
     }
 
     private getMousePos(event: MouseEvent){
-      const rect = this.ctx.canvas.getBoundingClientRect();
+      const rect = this.ctx?.canvas.getBoundingClientRect();
 
       if(this.isReversed)
         return {
-          x: COLS - 1 - Math.floor((event.clientX - rect.left) / this.blockSize),
-          y: Math.floor((event.clientY - rect.top) / this.blockSize)
+          x: COLS - 1 - Math.floor((event.clientX - (rect?.left || 0)) / this.blockSize),
+          y: Math.floor((event.clientY - (rect?.top || 0)) / this.blockSize)
         }
 
       return {
-        x: Math.floor((event.clientX - rect.left) / this.blockSize),
-        y: ROWS - 1 - Math.floor((event.clientY - rect.top) / this.blockSize)
+        x: Math.floor((event.clientX - (rect?.left || 0)) / this.blockSize),
+        y: ROWS - 1 - Math.floor((event.clientY - (rect?.top || 0)) / this.blockSize)
       }
     }
-
-    private getRawMousePos(event: MouseEvent){
-      const rect = this.ctx.canvas.getBoundingClientRect();
-
-      return {
-        x: Math.floor((event.clientX - rect.left)),
-        y: Math.floor((event.clientY - rect.top))
-      }
-    }
-
 
 }
