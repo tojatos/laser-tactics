@@ -68,7 +68,7 @@ export class Game{
     await this.resources.loadAssets()
     this.showAnimations = animations
     this.enableSounds = sounds
-    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, canvas, blockSize, this.resources, gameId)
+    this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, canvas, blockSize, this.resources, gameId, this.enableSounds)
     this.gameCanvas.showAnimations = this.showAnimations
     this.gameActions = new GameActions(this.gameService, gameId)
     this.gameService.connect(this.gameId)

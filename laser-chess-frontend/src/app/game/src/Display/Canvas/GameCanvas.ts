@@ -16,7 +16,6 @@ export class GameCanvas extends Canvas {
 
     hoveredCell: Cell | undefined
     mediator: GameMediator | undefined
-    enableSounds = true
     currentPlayer = this.authService.getUsername()
 
     constructor(private gameService: GameWebsocketService,
@@ -26,7 +25,8 @@ export class GameCanvas extends Canvas {
       canvas: HTMLCanvasElement,
       blockSize: number,
       resources: Resources,
-      private gameId: string) {
+      private gameId: string,
+      public enableSounds: boolean) {
         super(canvas, blockSize, resources)
     }
 
