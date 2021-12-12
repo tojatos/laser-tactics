@@ -41,7 +41,7 @@ describe('Gameplay tests', () => {
         cy.setLocalStorage("access_token", data)
         cy.saveLocalStorage()
       })
-      .visit("/game/cypressTest")
+      .visit("/game/cypressTest/")
       .get('canvas')
       .wait(100)
       .window()
