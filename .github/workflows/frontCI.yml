@@ -3,7 +3,7 @@ name: E2E Tests
 on: [push]
 
 jobs:
-  cypress-run:
+  validate-frontend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -14,3 +14,5 @@ jobs:
           working-directory: ./laser-chess-frontend
           build: npm run build
           start: npm start
+      - name: lint game frontend
+        run: npm run lint
