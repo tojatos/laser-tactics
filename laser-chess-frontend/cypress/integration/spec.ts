@@ -8,6 +8,7 @@ describe('Gameplay tests', () => {
   let gameComponent: any
 
   const beforeMethod = (fixture: string) => {
+    cy.fixture(fixture).then(data => {
     cy.fixture("userSettings.json").then(settings => {
       cy.fixture("userInfo.json").then(userInfo => {
         cy.fixture("initialGameState.json").then(initState => {
@@ -59,9 +60,7 @@ describe('Gameplay tests', () => {
     cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
     .should('not.be.checked')
     .get('#mat-slide-toggle-2 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
-    .fixture(fixture).then((data) => {
-        subject.next(data)
-    }).then(() => {
+      subject.next(data)
       cy.get(gameComponent.game.board.cells).should('have.length.above', 0)
       .get('app-board-actions').should('be.visible')
     })

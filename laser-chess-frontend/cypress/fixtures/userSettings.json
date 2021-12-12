@@ -1,3 +1,4 @@
 {
-  "skip_animations": true
+  "skip_animations": true,
+  "sound_on": false
 }
