@@ -270,6 +270,7 @@ it('Test laser', () => {
     expect(laserPosition.piece.piece_type).to.be.equal("LASER")
     cy.spy(gameComponent.game.gameService, "shootLaser")
     cy.spy(gameComponent.game.board, "removePiece")
+    cy.spy(gameComponent.game.eventsExecutor, "executeLaserAnimations")
     cy.stub(gameComponent.game.gameService, "animationsToShow").returns("2")
 
     cy.get('canvas').click(laserPosition.canvasCoordinates.x, laserPosition.canvasCoordinates.y)
@@ -279,6 +280,7 @@ it('Test laser', () => {
       }).then(() => {
       cy.then(() => {
         expect(gameComponent.game.gameService.shootLaser).to.have.been.calledOnce
+        expect(gameComponent.game.eventsExecutor.executeLaserAnimations).to.have.been.calledOnce
         cy.wrap(gameComponent.game.board.removePiece, {timeout: 2000}).should(fun => expect(fun).to.be.calledOnce)
       })
     })
