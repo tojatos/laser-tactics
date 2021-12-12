@@ -1,9 +1,9 @@
-name: E2E Tests
+name: Frontend CI
 
 on: [push]
 
 jobs:
-  validate-frontend:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
