@@ -45,7 +45,7 @@ fxLayoutAlign="center"></app-board-actions>
 <app-board-log class="float" #logs
 *ngIf="!isHandset"
 [gameState]="game.gameService.lastMessage"
-[maxHeight]="containerHeight * 0.9"
+[maxHeight]="containerHeight * .9"
 [gameFinished]="game.gamePhase !== 'STARTED'"
 [isSpectator]="isSpectator"
 (gameLogEmitter)="buildEvent($event)"

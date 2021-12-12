@@ -1,0 +1,19 @@
+name: Frontend CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: ./laser-chess-frontend
+          build: npm run build
+          start: npm start
+      - name: lint game frontend
+        working-directory: ./laser-chess-frontend
+        run: npm run lint

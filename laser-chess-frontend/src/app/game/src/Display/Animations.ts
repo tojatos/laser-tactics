@@ -280,6 +280,7 @@ export class Animations {
       const cellData = this.drawings.getPieceIndividualPixels(canvas, cell, pixelSize, isReverse)
       const intervals = 30
 
+      if(cellData){
       for(let k = 0; k < intervals; k++){
       await new Promise(resolve => setTimeout(resolve, 50))
       let rowId = 0
@@ -287,7 +288,7 @@ export class Animations {
         rowId++
         for(const pixel of row){
           const standardDev = cellData.length-rowId * 2 + k * 2
-          if(standardDev > 0){
+          if(standardDev > 0 && canvas.ctx){
             canvas.ctx.clearRect(pixel.originCoordinates.x, pixel.originCoordinates.y, pixelSize, pixelSize)
             const positionX = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
             const positionY = Math.round(Math.abs(Chance().normal({mean: 0, dev: standardDev})))
@@ -302,6 +303,7 @@ export class Animations {
         }
       }
     }
+  }
       canvas.deleteSelf()
   }
     }

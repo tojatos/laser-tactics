@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from "rxjs/webSocket";
-import { authWebsocketEndpoint, gameHistoryFullEndpoint, gameStateEndpoint, giveUpEndpoint, initalGameStateFullEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
+import { authWebsocketEndpoint, gameHistoryFullEndpoint, gameStateEndpoint, giveUpEndpoint, initialGameStateFullEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint } from 'src/app/api-definitions';
 import { AuthService } from 'src/app/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { Coordinates, GameState } from '../game.models';
@@ -29,12 +29,14 @@ export class GameWebsocketService {
 
   constructor(private authService: AuthService, private _snackBar: MatSnackBar, private eventEmitter: EventEmitterService, private http: HttpClient){}
 
-  private subject = webSocket<unknown>(environment.WEBSOCKET_URL);
+  subject = webSocket<unknown>(environment.WEBSOCKET_URL)
+
+  getSubject = () => this.subject
 
   lastMessage: GameState | undefined = undefined
 
-  connect(gameId: string): void{
-    this.subject.asObservable().subscribe(
+  connect(gameId: string){
+    this.getSubject().asObservable().subscribe(
       msg => {
         if((<websocketResponse>msg).status_code && (<websocketResponse>msg).status_code != 200){
           this.showSnackbar((<websocketResponse>msg).body)
@@ -71,7 +73,7 @@ export class GameWebsocketService {
 
   private sendRequest(path: string, request: unknown){
     const value: websocketRequest = { request_path: path, request: request}
-    this.subject.next(value)
+    this.getSubject().next(value)
   }
 
   getGameState(gameId: string): void {
@@ -137,7 +139,7 @@ export class GameWebsocketService {
   }
 
   getInitialGameState(): Promise<GameState>{
-    return this.http.get<GameState>(initalGameStateFullEndpoint).toPromise()
+    return this.http.get<GameState>(initialGameStateFullEndpoint).toPromise()
   }
 
   getGameInfo(gameId: string): Promise<UserHistory> {
@@ -153,11 +155,11 @@ export class GameWebsocketService {
     localStorage.setItem("animationEvents", num.toString())
   }
 
-  get numOfAnimationEvents(): number{
+  numOfAnimationEvents(): number{
     return parseInt(localStorage.getItem("animationEvents") || "0")
   }
 
-  animationsToShow(totalNumOfAnimations: number): number{
-    return totalNumOfAnimations - this.numOfAnimationEvents
+  animationsToShow(totalNumOfAnimations: number){
+    return totalNumOfAnimations - this.numOfAnimationEvents()
   }
 }

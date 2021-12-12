@@ -46,5 +46,5 @@ export const userFullEndpoint = (id  = ""): string => fullEndpoint(userEndpoint,
 export const giveUpFullEndpoint = fullEndpoint(giveUpEndpoint)
 export const offerDrawFullEndpoint = fullEndpoint(offerDrawEndpoint)
 export const emailFullEndpoint = (id  = ""): string => fullEndpoint(emailEndpoint, id ? `/${id}` : '')
-export const initalGameStateFullEndpoint = fullEndpoint(initialGameEndpoint)
+export const initialGameStateFullEndpoint = fullEndpoint(initialGameEndpoint)
 export const gameHistoryFullEndpoint = (id  = ""): string => fullEndpoint(gameHistoryEndpoint, id ? `/${id}` : '')
