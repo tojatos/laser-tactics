@@ -14,6 +14,7 @@ jobs:
           working-directory: ./laser-chess-frontend
           start: npm start
           wait-on: 'http://localhost:8080'
+          wait-on-timeout: 180
       - name: lint game frontend
         working-directory: ./laser-chess-frontend
         run: npm run lint
