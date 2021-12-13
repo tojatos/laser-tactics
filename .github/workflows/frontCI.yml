@@ -12,8 +12,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: ./laser-chess-frontend
-          build: npm start
-          start: ""
+          start: npm start
+          wait-on: 'http://localhost:8080'
       - name: lint game frontend
         working-directory: ./laser-chess-frontend
         run: npm run lint
