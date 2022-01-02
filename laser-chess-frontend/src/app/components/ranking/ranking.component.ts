@@ -20,7 +20,7 @@ export class RankingComponent implements OnInit {
 
   async ngOnInit() {
     const data = await this.userService.getTopRanking()
-    this.dataSource.data = data
+    this.dataSource.data = data.splice(0, 10)
     this.fetched = true
   }
 
