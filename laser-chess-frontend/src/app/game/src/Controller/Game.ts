@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, QueryList } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { UserService } from "src/app/services/user.service";
@@ -12,6 +12,7 @@ import { Drawings } from "../Display/Drawings";
 import { Resources } from "../Display/Resources";
 import { GameEvents, GamePhase, PlayerType } from "../Utils/Enums";
 import { EventsExecutor } from "./EventsExecutor";
+import { ClockComponent } from "../../components/clock/clock.component";
 
 enum analyzeModes {
   ANALYZING = "ANALYZING",
@@ -33,10 +34,15 @@ export class Game{
   analyzeMode = analyzeModes.NOT_ANALYZING
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
+  activeTurn: [boolean, boolean] = [false, false]
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
   playerRankings: [number, number] = [0, 0]
   playerRankingsChanges : [number | undefined, number | undefined] = [undefined, undefined]
   initialGameState!: GameState
+  playersLastTurnTimes: [number, number] = [0, 0]
+  gameStartTime = 0
+  expectedTime = 0
+  clocks: QueryList<ClockComponent> | undefined
 
   constructor(public gameService: GameWebsocketService,
     private userService: UserService,
@@ -61,9 +67,10 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean): Promise<void>{
+  async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean, clocks: QueryList<ClockComponent>): Promise<void>{
     this.sizeScale = sizeScale
     this.gameId = gameId
+    this.expectedTime = 30
     this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
     this.showAnimations = animations
@@ -73,6 +80,7 @@ export class Game{
     this.gameActions = new GameActions(this.gameService, gameId)
     this.gameService.connect(this.gameId)
     this.gameCanvas.redrawGame(this.board)
+    this.clocks = clocks
   }
 
   destroyGame(): void{
@@ -220,8 +228,17 @@ export class Game{
     else
       console.error("Board not properly initialized")
 
-    this.gamePhase = newGameState.game_phase
+    // TODO: get new lastMoves from backend
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
+    this.gamePhase = newGameState.game_phase
+
+    const p1Turn = this.whoseTurn === PlayerType.PLAYER_ONE
+    this.gameStartTime = 1648251448
+    this.playersLastTurnTimes = this.gameCanvas?.isReversed ? [1648252239, 1648251842] : [1648251842, 1648252239]
+    this.activeTurn = this.gameCanvas ? this.gameCanvas.isReversed ? [!p1Turn, p1Turn] : [p1Turn, !p1Turn] : [false, false]
+    await (new Promise(resolve => setTimeout(resolve, 1)))
+    this.clocks?.forEach(c => c.activateClock())
+
 
   if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
     this.whoseTurn = PlayerType.PLAYER_ONE

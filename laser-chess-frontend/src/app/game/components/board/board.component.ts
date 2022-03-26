@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -6,7 +6,7 @@ import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/Utils/Constants';
 import { GamePhase, PlayerType } from '../../src/Utils/Enums';
 import { Game } from '../../src/Controller/Game';
-import { BoardLogComponent } from '../board-log/board-log.component';
+import { ClockComponent } from '../clock/clock.component';
 
 @Component({
   selector: 'app-board',
@@ -17,8 +17,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>
 
-  @ViewChild('logs', { static: true })
-  logsComponent: ElementRef<BoardLogComponent> | undefined
+  @ViewChildren(ClockComponent)
+  clockComponents!: QueryList<ClockComponent>
 
   readonly sizeScale = 0.07
   readonly handsetSize = 835
@@ -52,7 +52,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
           this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
           (<urlModel>params).id,
           this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
-          this.animation, this.sounds)
+          this.animation, this.sounds, this.clockComponents)
       })()
   })
   }
