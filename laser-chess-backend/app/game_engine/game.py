@@ -84,6 +84,13 @@ class Game:
         self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player is Player.PLAYER_TWO \
             else GamePhase.PLAYER_TWO_VICTORY
 
+    def timeout(self, player):
+        event = TimeoutEvent(player)
+        self.game_state.user_events.append(event)
+        self.game_state.game_events.append(event)
+        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player is Player.PLAYER_TWO \
+            else GamePhase.PLAYER_TWO_VICTORY
+
     def offer_draw(self, player):
         game_draw_offers: List[OfferDrawEvent] = [e for e in self.game_state.user_events if
                                                   isinstance(e, OfferDrawEvent)]
@@ -308,6 +315,14 @@ class Game:
         return True, None
 
     def validate_give_up(self):
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
+        if self.is_game_over():
+            return False, "The game is over."
+        return True, None
+
+    def validate_timeout(self):
         if not self.is_game_started():
             return False, "The game has not started yet."
 

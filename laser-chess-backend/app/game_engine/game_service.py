@@ -50,11 +50,29 @@ def give_up(user_id: string, request: GiveUpRequest, db: Session):
 
     game = Game(game_state)
 
+    can_move, error = game.validate_timeout()
+    if not can_move:
+        raise HTTPException(status_code=403, detail=f"Unable to timeout. {error}")
+
+    game.timeout(player)
+    crud.update_game(db, game.game_state, request.game_id)
+
+
+def timeout(user_id: string, request: TimeoutRequest, db: Session):
+    game_state_serializable = get_game_state(GetGameStateRequest(request.game_id), db)
+    game_state = game_state_serializable.to_normal()
+    player = get_player_from_user_id(game_state, user_id)
+
+    if player is None:
+        raise HTTPException(status_code=403, detail=f"You are not a player in game with id {request.game_id}.")
+
+    game = Game(game_state)
+
     can_move, error = game.validate_give_up()
     if not can_move:
         raise HTTPException(status_code=403, detail=f"Unable to give up. {error}")
 
-    game.give_up(player)
+    game.timeout(player)
     crud.update_game(db, game.game_state, request.game_id)
 
 

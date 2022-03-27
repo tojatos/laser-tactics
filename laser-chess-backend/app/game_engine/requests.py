@@ -64,6 +64,10 @@ class RotatePieceRequest:
 class GiveUpRequest:
     game_id: str
 
+@dataclass
+class TimeoutRequest:
+    game_id: str
+
 
 @dataclass
 class OfferDrawRequest:
@@ -77,10 +81,11 @@ AuthenticatedGameApiRequestPaths = {
     GameApiRequestPath.RotatePiece,
     GameApiRequestPath.GiveUp,
     GameApiRequestPath.OfferDraw,
+    GameApiRequestPath.Timeout,
 }
 
 GameApiRequest = Union[GetGameStateRequest, StartGameRequest, ShootLaserRequest, MovePieceRequest, RotatePieceRequest,
-                       GiveUpRequest, OfferDrawRequest, WebsocketAuthRequest, WebsocketObserveRequest]
+                       GiveUpRequest, OfferDrawRequest, TimeoutRequest, WebsocketAuthRequest, WebsocketObserveRequest]
 
 
 @dataclass
