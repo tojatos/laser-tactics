@@ -12,10 +12,9 @@
       <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds">Sounds</mat-slide-toggle>
     </div>
     <app-clock
-    [lastMoveMade]="game.playersLastTurnTimes[1]"
-    [gameStart]="game.gameStartTime"
-    [expectedTimeInMinutes]="game.expectedTime"
+    [serverTime]="game.playerTimes[1]"
     [isActive]="game.activeTurn[1]"
+    (timeoutEmitter)="game.notifyTimeout()"
     ></app-clock>
     <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[1]]">{{game.playerNames[1]}}</a></i>
       ({{game.playerRankings[1]}})
@@ -35,10 +34,9 @@
     </div>
   </div>
 <app-clock
-[lastMoveMade]="game.playersLastTurnTimes[0]"
-[gameStart]="game.gameStartTime"
-[expectedTimeInMinutes]="game.expectedTime"
+[serverTime]="game.playerTimes[0]"
 [isActive]="game.activeTurn[0]"
+(timeoutEmitter)="game.notifyTimeout()"
 ></app-clock>
 <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[0]]">{{game.playerNames[0]}}</a></i>
   ({{game.playerRankings[0]}})

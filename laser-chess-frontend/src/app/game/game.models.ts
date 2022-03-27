@@ -7,6 +7,8 @@ export interface GameState {
   game_id: string
   player_one_id: string
   player_two_id: string
+  player_one_time_left: number
+  player_two_time_left: number
   board: BoardInterface
   game_phase: GamePhase
   turn_number: number

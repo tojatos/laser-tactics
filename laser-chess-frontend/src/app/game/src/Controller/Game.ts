@@ -39,9 +39,7 @@ export class Game{
   playerRankings: [number, number] = [0, 0]
   playerRankingsChanges : [number | undefined, number | undefined] = [undefined, undefined]
   initialGameState!: GameState
-  playersLastTurnTimes: [number, number] = [0, 0]
-  gameStartTime = 0
-  expectedTime = 0
+  playerTimes: [number, number] = [0, 0]
   clocks: QueryList<ClockComponent> | undefined
 
   constructor(public gameService: GameWebsocketService,
@@ -70,7 +68,6 @@ export class Game{
   async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean, clocks: QueryList<ClockComponent>): Promise<void>{
     this.sizeScale = sizeScale
     this.gameId = gameId
-    this.expectedTime = 30
     this.initialGameState = await this.gameService.getInitialGameState()
     await this.resources.loadAssets()
     this.showAnimations = animations
@@ -228,16 +225,16 @@ export class Game{
     else
       console.error("Board not properly initialized")
 
-    // TODO: get new lastMoves from backend
+
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
     this.gamePhase = newGameState.game_phase
 
+    console.log(newGameState.player_one_time_left)
+    console.log(newGameState.player_two_time_left)
+
     const p1Turn = this.whoseTurn === PlayerType.PLAYER_ONE
-    this.gameStartTime = 1648251448
-    this.playersLastTurnTimes = this.gameCanvas?.isReversed ? [1648252239, 1648251842] : [1648251842, 1648252239]
+    this.playerTimes = this.gameCanvas?.isReversed ? [newGameState.player_two_time_left, newGameState.player_one_time_left] : [newGameState.player_one_time_left, newGameState.player_two_time_left]
     this.activeTurn = this.gameCanvas ? this.gameCanvas.isReversed ? [!p1Turn, p1Turn] : [p1Turn, !p1Turn] : [false, false]
-    await (new Promise(resolve => setTimeout(resolve, 1)))
-    this.clocks?.forEach(c => c.activateClock())
 
 
   if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
@@ -286,6 +283,11 @@ export class Game{
   offerDraw(): void{
     if(this.gameId)
       this.gameService.offerDraw(this.gameId)
+  }
+
+  notifyTimeout(): void {
+    if(this.gameId && this.whoseTurn && this.whoseTurn != PlayerType.NONE)
+      this.gameService.timeout(this.gameId, this.whoseTurn)
   }
 
   passRotation(degree: number): void{

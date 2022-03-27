@@ -8,7 +8,7 @@ import { Coordinates, GameState } from '../game.models';
 import { MovePieceRequest, RotatePieceRequest } from '../game.request.models';
 import { EventEmitterService } from './event-emitter.service';
 import Swal from 'sweetalert2'
-import { GamePhase } from '../src/Utils/Enums';
+import { GamePhase, PlayerType } from '../src/Utils/Enums';
 import { HttpClient } from '@angular/common/http';
 import { UserHistory } from 'src/app/app.models';
 
@@ -112,6 +112,12 @@ export class GameWebsocketService {
     const request = { game_id: gameId }
 
     this.sendRequest(giveUpEndpoint, request)
+  }
+
+  timeout(gameId: string, player: PlayerType): void {
+    const request = { game_id: gameId, player: player}
+    console.log(player)
+    //this.sendRequest(timeoutEndpoint, request)
   }
 
   offerDraw(gameId: string): void {
