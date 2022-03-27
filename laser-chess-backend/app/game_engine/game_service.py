@@ -68,11 +68,11 @@ def timeout(user_id: string, request: TimeoutRequest, db: Session):
 
     game = Game(game_state)
 
-    can_move, error = game.validate_give_up()
+    can_move, error = game.validate_timeout()
     if not can_move:
-        raise HTTPException(status_code=403, detail=f"Unable to give up. {error}")
+        raise HTTPException(status_code=403, detail=f"Unable to timeout. {error}")
 
-    game.timeout(player)
+    game.timeout(request.player_nr)
     crud.update_game(db, game.game_state, request.game_id)
 
 

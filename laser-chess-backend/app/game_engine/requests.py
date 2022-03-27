@@ -64,9 +64,11 @@ class RotatePieceRequest:
 class GiveUpRequest:
     game_id: str
 
+
 @dataclass
 class TimeoutRequest:
     game_id: str
+    player_nr: int
 
 
 @dataclass

@@ -64,7 +64,6 @@ class EventType(str, AutoNameEnum):
     OFFER_DRAW_EVENT = auto()
     TIMEOUT_EVENT = auto()
 
-
 @dataclass
 class Piece:
     piece_type: PieceType
@@ -114,7 +113,7 @@ class GiveUpEvent:
 
 @dataclass
 class TimeoutEvent:
-    player: Player
+    player_nr: int
     event_type: str = EventType.TIMEOUT_EVENT
 
     def to_serializable(self):
@@ -326,6 +325,10 @@ class GameStateSerializable:
     game_events: List[GameEventSerializable]
     user_events: List[UserEventSerializable]
     is_rated: bool
+    ame_start_timestamp: datetime
+    player_one_time_left: int
+    player_two_time_left: int
+    layer_last_turn_start_timestamp = datetime
 
     def to_normal(self) -> "GameState":
         return GameState(
@@ -336,11 +339,11 @@ class GameStateSerializable:
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
             user_events=list(map(lambda x: x.to_normal(), self.user_events)),
-            game_time=self.game_time,
             is_rated=self.is_rated,
             game_start_timestamp=self.game_start_timestamp,
-            player_one_last_move_timestamp=self.player_one_last_move_timestamp,
-            player_two_last_move_timestamp=self.player_one_last_move_timestamp,
+            player_one_time_left=self.player_one_time_left,
+            player_two_time_left=self.player_one_time_left,
+            player_last_turn_start_timestamp=datetime,
         )
 
 
@@ -354,12 +357,10 @@ class GameState:
     game_events: List[GameEvent]
     user_events: List[UserEvent]
     is_rated: bool
-    game_time: datetime
     game_start_timestamp: datetime
-    player_one_last_move_timestamp: datetime
-    player_two_last_move_timestamp: datetime
-
-
+    player_one_time_left: int
+    player_two_time_left: int
+    player_last_turn_start_timestamp = datetime
 
     def to_serializable(self) -> GameStateSerializable:
         return GameStateSerializable(
@@ -371,10 +372,10 @@ class GameState:
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
             user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
             is_rated=self.is_rated,
-            game_time=self.game_time,
             game_start_timestamp=self.game_start_timestamp,
-            player_one_last_move_timestamp=self.player_one_last_move_timestamp,
-            player_two_last_move_timestamp=self.player_one_last_move_timestamp,
+            player_one_time_left=self.player_one_time_left,
+            player_two_time_left=self.player_one_time_left,
+            player_last_turn_start_timestamp=datetime,
         )
 
 
@@ -473,4 +474,5 @@ def empty_game_state(player_one_id, player_two_id, is_rated=False) -> GameState:
     game_phase: GamePhase = GamePhase.NOT_STARTED
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated, None, datetime.now(), None, None)
+    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated, datetime.now(), -1,
+                     -1, datetime.now(),)
