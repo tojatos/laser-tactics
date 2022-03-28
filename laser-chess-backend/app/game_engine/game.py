@@ -88,7 +88,7 @@ class Game:
         event = TimeoutEvent(player_nr)
         self.game_state.user_events.append(event)
         self.game_state.game_events.append(event)
-        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player_nr == 1 \
+        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player_nr == 2 \
             else GamePhase.PLAYER_TWO_VICTORY
 
     def offer_draw(self, player):
@@ -338,6 +338,10 @@ class Game:
         return True, None
 
     def validate_timeout(self):
+
+        if not self.game_state.player_one_time_left > 0 and self.game_state.player_two_time_left > 0:
+            return False, "Players time has not run out yet"
+
         if not self.is_game_started():
             return False, "The game has not started yet."
 
