@@ -267,8 +267,6 @@ def start_game(db: Session, game_state: GameState, request: StartGameRequest):
                                           player_two_id=request.player_two_id,
                                           game_id=request.game_id,
                                           game_state_json=game_state_json,
-                                          last_modification_date=datetime.now(),
-                                          game_start_date=datetime.now()
     )
     db.add(db_game_state)
     if lobby is not None:

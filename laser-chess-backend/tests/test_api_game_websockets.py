@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from starlette.websockets import WebSocket
 
@@ -359,6 +361,20 @@ def offer_draw_ignored(ws):
 
     game_state = get_game_state(ws)
     assert game_state.game_phase is GamePhase.STARTED
+
+
+def clock(ws):
+    rotate_piece(ws, 0, (0, 0), 90)
+    time.sleep(1)
+    rotate_piece(ws, 0, (0, 0), 90)
+    time.sleep(1)
+    rotate_piece(ws, 1, (8, 8), 90)
+    time.sleep(1)
+    rotate_piece(ws, 1, (8, 8), 90)
+
+    game_state = get_game_state(ws)
+    assert game_state.player_one_time_left is 200 - 2
+    assert game_state.player_two_time_left is 200 - 1
 
 
 def test_websocket_notify(client):

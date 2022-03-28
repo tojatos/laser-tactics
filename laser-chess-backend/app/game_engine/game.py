@@ -107,12 +107,13 @@ class Game:
     def update_clock(self):
         if self.game_state.turn_number % 2:
             player = self.get_current_player()
-            if player is Player.PLAYER_ONE:
-                self.game_state.player_one_time_left = self.game_state.player_one_time_left - (datetime.now() - self.game_state.player_last_turn_start_timestamp)
+            now = datetime.now()
+            timediff = int((now - self.game_state.player_last_turn_start_timestamp).total_seconds())
+            if player is Player.PLAYER_TWO:
+                self.game_state.player_one_time_left = self.game_state.player_one_time_left - timediff
             else:
-                self.game_state.player_two_time_left = self.game_state.player_one_time_left - (
-                            datetime.now() - self.game_state.player_last_turn_start_timestamp)
-            self.game_state.player_last_turn_start_timestamp = datetime.now()
+                self.game_state.player_two_time_left = self.game_state.player_two_time_left - timediff
+            self.game_state.player_last_turn_start_timestamp = now
 
     def start_game(self):
         self.game_state.game_phase = GamePhase.STARTED

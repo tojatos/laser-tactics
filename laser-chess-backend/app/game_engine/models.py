@@ -325,10 +325,10 @@ class GameStateSerializable:
     game_events: List[GameEventSerializable]
     user_events: List[UserEventSerializable]
     is_rated: bool
-    ame_start_timestamp: datetime
+    game_start_timestamp: str
     player_one_time_left: int
     player_two_time_left: int
-    layer_last_turn_start_timestamp = datetime
+    player_last_turn_start_timestamp: str
 
     def to_normal(self) -> "GameState":
         return GameState(
@@ -340,10 +340,10 @@ class GameStateSerializable:
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
             user_events=list(map(lambda x: x.to_normal(), self.user_events)),
             is_rated=self.is_rated,
-            game_start_timestamp=self.game_start_timestamp,
+            game_start_timestamp=datetime.fromisoformat(self.game_start_timestamp),
             player_one_time_left=self.player_one_time_left,
             player_two_time_left=self.player_one_time_left,
-            player_last_turn_start_timestamp=datetime,
+            player_last_turn_start_timestamp=datetime.fromisoformat(self.player_last_turn_start_timestamp),
         )
 
 
@@ -360,7 +360,7 @@ class GameState:
     game_start_timestamp: datetime
     player_one_time_left: int
     player_two_time_left: int
-    player_last_turn_start_timestamp = datetime
+    player_last_turn_start_timestamp: datetime
 
     def to_serializable(self) -> GameStateSerializable:
         return GameStateSerializable(
@@ -372,10 +372,10 @@ class GameState:
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
             user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
             is_rated=self.is_rated,
-            game_start_timestamp=self.game_start_timestamp,
+            game_start_timestamp=self.game_start_timestamp.isoformat(),
             player_one_time_left=self.player_one_time_left,
             player_two_time_left=self.player_one_time_left,
-            player_last_turn_start_timestamp=datetime,
+            player_last_turn_start_timestamp=self.player_last_turn_start_timestamp.isoformat(),
         )
 
 
@@ -474,5 +474,4 @@ def empty_game_state(player_one_id, player_two_id, is_rated=False) -> GameState:
     game_phase: GamePhase = GamePhase.NOT_STARTED
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated, datetime.now(), -1,
-                     -1, datetime.now(),)
+    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated, datetime.now(), -1, -1, datetime.now())

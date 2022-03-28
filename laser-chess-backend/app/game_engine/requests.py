@@ -16,6 +16,7 @@ class GameApiRequestPath(str, Enum):
     OfferDraw = "/offer_draw"
     WebsocketAuth = "/ws_auth"
     WebsocketObserve = "/ws_observe"
+    Timeout = "/ws_timeout"
 
 
 @dataclass

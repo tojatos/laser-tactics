@@ -54,7 +54,7 @@ def give_up(user_id: string, request: GiveUpRequest, db: Session):
     if not can_move:
         raise HTTPException(status_code=403, detail=f"Unable to timeout. {error}")
 
-    game.timeout(player)
+    game.give_up(player)
     crud.update_game(db, game.game_state, request.game_id)
 
 
