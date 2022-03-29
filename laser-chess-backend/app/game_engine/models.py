@@ -328,7 +328,7 @@ class GameStateSerializable:
     game_start_timestamp: str
     player_one_time_left: int
     player_two_time_left: int
-    player_last_turn_start_timestamp: str
+    last_clock_update: str
 
     def to_normal(self) -> "GameState":
         return GameState(
@@ -343,7 +343,7 @@ class GameStateSerializable:
             game_start_timestamp=datetime.fromisoformat(self.game_start_timestamp),
             player_one_time_left=self.player_one_time_left,
             player_two_time_left=self.player_one_time_left,
-            player_last_turn_start_timestamp=datetime.fromisoformat(self.player_last_turn_start_timestamp),
+            last_clock_update=datetime.fromisoformat(self.last_clock_update),
         )
 
 
@@ -360,7 +360,7 @@ class GameState:
     game_start_timestamp: datetime
     player_one_time_left: int
     player_two_time_left: int
-    player_last_turn_start_timestamp: datetime
+    last_clock_update: datetime
 
     def to_serializable(self) -> GameStateSerializable:
         return GameStateSerializable(
@@ -375,7 +375,7 @@ class GameState:
             game_start_timestamp=self.game_start_timestamp.isoformat(),
             player_one_time_left=self.player_one_time_left,
             player_two_time_left=self.player_one_time_left,
-            player_last_turn_start_timestamp=self.player_last_turn_start_timestamp.isoformat(),
+            last_clock_update=self.last_clock_update.isoformat(),
         )
 
 

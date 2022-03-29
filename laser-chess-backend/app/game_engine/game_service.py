@@ -11,6 +11,18 @@ from ..core.internal import crud
 
 
 def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerializable:
+    # TODO: think about what the f is wrong with me, cuz this is wrong way to do that for sure
+    game_state_table = crud.get_game_state_table(db, game_id=request.game_id)
+
+    if game_state_table is None:
+        raise HTTPException(status_code=404, detail=f"Game with id {request.game_id} does not exist.")
+
+    game_state_json = game_state_table.game_state_json
+    game_state_dict = json.loads(game_state_json)
+    g = GameStateSerializable(**game_state_dict)
+    game = Game(g.to_normal())
+    game.update_clock()
+    crud.update_game(db, game.game_state, request.game_id)
     game_state_table = crud.get_game_state_table(db, game_id=request.game_id)
 
     if game_state_table is None:
@@ -25,7 +37,8 @@ def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerial
 def start_game(username: str, request: StartGameRequest, db: Session):
     if username != request.player_two_id and username != request.player_one_id:
         raise HTTPException(status_code=403, detail="User need to participate in Game in order to start it")
-    initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id, is_rated=request.is_rated)
+    initial_state = empty_game_state(player_one_id=request.player_one_id, player_two_id=request.player_two_id,
+                                     is_rated=request.is_rated)
     crud.start_game(db, initial_state, request)
 
     game = Game(initial_state)

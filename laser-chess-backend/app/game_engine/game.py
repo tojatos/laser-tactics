@@ -88,7 +88,7 @@ class Game:
         event = TimeoutEvent(player_nr)
         self.game_state.user_events.append(event)
         self.game_state.game_events.append(event)
-        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player_nr == 2 \
+        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player_nr == 1 \
             else GamePhase.PLAYER_TWO_VICTORY
 
     def offer_draw(self, player):
@@ -105,15 +105,20 @@ class Game:
                 self.game_state.game_phase = GamePhase.DRAW
 
     def update_clock(self):
-        if self.game_state.turn_number % 2:
-            player = self.get_current_player()
-            now = datetime.now()
-            timediff = int((now - self.game_state.player_last_turn_start_timestamp).total_seconds())
-            if player is Player.PLAYER_TWO:
-                self.game_state.player_one_time_left = self.game_state.player_one_time_left - timediff
-            else:
-                self.game_state.player_two_time_left = self.game_state.player_two_time_left - timediff
-            self.game_state.player_last_turn_start_timestamp = now
+        player = self.get_current_player()
+        now = datetime.now()
+        timediff = int((now - self.game_state.last_clock_update).total_seconds())
+        if player is Player.PLAYER_ONE:
+            self.game_state.player_one_time_left = self.game_state.player_one_time_left - timediff
+            if self.game_state.player_one_time_left < 0:
+                self.game_state.player_one_time_left = 0
+                self.timeout(1)
+        else:
+            self.game_state.player_two_time_left = self.game_state.player_two_time_left - timediff
+            if self.game_state.player_two_time_left < 0:
+                self.game_state.player_two_time_left = 0
+                self.timeout(2)
+        self.game_state.last_clock_update = now
 
     def start_game(self):
         self.game_state.game_phase = GamePhase.STARTED
@@ -154,8 +159,8 @@ class Game:
             if target_piece is not None:
                 self.game_state.game_events.append(
                     PieceTakenEvent(to_cell, moved_piece.piece_type, target_piece.piece_type))
-        self.game_state.turn_number += 1
         self.update_clock()
+        self.game_state.turn_number += 1
         self.check_victory()
 
     def rotate(self, rotated_piece_at: CellCoordinates, rotation: int):
@@ -163,8 +168,8 @@ class Game:
         self.game_state.board.cells[rotated_piece_at].rotation_degree = normalize_rotation(
             self.game_state.board.cells[rotated_piece_at].rotation_degree + rotation)
         self.game_state.game_events.append(PieceRotatedEvent(rotated_piece_at, rotation))
-        self.game_state.turn_number += 1
         self.update_clock()
+        self.game_state.turn_number += 1
 
     def shoot_laser(self, player: Player):
         self.game_state.user_events.append(ShootLaserEvent())
@@ -284,8 +289,8 @@ class Game:
         self.game_state.board.cells = cells_after_laser_hit
         self.game_state.game_events.append(LaserShotEvent(laser_path))
         self.game_state.game_events.extend(pieces_destroyed_by_laser_events)
-        self.game_state.turn_number += 1
         self.update_clock()
+        self.game_state.turn_number += 1
         self.check_victory()
 
     def validate_move(self, player: Player, from_cell: CellCoordinates, to_cell: CellCoordinates) -> Tuple[bool, Optional[str]]:
