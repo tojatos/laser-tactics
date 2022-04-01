@@ -342,7 +342,7 @@ class GameStateSerializable:
             is_rated=self.is_rated,
             game_start_timestamp=datetime.fromisoformat(self.game_start_timestamp),
             player_one_time_left=self.player_one_time_left,
-            player_two_time_left=self.player_one_time_left,
+            player_two_time_left=self.player_two_time_left,
             last_clock_update=datetime.fromisoformat(self.last_clock_update),
         )
 
@@ -374,7 +374,7 @@ class GameState:
             is_rated=self.is_rated,
             game_start_timestamp=self.game_start_timestamp.isoformat(),
             player_one_time_left=self.player_one_time_left,
-            player_two_time_left=self.player_one_time_left,
+            player_two_time_left=self.player_two_time_left,
             last_clock_update=self.last_clock_update.isoformat(),
         )
 
