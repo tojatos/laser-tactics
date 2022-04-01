@@ -21,16 +21,18 @@ def get_game_state(request: GetGameStateRequest, db: Session) -> GameStateSerial
     game_state_dict = json.loads(game_state_json)
     g = GameStateSerializable(**game_state_dict)
     game = Game(g.to_normal())
-    game.update_clock()
-    crud.update_game(db, game.game_state, request.game_id)
-    game_state_table = crud.get_game_state_table(db, game_id=request.game_id)
 
-    if game_state_table is None:
-        raise HTTPException(status_code=404, detail=f"Game with id {request.game_id} does not exist.")
+    if game.game_state.game_phase == GamePhase.STARTED:
+        game.update_clock()
+        crud.update_game(db, game.game_state, request.game_id)
+        game_state_table = crud.get_game_state_table(db, game_id=request.game_id)
 
-    game_state_json = game_state_table.game_state_json
-    game_state_dict = json.loads(game_state_json)
-    g = GameStateSerializable(**game_state_dict)
+        if game_state_table is None:
+            raise HTTPException(status_code=404, detail=f"Game with id {request.game_id} does not exist.")
+
+        game_state_json = game_state_table.game_state_json
+        game_state_dict = json.loads(game_state_json)
+        g = GameStateSerializable(**game_state_dict)
     return g
 
 
