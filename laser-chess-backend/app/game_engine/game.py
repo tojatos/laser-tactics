@@ -88,7 +88,7 @@ class Game:
         event = TimeoutEvent(player_nr)
         self.game_state.user_events.append(event)
         self.game_state.game_events.append(event)
-        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player_nr == 1 \
+        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player_nr == 2 \
             else GamePhase.PLAYER_TWO_VICTORY
 
     def offer_draw(self, player):
