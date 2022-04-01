@@ -229,9 +229,6 @@ export class Game{
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
     this.gamePhase = newGameState.game_phase
 
-    console.log(newGameState.player_one_time_left)
-    console.log(newGameState.player_two_time_left)
-
     const p1Turn = this.whoseTurn === PlayerType.PLAYER_ONE
     this.playerTimes = this.gameCanvas?.isReversed ? [newGameState.player_two_time_left, newGameState.player_one_time_left] : [newGameState.player_one_time_left, newGameState.player_two_time_left]
     this.activeTurn = this.gameCanvas ? this.gameCanvas.isReversed ? [!p1Turn, p1Turn] : [p1Turn, !p1Turn] : [false, false]
@@ -287,7 +284,7 @@ export class Game{
 
   notifyTimeout(): void {
     if(this.gameId && this.whoseTurn && this.whoseTurn != PlayerType.NONE)
-      this.gameService.timeout(this.gameId, this.whoseTurn)
+      this.gameService.timeout(this.gameId, this.whoseTurn == PlayerType.PLAYER_ONE ? 1 : 2)
   }
 
   passRotation(degree: number): void{
