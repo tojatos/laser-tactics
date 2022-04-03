@@ -13,6 +13,15 @@ export enum LobbyStatus {
   GAME_STARTED = "GAME_STARTED",
   GAME_ENDED = "GAME_ENDED"
 }
+
+enum Times {
+  ONE_MINUTE = "1 Min",
+  FIVE_MINUTES = "5 Min",
+  TEN_MINUTES = "10 Min",
+  HALF_HOUR = "30 Min",
+  HOUR = "60 Min"
+}
+
 @Component({
   selector: 'app-lobby',
   templateUrl: './lobby.component.html',
@@ -31,8 +40,17 @@ export class LobbyComponent implements OnInit, OnDestroy {
   isPrivate: string | undefined
   username = ""
   name = ""
+  times = Object.values(Times)
+  selectedTime = Times.FIVE_MINUTES
+  timesMap = new Map<Times, number>()
 
   async ngOnInit() {
+    this.timesMap.set(Times.ONE_MINUTE, 1)
+    this.timesMap.set(Times.FIVE_MINUTES, 5)
+    this.timesMap.set(Times.TEN_MINUTES, 10)
+    this.timesMap.set(Times.HALF_HOUR, 30)
+    this.timesMap.set(Times.HOUR, 60)
+
     this.route.params.subscribe(async params => {
       const lobby = await this.lobbyService.getLobbyById(params.id)
       this.refreshLobbyState(lobby)
@@ -98,7 +116,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   async startGame() {
     if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username) {
-      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, this.lobby.is_ranked)
+      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, this.lobby.is_ranked, this.timesMap.get(this.selectedTime) || 5)
       this.router.navigate(['/game', this.lobby.game_id])
     }
 

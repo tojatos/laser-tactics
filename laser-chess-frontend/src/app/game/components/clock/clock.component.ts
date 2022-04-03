@@ -1,11 +1,11 @@
-import { Component, Input, OnChanges, Output, SimpleChanges, EventEmitter } from '@angular/core';
+import { Component, Input, OnChanges, Output, SimpleChanges, EventEmitter, OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-clock',
   templateUrl: './clock.component.html',
   styleUrls: ['./clock.component.scss']
 })
-export class ClockComponent implements OnChanges {
+export class ClockComponent implements OnChanges, OnDestroy {
 
   @Input() serverTime = 0
   @Input() isActive = false
@@ -22,6 +22,16 @@ export class ClockComponent implements OnChanges {
       this.localTime = <number>changes.serverTime.currentValue
       this.activateClock()
     }
+    if(changes.isActive){
+      this.activateClock()
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.localTime = 0
+    this.time = "00:00"
+    this.isWarning = false
+    this.isRunning = false
   }
 
   activateClock(){
@@ -55,8 +65,11 @@ export class ClockComponent implements OnChanges {
     const timeDiff = expectedFinishTime - Math.floor(new Date().getTime() / 1000)
     this.time = this.parseTimeLeftToString(timeDiff)
 
-    if(timeDiff < 1)
+    if(timeDiff < 1){
       this.timeoutEmitter.emit()
+      this.localTime = 0
+      this.time = "00:00"
+    }
 
     if(this.isRunning && this.isActive && timeDiff > 0)
       setTimeout(() => this.clockCycle(expectedFinishTime), 1000)

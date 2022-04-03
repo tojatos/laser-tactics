@@ -92,6 +92,8 @@ export class Game{
     this.playerNames = [undefined, undefined]
     this.playerRankings = [0, 0]
     this.playerRankingsChanges = [undefined, undefined]
+    this.playerTimes = [0, 0]
+    this.clocks = undefined
   }
 
   async loadDisplay(displaySize: number, receivedGameState: GameState): Promise<void>{
@@ -229,15 +231,21 @@ export class Game{
     this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
     this.gamePhase = newGameState.game_phase
 
-    const p1Turn = this.whoseTurn === PlayerType.PLAYER_ONE
+    if(this.gamePhase == GamePhase.STARTED){
+      const p1Turn = this.whoseTurn === PlayerType.PLAYER_ONE
+      this.activeTurn = this.gameCanvas ? this.gameCanvas.isReversed ? [!p1Turn, p1Turn] : [p1Turn, !p1Turn] : [false, false]
+    }
+    else
+      this.activeTurn = [false, false]
+
     this.playerTimes = this.gameCanvas?.isReversed ? [newGameState.player_two_time_left, newGameState.player_one_time_left] : [newGameState.player_one_time_left, newGameState.player_two_time_left]
-    this.activeTurn = this.gameCanvas ? this.gameCanvas.isReversed ? [!p1Turn, p1Turn] : [p1Turn, !p1Turn] : [false, false]
+
+    if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
+      this.whoseTurn = PlayerType.PLAYER_ONE
+    else if (newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
+      this.whoseTurn = PlayerType.PLAYER_TWO
 
 
-  if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
-    this.whoseTurn = PlayerType.PLAYER_ONE
-  else if(newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
-    this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
   async showGameEvent(gameEvents: GameEvent[]): Promise<void>{
@@ -283,7 +291,7 @@ export class Game{
   }
 
   notifyTimeout(): void {
-    if(this.gameId && this.whoseTurn && this.whoseTurn != PlayerType.NONE)
+    if(this.gameId && this.whoseTurn && this.whoseTurn != PlayerType.NONE && this.gamePhase == GamePhase.STARTED )
       this.gameService.timeout(this.gameId, this.whoseTurn == PlayerType.PLAYER_ONE ? 1 : 2)
   }
 
