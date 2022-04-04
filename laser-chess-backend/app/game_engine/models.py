@@ -325,6 +325,7 @@ class GameStateSerializable:
     game_events: List[GameEventSerializable]
     user_events: List[UserEventSerializable]
     is_rated: bool
+    is_timed: bool
     game_start_timestamp: str
     player_one_time_left: int
     player_two_time_left: int
@@ -340,6 +341,7 @@ class GameStateSerializable:
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
             user_events=list(map(lambda x: x.to_normal(), self.user_events)),
             is_rated=self.is_rated,
+            is_timed=self.is_timed,
             game_start_timestamp=datetime.fromisoformat(self.game_start_timestamp),
             player_one_time_left=self.player_one_time_left,
             player_two_time_left=self.player_two_time_left,
@@ -357,6 +359,7 @@ class GameState:
     game_events: List[GameEvent]
     user_events: List[UserEvent]
     is_rated: bool
+    is_timed: bool
     game_start_timestamp: datetime
     player_one_time_left: int
     player_two_time_left: int
@@ -372,6 +375,7 @@ class GameState:
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
             user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
             is_rated=self.is_rated,
+            is_timed=self.is_timed,
             game_start_timestamp=self.game_start_timestamp.isoformat(),
             player_one_time_left=self.player_one_time_left,
             player_two_time_left=self.player_two_time_left,
@@ -379,7 +383,7 @@ class GameState:
         )
 
 
-def empty_game_state(player_one_id, player_two_id, is_rated=False, ) -> GameState:
+def empty_game_state(player_one_id, player_two_id, is_rated=False, is_timed=False, player_one_time=-1, player_two_time=-1) -> GameState:
     board: Board = Board(cells={
         (0, 0): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE),
         (1, 0): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE),
@@ -474,4 +478,4 @@ def empty_game_state(player_one_id, player_two_id, is_rated=False, ) -> GameStat
     game_phase: GamePhase = GamePhase.NOT_STARTED
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated, datetime.now(), 300, 300, datetime.now())
+    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated, is_timed, datetime.now(), player_one_time, player_two_time, datetime.now())

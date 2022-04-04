@@ -63,7 +63,7 @@ def test_create_lobby_and_start_game(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 403
 
-    start_game_request = StartGameRequest(create_response.json()["game_id"], "test0", "test1", False)
+    start_game_request = StartGameRequest(create_response.json()["game_id"], "test0", "test1", False, False)
     start_game_response = tu.post_data(
         "/lobby/start_game",
         tokens[0],
@@ -75,6 +75,46 @@ def test_create_lobby_and_start_game(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201
     assert response.json()["lobby_status"] == "CREATED"
+
+
+def test_create_lobby_and_start_game_timed(tu):
+    create_response = tu.post_data("/lobby/create", tokens[0])
+    assert create_response.status_code == 201
+    assert create_response.json()["lobby_status"] == "CREATED"
+
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+
+    start_game_request = StartGameRequest(create_response.json()["game_id"], "test0", "test1", False, True, 200, 200)
+    start_game_response = tu.post_data(
+        "/lobby/start_game",
+        tokens[0],
+        json=dataclasses.asdict(start_game_request),
+    )
+
+    assert start_game_response.status_code == 200
+
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 201
+    assert response.json()["lobby_status"] == "CREATED"
+
+
+def test_create_lobby_and_start_game_timed_invalid(tu):
+    create_response = tu.post_data("/lobby/create", tokens[0])
+    assert create_response.status_code == 201
+    assert create_response.json()["lobby_status"] == "CREATED"
+
+    response = tu.post_data("/lobby/create", tokens[0])
+    assert response.status_code == 403
+
+    start_game_request = StartGameRequest(create_response.json()["game_id"], "test0", "test1", False, True, 200)
+    start_game_response = tu.post_data(
+        "/lobby/start_game",
+        tokens[0],
+        json=dataclasses.asdict(start_game_request),
+    )
+
+    assert start_game_response.status_code == 403
 
 
 def test_join_lobby_happy(tu):
@@ -239,6 +279,30 @@ def test_update_lobby_happy(tu):
     assert json["starting_position_reversed"] is True
 
 
+def test_update_lobby_timed_happy(tu):
+    response_create = tu.post_data("/lobby/create", tokens[0])
+    assert response_create.status_code == 201
+    assert response_create.json()["is_private"] is False
+    assert response_create.json()["is_ranked"] is False
+    assert response_create.json()["is_timed"] is False
+    json = response_create.json()
+    json["is_private"] = True
+    json["is_ranked"] = True
+    json["is_timed"] = True
+    json["player_one_time"] = 200
+    json["player_two_time"] = 200
+    json["starting_position_reversed"] = True
+
+    response = tu.patch_data(f"/lobby/update", token=tokens[0], json=json)
+    assert response.status_code == 200
+    assert response.json()["is_private"] is True
+    assert response.json()["is_ranked"] is True
+    assert response.json()["is_timed"] is True
+    assert response.json()["player_one_time"] == 200
+    assert response.json()["player_two_time"] == 200
+    assert json["starting_position_reversed"] is True
+
+
 def test_update_lobby_unauthorized(tu):
     response = tu.post_data("/lobby/create", tokens[0])
     assert response.status_code == 201
@@ -255,14 +319,15 @@ def test_update_lobby_notexisting(tu):
         "player_one_username": "string",
         "is_ranked": True,
         "is_private": True,
-        "starting_position_reversed": True
+        "starting_position_reversed": True,
+        "is_timed": False
     }
     response = tu.patch_data(f"/lobby/update", tokens[1], json=json)
     assert response.status_code == 404
 
 
 def test_start_game_unauthorized(tu):
-    start_game_request = StartGameRequest("game_id", "test2", "test1", False)
+    start_game_request = StartGameRequest("game_id", "test2", "test1", False, False)
     start_game_response = tu.post_data(
         "/lobby/start_game",
         tokens[0],
@@ -302,7 +367,8 @@ def test_join_lobby_random_ranked(tu):
                                  "player_one_username": response.json()["player_one_username"],
                                  "is_ranked": True,
                                  "is_private": response.json()["is_private"],
-                                 "starting_position_reversed": response.json()["starting_position_reversed"]
+                                 "starting_position_reversed": response.json()["starting_position_reversed"],
+                                 "is_timed": response.json()["is_timed"]
                              }
                              )
     assert response.status_code == 200
@@ -317,6 +383,7 @@ def test_join_lobby_random_ranked(tu):
                                  "name": response.json()["name"],
                                  "player_one_username": response.json()["player_one_username"],
                                  "is_ranked": True,
+                                 "is_timed": False,
                                  "is_private": response.json()["is_private"],
                                  "starting_position_reversed": response.json()["starting_position_reversed"]
                              })
@@ -332,6 +399,7 @@ def test_join_lobby_random_ranked(tu):
                                  "name": response.json()["name"],
                                  "player_one_username": response.json()["player_one_username"],
                                  "is_ranked": True,
+                                 "is_timed": False,
                                  "is_private": response.json()["is_private"],
                                  "starting_position_reversed": response.json()["starting_position_reversed"]
                              }
