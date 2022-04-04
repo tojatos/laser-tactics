@@ -85,6 +85,7 @@ class Game:
             else GamePhase.PLAYER_TWO_VICTORY
 
     def timeout(self, player_nr):
+        if not self.game_state.is_timed: raise AssertionError("game is not timed")
         event = TimeoutEvent(player_nr)
         self.game_state.user_events.append(event)
         self.game_state.game_events.append(event)
@@ -105,20 +106,21 @@ class Game:
                 self.game_state.game_phase = GamePhase.DRAW
 
     def update_clock(self):
-        player = self.get_current_player()
-        now = datetime.now()
-        timediff = int((now - self.game_state.last_clock_update).total_seconds())
-        if player is Player.PLAYER_ONE:
-            self.game_state.player_one_time_left = self.game_state.player_one_time_left - timediff
-            if self.game_state.player_one_time_left < 0:
-                self.game_state.player_one_time_left = 0
-                self.timeout(1)
-        else:
-            self.game_state.player_two_time_left = self.game_state.player_two_time_left - timediff
-            if self.game_state.player_two_time_left < 0:
-                self.game_state.player_two_time_left = 0
-                self.timeout(2)
-        self.game_state.last_clock_update = now
+        if self.game_state.is_timed:
+            player = self.get_current_player()
+            now = datetime.now()
+            timediff = int((now - self.game_state.last_clock_update).total_seconds())
+            if player is Player.PLAYER_ONE:
+                self.game_state.player_one_time_left = self.game_state.player_one_time_left - timediff
+                if self.game_state.player_one_time_left < 0:
+                    self.game_state.player_one_time_left = 0
+                    self.timeout(1)
+            else:
+                self.game_state.player_two_time_left = self.game_state.player_two_time_left - timediff
+                if self.game_state.player_two_time_left < 0:
+                    self.game_state.player_two_time_left = 0
+                    self.timeout(2)
+            self.game_state.last_clock_update = now
 
     def start_game(self):
         self.game_state.game_phase = GamePhase.STARTED

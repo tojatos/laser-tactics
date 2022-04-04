@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Union
+from typing import Union, Optional
 
 from pydantic.dataclasses import dataclass
 
@@ -40,6 +40,9 @@ class StartGameRequest:
     player_one_id: str
     player_two_id: str
     is_rated: bool
+    is_timed: bool
+    player_one_time: Optional[int] = -1
+    player_two_time: Optional[int] = -1
 
 
 @dataclass

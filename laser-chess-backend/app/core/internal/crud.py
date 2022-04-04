@@ -130,6 +130,9 @@ def update_lobby(db: Session, lobby: schemas.Lobby, lobby_new_data: schemas.Lobb
     lobby.name = lobby_new_data.name
     lobby.is_ranked = lobby_new_data.is_ranked
     lobby.is_private = lobby_new_data.is_private
+    lobby.is_timed = lobby_new_data.is_timed
+    lobby.player_one_time = lobby_new_data.player_one_time
+    lobby.player_two_time = lobby_new_data.player_two_time
     lobby.starting_position_reversed = lobby_new_data.starting_position_reversed
     db.commit()
     db.refresh(lobby)

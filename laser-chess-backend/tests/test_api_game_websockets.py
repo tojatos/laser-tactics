@@ -42,7 +42,7 @@ def before_all():
     for user in create_user_datas:
         verify_user(session, user["username"])
     start_game_request = StartGameRequest(game_id, create_user_datas[0]['username'], create_user_datas[1]['username'],
-                                          True)
+                                          True, True, 200, 200)
     start_game_response = tu.post_data(
         "/lobby/start_game",
         tokens[0],
@@ -135,11 +135,26 @@ def test_start_game(ws):
     assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 1
     assert game_state.is_rated is True
+    assert game_state.is_timed is True
 
 
 def test_auth(ws):
     response = auth(ws, 0)
     assert response.status_code == 200
+
+
+def test_clock(ws):
+    rotate_piece(ws, 0, (0, 0), 90)
+    time.sleep(1)
+    rotate_piece(ws, 0, (0, 0), 90)
+    time.sleep(1)
+    rotate_piece(ws, 1, (8, 8), 90)
+    time.sleep(1)
+    rotate_piece(ws, 1, (8, 8), 90)
+
+    game_state = get_game_state(ws)
+    assert game_state.player_one_time_left is 200 - 1
+    assert game_state.player_two_time_left is 200 - 2
 
 
 def test_shoot_laser(ws):
@@ -361,20 +376,6 @@ def offer_draw_ignored(ws):
 
     game_state = get_game_state(ws)
     assert game_state.game_phase is GamePhase.STARTED
-
-
-def clock(ws):
-    rotate_piece(ws, 0, (0, 0), 90)
-    time.sleep(1)
-    rotate_piece(ws, 0, (0, 0), 90)
-    time.sleep(1)
-    rotate_piece(ws, 1, (8, 8), 90)
-    time.sleep(1)
-    rotate_piece(ws, 1, (8, 8), 90)
-
-    game_state = get_game_state(ws)
-    assert game_state.player_one_time_left is 200 - 2
-    assert game_state.player_two_time_left is 200 - 1
 
 
 def test_websocket_notify(client):

@@ -12,7 +12,7 @@ def get_initial_test_game_state() -> GameState:
 def get_test_game_state(board: Board) -> GameState:
     player_one_id = "player1"
     player_two_id = "player2"
-    return GameState(player_one_id, player_two_id, board, GamePhase.NOT_STARTED, 0, [], [], False, datetime.now(), 200,
+    return GameState(player_one_id, player_two_id, board, GamePhase.NOT_STARTED, 0, [], [], False, True, datetime.now(), 200,
                      200, datetime.now())
 
 
