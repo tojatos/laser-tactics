@@ -43,6 +43,7 @@ def before_all():
         verify_user(session, user["username"])
     start_game_request = StartGameRequest(game_id, create_user_datas[0]['username'], create_user_datas[1]['username'],
                                           True, True, 200, 200)
+
     start_game_response = tu.post_data(
         "/lobby/start_game",
         tokens[0],
