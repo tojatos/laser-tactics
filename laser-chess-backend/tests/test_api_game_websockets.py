@@ -144,20 +144,6 @@ def test_auth(ws):
     assert response.status_code == 200
 
 
-def test_clock(ws):
-    rotate_piece(ws, 0, (0, 0), 90)
-    time.sleep(1)
-    rotate_piece(ws, 0, (0, 0), 90)
-    time.sleep(1)
-    rotate_piece(ws, 1, (8, 8), 90)
-    time.sleep(1)
-    rotate_piece(ws, 1, (8, 8), 90)
-
-    game_state = get_game_state(ws)
-    assert game_state.player_one_time_left is 200 - 1
-    assert game_state.player_two_time_left is 200 - 2
-
-
 def test_shoot_laser(ws):
     response = shoot_laser(ws, 0)
     assert response.status_code == 200
