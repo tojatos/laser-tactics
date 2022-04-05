@@ -65,13 +65,13 @@ export class ClockComponent implements OnChanges, OnDestroy {
     const timeDiff = expectedFinishTime - Math.floor(new Date().getTime() / 1000)
     this.time = this.parseTimeLeftToString(timeDiff)
 
-    if(timeDiff < 1){
+    if(timeDiff < -5){
       this.timeoutEmitter.emit()
       this.localTime = 0
       this.time = "00:00"
     }
 
-    if(this.isRunning && this.isActive && timeDiff > 0)
+    if(this.isRunning && this.isActive && timeDiff > -6)
       setTimeout(() => this.clockCycle(expectedFinishTime), 1000)
   }
 

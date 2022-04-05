@@ -12,6 +12,7 @@
       <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds">Sounds</mat-slide-toggle>
     </div>
     <app-clock
+    *ngIf="isTimed"
     [serverTime]="game.playerTimes[1]"
     [isActive]="game.activeTurn[1]"
     (timeoutEmitter)="game.notifyTimeout()"
@@ -34,6 +35,7 @@
     </div>
   </div>
 <app-clock
+*ngIf="isTimed"
 [serverTime]="game.playerTimes[0]"
 [isActive]="game.activeTurn[0]"
 (timeoutEmitter)="game.notifyTimeout()"

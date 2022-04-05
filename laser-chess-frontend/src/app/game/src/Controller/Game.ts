@@ -31,6 +31,7 @@ export class Game{
   enableSounds = true
   executingActions = false
   isInitiated = false
+  isTimed = false
   analyzeMode = analyzeModes.NOT_ANALYZING
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
@@ -100,6 +101,7 @@ export class Game{
 
     if(this.gameCanvas && this.gameActions){
 
+      this.isTimed = receivedGameState.is_timed
       this.board.initBoard(receivedGameState, displaySize)
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
@@ -320,5 +322,4 @@ export class Game{
       this.gameCanvas.redrawGame(this.board)
     }
   }
-
 }

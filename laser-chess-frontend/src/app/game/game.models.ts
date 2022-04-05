@@ -13,6 +13,7 @@ export interface GameState {
   game_phase: GamePhase
   turn_number: number
   is_rated: boolean
+  is_timed: boolean
   game_events: GameEvent[]
   user_events: UserEvent[]
 }

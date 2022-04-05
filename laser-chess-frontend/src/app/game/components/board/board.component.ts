@@ -152,4 +152,9 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     return this.game.authService.getUsername() != this.game.playerNames[0] && this.game.authService.getUsername() != this.game.playerNames[1]
   }
 
+  get isTimed(): boolean {
+    return this.game.isTimed
+  }
+  
+
 }

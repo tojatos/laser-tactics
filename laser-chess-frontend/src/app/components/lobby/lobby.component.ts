@@ -22,6 +22,13 @@ enum Times {
   HOUR = "60 Min"
 }
 
+function getByValue(map: Map<any, any>, searchValue: any) {
+  for (let [key, value] of map.entries()) {
+    if (value === searchValue)
+      return key;
+  }
+}
+
 @Component({
   selector: 'app-lobby',
   templateUrl: './lobby.component.html',
@@ -40,16 +47,19 @@ export class LobbyComponent implements OnInit, OnDestroy {
   isPrivate: string | undefined
   username = ""
   name = ""
-  times = Object.values(Times)
-  selectedTime = Times.FIVE_MINUTES
+  times1 = Object.values(Times)
+  times2 = Object.values(Times)
+  isTimed = false
+  selectedTime1 = Times.FIVE_MINUTES
+  selectedTime2 = Times.FIVE_MINUTES
   timesMap = new Map<Times, number>()
 
-  async ngOnInit() {
-    this.timesMap.set(Times.ONE_MINUTE, 1)
-    this.timesMap.set(Times.FIVE_MINUTES, 5)
-    this.timesMap.set(Times.TEN_MINUTES, 10)
-    this.timesMap.set(Times.HALF_HOUR, 30)
-    this.timesMap.set(Times.HOUR, 60)
+  ngOnInit() {
+    this.timesMap.set(Times.ONE_MINUTE, 60)
+    this.timesMap.set(Times.FIVE_MINUTES, 300)
+    this.timesMap.set(Times.TEN_MINUTES, 600)
+    this.timesMap.set(Times.HALF_HOUR, 1800)
+    this.timesMap.set(Times.HOUR, 3600)
 
     this.route.params.subscribe(async params => {
       const lobby = await this.lobbyService.getLobbyById(params.id)
@@ -68,6 +78,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
   get lastWebsocketMessage(){
     return this.lastMessage
   }
+
+
 
   connectWebsocket(lobbyId: string){
     this.subject.asObservable().subscribe(
@@ -114,9 +126,18 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
   }
 
+  async changeTime(){
+    if(this.lobby && this.username == this.lobby.player_one_username){
+      this.lobby.is_timed = this.isTimed
+      this.lobby.player_one_time = this.timesMap.get(this.selectedTime1) || -1
+      this.lobby.player_two_time = this.timesMap.get(this.selectedTime2) || -1
+      await this.lobbyService.updateLobby(this.lobby)
+    }
+  }
+
   async startGame() {
     if (this.lobby &&  this.player_one && this.player_two&& this.username== this.lobby.player_one_username) {
-      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, this.lobby.is_ranked, this.timesMap.get(this.selectedTime) || 5)
+      await this.lobbyService.startGame(this.lobby.game_id, this.player_one, this.player_two, this.lobby.is_ranked, this.isTimed, this.timesMap.get(this.selectedTime1) || -1, this.timesMap.get(this.selectedTime2) || -1)
       this.router.navigate(['/game', this.lobby.game_id])
     }
 
@@ -134,6 +155,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
     if(this.lobby?.lobby_status == LobbyStatus.GAME_STARTED)
       this.router.navigate(['/game', this.lobby.game_id])
 
+    this.isTimed = this.lobby.is_timed
+    this.selectedTime1 = getByValue(this.timesMap, this.lobby.player_one_time)
+    this.selectedTime2 = getByValue(this.timesMap, this.lobby.player_two_time)
     this.player_one = this.lobby.player_one_username
     this.player_two = this.lobby.player_two_username
     this.name = this.lobby.name
