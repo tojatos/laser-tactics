@@ -4,7 +4,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/Utils/Constants';
-import { GamePhase, PlayerType } from '../../src/Utils/Enums';
+import { GamePhase, PlayerType, Theme } from '../../src/Utils/Enums';
 import { Game } from '../../src/Controller/Game';
 import { BoardLogComponent } from '../board-log/board-log.component';
 
@@ -27,6 +27,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly minWidth = 695
   animation = true
   sounds = true
+  theme = Theme.CLASSIC
+  backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
 
   constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
 
@@ -52,7 +54,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
           this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
           (<urlModel>params).id,
           this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
-          this.animation, this.sounds)
+          this.animation, this.sounds, this.theme)
       })()
   })
   }
