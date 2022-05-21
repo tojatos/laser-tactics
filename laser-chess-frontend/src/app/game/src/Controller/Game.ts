@@ -229,12 +229,13 @@ export class Game{
     this.whoseTurn = PlayerType.PLAYER_TWO
   }
 
-  async showGameEvent(gameEvents: GameEvent[]): Promise<void>{
+  async showGameEvent(gameEvents: GameEvent[], isContinued: boolean, spectableHistory: boolean): Promise<void>{
     if(this.gameCanvas){
       this.analyzeMode = analyzeModes.ANALYZING
       this.gameCanvas.interactable = false
-      this.board.setInitialGameState(this.initialGameState, this.displaySize)
-      await this.executePendingActions(gameEvents, gameEvents.length, false, false, false)
+      if(!isContinued || !spectableHistory)
+        this.board.setInitialGameState(this.initialGameState, this.displaySize)
+      await this.executePendingActions(gameEvents, gameEvents.length, spectableHistory, spectableHistory, spectableHistory)
       if(gameEvents.slice(-1)[0].event_type == GameEvents.LASER_SHOT_EVENT || gameEvents.slice(-1)[0].event_type == GameEvents.PIECE_DESTROYED_EVENT)
         for(let i = gameEvents.length-1; i > 0; i--)
           if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){

@@ -7,6 +7,7 @@ import { COLS, ROWS } from '../../src/Utils/Constants';
 import { GamePhase, PlayerType } from '../../src/Utils/Enums';
 import { Game } from '../../src/Controller/Game';
 import { BoardLogComponent } from '../board-log/board-log.component';
+import { clone } from 'lodash';
 
 @Component({
   selector: 'app-board',
@@ -27,6 +28,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly minWidth = 695
   animation = true
   sounds = true
+  lastPassedGameStateSize = 0
 
   constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
 
@@ -84,8 +86,14 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  buildEvent(gameEvents: GameEvent[]): void{
-    void this.game.showGameEvent(gameEvents)
+  buildEvent(gameInfo: [GameEvent[], boolean]): void{
+    const lastPassBuffer = clone(gameInfo[0].length)
+    if(this.lastPassedGameStateSize < gameInfo[0].length && gameInfo[1])
+      gameInfo[0].splice(0, this.lastPassedGameStateSize)
+    else if(this.lastPassedGameStateSize > gameInfo[0].length)
+      this.lastPassedGameStateSize = 0
+    void this.game.showGameEvent(gameInfo[0], this.lastPassedGameStateSize > 0, gameInfo[1])
+    this.lastPassedGameStateSize = lastPassBuffer
   }
 
   returnToCurrentEvent(): void{
