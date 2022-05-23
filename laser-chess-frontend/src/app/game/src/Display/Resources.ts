@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { PieceColors, PieceType, PlayerType } from "../Utils/Enums";
+import { PieceColors, PieceType, PlayerType, Theme } from "../Utils/Enums";
 import { Piece } from "../GameStateData/Piece";
 
 export type PieceImageElement = {
@@ -12,44 +12,47 @@ export class Resources {
 
   boardImage: HTMLImageElement = new Image()
   pieceImages: Map<string, HTMLImageElement> = new Map()
-  move: () => HTMLAudioElement = () => new Audio("assets/sounds/move.wav")
-  laser: () => HTMLAudioElement = () => new Audio("assets/sounds/laser.mp3")
-  teleport: () => HTMLAudioElement = () => new Audio("assets/sounds/teleport.mp3")
-  destroy: () => HTMLAudioElement = () => new Audio("assets/sounds/destroy.mp3")
-  take: () => HTMLAudioElement = () => new Audio("assets/sounds/take.mp3")
-  rotate: () => HTMLAudioElement = () => new Audio("assets/sounds/rotate.wav")
-  deflect: () => HTMLAudioElement = () => new Audio("assets/sounds/deflect.mp3")
+  theme: Theme = Theme.CLASSIC
 
-  async loadAssets(): Promise<void>{
-    await this.loadBoardImage()
-    await this.loadPiecesImages()
-   }
+  move: () => HTMLAudioElement = () => new Audio(`assets/${this.theme}/sounds/move.wav`)
+  laser: () => HTMLAudioElement = () => new Audio(`assets/${this.theme}/sounds/laser.mp3`)
+  teleport: () => HTMLAudioElement = () => new Audio(`assets/${this.theme}/sounds/teleport.mp3`)
+  destroy: () => HTMLAudioElement = () => new Audio(`assets/${this.theme}/sounds/destroy.mp3`)
+  take: () => HTMLAudioElement = () => new Audio(`assets/${this.theme}/sounds/take.mp3`)
+  rotate: () => HTMLAudioElement = () => new Audio(`assets/${this.theme}/sounds/rotate.wav`)
+  deflect: () => HTMLAudioElement = () => new Audio(`assets/${this.theme}/sounds/deflect.mp3`)
 
-  private async loadBoardImage(): Promise<void> {
-    await this.loadElement(this.boardImage, "assets/board.svg")
+  async loadAssets(theme: Theme): Promise<void>{
+    this.theme = theme
+    await this.loadBoardImage(theme)
+    await this.loadPiecesImages(theme)
   }
 
-  private async loadPiecesImages(): Promise<void>{
+  private async loadBoardImage(theme: string): Promise<void> {
+    await this.loadElement(this.boardImage, `assets/${theme}/board.svg`)
+  }
+
+  private async loadPiecesImages(theme: string): Promise<void>{
 
     Object.values(PieceColors).forEach(p => {
       void Promise.all([
-        this.loadPieceElement(PieceType.BEAM_SPLITTER, p),
-        this.loadPieceElement(PieceType.BLOCK, p),
-        this.loadPieceElement(PieceType.DIAGONAL_MIRROR, p),
-        this.loadPieceElement(PieceType.HYPER_CUBE, p),
-        this.loadPieceElement(PieceType.KING, p),
-        this.loadPieceElement(PieceType.LASER, p),
-        this.loadPieceElement(PieceType.MIRROR, p),
-        this.loadPieceElement(PieceType.TRIANGULAR_MIRROR, p)
+        this.loadPieceElement(PieceType.BEAM_SPLITTER, p, theme),
+        this.loadPieceElement(PieceType.BLOCK, p, theme),
+        this.loadPieceElement(PieceType.DIAGONAL_MIRROR, p, theme),
+        this.loadPieceElement(PieceType.HYPER_CUBE, p, theme),
+        this.loadPieceElement(PieceType.KING, p, theme),
+        this.loadPieceElement(PieceType.LASER, p, theme),
+        this.loadPieceElement(PieceType.MIRROR, p, theme),
+        this.loadPieceElement(PieceType.TRIANGULAR_MIRROR, p, theme)
       ])
     })
 
-    await this.loadPieceElement(PieceType.HYPER_SQUARE, "")
-    await this.loadPieceElement(PieceType.UNKNOWN, "")
+    await this.loadPieceElement(PieceType.HYPER_SQUARE, "", theme)
+    await this.loadPieceElement(PieceType.UNKNOWN, "", theme)
 
   }
 
-  private async loadPieceElement(name: string, color: string): Promise<void> {
+  private async loadPieceElement(name: string, color: string, theme: string): Promise<void> {
 
     const newImage: PieceImageElement = ({
       name: name,
@@ -58,7 +61,7 @@ export class Resources {
 
     const image = new Image()
 
-    await this.loadElement(image, `assets/${name + color}.svg`)
+    await this.loadElement(image, `assets/${theme}/${name + color}.svg`)
     this.pieceImages.set(JSON.stringify(newImage), image)
   }
 

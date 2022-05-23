@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, String, Enum, DateTime, Float, ForeignKey
 
 from .database import Base
-from .schemas import FriendRequestStatus, LobbyStatus, GameResult
+from .schemas import FriendRequestStatus, LobbyStatus, GameResult, UserTheme
 
 
 class User(Base):
@@ -60,9 +60,12 @@ class Lobby(Base):
     game_id = Column(String)
     is_ranked = Column(Boolean, default=False)
     is_private = Column(Boolean, default=False)
+    is_timed = Column(Boolean, default=False)
     starting_position_reversed = Column(Boolean, default=False)
     lobby_status = Column(Enum(LobbyStatus))
     lobby_creation_date = Column(DateTime)
+    player_one_time = Column(Integer, nullable=True)
+    player_two_time = Column(Integer, nullable=True)
 
 
 class FriendRequests(Base):
@@ -88,4 +91,5 @@ class UserSettings(Base):
     username = Column(String, primary_key=True)
     skip_animations = Column(Boolean, default=False)
     sound_on = Column(Boolean, default=True)
+    theme = Column(Enum(UserTheme), default=UserTheme.CLASSIC)
 

@@ -16,6 +16,8 @@ router = APIRouter(
 
 @router.post("/send_verification_email")
 async def send_verification_email(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    return {'detail': "Feature temporary disabled"}
+    """
     username = current_user.username
     db_user = crud.get_user(db, username=username)
     if not db_user:
@@ -39,10 +41,12 @@ async def send_verification_email(current_user: schemas.User = Depends(get_curre
     fm = FastMail(verify_conf)
     await fm.send_message(message, template_name=verification_template())
     return {'detail': "Verification email sent"}
-
+"""
 
 @router.post("/send_password_change_request")
 async def send_password_change_email(emailSchema: schemas.EmailSchema, db: Session = Depends(get_db)):
+    return {'detail': "Feature temporary disabled"}
+    """
     email = emailSchema.email
     db_user = crud.get_user_by_email(db, email=email)
     if not db_user:
@@ -65,3 +69,4 @@ async def send_password_change_email(emailSchema: schemas.EmailSchema, db: Sessi
     fm = FastMail(conf)
     await fm.send_message(message, template_name=change_password_template())
     return {'detail': "Verification email sent"}
+"""

@@ -29,6 +29,14 @@ class GameResult(AutoNameEnum):
     DRAW = auto()
 
 
+class UserTheme(AutoNameEnum):
+    CLASSIC = auto()
+    WOOD = auto()
+    WOOD2 = auto()
+    BLACK_AND_WHITE = auto()
+    CRYSTAL = auto()
+
+
 class ChangePasswordSchema(BaseModel):
     oldPassword: str
     newPassword: str
@@ -157,7 +165,10 @@ class LobbyEditData(BaseModel):
     player_one_username: str
     is_ranked: bool
     is_private: bool
+    is_timed: bool
     starting_position_reversed: bool
+    player_one_time: Optional[int]
+    player_two_time: Optional[int]
 
     @validator('name')
     def name_not_empty(cls, value):
@@ -185,9 +196,12 @@ class Lobby(BaseModel):
     player_two_username: Optional[str] = None
     is_ranked: bool = False
     is_private: bool = False
+    is_timed: bool = False
     starting_position_reversed: bool = False
     lobby_status: LobbyStatus
     lobby_creation_date: dt.datetime
+    player_one_time: Optional[int]
+    player_two_time: Optional[int]
 
     class Config:
         orm_mode = True
@@ -262,6 +276,7 @@ class Stats(BaseModel):
 class Settings(BaseModel):
     skip_animations: bool = False
     sound_on: bool = True
+    theme: UserTheme = UserTheme.CLASSIC
 
     class Config:
         orm_mode = True
@@ -271,4 +286,3 @@ class JoinRandomRequest(BaseModel):
     rating_lower_bound: int
     rating_higher_bound: int
     is_rated: bool
-

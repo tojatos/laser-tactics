@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from starlette.websockets import WebSocket
 
@@ -40,7 +42,8 @@ def before_all():
     for user in create_user_datas:
         verify_user(session, user["username"])
     start_game_request = StartGameRequest(game_id, create_user_datas[0]['username'], create_user_datas[1]['username'],
-                                          True)
+                                          True, True, 200, 200)
+
     start_game_response = tu.post_data(
         "/lobby/start_game",
         tokens[0],
@@ -133,6 +136,7 @@ def test_start_game(ws):
     assert game_state.game_phase is GamePhase.STARTED
     assert game_state.turn_number is 1
     assert game_state.is_rated is True
+    assert game_state.is_timed is True
 
 
 def test_auth(ws):

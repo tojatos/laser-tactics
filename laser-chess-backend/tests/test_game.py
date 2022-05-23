@@ -1,5 +1,6 @@
 from app.game_engine.game import Game
 from app.game_engine.models import *
+import time
 
 
 def get_initial_test_game_state() -> GameState:
@@ -11,7 +12,8 @@ def get_initial_test_game_state() -> GameState:
 def get_test_game_state(board: Board) -> GameState:
     player_one_id = "player1"
     player_two_id = "player2"
-    return GameState(player_one_id, player_two_id, board, GamePhase.NOT_STARTED, 0, [], [], False)
+    return GameState(player_one_id, player_two_id, board, GamePhase.NOT_STARTED, 0, [], [], False, True, datetime.now(), 200,
+                     200, datetime.now())
 
 
 def test_start_game():
@@ -698,3 +700,52 @@ def test_take_hyper_cube():
     game.move((0, 0), (1, 0))
 
     assert game.validate_move(Player.PLAYER_TWO, (2, 0), (1, 0))[0] is True
+
+
+def test_clock():
+    board: Board = Board({
+        (0, 0): Piece(PieceType.BLOCK, Player.PLAYER_ONE),
+        (1, 0): Piece(PieceType.HYPER_CUBE, Player.PLAYER_ONE),
+        (2, 0): Piece(PieceType.BLOCK, Player.PLAYER_TWO),
+        (3, 0): Piece(PieceType.KING, Player.PLAYER_ONE),
+        (4, 0): Piece(PieceType.KING, Player.PLAYER_TWO),
+    })
+    initial_state = get_test_game_state(board)
+    game = Game(initial_state)
+    game.start_game()
+
+    from_cell_coordinates = (1, 0)
+    to_cell_coordinates = (2, 0)
+    game.move(from_cell_coordinates, to_cell_coordinates)
+    time.sleep(2)
+    from_cell_coordinates = (2, 0)
+    to_cell_coordinates = (3, 0)
+    game.move(from_cell_coordinates, to_cell_coordinates)
+    p1time, p2time = game.game_state.player_one_time_left, game.game_state.player_two_time_left
+    assert p1time == 200 - 2
+    assert p2time == 200
+
+    from_cell_coordinates = (4, 0)
+    to_cell_coordinates = (3, 0)
+    game.move(from_cell_coordinates, to_cell_coordinates)
+    time.sleep(2)
+    from_cell_coordinates = (3, 0)
+    to_cell_coordinates = (4, 0)
+    game.move(from_cell_coordinates, to_cell_coordinates)
+    p1time, p2time = game.game_state.player_one_time_left, game.game_state.player_two_time_left
+    assert p1time == 200 - 2
+    assert p2time == 200 - 2
+
+    time.sleep(1)
+    from_cell_coordinates = (1, 0)
+    to_cell_coordinates = (2, 0)
+    game.move(from_cell_coordinates, to_cell_coordinates)
+    time.sleep(1)
+    from_cell_coordinates = (2, 0)
+    to_cell_coordinates = (3, 0)
+    game.move(from_cell_coordinates, to_cell_coordinates)
+    p1time, p2time = game.game_state.player_one_time_left, game.game_state.player_two_time_left
+    assert p1time == 200 - 4
+    assert p2time == 200 - 2
+
+

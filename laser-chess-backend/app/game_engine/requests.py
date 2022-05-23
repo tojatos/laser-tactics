@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Union
+from typing import Union, Optional
 
 from pydantic.dataclasses import dataclass
 
@@ -16,6 +16,7 @@ class GameApiRequestPath(str, Enum):
     OfferDraw = "/offer_draw"
     WebsocketAuth = "/ws_auth"
     WebsocketObserve = "/ws_observe"
+    Timeout = "/timeout"
 
 
 @dataclass
@@ -39,6 +40,9 @@ class StartGameRequest:
     player_one_id: str
     player_two_id: str
     is_rated: bool
+    is_timed: bool
+    player_one_time: Optional[int] = -1
+    player_two_time: Optional[int] = -1
 
 
 @dataclass
@@ -66,6 +70,12 @@ class GiveUpRequest:
 
 
 @dataclass
+class TimeoutRequest:
+    game_id: str
+    player_nr: int
+
+
+@dataclass
 class OfferDrawRequest:
     game_id: str
 
@@ -77,10 +87,11 @@ AuthenticatedGameApiRequestPaths = {
     GameApiRequestPath.RotatePiece,
     GameApiRequestPath.GiveUp,
     GameApiRequestPath.OfferDraw,
+    GameApiRequestPath.Timeout,
 }
 
 GameApiRequest = Union[GetGameStateRequest, StartGameRequest, ShootLaserRequest, MovePieceRequest, RotatePieceRequest,
-                       GiveUpRequest, OfferDrawRequest, WebsocketAuthRequest, WebsocketObserveRequest]
+                       GiveUpRequest, OfferDrawRequest, TimeoutRequest, WebsocketAuthRequest, WebsocketObserveRequest]
 
 
 @dataclass

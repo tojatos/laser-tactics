@@ -14,6 +14,14 @@
             </mat-slide-toggle>
             <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sound">Sounds
             </mat-slide-toggle>
+            <mat-form-field appearance="fill">
+              <mat-label>Selected Theme</mat-label>
+              <mat-select [(ngModel)]="selectedTheme" (selectionChange)="changeThemeOption()" name="theme">
+                <mat-option *ngFor="let theme of themes" [value]="theme">
+                  {{theme}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
         </mat-card>
     </div>
 

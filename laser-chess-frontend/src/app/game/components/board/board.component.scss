@@ -1,7 +1,4 @@
-$imagePath: "/assets/board.svg";
-
 .gameCanvas {
-  background-image: url($imagePath);
   background-size: cover;
   z-index: 1;
   position: absolute;
@@ -47,7 +44,7 @@ mat-icon {
 }
 
 .btns {
-  margin-top: -2%;
+  margin-top: 10%;
 }
 
 a {
@@ -56,4 +53,9 @@ a {
 
 .sliders {
   margin-top: -3%;
+  min-width: 100px;
+}
+
+.app-clock {
+  margin: 0 auto;
 }

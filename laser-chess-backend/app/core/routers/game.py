@@ -70,6 +70,8 @@ async def websocket_endpoint(websocket: WebSocket,
                             game_service.move_piece(current_user.username, websocket_request.request, db)
                         if websocket_request.request_path is GameApiRequestPath.RotatePiece:
                             game_service.rotate_piece(current_user.username, websocket_request.request, db)
+                        if websocket_request.request_path is GameApiRequestPath.Timeout:
+                            game_service.timeout(current_user.username, websocket_request.request, db)
                         game_state = game_service.get_game_state(websocket_request.request, db)
                         await send_websocket_response(200)
                         await manager.notify(websocket_request.request.game_id, dataclasses.asdict(game_state))

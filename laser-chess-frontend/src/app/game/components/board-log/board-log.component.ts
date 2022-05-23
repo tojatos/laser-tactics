@@ -36,8 +36,8 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
       if(newChange && newChange.game_events.length > 0){
         this.validGameState = cloneDeep(this.gameState)
         if(this.validGameState){
-        this.validGameState.user_events = this.validGameState.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT)
-        this.validGameState.game_events = this.validGameState.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT)
+        this.validGameState.user_events = this.validGameState.user_events.filter(ue => ue.event_type != GameEvents.OFFER_DRAW_EVENT && ue.event_type != GameEvents.GIVE_UP_EVENT && ue.event_type != GameEvents.TIMEOUT_EVENT)
+        this.validGameState.game_events = this.validGameState.game_events.filter(ge => ge.event_type != GameEvents.OFFER_DRAW_EVENT && ge.event_type != GameEvents.GIVE_UP_EVENT && ge.event_type != GameEvents.TIMEOUT_EVENT)
         this.divideArrayOnUserEventChains()
         this.validGameState.user_events.forEach((_, i) => {
           this.notationList.push(this.eventNotation(i))
@@ -127,6 +127,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
         || gameEvent?.event_type == GameEvents.LASER_SHOT_EVENT
         || gameEvent?.event_type == GameEvents.OFFER_DRAW_EVENT
         || gameEvent?.event_type == GameEvents.GIVE_UP_EVENT
+        || gameEvent?.event_type == GameEvents.TIMEOUT_EVENT
   }
 
 }

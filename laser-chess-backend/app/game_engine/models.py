@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic.dataclasses import dataclass
 from enum import Enum, auto
 from typing import Dict, List, Optional, Tuple, Union
@@ -60,7 +62,7 @@ class EventType(str, AutoNameEnum):
     SHOOT_LASER_EVENT = auto()
     GIVE_UP_EVENT = auto()
     OFFER_DRAW_EVENT = auto()
-
+    TIMEOUT_EVENT = auto()
 
 @dataclass
 class Piece:
@@ -101,6 +103,18 @@ class Board:
 class GiveUpEvent:
     player: Player
     event_type: str = EventType.GIVE_UP_EVENT
+
+    def to_serializable(self):
+        return self
+
+    def to_normal(self):
+        return self
+
+
+@dataclass
+class TimeoutEvent:
+    player_nr: int
+    event_type: str = EventType.TIMEOUT_EVENT
 
     def to_serializable(self):
         return self
@@ -291,14 +305,14 @@ class LaserShotEventSerializable:
 
 
 GameEvent = Union[PieceRotatedEvent, PieceMovedEvent, TeleportEvent, LaserShotEvent, PieceTakenEvent,
-                  PieceDestroyedEvent, GiveUpEvent, OfferDrawEvent]
-UserEvent = Union[PieceRotatedEvent, PieceMovedEvent, ShootLaserEvent, GiveUpEvent, OfferDrawEvent]
+                  PieceDestroyedEvent, GiveUpEvent, OfferDrawEvent, TimeoutEvent]
+UserEvent = Union[PieceRotatedEvent, PieceMovedEvent, ShootLaserEvent, GiveUpEvent, OfferDrawEvent, TimeoutEvent]
 
 GameEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, TeleportEventSerializable,
                               LaserShotEventSerializable, PieceTakenEventSerializable, PieceDestroyedEventSerializable,
-                              GiveUpEvent, OfferDrawEvent]
+                              GiveUpEvent, OfferDrawEvent, TimeoutEvent]
 UserEventSerializable = Union[PieceRotatedEventSerializable, PieceMovedEventSerializable, ShootLaserEvent, GiveUpEvent,
-                              OfferDrawEvent]
+                              OfferDrawEvent, TimeoutEvent]
 
 
 @dataclass
@@ -311,6 +325,11 @@ class GameStateSerializable:
     game_events: List[GameEventSerializable]
     user_events: List[UserEventSerializable]
     is_rated: bool
+    is_timed: bool
+    game_start_timestamp: str
+    player_one_time_left: int
+    player_two_time_left: int
+    last_clock_update: str
 
     def to_normal(self) -> "GameState":
         return GameState(
@@ -321,7 +340,12 @@ class GameStateSerializable:
             turn_number=self.turn_number,
             game_events=list(map(lambda x: x.to_normal(), self.game_events)),
             user_events=list(map(lambda x: x.to_normal(), self.user_events)),
-            is_rated=self.is_rated
+            is_rated=self.is_rated,
+            is_timed=self.is_timed,
+            game_start_timestamp=datetime.fromisoformat(self.game_start_timestamp),
+            player_one_time_left=self.player_one_time_left,
+            player_two_time_left=self.player_two_time_left,
+            last_clock_update=datetime.fromisoformat(self.last_clock_update),
         )
 
 
@@ -335,6 +359,11 @@ class GameState:
     game_events: List[GameEvent]
     user_events: List[UserEvent]
     is_rated: bool
+    is_timed: bool
+    game_start_timestamp: datetime
+    player_one_time_left: int
+    player_two_time_left: int
+    last_clock_update: datetime
 
     def to_serializable(self) -> GameStateSerializable:
         return GameStateSerializable(
@@ -346,10 +375,15 @@ class GameState:
             game_events=list(map(lambda x: x.to_serializable(), self.game_events)),
             user_events=list(map(lambda x: x.to_serializable(), self.user_events)),
             is_rated=self.is_rated,
+            is_timed=self.is_timed,
+            game_start_timestamp=self.game_start_timestamp.isoformat(),
+            player_one_time_left=self.player_one_time_left,
+            player_two_time_left=self.player_two_time_left,
+            last_clock_update=self.last_clock_update.isoformat(),
         )
 
 
-def empty_game_state(player_one_id, player_two_id, is_rated=False) -> GameState:
+def empty_game_state(player_one_id, player_two_id, is_rated=False, is_timed=False, player_one_time=-1, player_two_time=-1) -> GameState:
     board: Board = Board(cells={
         (0, 0): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE),
         (1, 0): Piece(PieceType.TRIANGULAR_MIRROR, Player.PLAYER_ONE),
@@ -444,4 +478,4 @@ def empty_game_state(player_one_id, player_two_id, is_rated=False) -> GameState:
     game_phase: GamePhase = GamePhase.NOT_STARTED
     turn_number: int = 0
 
-    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated)
+    return GameState(player_one_id, player_two_id, board, game_phase, turn_number, [], [], is_rated, is_timed, datetime.now(), player_one_time, player_two_time, datetime.now())

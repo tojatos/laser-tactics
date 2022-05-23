@@ -130,6 +130,9 @@ def update_lobby(db: Session, lobby: schemas.Lobby, lobby_new_data: schemas.Lobb
     lobby.name = lobby_new_data.name
     lobby.is_ranked = lobby_new_data.is_ranked
     lobby.is_private = lobby_new_data.is_private
+    lobby.is_timed = lobby_new_data.is_timed
+    lobby.player_one_time = lobby_new_data.player_one_time
+    lobby.player_two_time = lobby_new_data.player_two_time
     lobby.starting_position_reversed = lobby_new_data.starting_position_reversed
     db.commit()
     db.refresh(lobby)
@@ -266,7 +269,8 @@ def start_game(db: Session, game_state: GameState, request: StartGameRequest):
     db_game_state = models.GameStateTable(player_one_id=request.player_one_id,
                                           player_two_id=request.player_two_id,
                                           game_id=request.game_id,
-                                          game_state_json=game_state_json)
+                                          game_state_json=game_state_json,
+    )
     db.add(db_game_state)
     if lobby is not None:
         lobby.lobby_status = LobbyStatus.GAME_STARTED
@@ -526,6 +530,7 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     # change settings here
     db_settings.skip_animations = settings.skip_animations
     db_settings.sound_on = settings.sound_on
+    db_settings.theme = settings.theme
     # ------------------------------------------
     db.commit()
     db.refresh(db_settings)

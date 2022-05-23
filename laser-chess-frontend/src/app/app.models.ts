@@ -1,4 +1,5 @@
 import { LobbyStatus } from "./components/lobby/lobby.component";
+import { Theme } from "./game/src/Utils/Enums";
 
 export interface UserToken{
   access_token: string,
@@ -20,7 +21,10 @@ export interface Lobby {
   is_private: boolean,
   starting_position_reversed: boolean,
   lobby_status: LobbyStatus,
-  lobby_creation_date: string
+  lobby_creation_date: string,
+  is_timed: boolean,
+  player_one_time: number,
+  player_two_time: number
 }
 
 export interface Item {
@@ -65,6 +69,7 @@ export interface UserStats {
 export interface Settings {
   skip_animations: boolean
   sound_on: boolean
+  theme: Theme
 }
 
 export interface UserHistory {
