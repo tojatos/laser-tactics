@@ -41,11 +41,11 @@ def test_get_settings(tu):
 
 def test_change_settings(tu):
     response = tu.patch_data("/users/me/settings", tokens[0],
-                             json={"skip_animations": True, "sound_on": False, "theme": "WODDEN1"})
+                             json={"skip_animations": True, "sound_on": False, "theme": "WOOD"})
     assert response.status_code == 200
     assert response.json()["skip_animations"] == True
     assert response.json()["sound_on"] == False
-    assert response.json()["theme"] == "WODDEN1"
+    assert response.json()["theme"] == "WOOD"
 
     response = tu.get_data("/users/me/settings", tokens[0])
     assert response.status_code == 200

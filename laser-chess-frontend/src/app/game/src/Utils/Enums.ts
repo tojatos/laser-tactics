@@ -55,3 +55,9 @@ export enum EventsColors {
   PIECE_DESTROYED = "red",
   TELEPORT_EVENT = "blue"
 }
+
+export enum Theme {
+  CLASSIC = "classic",
+  FUTURE = "future",
+  WOOD = "wood"
+}

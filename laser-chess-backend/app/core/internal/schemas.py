@@ -31,8 +31,9 @@ class GameResult(AutoNameEnum):
 
 class UserTheme(AutoNameEnum):
     DEFAULT = auto()
-    WODDEN1 = auto()
-    WOODEN2 = auto()
+    WOOD = auto()
+    WOOD2 = auto()
+    BLACKNWHITE = auto()
 
 
 class ChangePasswordSchema(BaseModel):
