@@ -56,7 +56,6 @@ def test_accept_friend_request(tu):
     pending_requests = list(response.json())
     assert len(pending_requests) > 0
 
-    # thats wack
     response = tu.post_data(f"/users/me/friends/requests/accept", tokens[2], json={"id": pending_requests[0]['id']})
     assert response.status_code == 200
 

@@ -114,7 +114,7 @@ def test_websocket_notify_game_start(client):
         assert lobby_dict["player_two_username"] is not None
         assert lobby_dict["starting_position_reversed"] is True
 
-        start_game_request = StartGameRequest(game_id, "test0", "test1", False)
+        start_game_request = StartGameRequest(game_id, "test0", "test1", False, False)
         start_game_response = tu.post_data(
             "/lobby/start_game",
             tokens[0],
