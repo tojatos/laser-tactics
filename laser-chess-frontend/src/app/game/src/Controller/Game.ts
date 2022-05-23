@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, QueryList } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { UserService } from "src/app/services/user.service";
@@ -12,6 +12,7 @@ import { Drawings } from "../Display/Drawings";
 import { Resources } from "../Display/Resources";
 import { GameEvents, GamePhase, PlayerType } from "../Utils/Enums";
 import { EventsExecutor } from "./EventsExecutor";
+import { ClockComponent } from "../../components/clock/clock.component";
 
 enum analyzeModes {
   ANALYZING = "ANALYZING",
@@ -30,13 +31,17 @@ export class Game{
   enableSounds = true
   executingActions = false
   isInitiated = false
+  isTimed = false
   analyzeMode = analyzeModes.NOT_ANALYZING
   gamePhase: GamePhase = GamePhase.NOT_STARTED
   whoseTurn: PlayerType = PlayerType.NONE
+  activeTurn: [boolean, boolean] = [false, false]
   playerNames: [string | undefined, string | undefined] = [undefined, undefined]
   playerRankings: [number, number] = [0, 0]
   playerRankingsChanges : [number | undefined, number | undefined] = [undefined, undefined]
   initialGameState!: GameState
+  playerTimes: [number, number] = [0, 0]
+  clocks: QueryList<ClockComponent> | undefined
 
   constructor(public gameService: GameWebsocketService,
     private userService: UserService,
@@ -61,7 +66,7 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean): Promise<void>{
+  async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean, clocks: QueryList<ClockComponent>): Promise<void>{
     this.sizeScale = sizeScale
     this.gameId = gameId
     this.initialGameState = await this.gameService.getInitialGameState()
@@ -73,6 +78,7 @@ export class Game{
     this.gameActions = new GameActions(this.gameService, gameId)
     this.gameService.connect(this.gameId)
     this.gameCanvas.redrawGame(this.board)
+    this.clocks = clocks
   }
 
   destroyGame(): void{
@@ -87,12 +93,15 @@ export class Game{
     this.playerNames = [undefined, undefined]
     this.playerRankings = [0, 0]
     this.playerRankingsChanges = [undefined, undefined]
+    this.playerTimes = [0, 0]
+    this.clocks = undefined
   }
 
   async loadDisplay(displaySize: number, receivedGameState: GameState): Promise<void>{
 
     if(this.gameCanvas && this.gameActions){
 
+      this.isTimed = receivedGameState.is_timed
       this.board.initBoard(receivedGameState, displaySize)
       this.gameCanvas.initCanvas(this.board, this.gameActions)
       this.gameActions.initCanvas(this.gameCanvas)
@@ -220,13 +229,25 @@ export class Game{
     else
       console.error("Board not properly initialized")
 
-    this.gamePhase = newGameState.game_phase
-    this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
 
-  if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
-    this.whoseTurn = PlayerType.PLAYER_ONE
-  else if(newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
-    this.whoseTurn = PlayerType.PLAYER_TWO
+    this.whoseTurn = this.board.turnOfPlayer || PlayerType.NONE
+    this.gamePhase = newGameState.game_phase
+
+    if(this.gamePhase == GamePhase.STARTED){
+      const p1Turn = this.whoseTurn === PlayerType.PLAYER_ONE
+      this.activeTurn = this.gameCanvas ? this.gameCanvas.isReversed ? [!p1Turn, p1Turn] : [p1Turn, !p1Turn] : [false, false]
+    }
+    else
+      this.activeTurn = [false, false]
+
+    this.playerTimes = this.gameCanvas?.isReversed ? [newGameState.player_two_time_left, newGameState.player_one_time_left] : [newGameState.player_one_time_left, newGameState.player_two_time_left]
+
+    if(newGameState.game_phase == GamePhase.PLAYER_ONE_VICTORY)
+      this.whoseTurn = PlayerType.PLAYER_ONE
+    else if (newGameState.game_phase == GamePhase.PLAYER_TWO_VICTORY)
+      this.whoseTurn = PlayerType.PLAYER_TWO
+
+
   }
 
   async showGameEvent(gameEvents: GameEvent[]): Promise<void>{
@@ -271,6 +292,11 @@ export class Game{
       this.gameService.offerDraw(this.gameId)
   }
 
+  notifyTimeout(): void {
+    if(this.gameId && this.whoseTurn && this.whoseTurn != PlayerType.NONE && this.gamePhase == GamePhase.STARTED )
+      this.gameService.timeout(this.gameId, this.whoseTurn == PlayerType.PLAYER_ONE ? 1 : 2)
+  }
+
   passRotation(degree: number): void{
     if(this.gameActions)
       void this.gameActions.rotationPressed(this.board, degree)
@@ -296,5 +322,4 @@ export class Game{
       this.gameCanvas.redrawGame(this.board)
     }
   }
-
 }
