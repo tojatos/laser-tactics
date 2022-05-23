@@ -27,12 +27,16 @@ export class LobbyService {
     return this.http.post<Lobby>(createLobbyFullEndpoint(), {}).toPromise()
   }
 
-  startGame(game_id: string, player_one_id: string, player_two_id: string, is_rated: boolean){
+  startGame(game_id: string, player_one_id: string, player_two_id: string, is_rated: boolean, isTimed: boolean, time1: number, time2: number){
+
     const req: StartGameRequest = {
       game_id: game_id,
       player_one_id: player_one_id,
       player_two_id: player_two_id,
-      is_rated: is_rated
+      is_rated: is_rated,
+      is_timed: isTimed,
+      player_one_time: time1,
+      player_two_time: time2
     }
 
     return this.http.post<any>(startGameFullEndpoint, req).toPromise()

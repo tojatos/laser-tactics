@@ -11,10 +11,12 @@
       <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations</mat-slide-toggle> <br />
       <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds">Sounds</mat-slide-toggle>
     </div>
-    <div class="btns" *ngIf="isHandset && game.gamePhase === 'STARTED'">
-      <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()"><mat-icon>flag</mat-icon></button>
-      <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()"><mat-icon>volunteer_activism</mat-icon></button>
-    </div>
+    <app-clock
+    *ngIf="isTimed"
+    [serverTime]="game.playerTimes[1]"
+    [isActive]="game.activeTurn[1]"
+    (timeoutEmitter)="game.notifyTimeout()"
+    ></app-clock>
     <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[1]]">{{game.playerNames[1]}}</a></i>
       ({{game.playerRankings[1]}})
       <span *ngIf="game.playerRankingsChanges[1]" [ngStyle]="{'color': game.playerRankingsChanges[1] < 0 ? 'green' : 'red'}">
@@ -26,7 +28,18 @@
   <canvas #canvas class="gameCanvas" [ngStyle]="{'background-image': backgroundBoardUrl}"></canvas>
 </div>
 <div class="boardText">
-  <p></p>
+  <div class="sliders">
+    <div class="btns" *ngIf="isHandset && game.gamePhase === 'STARTED'">
+      <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()"><mat-icon>flag</mat-icon></button>
+      <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()"><mat-icon>volunteer_activism</mat-icon></button>
+    </div>
+  </div>
+<app-clock
+*ngIf="isTimed"
+[serverTime]="game.playerTimes[0]"
+[isActive]="game.activeTurn[0]"
+(timeoutEmitter)="game.notifyTimeout()"
+></app-clock>
 <h3><i matTooltip="View profile"><a [routerLink]="['/users', game.playerNames[0]]">{{game.playerNames[0]}}</a></i>
   ({{game.playerRankings[0]}})
   <span *ngIf="game.playerRankingsChanges[0]" [ngStyle]="{'color': game.playerRankingsChanges[0] < 0 ? 'green' : 'red'}">

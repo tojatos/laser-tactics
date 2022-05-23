@@ -25,6 +25,7 @@ export const observeWebsocketEndpoint = '/ws_observe'
 export const emailEndpoint = '/email'
 export const initialGameEndpoint = '/game/initial_game_state'
 export const gameHistoryEndpoint = '/game/history'
+export const timeoutEndpoint = '/timeout'
 
 export const usersFullEndpoint = fullEndpoint(userEndpoint)
 export const tokenFullEndpoint = fullEndpoint(tokenEndpoint)

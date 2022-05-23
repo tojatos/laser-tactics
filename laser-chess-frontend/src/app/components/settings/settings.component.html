@@ -16,7 +16,7 @@
             </mat-slide-toggle>
             <mat-form-field appearance="fill">
               <mat-label>Selected Theme</mat-label>
-              <mat-select [(ngModel)]="selectedTheme" name="theme">
+              <mat-select [(ngModel)]="selectedTheme" (selectionChange)="changeThemeOption()" name="theme">
                 <mat-option *ngFor="let theme of themes" [value]="theme">
                   {{theme}}
                 </mat-option>

@@ -84,6 +84,14 @@ class Game:
         self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player is Player.PLAYER_TWO \
             else GamePhase.PLAYER_TWO_VICTORY
 
+    def timeout(self, player_nr):
+        if not self.game_state.is_timed: raise AssertionError("game is not timed")
+        event = TimeoutEvent(player_nr)
+        self.game_state.user_events.append(event)
+        self.game_state.game_events.append(event)
+        self.game_state.game_phase = GamePhase.PLAYER_ONE_VICTORY if player_nr == 2 \
+            else GamePhase.PLAYER_TWO_VICTORY
+
     def offer_draw(self, player):
         game_draw_offers: List[OfferDrawEvent] = [e for e in self.game_state.user_events if
                                                   isinstance(e, OfferDrawEvent)]
@@ -97,9 +105,27 @@ class Game:
             if last_draw_offer.player != player and self.game_state.turn_number - last_draw_offer.turn_number < 3:
                 self.game_state.game_phase = GamePhase.DRAW
 
+    def update_clock(self):
+        if self.game_state.is_timed:
+            player = self.get_current_player()
+            now = datetime.now()
+            timediff = int((now - self.game_state.last_clock_update).total_seconds())
+            if player is Player.PLAYER_ONE:
+                self.game_state.player_one_time_left = self.game_state.player_one_time_left - timediff
+                if self.game_state.player_one_time_left < 0:
+                    self.game_state.player_one_time_left = 0
+                    self.timeout(1)
+            else:
+                self.game_state.player_two_time_left = self.game_state.player_two_time_left - timediff
+                if self.game_state.player_two_time_left < 0:
+                    self.game_state.player_two_time_left = 0
+                    self.timeout(2)
+            self.game_state.last_clock_update = now
+
     def start_game(self):
         self.game_state.game_phase = GamePhase.STARTED
         self.game_state.turn_number = 1
+        self.game_state.game_start_timestamp = datetime.now()
 
     def move(self, from_cell: CellCoordinates, to_cell: CellCoordinates):
         self.game_state.user_events.append(PieceMovedEvent(from_cell, to_cell))
@@ -135,6 +161,7 @@ class Game:
             if target_piece is not None:
                 self.game_state.game_events.append(
                     PieceTakenEvent(to_cell, moved_piece.piece_type, target_piece.piece_type))
+        self.update_clock()
         self.game_state.turn_number += 1
         self.check_victory()
 
@@ -143,6 +170,7 @@ class Game:
         self.game_state.board.cells[rotated_piece_at].rotation_degree = normalize_rotation(
             self.game_state.board.cells[rotated_piece_at].rotation_degree + rotation)
         self.game_state.game_events.append(PieceRotatedEvent(rotated_piece_at, rotation))
+        self.update_clock()
         self.game_state.turn_number += 1
 
     def shoot_laser(self, player: Player):
@@ -263,6 +291,7 @@ class Game:
         self.game_state.board.cells = cells_after_laser_hit
         self.game_state.game_events.append(LaserShotEvent(laser_path))
         self.game_state.game_events.extend(pieces_destroyed_by_laser_events)
+        self.update_clock()
         self.game_state.turn_number += 1
         self.check_victory()
 
@@ -308,6 +337,18 @@ class Game:
         return True, None
 
     def validate_give_up(self):
+        if not self.is_game_started():
+            return False, "The game has not started yet."
+
+        if self.is_game_over():
+            return False, "The game is over."
+        return True, None
+
+    def validate_timeout(self):
+
+        if not self.game_state.player_one_time_left > 0 and self.game_state.player_two_time_left > 0:
+            return False, "Players time has not run out yet"
+
         if not self.is_game_started():
             return False, "The game has not started yet."
 

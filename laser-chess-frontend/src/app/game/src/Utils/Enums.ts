@@ -30,7 +30,8 @@ export enum GameEvents {
   PIECE_TAKEN_EVENT = "PIECE_TAKEN_EVENT",
   PIECE_DESTROYED_EVENT = "PIECE_DESTROYED_EVENT",
   GIVE_UP_EVENT = "GIVE_UP_EVENT",
-  OFFER_DRAW_EVENT = "OFFER_DRAW_EVENT"
+  OFFER_DRAW_EVENT = "OFFER_DRAW_EVENT",
+  TIMEOUT_EVENT = "TIMEOUT_EVENT"
 }
 
 export enum GamePhase {
@@ -57,7 +58,9 @@ export enum EventsColors {
 }
 
 export enum Theme {
-  CLASSIC = "classic",
-  FUTURE = "future",
-  WOOD = "wood"
+  CLASSIC = "CLASSIC",
+  WOOD = "WOOD",
+  WOOD2 = "WOOD2",
+  BLACK_AND_WHITE = "BLACK_AND_WHITE",
+  CRYSTAL = "CRYSTAL"
 }

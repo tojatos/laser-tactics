@@ -13,16 +13,17 @@ export class SettingsComponent implements OnInit {
   sound = false
   userSettings: Settings | undefined
 
-  themes = Object.values(Theme)
+  themes = Object.values(Theme);
   selectedTheme = Theme.CLASSIC
 
   constructor (private userService: UserService) { }
 
   ngOnInit() {
-    this.userService.getSettings().toPromise().then(settings=> {
+    this.userService.getSettings().toPromise().then((settings: Settings)=> {
       this.userSettings = settings
       this.animation = !settings.skip_animations
       this.sound = settings.sound_on
+      this.selectedTheme = settings.theme
     })
   }
 
@@ -38,6 +39,13 @@ export class SettingsComponent implements OnInit {
     if (this.userSettings){
       !this.sound
       this.userSettings.sound_on = this.sound
+      this.userService.updateSettings(this.userSettings)
+    }
+  }
+
+  changeThemeOption(){
+    if (this.userSettings){
+      this.userSettings.theme = this.selectedTheme;
       this.userService.updateSettings(this.userSettings)
     }
   }

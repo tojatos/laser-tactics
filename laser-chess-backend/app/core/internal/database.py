@@ -20,7 +20,7 @@ def get_env(key, fallback):
 SQLALCHEMY_DATABASE_URL = get_env('SQLALCHEMY_DATABASE_URL', "postgresql://postgres:admin@localhost:5432/laserchess")
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, pool_size=500, max_overflow=-1
+    SQLALCHEMY_DATABASE_URL, pool_size=500, max_overflow=1000
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -6,7 +6,7 @@ import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/Utils/Constants';
 import { GamePhase, PlayerType, Theme } from '../../src/Utils/Enums';
 import { Game } from '../../src/Controller/Game';
-import { BoardLogComponent } from '../board-log/board-log.component';
+import { ClockComponent } from '../clock/clock.component';
 
 @Component({
   selector: 'app-board',
@@ -17,8 +17,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>
 
-  @ViewChild('logs', { static: true })
-  logsComponent: ElementRef<BoardLogComponent> | undefined
+  @ViewChildren(ClockComponent)
+  clockComponents!: QueryList<ClockComponent>
 
   readonly sizeScale = 0.07
   readonly handsetSize = 835
@@ -27,7 +27,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly minWidth = 695
   animation = true
   sounds = true
-  theme = Theme.CLASSIC
+  theme: Theme = Theme.CLASSIC
   backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
 
   constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
@@ -37,6 +37,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       const settings = await this.userService.getSettings().toPromise()
       this.animation = !settings.skip_animations
       this.sounds = settings.sound_on
+      this.theme = settings.theme
+      this.backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
     }
 
     if(!this.canvasGame.nativeElement.getContext('2d')){
@@ -54,7 +56,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
           this.isHandset ? this.currentSize * this.handsetScale : this.currentSize,
           (<urlModel>params).id,
           this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
-          this.animation, this.sounds, this.theme)
+          this.animation, this.sounds, this.clockComponents, this.theme)
       })()
   })
   }
@@ -153,5 +155,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   get isSpectator(): boolean {
     return this.game.authService.getUsername() != this.game.playerNames[0] && this.game.authService.getUsername() != this.game.playerNames[1]
   }
+
+  get isTimed(): boolean {
+    return this.game.isTimed
+  }
+  
 
 }
