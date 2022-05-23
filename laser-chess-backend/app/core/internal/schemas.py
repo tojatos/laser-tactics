@@ -29,6 +29,14 @@ class GameResult(AutoNameEnum):
     DRAW = auto()
 
 
+class UserTheme(AutoNameEnum):
+    CLASSIC = auto()
+    WOOD = auto()
+    WOOD2 = auto()
+    BLACK_AND_WHITE = auto()
+    CRYSTAL = auto()
+
+
 class ChangePasswordSchema(BaseModel):
     oldPassword: str
     newPassword: str
@@ -268,6 +276,7 @@ class Stats(BaseModel):
 class Settings(BaseModel):
     skip_animations: bool = False
     sound_on: bool = True
+    theme: UserTheme = UserTheme.CLASSIC
 
     class Config:
         orm_mode = True
@@ -277,4 +286,3 @@ class JoinRandomRequest(BaseModel):
     rating_lower_bound: int
     rating_higher_bound: int
     is_rated: bool
-
