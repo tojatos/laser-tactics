@@ -34,7 +34,7 @@ class UserTheme(AutoNameEnum):
     WOOD = auto()
     WOOD2 = auto()
     BLACK_AND_WHITE = auto()
-    CRYTSAL = auto()
+    CRYSTAL = auto()
 
 
 class ChangePasswordSchema(BaseModel):
