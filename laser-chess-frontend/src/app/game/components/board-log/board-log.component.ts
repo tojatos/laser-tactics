@@ -18,7 +18,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   @Input() maxHeight = 300
   @Input() gameFinished = false
   @Input() isSpectator = false
-  @Output() gameLogEmitter = new EventEmitter<GameEvent[]>()
+  @Output() gameLogEmitter = new EventEmitter()
   @Output() gameReturnEmitter = new EventEmitter()
   @Output() giveUpEmitter = new EventEmitter()
   @Output() drawEmitter = new EventEmitter()
@@ -26,6 +26,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   notationList: string[] = []
   validGameState: GameState | undefined
   userEventChains: GameEvent[][] = []
+  spectableHistory = true
 
   ngOnChanges(changes: SimpleChanges): void{
     if(changes.gameState){
@@ -51,8 +52,8 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     this.gameReturnEmitter.emit()
   }
 
-  buildEvent(gameEvents: GameEvent[]): void {
-    this.gameLogEmitter.emit(gameEvents)
+  buildEvent(gameEvents: GameEvent[], spectableHistory: boolean): void {
+    this.gameLogEmitter.emit([gameEvents, spectableHistory])
   }
 
   returnToCurrentEvent(): void{
@@ -65,7 +66,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     if(e == this.userEventChains.length-1)
       this.returnToCurrentEvent()
     else
-      this.gameLogEmitter.emit(this.userEventChains.slice(0, e+1).flat())
+      this.gameLogEmitter.emit([this.userEventChains.slice(0, e+1).flat(), this.spectableHistory])
     }
   }
 

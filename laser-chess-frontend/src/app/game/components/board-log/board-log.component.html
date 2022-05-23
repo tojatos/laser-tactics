@@ -1,4 +1,5 @@
 <h3>Game logs</h3>
+<mat-slide-toggle (change)="!spectableHistory" [(ngModel)]="spectableHistory">Animated</mat-slide-toggle> <br />
 <mat-selection-list #userEvents [style.height.px]="maxHeight"
 (selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)"
 [multiple]="false">

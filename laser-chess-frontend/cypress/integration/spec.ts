@@ -202,6 +202,7 @@ it('Test logs', () => {
   expect(beamSplitterPosition.piece.piece_type).to.be.equal("BEAM_SPLITTER")
   expect(beamSplitterPosition.piece.rotation_degree).to.be.equal(90)
 
+  cy.get("#mat-slide-toggle-3 > .mat-slide-toggle-label > .mat-slide-toggle-bar").click().then(() =>{
   cy.get('[ng-reflect-value="0"] > .mat-list-item-content').click().then(() => {
 
     const teleportPosition = getCell(gameComponent, 5, 5)
@@ -227,6 +228,7 @@ it('Test logs', () => {
         expect(beamSplitterPosition.piece.rotation_degree).to.be.equal(90)
     })
   })
+})
 })
 
 
