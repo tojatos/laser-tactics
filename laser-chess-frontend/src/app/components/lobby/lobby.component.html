@@ -3,7 +3,7 @@
         <button mat-stroked-button color="warn" class="leave-lobby-button" (click)="leaveLobby()"> Leave lobby </button>
     </div>
     <div class="main-wrapper" fxFlex="10" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
-        <mat-card class="mat-card-lobby"> 
+        <mat-card class="mat-card-lobby">
             <input class="input-box" #box (keyup.enter)="onEnter(box.value)" placeholder={{name}}> </mat-card>
     </div>
     <div class="main-wrapper" fxFlex="20" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
@@ -23,6 +23,26 @@
     <div class="main-wrapper" fxFlex="20" fxFlexAlign="stretch" fxLayoutGap="30px" fxLayout="column"
         fxLayoutAlign="start center">
         <button mat-stroked-button [disabled]="!isPlayerOne" (click)="changePlayers()"> Change players </button>
+    </div>
+    <div class="main-wrapper" fxFlex="20" fxFlexAlign="stretch" fxLayoutGap="30px" fxLayout="row"
+        fxLayoutAlign="center center">
+        <mat-slide-toggle [disabled]="!isPlayerOne" (change)="changeTime()" [(ngModel)]="isTimed">Is game timed</mat-slide-toggle> <br />
+        <mat-form-field appearance="fill">
+          <mat-label>Red player time</mat-label>
+          <mat-select (selectionChange)="changeTime()" [disabled]="!isTimed || !isPlayerOne" [(value)]="selectedTime1">
+            <mat-option *ngFor="let time of times1" [value]="time">
+              {{time}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Blue player time</mat-label>
+            <mat-select (selectionChange)="changeTime()" [disabled]="!isTimed || !isPlayerOne" [(value)]="selectedTime2">
+              <mat-option *ngFor="let time of times2" [value]="time">
+                {{time}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
     </div>
     <div class="main-wrapper" fxFlexAlign="center" fxFlex="20" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
         <mat-card class="mat-card-lobby"> {{isRanked}} </mat-card>

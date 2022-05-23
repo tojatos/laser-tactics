@@ -4,7 +4,10 @@ export interface StartGameRequest {
   game_id: string,
   player_one_id: string,
   player_two_id: string,
-  is_rated: boolean
+  is_rated: boolean,
+  is_timed: boolean,
+  player_one_time: number,
+  player_two_time: number
 }
 
 export interface MovePieceRequest {

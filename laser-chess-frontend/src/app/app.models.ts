@@ -20,7 +20,10 @@ export interface Lobby {
   is_private: boolean,
   starting_position_reversed: boolean,
   lobby_status: LobbyStatus,
-  lobby_creation_date: string
+  lobby_creation_date: string,
+  is_timed: boolean,
+  player_one_time: number,
+  player_two_time: number
 }
 
 export interface Item {

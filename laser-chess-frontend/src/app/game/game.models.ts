@@ -1,16 +1,19 @@
 import { GameEvents, GamePhase, PieceType } from "./src/Utils/Enums";
 
-export type GameEvent = PieceRotatedEvent | PieceMovedEvent | TeleportEvent | LaserShotEvent | TakeEvent | PieceDestroyedEvent | DrawEvent | GiveUpEvent
-export type UserEvent = PieceRotatedEvent | PieceMovedEvent | LaserShotEvent | DrawEvent | GiveUpEvent
+export type GameEvent = PieceRotatedEvent | PieceMovedEvent | TeleportEvent | LaserShotEvent | TakeEvent | PieceDestroyedEvent | DrawEvent | GiveUpEvent | TimeoutEvent
+export type UserEvent = PieceRotatedEvent | PieceMovedEvent | LaserShotEvent | DrawEvent | GiveUpEvent | TimeoutEvent
 
 export interface GameState {
   game_id: string
   player_one_id: string
   player_two_id: string
+  player_one_time_left: number
+  player_two_time_left: number
   board: BoardInterface
   game_phase: GamePhase
   turn_number: number
   is_rated: boolean
+  is_timed: boolean
   game_events: GameEvent[]
   user_events: UserEvent[]
 }
@@ -34,6 +37,11 @@ export interface PieceInterface {
   piece_type: PieceType
   piece_owner: string
   rotation_degree: number
+}
+
+export interface TimeoutEvent {
+  event_type: GameEvents.TIMEOUT_EVENT
+  player_nr: number
 }
 
 export interface PieceRotatedEvent {
