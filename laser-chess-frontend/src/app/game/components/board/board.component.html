@@ -25,7 +25,7 @@
     </h3>
   </div>
 <div [style.width.px]="containerWidth" [style.height.px]="containerHeight" class="game-container">
-  <canvas #canvas class="gameCanvas"></canvas>
+  <canvas #canvas class="gameCanvas" [ngStyle]="{'background-image': backgroundBoardUrl}"></canvas>
 </div>
 <div class="boardText">
   <div class="sliders">

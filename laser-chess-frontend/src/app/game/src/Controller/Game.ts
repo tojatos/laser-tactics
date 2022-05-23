@@ -10,7 +10,7 @@ import { GameActions } from "../Display/Canvas/GameActions";
 import { GameCanvas } from "../Display/Canvas/GameCanvas";
 import { Drawings } from "../Display/Drawings";
 import { Resources } from "../Display/Resources";
-import { GameEvents, GamePhase, PlayerType } from "../Utils/Enums";
+import { GameEvents, GamePhase, PlayerType, Theme } from "../Utils/Enums";
 import { EventsExecutor } from "./EventsExecutor";
 import { ClockComponent } from "../../components/clock/clock.component";
 
@@ -66,11 +66,11 @@ export class Game{
     return (innerWidth > innerHeight ? innerHeight : innerWidth) * this.sizeScale
   }
 
-  async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean, clocks: QueryList<ClockComponent>): Promise<void>{
+  async initGame(canvas: HTMLCanvasElement, blockSize: number, gameId: string, sizeScale: number, animations: boolean, sounds: boolean, clocks: QueryList<ClockComponent>, theme: Theme): Promise<void>{
     this.sizeScale = sizeScale
     this.gameId = gameId
     this.initialGameState = await this.gameService.getInitialGameState()
-    await this.resources.loadAssets()
+    await this.resources.loadAssets(theme)
     this.showAnimations = animations
     this.enableSounds = sounds
     this.gameCanvas = new GameCanvas(this.gameService, this.authService, this.animations, this.drawings, canvas, blockSize, this.resources, gameId, this.enableSounds)

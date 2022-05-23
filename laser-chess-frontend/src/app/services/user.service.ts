@@ -35,6 +35,7 @@ export class UserService {
   }
 
   updateSettings(settings: Settings){
+    console.log(settings)
     return this.http.patch<Settings>(settingsFullEndpoint, settings).toPromise()
   }
 
