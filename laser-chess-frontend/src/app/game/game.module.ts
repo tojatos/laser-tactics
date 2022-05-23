@@ -15,9 +15,10 @@ import { BoardActionsComponent } from './components/board-actions/board-actions.
 import { BoardLogComponent } from './components/board-log/board-log.component';
 import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from '../app-routing.module';
+import { ClockComponent } from './components/clock/clock.component';
 
 @NgModule({
-  declarations: [GameComponent, BoardComponent, BoardActionsComponent, BoardActionsComponent, BoardLogComponent],
+  declarations: [GameComponent, BoardComponent, BoardActionsComponent, BoardActionsComponent, BoardLogComponent, ClockComponent],
   imports: [
     CommonModule,
     HttpClientModule,
