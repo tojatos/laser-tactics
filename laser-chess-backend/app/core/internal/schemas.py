@@ -30,9 +30,11 @@ class GameResult(AutoNameEnum):
 
 
 class UserTheme(AutoNameEnum):
-    DEFAULT = auto()
-    WODDEN1 = auto()
-    WOODEN2 = auto()
+    CLASSIC = auto()
+    WOOD = auto()
+    WOOD2 = auto()
+    BLACK_AND_WHITE = auto()
+    CRYTSAL = auto()
 
 
 class ChangePasswordSchema(BaseModel):
@@ -274,7 +276,7 @@ class Stats(BaseModel):
 class Settings(BaseModel):
     skip_animations: bool = False
     sound_on: bool = True
-    theme: UserTheme = UserTheme.DEFAULT
+    theme: UserTheme = UserTheme.CLASSIC
 
     class Config:
         orm_mode = True
