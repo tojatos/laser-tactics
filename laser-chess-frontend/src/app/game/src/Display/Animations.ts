@@ -204,6 +204,14 @@ export class Animations {
               this.drawings.drawLaserCorner(canvas, toCell.canvasCoordinates, isReverse)
             }
 
+            const lasers = board.cells.filter(bc => bc.piece?.piece_type == PieceType.LASER)
+            if(lasers){
+              lasers.forEach(l => {
+                if(l.piece)
+                  this.drawings.drawPiece(canvas, l.piece, isReverse)
+                })
+            }
+
           }
         }
 

@@ -13,6 +13,7 @@ import { Resources } from "../Display/Resources";
 import { GameEvents, GamePhase, PlayerType, Theme } from "../Utils/Enums";
 import { EventsExecutor } from "./EventsExecutor";
 import { ClockComponent } from "../../components/clock/clock.component";
+import { BoardLogComponent } from "../../components/board-log/board-log.component";
 
 enum analyzeModes {
   ANALYZING = "ANALYZING",
@@ -42,6 +43,7 @@ export class Game{
   initialGameState!: GameState
   playerTimes: [number, number] = [0, 0]
   clocks: QueryList<ClockComponent> | undefined
+  lastPassedGameStateSize = 0
 
   constructor(public gameService: GameWebsocketService,
     private userService: UserService,
@@ -250,13 +252,13 @@ export class Game{
 
   }
 
-  async showGameEvent(gameEvents: GameEvent[], isContinued: boolean, spectableHistory: boolean): Promise<void>{
+  async showGameEvent(gameEvents: GameEvent[], isContinued: boolean, spectableHistory: boolean, boardLogComponent: BoardLogComponent | undefined): Promise<void>{
     if(this.gameCanvas){
       this.analyzeMode = analyzeModes.ANALYZING
       this.gameCanvas.interactable = false
       if(!isContinued || !spectableHistory)
         this.board.setInitialGameState(this.initialGameState, this.displaySize)
-      await this.executePendingActions(gameEvents, gameEvents.length, spectableHistory, spectableHistory, spectableHistory)
+      await this.executePendingActions(gameEvents, gameEvents.length, spectableHistory, spectableHistory, boardLogComponent, spectableHistory)
       if(gameEvents.slice(-1)[0].event_type == GameEvents.LASER_SHOT_EVENT || gameEvents.slice(-1)[0].event_type == GameEvents.PIECE_DESTROYED_EVENT)
         for(let i = gameEvents.length-1; i > 0; i--)
           if(gameEvents[i].event_type == GameEvents.LASER_SHOT_EVENT){
@@ -270,16 +272,17 @@ export class Game{
 
   returnToCurrentEvent(): void{
     if(this.gameId){
+      this.lastPassedGameStateSize = 0
       this.analyzeMode = analyzeModes.EXITING_ANALYZE_MODE
       this.gameService.getGameState(this.gameId)
     }
   }
 
-  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, enableSounds: boolean, showLaser = true){
+  private async executePendingActions(events: GameEvent[], animationsToShow: number, showAnimations: boolean, enableSounds: boolean, boardLogComponent: BoardLogComponent | undefined = undefined, showLaser = true){
     if(this.gameCanvas){
       this.gameCanvas.interactable = false
       this.eventsExecutor.addEventsToExecute(events.slice(-animationsToShow))
-      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, showAnimations, enableSounds, showLaser)
+      await this.eventsExecutor.executeEventsQueue(this.gameCanvas, this.board, boardLogComponent, showAnimations, enableSounds, showLaser)
     }
   }
 

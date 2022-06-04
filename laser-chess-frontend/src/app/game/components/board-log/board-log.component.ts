@@ -27,6 +27,7 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   validGameState: GameState | undefined
   userEventChains: GameEvent[][] = []
   spectableHistory = true
+  currentHistorySelection = -1
 
   ngOnChanges(changes: SimpleChanges): void{
     if(changes.gameState){
@@ -58,15 +59,29 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
 
   returnToCurrentEvent(): void{
     this.logList?.deselectAll()
+    this.currentHistorySelection = -1
     this.gameReturnEmitter.emit()
   }
 
   onSelection(e: number): void{
     if(this.validGameState){
-    if(e == this.userEventChains.length-1)
-      this.returnToCurrentEvent()
-    else
-      this.gameLogEmitter.emit([this.userEventChains.slice(0, e+1).flat(), this.spectableHistory])
+      console.log(e)
+      console.log(this.currentHistorySelection)
+      if(e < this.currentHistorySelection)
+        this.currentHistorySelection = -1
+      if(e == this.userEventChains.length-1)
+        this.returnToCurrentEvent()
+      else
+        this.gameLogEmitter.emit([this.userEventChains.slice(0, e+1).flat(), this.spectableHistory])
+    }
+  }
+
+  animatedHistorySelectionStep(){
+    this.currentHistorySelection++
+    if(this.logList && this.currentHistorySelection > -1){
+      const listOption = this.logList.options.get(this.currentHistorySelection)
+      if(listOption)
+        listOption.selected = true
     }
   }
 
