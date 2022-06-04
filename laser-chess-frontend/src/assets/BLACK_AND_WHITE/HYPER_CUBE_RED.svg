@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="200mm"
+   height="200mm"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   sodipodi:docname="HYPER_CUBE_RED.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     width="200mm"
+     inkscape:zoom="1.0998546"
+     inkscape:cx="23.184883"
+     inkscape:cy="412.78183"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Warstwa 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect118"
+       style="fill:#000000;stroke-width:0.999999"
+       d="M 0 0 L 0 759.91797 L 759.91797 759.91797 L 759.91797 0 L 0 0 z M 37.853516 37.931641 L 718.05273 37.931641 L 718.05273 718.12891 L 37.853516 718.12891 L 37.853516 37.931641 z "
+       transform="scale(0.26458333)" />
+    <path
+       style="fill:none;stroke-width:1.28582"
+       d="M 0,379.95941 V 0 H 379.95941 759.91882 V 379.95941 759.91882 H 379.95941 0 Z"
+       transform="scale(0.26458333)"
+       id="path262" />
+  </g>
+</svg>

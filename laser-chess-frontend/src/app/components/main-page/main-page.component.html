@@ -1,7 +1,7 @@
 <div *ngIf="fetched" class="main-wrapper" fxLayout="column" fxLayout.gt-sm="column" fxLayoutGap="20px" fxLayoutAlign="start stretch">
   <div *ngIf="!verified&&isLoggedin" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="20px" fxLayoutAlign="center">
-  <h1 class = "text">You need to verify your account </h1>
-  <button  mat-stroked-button (click)="sendVerifyEmail()">Click to send email</button>
+  <!-- <h1 class = "text">You need to verify your account </h1>
+  <button  mat-stroked-button (click)="sendVerifyEmail()">Click to send email</button> -->
 </div>
 <div *ngIf="verified&&isLoggedin" fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="20px" fxLayoutAlign="center">
 </div>

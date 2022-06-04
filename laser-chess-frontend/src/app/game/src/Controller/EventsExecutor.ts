@@ -8,6 +8,7 @@ import { Animations } from "../Display/Animations";
 import { Canvas } from "../Display/Canvas/Canvas";
 import { Drawings } from "../Display/Drawings";
 import { GameEvents } from "../Utils/Enums";
+import { BoardLogComponent } from "../../components/board-log/board-log.component";
 
 type PathInfo = {
   from: Coordinates,
@@ -27,9 +28,11 @@ export class EventsExecutor{
         this.eventsQueue.push(...events)
     }
 
-    async executeEventsQueue(canvas: Canvas, board: Board, showAnimations = true, enableSounds = true, showLaser = true, timeout: number = this.eventsExecutionTimeout): Promise<void>{
+    async executeEventsQueue(canvas: Canvas, board: Board, boardLogComponent: BoardLogComponent | undefined, showAnimations = true, enableSounds = true, showLaser = true, timeout: number = this.eventsExecutionTimeout): Promise<void>{
       for (const event of this.eventsQueue.filter(e => e.event_type != GameEvents.PIECE_DESTROYED_EVENT)){
         if(event){
+          if(boardLogComponent && event.event_type != GameEvents.TELEPORT_EVENT)
+            boardLogComponent.animatedHistorySelectionStep()
           await this.getAnimationToExecute(canvas, board, event, this.eventsQueue.indexOf(event), document.hidden ? false : showAnimations, enableSounds, showLaser)
           this.gameService.increaseAnimationEvents()
           board.executeEvent(event)

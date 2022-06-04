@@ -8,6 +8,7 @@ import { GamePhase, PlayerType, Theme } from '../../src/Utils/Enums';
 import { Game } from '../../src/Controller/Game';
 import { clone } from 'lodash';
 import { ClockComponent } from '../clock/clock.component';
+import { BoardLogComponent } from '../board-log/board-log.component';
 
 @Component({
   selector: 'app-board',
@@ -17,6 +18,9 @@ import { ClockComponent } from '../clock/clock.component';
 export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>
+
+  @ViewChild('logsComponent')
+  boardLogComponent: BoardLogComponent | undefined
 
   @ViewChildren(ClockComponent)
   clockComponents!: QueryList<ClockComponent>
@@ -28,7 +32,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   readonly minWidth = 695
   animation = true
   sounds = true
-  lastPassedGameStateSize = 0
   theme: Theme = Theme.CLASSIC
   backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
 
@@ -92,12 +95,12 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   buildEvent(gameInfo: [GameEvent[], boolean]): void{
     const lastPassBuffer = clone(gameInfo[0].length)
-    if(this.lastPassedGameStateSize < gameInfo[0].length && gameInfo[1])
-      gameInfo[0].splice(0, this.lastPassedGameStateSize)
-    else if(this.lastPassedGameStateSize > gameInfo[0].length)
-      this.lastPassedGameStateSize = 0
-    void this.game.showGameEvent(gameInfo[0], this.lastPassedGameStateSize > 0, gameInfo[1])
-    this.lastPassedGameStateSize = lastPassBuffer
+    if(this.game.lastPassedGameStateSize < gameInfo[0].length && gameInfo[1])
+      gameInfo[0].splice(0, this.game.lastPassedGameStateSize)
+    else if(this.game.lastPassedGameStateSize > gameInfo[0].length)
+      this.game.lastPassedGameStateSize = 0
+    void this.game.showGameEvent(gameInfo[0], this.game.lastPassedGameStateSize > 0, gameInfo[1], this.boardLogComponent)
+    this.game.lastPassedGameStateSize = lastPassBuffer
   }
 
   returnToCurrentEvent(): void{
@@ -167,6 +170,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   get isTimed(): boolean {
     return this.game.isTimed
   }
-  
+
 
 }
