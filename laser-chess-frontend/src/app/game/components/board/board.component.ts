@@ -34,6 +34,9 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   sounds = true
   theme: Theme = Theme.CLASSIC
   backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
+  spectators: Array<string | undefined>  = ['user', 'user2', undefined, undefined]
+  filteredSpectators: Array<string> = []
+  spectatorsNum = 5;
 
   constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
 
@@ -44,6 +47,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       this.sounds = settings.sound_on
       this.theme = settings.theme
       this.backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
+      this.filteredSpectators = (this.spectators.filter(spec => spec != undefined) as string[])
+      this.filteredSpectators.push(
+        `${this.spectators.filter(spec => spec == undefined).length.toString()} anonymous`
+      )
     }
 
     if(!this.canvasGame.nativeElement.getContext('2d')){
