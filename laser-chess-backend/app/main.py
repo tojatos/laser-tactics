@@ -12,6 +12,7 @@ from app.core.dependecies import API_PREFIX, HOST, PORT, get_db, authenticate_us
 from app.core.internal import models, schemas
 from app.core.internal.database import engine, SessionLocal
 from app.core.routers import friends, users, email, game, lobby
+from app.core.routers.chat import chat_websocket_endpoint
 from app.core.routers.game import websocket_endpoint
 from sqlalchemy.orm import Session
 from fastapi_utils.tasks import repeat_every
@@ -85,6 +86,7 @@ app.include_router(lobby.router, prefix=API_PREFIX)
 app.include_router(game.router, prefix=API_PREFIX)
 app.add_api_websocket_route("/ws", websocket_endpoint)
 app.add_api_websocket_route("/lobby_ws", lobby_websocket_endpoint)
+app.add_api_websocket_route("/chat", chat_websocket_endpoint)
 
 if __name__ == "__main__":
     # models.Base.metadata.drop_all(bind=engine)
