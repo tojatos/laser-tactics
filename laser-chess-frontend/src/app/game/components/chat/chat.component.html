@@ -1,0 +1,22 @@
+
+<button *ngIf="!isOpened" mat-fab color="primary" (click)="isOpened = true">
+  <mat-icon>chat_bubble</mat-icon>
+</button>
+
+<div *ngIf="isOpened" class="chat-box">
+
+<div class="chat-header">
+  <button mat-icon-button class="close-button" (click)="isOpened=false"><mat-icon>close</mat-icon></button>
+</div>
+
+<div class="message-container">
+  <div *ngFor="let msg of messages" class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">{{msg.content}}</div>
+</div>
+
+<mat-form-field class="chat-input">
+  <input matInput autocomplete="off" [(ngModel)]="message">
+  <button mat-icon-button matSuffix (click)="sendMessage()">
+    <mat-icon>send</mat-icon>
+  </button>
+</mat-form-field>
+</div>

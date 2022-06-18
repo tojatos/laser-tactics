@@ -1,3 +1,4 @@
+<app-chat [myUsername]="this.game.authService.getUsername()"></app-chat>
 <h1 class="float">{{parseGamePhase(game.gamePhase)}}
   <span *ngIf="game.gamePhase !== 'DRAW' && game.gamePhase !== 'NOT_STARTED'"
   [style.color]="game.whoseTurn === 'PLAYER_ONE' ? 'red' : 'blue'">

@@ -1,0 +1,63 @@
+@import "src/styles.scss";
+
+.chat-box {
+  width: 200px;
+  height: 400px;
+  background-color: map_get($custom-palette,400);
+  border: solid 1px white;
+  overflow: hidden;
+}
+
+.close-button {
+  margin-left: auto;
+  position:sticky;
+}
+
+.chat-header {
+  width: 100%;
+  text-align: right;
+  background-color: map_get($custom-palette,100);
+}
+
+.chat-input {
+  position: sticky;
+  bottom: 0;
+  background-color: black;
+}
+
+.message-container {
+  height: 323px;
+  padding: 0 5px 5px 5px;
+  overflow-y: auto;
+}
+
+.message-container::-webkit-scrollbar {
+  display: none;
+}
+
+.message {
+  margin-top: 10px;
+  padding: 5px 10px 5px 10px;
+  max-width: 80%;
+  width: -moz-fit-content;
+  width: fit-content;
+  border-radius: 25px;
+}
+
+.my-message {
+  margin-left: auto;
+  background-color: map_get($custom-palette,100);
+}
+
+.opponent-message {
+ background-color: black;
+}
+
+.chat-input .mat-form-field-wrapper {
+  margin-bottom: -1.25em;
+  margin-top: -1.25em;
+}
+
+.chat-input input {
+  padding: 5px 0 5px 0;
+}

@@ -16,9 +16,10 @@ import { BoardLogComponent } from './components/board-log/board-log.component';
 import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from '../app-routing.module';
 import { ClockComponent } from './components/clock/clock.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
-  declarations: [GameComponent, BoardComponent, BoardActionsComponent, BoardActionsComponent, BoardLogComponent, ClockComponent],
+  declarations: [GameComponent, BoardComponent, BoardActionsComponent, BoardActionsComponent, BoardLogComponent, ClockComponent, ChatComponent],
   imports: [
     CommonModule,
     HttpClientModule,
