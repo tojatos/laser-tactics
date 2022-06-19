@@ -30,6 +30,14 @@ class GameStateTable(Base):
     game_state_json = Column(String)
 
 
+class ChatMessegesTable(Base):
+    __tablename__ = "chat"
+
+    id = Column(Integer, primary_key=True, index=True)
+    game_id = Column(String)
+    messages_json = Column(String)
+
+
 class GameHistory(Base):
     __tablename__ = "game_history"
 
@@ -92,4 +100,3 @@ class UserSettings(Base):
     skip_animations = Column(Boolean, default=False)
     sound_on = Column(Boolean, default=True)
     theme = Column(Enum(UserTheme), default=UserTheme.CLASSIC)
-

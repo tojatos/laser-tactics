@@ -170,3 +170,4 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 lobby_manager = ConnectionManager()
+chat_manager = ConnectionManager()

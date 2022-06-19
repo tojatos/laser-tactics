@@ -14,6 +14,7 @@ from app.game_engine.requests import StartGameRequest
 from uuid import uuid4
 from app.Rating.schemas import PlayerMatchResult, PlayerMatchHistory, PlayerRatingUpdate
 from app.Rating.rating import get_starting_rating, update_rating
+from app.chat.models import GameChat, Message
 
 RATING_PERIOD = 30
 # max days we get matches from
@@ -270,10 +271,15 @@ def start_game(db: Session, game_state: GameState, request: StartGameRequest):
                                           player_two_id=request.player_two_id,
                                           game_id=request.game_id,
                                           game_state_json=game_state_json,
-    )
+                                          )
     db.add(db_game_state)
+    db_chat = models.ChatMessegesTable(game_id=request.game_id,
+                                       messages_json=str([])
+                                       )
+    db.add(db_chat)
     if lobby is not None:
         lobby.lobby_status = LobbyStatus.GAME_STARTED
+
     db.commit()
     db.refresh(db_game_state)
     return db_game_state
@@ -535,3 +541,19 @@ def update_settings(settings: schemas.Settings, db: Session, user: schemas.User)
     db.commit()
     db.refresh(db_settings)
     return db_settings
+
+
+def get_chat(db: Session, game_id: str):
+    db_chat = db.query(models.ChatMessegesTable).filter(models.ChatMessegesTable.game_id == game_id).first()
+    return db_chat
+
+
+def add_message_chat(db: Session, messaage: Message, game_id: str):
+    db_chat = get_chat(db, game_id)
+    messages = [json.loads(x) for x in json.loads(db_chat.messages_json)]
+    chat = GameChat(db_chat.game_id, [Message(**m) for m in messages])
+    chat.messages.append(messaage)
+    db_chat.messages_json = json.dumps([m.toJSON() for m in chat.messages])
+    db.add(db_chat)
+    db.commit()
+    return chat
