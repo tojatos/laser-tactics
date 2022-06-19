@@ -1,9 +1,21 @@
-<h1>{{parseGamePhase(game.gamePhase)}}
+<app-chat #chatComponent [myUsername]="this.game.authService.getUsername()"></app-chat>
+<h1 class="float">{{parseGamePhase(game.gamePhase)}}
   <span *ngIf="game.gamePhase !== 'DRAW' && game.gamePhase !== 'NOT_STARTED'"
   [style.color]="game.whoseTurn === 'PLAYER_ONE' ? 'red' : 'blue'">
     ■
   </span>
 </h1>
+<div class="spectators">
+  <mat-form-field appearance="fill">
+    <mat-label>Spectators: {{spectatorsNum}}</mat-label>
+    <mat-select>
+      <mat-option *ngFor="let spectator of filteredSpectators" [value]="spectator" disabled>
+        {{spectator}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div style="clear: both"></div>
 <div [style.width.px]="displayedContainerWidth" [style.height.px]="containerHeight">
 <div class="float">
   <div class="boardText">

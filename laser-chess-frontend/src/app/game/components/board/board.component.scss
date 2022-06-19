@@ -10,7 +10,6 @@
 }
 
 .guiCanvas {
-
   position: absolute;
   z-index: 2;
 }
@@ -58,4 +57,16 @@ a {
 
 .app-clock {
   margin: 0 auto;
+}
+
+.spectators {
+  float:right;
+}
+
+app-chat {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 20px;
+  z-index: 100;
 }

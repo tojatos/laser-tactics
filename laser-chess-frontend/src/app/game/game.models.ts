@@ -95,3 +95,8 @@ export interface DrawEvent {
   player: string,
   event_type: GameEvents.OFFER_DRAW_EVENT
 }
+
+export interface ChatMessage {
+  username: string,
+  payload: string
+}
