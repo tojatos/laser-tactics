@@ -1,9 +1,7 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-
-type Message = {
-  from: string,
-  content: string
-}
+import { Component, ElementRef, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChatMessage } from '../../game.models';
+import { ChatWebsocketService } from '../../services/chat.service';
+import { EventEmitterService } from '../../services/event-emitter.service';
 
 @Component({
   selector: 'app-chat',
@@ -11,50 +9,63 @@ type Message = {
   styleUrls: ['./chat.component.scss'],
   encapsulation : ViewEncapsulation.None,
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent {
+
+  @ViewChild('msg')
+  myScrollContainer: ElementRef<Window> | undefined
 
   @Input() myUsername: string | undefined
-  messages: Array<Message> = []
+  messages: Array<ChatMessage> = []
   message = ""
-  readMessages = 0;
+  unreadMessages = -1;
+  gameId = ""
 
-  ngOnInit() {
+  constructor(private eventEmitter: EventEmitterService, private chatService: ChatWebsocketService) {
+    this.eventEmitter.subsChat.asObservable().subscribe(chatMessages => {
+      this.setChat(<Array<ChatMessage>>chatMessages)
+    })
+  }
 
-  //load from server, also some rxjs
-  this.messages = [
-      {
-        from: "string",
-        content: "Hello my friend"
-      },
-      {
-        from: "string2",
-        content: "Hello"
-      },
-      {
-        from: "string2",
-        content: "Hello"
-      },
-      {
-        from: "string2",
-        content: "Hello"
-      },
-    ]
+  setWebsocketConnection(gameId: string){
+    this.chatService.connect(gameId)
+    this.gameId = gameId
   }
 
   isOpened = false;
 
-  isMyMessage(msg: Message){
-    return msg.from == this.myUsername;
+  setChat(messages: Array<ChatMessage>) {
+    if(!this.isOpened)
+      this.unreadMessages++
+    this.messages = messages
+  }
+
+  scrollDownToBottom() {
+    setTimeout(() => {
+      this.myScrollContainer?.nativeElement.scrollTo(0, 1000)
+    }, 10)
+  }
+
+  openChat() {
+    this.unreadMessages = 0;
+    this.isOpened = true;
+    this.scrollDownToBottom()
+  }
+
+  isMyMessage(msg: ChatMessage){
+    if(this.myUsername)
+      return msg.username == this.myUsername;
+    return msg.username == this.messages[0].username
   }
 
   sendMessage(){
     if(this.myUsername){
       this.messages.push({
-        from: this.myUsername,
-        content: this.message
+        username: this.myUsername,
+        payload: this.message
       })
+      this.chatService.sendMessage(this.gameId, this.message)
       this.message = ""
-      // send to rxjs
+      this.scrollDownToBottom()
     }
   }
 

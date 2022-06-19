@@ -9,6 +9,7 @@ import { Game } from '../../src/Controller/Game';
 import { clone } from 'lodash';
 import { ClockComponent } from '../clock/clock.component';
 import { BoardLogComponent } from '../board-log/board-log.component';
+import { ChatComponent } from '../chat/chat.component';
 
 @Component({
   selector: 'app-board',
@@ -21,6 +22,9 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('logsComponent')
   boardLogComponent: BoardLogComponent | undefined
+
+  @ViewChild('chatComponent')
+  chatComponent: ChatComponent | undefined
 
   @ViewChildren(ClockComponent)
   clockComponents!: QueryList<ClockComponent>
@@ -36,7 +40,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
   spectators: Array<string | undefined>  = ['user', 'user2', undefined, undefined]
   filteredSpectators: Array<string> = []
-  spectatorsNum = 5;
+  spectatorsNum = 4;
 
   constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
 
@@ -70,7 +74,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
           this.isHandset ? this.sizeScale * this.handsetScale : this.sizeScale,
           this.animation, this.sounds, this.clockComponents, this.theme)
       })()
-  })
+      this.chatComponent?.setWebsocketConnection((<urlModel>params).id)
+    })
   }
 
   ngOnDestroy(): void {

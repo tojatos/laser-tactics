@@ -1,5 +1,5 @@
 
-<button *ngIf="!isOpened" mat-fab color="primary" (click)="isOpened = true">
+<button [matBadge]="unreadMessages" [matBadgeHidden]="unreadMessages < 1" *ngIf="!isOpened" mat-fab color="primary" (click)="openChat()">
   <mat-icon>chat_bubble</mat-icon>
 </button>
 
@@ -9,11 +9,11 @@
   <button mat-icon-button class="close-button" (click)="isOpened=false"><mat-icon>close</mat-icon></button>
 </div>
 
-<div class="message-container">
-  <div *ngFor="let msg of messages" class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">{{msg.content}}</div>
+<div class="message-container" #msg>
+  <div *ngFor="let msg of messages" class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">{{msg.payload}}</div>
 </div>
 
-<mat-form-field class="chat-input">
+<mat-form-field *ngIf="myUsername" class="chat-input">
   <input matInput autocomplete="off" [(ngModel)]="message">
   <button mat-icon-button matSuffix (click)="sendMessage()">
     <mat-icon>send</mat-icon>
