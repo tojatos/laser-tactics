@@ -17,7 +17,7 @@
 </div>
 
 <mat-form-field *ngIf="myUsername" class="chat-input">
-  <input matInput autocomplete="off" [(ngModel)]="message">
+  <input matInput autocomplete="off" (keydown.enter)="sendMessage()" [(ngModel)]="message">
   <button mat-icon-button matSuffix (click)="sendMessage()" [disabled]="!message">
     <mat-icon>send</mat-icon>
   </button>

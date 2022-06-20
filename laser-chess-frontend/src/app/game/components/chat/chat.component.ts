@@ -52,13 +52,11 @@ export class ChatComponent {
   }
 
   isMyMessage(msg: ChatMessage){
-    if(this.myUsername)
-      return msg.username == this.myUsername;
-    return msg.username == this.messages[0].username
+    return msg.username == this.myUsername;
   }
 
   sendMessage(){
-    if(this.myUsername){
+    if(this.myUsername && this.message){
       this.messages.push({
         username: this.myUsername,
         payload: this.message
