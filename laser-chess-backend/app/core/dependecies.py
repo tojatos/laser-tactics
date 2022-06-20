@@ -161,7 +161,7 @@ class ConnectionManager:
         for key in self.game_observers.keys():
             try:
                 self.game_observers[key].remove(websocket)
-                self.notify(key, self.get_observers(key))
+                await self.notify(key, self.get_observers(key))
             except KeyError:
                 pass
 
