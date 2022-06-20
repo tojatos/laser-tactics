@@ -70,7 +70,8 @@ def generate_verification_token(email: str, is_verifed: str):
 
     token = create_access_token(
 
-        data={"sub": email, "purpose": TokenPurpose.ACCOUNT_VERIFICATION, "is_verified": is_verifed}, expires_delta=token_expires
+        data={"sub": email, "purpose": TokenPurpose.ACCOUNT_VERIFICATION, "is_verified": is_verifed},
+        expires_delta=token_expires
 
     )
     return token
@@ -81,7 +82,7 @@ def generate_change_password_token(username: str, hash: str):
 
     token = create_access_token(
 
-        data={"sub": username, "purpose": TokenPurpose.CHANGE_PASSWORD,  "hash": hash}, expires_delta=token_expires
+        data={"sub": username, "purpose": TokenPurpose.CHANGE_PASSWORD, "hash": hash}, expires_delta=token_expires
 
     )
     return token
@@ -156,9 +157,13 @@ class ConnectionManager:
     def observe(self, game_id: str, websocket: WebSocket):
         self.game_observers[game_id].add(websocket)
 
-    def disconnect(self, websocket: WebSocket):
+    async def disconnect(self, websocket: WebSocket):
         for key in self.game_observers.keys():
-            self.game_observers[key].discard(websocket)
+            try:
+                self.game_observers[key].remove(websocket)
+                await self.notify(key, self.get_observers(key))
+            except KeyError:
+                pass
 
     async def notify(self, game_id: str, data: any):
         if game_id not in self.game_observers:
@@ -166,6 +171,9 @@ class ConnectionManager:
 
         coroutines = [websocket.send_json(data) for websocket in self.game_observers[game_id]]
         await asyncio.gather(*coroutines)
+
+    def get_observers(self, game_id: str):
+        return [o.session.get("username", None) for o in self.game_observers[game_id]]
 
 
 manager = ConnectionManager()

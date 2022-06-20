@@ -46,15 +46,21 @@ async def websocket_endpoint(websocket: WebSocket,
                 token = request.token
                 try:
                     current_user = await get_current_user(token, db)
+                    websocket.session["username"] = current_user.username
                     await send_websocket_response(200)
                 except HTTPException as e:
                     await send_websocket_response(e.status_code, e.detail)
             elif websocket_request.request_path is GameApiRequestPath.WebsocketObserve:
                 manager.observe(websocket_request.request.game_id, websocket)
                 await send_websocket_response(200)
+                await manager.notify(websocket_request.request.game_id, manager.get_observers(websocket_request.request.game_id))
             elif websocket_request.request_path is GameApiRequestPath.GetGameState:
                 game_state = game_service.get_game_state(websocket_request.request, db)
                 await websocket.send_json(dataclasses.asdict(game_state))
+            elif websocket_request.request_path is GameApiRequestPath.get_observers:
+                if websocket_request.request.game_id:
+                    observers = manager.get_observers(websocket_request.request.game_id)
+                    await websocket.send_json(observers)
             elif websocket_request.request_path in AuthenticatedGameApiRequestPaths:
                 if current_user is None:
                     await send_websocket_response(401, "You are not authenticated.")
@@ -81,5 +87,5 @@ async def websocket_endpoint(websocket: WebSocket,
                 await send_websocket_response(404)
     except WebSocketDisconnect:
         print('Websocked disconnected:', websocket.client)
-        manager.disconnect(websocket)
+        await manager.disconnect(websocket)
         pass

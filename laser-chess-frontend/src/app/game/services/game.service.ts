@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from "rxjs/webSocket";
-import { authWebsocketEndpoint, gameHistoryFullEndpoint, gameStateEndpoint, giveUpEndpoint, initialGameStateFullEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint, timeoutEndpoint } from 'src/app/api-definitions';
+import { authWebsocketEndpoint, gameHistoryFullEndpoint, gameStateEndpoint, giveUpEndpoint, initialGameStateFullEndpoint, movePieceEndpoint, observeWebsocketEndpoint, offerDrawEndpoint, rotatePieceEndpoint, shootLaserEndpoint, spectatorsEndpoint, timeoutEndpoint } from 'src/app/api-definitions';
 import { AuthService } from 'src/app/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { Coordinates, GameState } from '../game.models';
@@ -34,6 +34,7 @@ export class GameWebsocketService {
   getSubject = () => this.subject
 
   lastMessage: GameState | undefined = undefined
+  lastSpectators: Array<string | null> = []
 
   connect(gameId: string){
     this.getSubject().asObservable().subscribe(
@@ -48,6 +49,11 @@ export class GameWebsocketService {
           this.lastMessage = <GameState>msg
           this.eventEmitter.invokeRefresh(<GameState>msg)
         }
+        else if((<Array<string | null>>msg).length > 0 && msg != this.lastSpectators){
+          console.log(msg)
+          this.lastSpectators = <Array<string | null>>msg
+          this.eventEmitter.setSpectators(this.lastSpectators)
+        }
       },
       err => {
         console.error(err)
@@ -56,13 +62,14 @@ export class GameWebsocketService {
       () => this.showSnackbar("Connection to the game server closed.")
     )
 
-    this.sendRequest(observeWebsocketEndpoint, {game_id: gameId})
-
     const token = this.authService.jwt
     if(token)
       this.sendRequest(authWebsocketEndpoint, {token : token})
 
+    this.sendRequest(observeWebsocketEndpoint, {game_id: gameId})
+
     this.getGameState(gameId)
+    this.getSpectators(gameId)
   }
 
   private showSnackbar(message: string) {
@@ -78,8 +85,12 @@ export class GameWebsocketService {
 
   getGameState(gameId: string): void {
     const request = { game_id: gameId }
-
     this.sendRequest(gameStateEndpoint, request)
+  }
+
+  getSpectators(gameId: string): void {
+    const request = { game_id: gameId }
+    this.sendRequest(spectatorsEndpoint, request)
   }
 
   movePiece(gameId: string, from: Coordinates, to: Coordinates): void{

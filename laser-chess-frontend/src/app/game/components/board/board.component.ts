@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
@@ -38,11 +38,11 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   sounds = true
   theme: Theme = Theme.CLASSIC
   backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
-  spectators: Array<string | undefined>  = ['user', 'user2', undefined, undefined]
-  filteredSpectators: Array<string> = []
+  spectators: Array<string | null>  = []
+  filteredSpectators: Array<string | null> = []
   spectatorsNum = 4;
 
-  constructor(private route: ActivatedRoute, private userService: UserService, private authService: AuthService, public game: Game) {}
+  constructor(private route: ActivatedRoute, private router: Router, private userService: UserService, private authService: AuthService, public game: Game) {}
 
   async ngAfterViewInit(): Promise<void> {
     if(this.authService.isLoggedIn()){
@@ -51,10 +51,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       this.sounds = settings.sound_on
       this.theme = settings.theme
       this.backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
-      this.filteredSpectators = (this.spectators.filter(spec => spec != undefined) as string[])
-      this.filteredSpectators.push(
-        `${this.spectators.filter(spec => spec == undefined).length.toString()} anonymous`
-      )
     }
 
     if(!this.canvasGame.nativeElement.getContext('2d')){
@@ -75,6 +71,15 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
           this.animation, this.sounds, this.clockComponents, this.theme)
       })()
       this.chatComponent?.setWebsocketConnection((<urlModel>params).id)
+
+      this.game.eventEmitter.subsSpectators.asObservable().subscribe(spectators => {
+        this.spectators = spectators as Array<string | null>
+        this.filteredSpectators = this.spectators.filter(spec => spec != null) as Array<string>
+        this.filteredSpectators.push(
+          `${this.spectators.filter(spec => spec == null).length.toString()} anonymous`
+        )
+        this.spectatorsNum = this.spectators.length
+      })
     })
   }
 
@@ -94,6 +99,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   changeSoundOption(): void{
     this.game.changeSoundOption(this.sounds)
+  }
+
+  goToProfile(user: string){
+    void this.router.navigate(['/users', user])
   }
 
   buttonPressEvent(event: string): void{

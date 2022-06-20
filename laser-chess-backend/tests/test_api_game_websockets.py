@@ -86,6 +86,13 @@ def auth(ws: WebSocket, token_num: int):
     return receive_ws_response(ws)
 
 
+def get_observers(ws: WebSocket):
+    request = WebsocketRequest(GameApiRequestPath.get_observers, GetObserversRequest(game_id))
+    send_dataclass(ws, request)
+    observers = ws.receive_json()
+    return observers
+
+
 def observe(ws: WebSocket, game_id: str):
     request = WebsocketRequest(GameApiRequestPath.WebsocketObserve, WebsocketObserveRequest(game_id))
     send_dataclass(ws, request)
@@ -378,8 +385,18 @@ def test_websocket_notify(client):
         assert auth(ws2, 2).status_code == 200
 
         assert observe(ws1, game_id).status_code == 200
+        observers = ws1.receive_json()
         assert observe(ws2, game_id).status_code == 200
+        observers = ws1.receive_json()
+        observers = ws2.receive_json()
         assert observe(ws3, game_id).status_code == 200
+        observers = ws1.receive_json()
+        observers = ws2.receive_json()
+        observers = ws3.receive_json()
+
+        observers = get_observers(ws0)
+
+        assert len(observers) == 3
 
         assert shoot_laser(ws0, 0).status_code == 200
 
@@ -402,10 +419,17 @@ def test_websocket_notify(client):
 
         ws2.close()
 
+        observers = ws1.receive_json()
+        assert len(observers) == 2
+        observers = ws3.receive_json()
+        assert len(observers) == 2
+
         assert rotate_piece(ws0, 0, (0, 0), 90).status_code == 200
 
         # check after last request to give manager some time to cleanup disconnected observer
         assert len(manager.game_observers[game_id]) == 2
+        observers = get_observers(ws0)
+        assert len(observers) == 2
 
         game_state_dict = ws1.receive_json()
         game_state_serializable: GameStateSerializable = GameStateSerializable(**game_state_dict)

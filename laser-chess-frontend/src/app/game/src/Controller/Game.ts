@@ -2,7 +2,7 @@ import { Injectable, QueryList } from "@angular/core";
 import { AuthService } from "src/app/auth/auth.service";
 import { EventEmitterService } from "src/app/game/services/event-emitter.service";
 import { UserService } from "src/app/services/user.service";
-import { ChatMessage, GameEvent, GameState, LaserShotEvent } from "../../game.models";
+import { GameEvent, GameState, LaserShotEvent } from "../../game.models";
 import { GameWebsocketService } from "../../services/game.service";
 import { Board } from "../GameStateData/Board";
 import { Animations } from "../Display/Animations";
@@ -48,7 +48,7 @@ export class Game{
   constructor(public gameService: GameWebsocketService,
     private userService: UserService,
     public authService: AuthService,
-    private eventEmitter: EventEmitterService,
+    public eventEmitter: EventEmitterService,
     private eventsExecutor: EventsExecutor,
     private board: Board,
     private drawings: Drawings,

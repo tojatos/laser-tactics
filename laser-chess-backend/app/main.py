@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from fastapi_utils.tasks import repeat_every
 from app.core.internal.crud import dispose_abandoned_lobby
 from app.core.routers.lobby import lobby_websocket_endpoint
+from starlette.middleware.sessions import SessionMiddleware
 
 app = FastAPI(root_path=ROOT_PATH, openapi_url=f"{API_PREFIX}/openapi.json")
 
@@ -36,6 +37,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(SessionMiddleware, secret_key="secret")
 
 router = APIRouter(
     prefix=API_PREFIX,
