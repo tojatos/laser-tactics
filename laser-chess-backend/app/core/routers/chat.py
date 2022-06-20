@@ -60,5 +60,5 @@ async def chat_websocket_endpoint(websocket: WebSocket,
                 await send_websocket_response(404)
     except WebSocketDisconnect:
         print('Websocked disconnected:', websocket.client)
-        chat_manager.disconnect(websocket)
+        await chat_manager.disconnect(websocket)
         pass
