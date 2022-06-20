@@ -419,6 +419,9 @@ def test_websocket_notify(client):
 
         ws2.close()
 
+        observers = ws1.receive_json()
+        observers = ws3.receive_json()
+
         assert rotate_piece(ws0, 0, (0, 0), 90).status_code == 200
 
         # check after last request to give manager some time to cleanup disconnected observer

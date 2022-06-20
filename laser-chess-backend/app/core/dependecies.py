@@ -157,7 +157,7 @@ class ConnectionManager:
     def observe(self, game_id: str, websocket: WebSocket):
         self.game_observers[game_id].add(websocket)
 
-    def disconnect(self, websocket: WebSocket):
+    async def disconnect(self, websocket: WebSocket):
         for key in self.game_observers.keys():
             try:
                 self.game_observers[key].remove(websocket)
