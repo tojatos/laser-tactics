@@ -53,6 +53,7 @@ async def websocket_endpoint(websocket: WebSocket,
             elif websocket_request.request_path is GameApiRequestPath.WebsocketObserve:
                 manager.observe(websocket_request.request.game_id, websocket)
                 await send_websocket_response(200)
+                await manager.notify(websocket_request.request.game_id, manager.get_observers(websocket_request.request.game_id))
             elif websocket_request.request_path is GameApiRequestPath.GetGameState:
                 game_state = game_service.get_game_state(websocket_request.request, db)
                 await websocket.send_json(dataclasses.asdict(game_state))

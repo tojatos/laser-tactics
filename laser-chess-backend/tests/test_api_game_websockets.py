@@ -385,8 +385,14 @@ def test_websocket_notify(client):
         assert auth(ws2, 2).status_code == 200
 
         assert observe(ws1, game_id).status_code == 200
+        observers = ws1.receive_json()
         assert observe(ws2, game_id).status_code == 200
+        observers = ws1.receive_json()
+        observers = ws2.receive_json()
         assert observe(ws3, game_id).status_code == 200
+        observers = ws1.receive_json()
+        observers = ws2.receive_json()
+        observers = ws3.receive_json()
 
         observers = get_observers(ws0)
 
