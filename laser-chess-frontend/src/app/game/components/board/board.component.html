@@ -8,8 +8,8 @@
 <div class="spectators">
   <mat-form-field appearance="fill">
     <mat-label>Spectators: {{spectatorsNum}}</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let spectator of filteredSpectators" [value]="spectator" disabled>
+    <mat-select (selectionChange)="goToProfile($event.value)">
+      <mat-option *ngFor="let spectator of filteredSpectators" [value]="spectator" [disabled] = "spectator?.includes('anonymous')">
         {{spectator}}
       </mat-option>
     </mat-select>

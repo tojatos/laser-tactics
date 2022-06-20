@@ -10,6 +10,7 @@ export class EventEmitterService {
   subsRefresh = new Subject()
   subsRollback = new Subject()
   subsChat = new Subject()
+  subsSpectators = new Subject()
 
   invokeRefresh(gameState: GameState): void{
     this.subsRefresh.next(gameState)
@@ -21,6 +22,10 @@ export class EventEmitterService {
 
   setChat(messages: Array<ChatMessage>): void {
     this.subsChat.next(messages)
+  }
+
+  setSpectators(spectators: Array<string | null>): void {
+    this.subsSpectators.next(spectators)
   }
 
 }

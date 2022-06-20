@@ -48,7 +48,7 @@ export class Game{
   constructor(public gameService: GameWebsocketService,
     private userService: UserService,
     public authService: AuthService,
-    private eventEmitter: EventEmitterService,
+    public eventEmitter: EventEmitterService,
     private eventsExecutor: EventsExecutor,
     private board: Board,
     private drawings: Drawings,
