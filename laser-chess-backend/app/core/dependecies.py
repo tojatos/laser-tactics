@@ -158,12 +158,12 @@ class ConnectionManager:
         self.game_observers[game_id].add(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        try:
-            for key in self.game_observers.keys():
+        for key in self.game_observers.keys():
+            try:
                 self.game_observers[key].remove(websocket)
                 self.notify(key, self.get_observers(key))
-        except KeyError:
-            pass
+            except KeyError:
+                pass
 
     async def notify(self, game_id: str, data: any):
         if game_id not in self.game_observers:
