@@ -167,6 +167,9 @@ class ConnectionManager:
         coroutines = [websocket.send_json(data) for websocket in self.game_observers[game_id]]
         await asyncio.gather(*coroutines)
 
+    def get_observers(self, game_id: str):
+        return [o.session.get("username", None) for o in self.game_observers[game_id]]
+
 
 manager = ConnectionManager()
 lobby_manager = ConnectionManager()

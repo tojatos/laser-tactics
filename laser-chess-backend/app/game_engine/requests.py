@@ -17,6 +17,7 @@ class GameApiRequestPath(str, Enum):
     WebsocketAuth = "/ws_auth"
     WebsocketObserve = "/ws_observe"
     Timeout = "/timeout"
+    get_observers = "/get_observers"
 
 
 @dataclass
@@ -79,6 +80,10 @@ class TimeoutRequest:
 class OfferDrawRequest:
     game_id: str
 
+@dataclass
+class GetObserversRequest:
+    game_id: str
+
 
 AuthenticatedGameApiRequestPaths = {
     GameApiRequestPath.StartGame,
@@ -91,7 +96,7 @@ AuthenticatedGameApiRequestPaths = {
 }
 
 GameApiRequest = Union[GetGameStateRequest, StartGameRequest, ShootLaserRequest, MovePieceRequest, RotatePieceRequest,
-                       GiveUpRequest, OfferDrawRequest, TimeoutRequest, WebsocketAuthRequest, WebsocketObserveRequest]
+                       GiveUpRequest, OfferDrawRequest, TimeoutRequest, WebsocketAuthRequest, WebsocketObserveRequest, GetObserversRequest]
 
 
 @dataclass
