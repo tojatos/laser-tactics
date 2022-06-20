@@ -10,12 +10,15 @@
 </div>
 
 <div class="message-container" #msg>
-  <div *ngFor="let msg of messages" class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">{{msg.payload}}</div>
+  <div *ngFor="let msg of messages">
+    <div class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">{{msg.payload}}</div>
+    <div class="message-footer" [ngClass]="isMyMessage(msg) ? 'my-message-footer' : 'opponent-message-footer'">{{msg.username}}</div>
+  </div>
 </div>
 
 <mat-form-field *ngIf="myUsername" class="chat-input">
   <input matInput autocomplete="off" [(ngModel)]="message">
-  <button mat-icon-button matSuffix (click)="sendMessage()">
+  <button mat-icon-button matSuffix (click)="sendMessage()" [disabled]="!message">
     <mat-icon>send</mat-icon>
   </button>
 </mat-form-field>

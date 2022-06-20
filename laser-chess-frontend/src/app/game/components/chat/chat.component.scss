@@ -36,7 +36,7 @@
 }
 
 .message {
-  margin-top: 10px;
+  margin-top: 5px;
   padding: 5px 10px 5px 10px;
   max-width: 80%;
   width: -moz-fit-content;
@@ -44,9 +44,21 @@
   border-radius: 25px;
 }
 
+.message-footer {
+  padding: 0 5px 0 5px;
+  width: -moz-fit-content;
+  width: fit-content;
+  color: lightgray;
+  font-size: x-small;
+}
+
 .my-message {
   margin-left: auto;
   background-color: map_get($custom-palette,100);
+}
+
+.my-message-footer {
+  margin-left: auto;
 }
 
 .opponent-message {
