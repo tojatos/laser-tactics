@@ -40,7 +40,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   backgroundBoardUrl = `url(assets/${this.theme}/board.svg)`
   spectators: Array<string | null>  = []
   filteredSpectators: Array<string | null> = []
-  spectatorsNum = 4;
+  spectatorsNum = 0;
 
   constructor(private route: ActivatedRoute, private router: Router, private userService: UserService, private authService: AuthService, public game: Game) {}
 

@@ -15,6 +15,7 @@ import { PasswordReminderComponent } from './components/password-reminder/passwo
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { RankingComponent } from './components/ranking/ranking.component';
 import { RulesComponent } from './components/rules/rules.component';
+import { LobbyListComponent } from './components/lobby-list/lobby-list.component';
 
 const routes: Routes = [
   {
@@ -71,6 +72,10 @@ const routes: Routes = [
   {
     path: 'rules',
     component: RulesComponent
+  },
+  {
+    path: 'lobbys',
+    component: LobbyListComponent
   },
   {
     path: '**',

@@ -37,8 +37,10 @@ export class MainNavComponent {
     return this.authService.isLoggedIn()
   }
 
-  logout() {
-    this.authService.clearJWT()
+  async logout() {
+    this.authService.logout().then().finally(() => {
+      this.authService.clearJWT()
+    })
     this.router.navigate(['/'])
   }
 

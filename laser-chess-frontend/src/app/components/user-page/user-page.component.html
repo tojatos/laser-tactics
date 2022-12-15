@@ -1,35 +1,37 @@
-<div  class="main-wrapper" fxLayout="column" fxLayoutAlign="center" fxLayoutGap="30px">
+<div class="main-wrapper" fxLayout="column" fxLayoutGap="30px">
 
-  <div *ngIf="!isOwner" fxLayout="row" fxLayoutAlign="end start" fxFlex="20">
-    <mat-icon [matMenuTriggerFor]="user">more_vert</mat-icon>
-    <mat-menu class="menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
-        <button mat-menu-item *ngIf="!isInFriends" (click)="sendRequest(username!)">Send friend request</button>
-        <button mat-menu-item *ngIf="isInFriends" (click)="unfriend(username!)">Unfriend</button>
-        <button mat-menu-item *ngIf="!isInBlocked" (click)="blockUser(username!)">Block</button>
-        <button mat-menu-item *ngIf="isInBlocked" (click)="unblockUser(username!)">Unblock</button>
-    </mat-menu></div>
-    <div *ngIf="isOwner"  fxLayout="row" fxLayoutAlign="end start" fxFlex="15" fxLayoutGap="20px">
+    <div class="container" fxLayout="column" fxLayoutAlign="center" fxFlex="5" fxLayoutGap="20px">
+    <h1>{{username}} profile</h1>
     </div>
-    <div fxLayout="column" fxLayoutAlign="center center" fxFlex="5" fxLayoutGap="20px">
-    <h1>{{username}}</h1>
-    <h3>Rating :{{rating}}</h3>
+    <div class="userBox" fxLayoutAlign="space-evenly center">
+        <div class="userMain">
+          <img width="50%" src="assets/user-icon.png" />
+          <h1><span [style.color]="user?.is_active ? 'green' : 'gray'">• </span> {{username}}</h1>
+          <h3 class="rating">{{rating}}</h3>
+        </div>
+        <mat-list>
+          <h3 matLine *ngIf="!empty"> Statistics </h3>
+            <mat-list-item><h2>Draws: {{stats?.draws}} ({{(stats?.drawrate || 0) * 100}} %)</h2></mat-list-item>
+            <mat-list-item><h2>Loses: {{stats?.loses}} ({{loseRate * 100}} %)</h2></mat-list-item>
+            <mat-list-item><h2>Wins: {{stats?.wins}} ({{(stats?.winrate || 0) * 100}} %)</h2></mat-list-item>
+        </mat-list>
     </div>
-  <div fxLayout="row"  fxLayoutAlign="space-evenly strech">
 
-    <mat-card class="box" >
-    <mat-list>
-      <h3 matLine *ngIf="!empty"> Statistics </h3>
-        <mat-list-item>Drawrate: {{stats?.drawrate}}</mat-list-item>
-        <mat-list-item>Draws: {{stats?.draws}}</mat-list-item>
-        <mat-list-item>Loses: {{stats?.loses}}</mat-list-item>
-        <mat-list-item>Winrate: {{stats?.winrate}}</mat-list-item>
-        <mat-list-item>Winrate as player 1: {{stats?.winrate_as_p1}}</mat-list-item>
-        <mat-list-item>Winrate as player 2: {{stats?.winrate_as_p2}}</mat-list-item>
-        <mat-list-item>Wins: {{stats?.wins}}</mat-list-item>
-    </mat-list>
-  </mat-card>
-  <mat-card class="box" >
-    <h3 matLine > Game history  </h3>
+  <div fxLayoutAlign="space-evenly strech">
+
+  <div class="actions" fxLayout="column" *ngIf="isOwner">
+    <a href="settings/password" mat-stroked-button color="accent">Change password</a>
+    <a href="settings" mat-stroked-button color="accent">Settings</a>
+    <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
+  </div>
+  <div class="actions" fxLayout="column" *ngIf="!isOwner && this.authService.isLoggedIn()">
+    <button mat-stroked-button *ngIf="!isInFriends" color="accent" (click)="sendRequest(username!)">Send friend request</button>
+    <button mat-stroked-button *ngIf="isInFriends" color="accent" (click)="unfriend(username!)">Unfriend</button>
+    <button mat-stroked-button *ngIf="!isInBlocked" color="accent" (click)="blockUser(username!)">Block</button>
+    <button mat-stroked-button *ngIf="isInBlocked" color="accent" (click)="unblockUser(username!)">Unblock</button>
+  </div>
+  <div class="game-history">
+    <h2 matLine > Game history  </h2>
     <mat-table [dataSource]="dataSource" class="table">
 
         <ng-container matColumnDef="Date">
@@ -50,23 +52,20 @@
         <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="goToGame(row)"></mat-row>
       </mat-table>
-      </mat-card>
+      </div>
     </div>
-        <div *ngIf="isOwner" fxLayout="row" fxLayoutAlign="space-evenly strech">
+    <div *ngIf="isOwner" fxLayoutAlign="space-evenly strech">
 
-          <mat-card class="box" >
+      <div class="friend-list">
         <mat-list class="list">
-          <h3 matLine *ngIf="!empty"> Friend list  </h3>
-          <h3 matLine *ngIf="empty"> Friend list empty</h3>
+          <h2 matLine *ngIf="!empty">Friend list</h2>
+          <h2 matLine *ngIf="empty">Friend list empty</h2>
             <mat-list-item *ngFor="let friend of friends">
-                <button mat-button (click)="goToProfile(friend)"> {{friend}} </button>
-                <mat-icon class="icon-right" [matMenuTriggerFor]="friends">more_vert</mat-icon>
-                <mat-menu class="menu" #friends="matMenu" xPosition="before" [overlapTrigger]="false">
-                    <button mat-menu-item (click)="goToProfile(friend)">Profile</button>
-                    <button mat-menu-item *ngIf="getIsInFriends(friend)" (click)="unfriend(friend)">Unfriend</button>
-                    <button mat-menu-item *ngIf="!getIsInBlocked(friend)" (click)="blockUser(friend)">Block</button>
-                    <button mat-menu-item *ngIf="getIsInBlocked(friend)" (click)="unblockUser(friend)">Unblock</button>
-                </mat-menu>
+                    <span [style.color]="friend.is_active ? 'green' : 'gray'">•</span>
+                    <button mat-menu-item (click)="goToProfile(friend.username)">{{friend.username}}</button>
+                    <button mat-icon-button matTooltip="Unfriend" *ngIf="getIsInFriends(friend.username)" (click)="unfriend(friend.username)"><mat-icon>delete</mat-icon></button>
+                    <button mat-icon-button matTooltip="Block" color="warn" *ngIf="!getIsInBlocked(friend.username)" (click)="blockUser(friend.username)"><mat-icon>block</mat-icon></button>
+                    <button mat-icon-button matTooltip="Unblock" *ngIf="getIsInBlocked(friend.username)" (click)="unblockUser(friend.username)"><mat-icon>add</mat-icon></button>
             </mat-list-item>
           </mat-list>
 
@@ -76,13 +75,14 @@
                   <mat-label>Username</mat-label>
                   <input formControlName="input" matInput #box>
             </mat-form-field>
+            <br />
 
             <button mat-stroked-button color="accent" class="btn-block">Add friend</button>
-        </form></mat-card>
+        </form></div>
 
-        <mat-card class="box" >
-          <h3 matLine *ngIf="!empty_req"> Friend request list  </h3>
-          <h3 matLine *ngIf="empty_req"> Friend request list empty</h3>
+        <div class="friend-requests">
+          <h2 matLine *ngIf="!empty_req"> Friend request list  </h2>
+          <h2 matLine *ngIf="empty_req"> Friend request list empty</h2>
         <mat-list *ngIf="isOwner">
             <mat-list-item *ngFor="let request of friendsRequests">
                 <a matLine>{{request.user_one_username}}</a>
@@ -90,8 +90,6 @@
                 <button mat-button color="warn" class="req-buttons"  (click)="declineFriendRequest(request.id)"> Decline </button>
             </mat-list-item>
         </mat-list>
-      </mat-card>
-
       </div>
-      <div *ngIf="!isOwner" fxFlex="20" fxLayout="row" fxLayoutAlign="space-evenly strech"></div>
+    </div>
   </div>

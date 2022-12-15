@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { LobbyService } from 'src/app/services/lobby.service';
 import { webSocket } from 'rxjs/webSocket';
 import { environment } from 'src/environments/environment';
+import { FormControl, FormGroup } from '@angular/forms';
 
 export enum LobbyStatus {
   CREATED = "CREATED",
@@ -79,7 +80,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
     return this.lastMessage
   }
 
-
+  form = new FormGroup({
+    input: new FormControl('')
+  });
 
   connectWebsocket(lobbyId: string){
     this.subject.asObservable().subscribe(
@@ -178,6 +181,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
       this.player_one = this.player_two
       this.player_two = p1
     }
+    this.form.setValue({input: this.name})
   }
 
   getName() {

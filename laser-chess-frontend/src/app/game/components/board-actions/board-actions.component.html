@@ -2,7 +2,7 @@
 [disabled]="!rotationPossible"
 (click)="sendButtonPressInfo('left')"
 [style.height.px]="height" [style.width.px]="width">
-  <mat-icon [style.font-size.px]="height">arrow_back</mat-icon>
+  <mat-icon [style.font-size.px]="height">rotate_left</mat-icon>
 </button>
 <button mat-raised-button
 [disabled]="!laserPossible"
@@ -21,5 +21,5 @@
 [disabled]="!rotationPossible"
 (click)="sendButtonPressInfo('right')"
 [style.height.px]="height" [style.width.px]="width">
-  <mat-icon [style.font-size.px]="height">arrow_forward</mat-icon>
+  <mat-icon [style.font-size.px]="height">rotate_right</mat-icon>
 </button>

@@ -31,6 +31,7 @@ export const emailEndpoint = '/email'
 export const initialGameEndpoint = '/game/initial_game_state'
 export const gameHistoryEndpoint = '/game/history'
 export const timeoutEndpoint = '/timeout'
+export const userLogoutEndpoint = '/users/me/logout'
 
 export const usersFullEndpoint = fullEndpoint(userEndpoint)
 export const tokenFullEndpoint = fullEndpoint(tokenEndpoint)
@@ -49,6 +50,7 @@ export const joinLobbyFullEndpoint = (id = ""): string => fullEndpoint(joinLobby
 export const joinRandomLobbyFullEndpoint = (id = ""): string => fullEndpoint(joinRandomLobbyEndpoint, id ? `/${id}` : '')
 export const gameFullEndpoint = (id  = ""): string => fullEndpoint(gameEndpoint, id ? `/${id}` : '')
 export const userFullEndpoint = (id  = ""): string => fullEndpoint(userEndpoint, id ? `/${id}` : '')
+export const logoutFullEndpoint = fullEndpoint(userLogoutEndpoint)
 export const giveUpFullEndpoint = fullEndpoint(giveUpEndpoint)
 export const offerDrawFullEndpoint = fullEndpoint(offerDrawEndpoint)
 export const emailFullEndpoint = (id  = ""): string => fullEndpoint(emailEndpoint, id ? `/${id}` : '')

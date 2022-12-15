@@ -1,4 +1,11 @@
-<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+<div class="main-wrapper" fxLayout="column" fxLayoutAlign="center center">
+
+  <form class="frm" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field class="example-full-width" appearance="fill">
+      <mat-label>Username</mat-label>
+      <input formControlName="input" matInput #box>
+    </mat-form-field>
+    </form>
     <mat-table [dataSource]="dataSource" class="table-box">
 
         <ng-container matColumnDef="position">

@@ -127,6 +127,7 @@ class UserGet(BaseModel):
     username: str
     rating: int
     registration_date: dt.date
+    is_active: bool
 
     class Config:
         orm_mode = True

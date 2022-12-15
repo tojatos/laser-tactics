@@ -1,0 +1,34 @@
+.frm {
+    width: 400px;
+}
+
+.leave {
+    text-align: right;
+    width: 100%;
+}
+
+.user-card {
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    background-color: #202020;
+    padding: 20px;
+}
+
+.red-player-card {
+	background-color: #902b2b;
+	font-size: 20px;
+	border: 1px solid #410909;
+}
+
+.blue-player-card {
+	background-color: #276380;
+	font-size: 20px;
+	border: 1px solid #103d53;
+}
+
+.main-wrapper {
+    padding: 30px;
+}

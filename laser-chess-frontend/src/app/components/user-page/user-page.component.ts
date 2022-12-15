@@ -15,11 +15,11 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class UserPageComponent {
 
-  constructor(private _snackBar: MatSnackBar, private userService: UserService, private route: ActivatedRoute, private authService: AuthService, private router: Router) { }
+  constructor(private _snackBar: MatSnackBar, private userService: UserService, private route: ActivatedRoute, public authService: AuthService, private router: Router) { }
 
   user: User | undefined
   username: string | undefined
-  friends: string[] | undefined
+  friends: { username: string, is_active: boolean }[] = []
   blocked: string[] | undefined
   friendsRequests: FriendRequest[] | undefined
   stats: UserStats | undefined
@@ -52,7 +52,12 @@ export class UserPageComponent {
         this.rating = this.user.rating
     })
       this.userService.getUserFriends().then(userData => {
-        this.friends = userData
+        for(let data of userData){
+          this.userService.getUserByUsername(data)?.then(res => {
+            this.friends?.push({username: res.username, is_active: res.is_active})
+          })
+        }
+
         if (this.friends?.length != 0) {
           this.empty = false
         }
@@ -94,7 +99,7 @@ export class UserPageComponent {
 
   get isInFriends() {
     if (this.friends) {
-      if (this.friends.includes(this.username!)) {
+      if (this.friends.map(f => f.username).includes(this.username!)) {
         return true
       }
       else return false
@@ -112,9 +117,15 @@ export class UserPageComponent {
     else return false
   }
 
+  get loseRate() {
+    const drawrate = this.stats?.drawrate || 1
+    const winrate = this.stats?.winrate || 1
+    return Math.max(0, 1 - drawrate + winrate)
+  }
+
   getIsInFriends(name: string) {
     if (this.friends) {
-      if (this.friends.includes(name)) {
+      if (this.friends.map(f => f.username).includes(name)) {
         return true
       }
       else return false
@@ -140,6 +151,10 @@ export class UserPageComponent {
   declineFriendRequest(id: string){
     this.userService.declineFriendRequests(id)
     this.loadData()
+  }
+
+  isActive(username: string){
+    return this.userService.checkIfActive(username)
   }
 
   unfriend(username: string){

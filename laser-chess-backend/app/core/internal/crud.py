@@ -75,6 +75,13 @@ def change_password(user: schemas.User, new_password: str, db: Session):
     db.refresh(db_user)
     return {"detail": "password change successful"}
 
+def set_active(user: schemas.User, active: bool, db: Session):
+    db_user = get_user(db, user.username)
+    db_user.is_active = active
+    db.commit()
+    db.refresh(db_user)
+    return {"detail": "user set inactive"}
+
 
 def create_lobby(db: Session, user: schemas.User):
     db_lobby = models.Lobby(name=f"{user.username}'s game", game_id=str(uuid4()), player_one_username=user.username,
@@ -293,7 +300,7 @@ def get_player_rating(db: Session, username: str):
 
 
 # gets users rating from before last match in rating period
-def get_users_last_rating(db: Session, username: str, rating_period: int = RATING_PERIOD):
+def get_userps_last_rating(db: Session, username: str, rating_period: int = RATING_PERIOD):
     user = get_user(db, username)
     crossout_date = datetime.now() - timedelta(days=rating_period)
     match_left = db.query(models.GameHistory).filter(
@@ -529,6 +536,9 @@ def get_stats(db: Session, user: schemas.User):
 
 def get_settings(db: Session, user: schemas.User):
     return db.query(models.UserSettings).filter(models.UserSettings.username == user.username).first()
+
+def get_active(db: Session, user: schemas.User):
+    return db.query(models.User).filter(models.User.username == user.username).first().is_active
 
 
 def update_settings(settings: schemas.Settings, db: Session, user: schemas.User):

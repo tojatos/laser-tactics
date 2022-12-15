@@ -4,6 +4,7 @@
 
 .list{
     margin-bottom: 50px;
+    max-width: 500px;
 }
 
 .box{
@@ -12,4 +13,73 @@
 
 .table{
     background-color: transparent;
+}
+
+.menu {
+    margin: 10px;
+    cursor: pointer;
+}
+
+.container {
+    margin: 50px;
+}
+
+.userBox {
+    border: 1px solid white;
+    padding: 10px;
+}
+
+.userMain {
+    width: 30%;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: -5px;
+}
+
+.rating {
+    color: gray;
+}
+
+.main-wrapper {
+    height: 120%;
+    padding: 0 100px 0 100px;
+}
+.actions {
+    width: 80%;
+}
+
+.actions button {
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.actions a {
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.game-history {
+    width: 40%;
+}
+
+.friend-list{
+    width: 80%;
+    padding-bottom: 100px;
+
+}
+
+.friend-list mat-form-field {
+    width: 30%;
+}
+
+.friend-list button {
+    width: 30%;
+}
+
+.friend-requests{
+    width: 40%;
+    padding-bottom: 100px;
 }

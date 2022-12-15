@@ -1,3 +1,35 @@
-.text{
-    color: #ffffff
+.container {
+    width: 50%;
+}
+
+.container div {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.buttons {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.text {
+    text-align: justify;
+}
+
+.center {
+    text-align: center;
+}
+
+.image {
+    padding: 30px;
+}
+
+button {
+    height: 100px;
+    min-width: 150px;
+    font-size: large;
 }

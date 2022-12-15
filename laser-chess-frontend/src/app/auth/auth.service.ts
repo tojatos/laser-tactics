@@ -5,7 +5,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { FormControl } from '@angular/forms';
 import { analyzeAndValidateNgModules } from '@angular/compiler';
 import { environment } from 'src/environments/environment';
-import { tokenFullEndpoint, usersFullEndpoint , userFullEndpoint, emailFullEndpoint} from '../api-definitions';
+import { tokenFullEndpoint, usersFullEndpoint , userFullEndpoint, emailFullEndpoint, logoutFullEndpoint} from '../api-definitions';
 // import * as moment from "moment"
 
 @Injectable({
@@ -29,6 +29,11 @@ export class AuthService {
 
     return this.http.post<UserToken>(tokenFullEndpoint, body.toString(), options).toPromise().then(res => this.setSession(res))
   }
+
+  logout() {
+    return this.http.put<any>(logoutFullEndpoint, {}).toPromise()
+  }
+  
 
   register(login:string, email:string, pass:string){
     return this.http.post<any>(usersFullEndpoint, {'username': login, 'email': email, 'password': pass}).toPromise();

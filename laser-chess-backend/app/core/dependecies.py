@@ -98,6 +98,7 @@ def authenticate_user(username: str, password: str, db: Session = Depends(get_db
         return False
     if not verify_password(password, user.hashed_password):
         return False
+    crud.set_active(user, True, db)
     return user
 
 

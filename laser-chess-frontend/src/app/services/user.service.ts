@@ -53,6 +53,10 @@ export class UserService {
     return this.http.post<any>(friendsFullEndpoint("requests/accept"), {'id': id}).toPromise()
   }
 
+  checkIfActive(username: string) {
+    return this.http.get<any>(userFullEndpoint(`isActive/${username}`)).toPromise()
+  }
+
   declineFriendRequests(id: string) {
     return this.http.post<any>(friendsFullEndpoint("requests/decline"),{'id': id}).toPromise()
   }

@@ -1,32 +1,38 @@
-<div class="main-wrapper" fxLayout="column" fxLayoutAlign="center">
-    <div class="main-wrapper" fxFlex="20" fxLayout="row" fxLayoutAlign="end start">
+<div class="main-wrapper" fxLayout="column">
+    <h1>Create new game</h1>
+    <div class="leave">
         <button mat-stroked-button color="warn" class="leave-lobby-button" (click)="leaveLobby()"> Leave lobby </button>
     </div>
-    <div class="main-wrapper" fxFlex="10" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
-        <mat-card class="mat-card-lobby">
-            <input class="input-box" #box (keyup.enter)="onEnter(box.value)" placeholder={{name}}> </mat-card>
+    <div fxLayoutAlign="center center">
+    <form class="frm" [formGroup]="form">
+        <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Game name</mat-label>
+            <input formControlName="input" matInput #box (change)="onEnter(box.value)">
+        </mat-form-field>
+    </form>
     </div>
-    <div class="main-wrapper" fxFlex="20" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
-        <mat-card *ngIf="!player_one" class="red-player-card" (click)="joinLobby()">
-            Join lobby
-        </mat-card>
-        <mat-card *ngIf="player_one" class="red-player-card">
-            {{player_one}}
-        </mat-card>
-        <mat-card *ngIf="!player_two" class="blue-player-card" (click)="joinLobby()">
-            Join lobby
-        </mat-card>
-        <mat-card *ngIf="player_two" class="blue-player-card">
-            {{player_two}}
-        </mat-card>
+    <div class="main-wrapper" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="20px">
+        <div fxLayoutGap="40px" fxLayout="row">
+            <div class="user-card red-player-card" *ngIf="!player_one">
+                <button mat-button [disabled]="!isPlayerOne" (click)="joinLobby()">Join lobby</button>
+            </div>
+            <div class="user-card blue-player-card" *ngIf="player_one">
+                <button mat-button disabled>{{player_one}}</button>
+            </div>
+            <div class="user-card red-player-card" *ngIf="!player_two">
+                <button mat-button [disabled]="!isPlayerOne" (click)="joinLobby()">Join lobby</button>
+            </div>
+            <div class="user-card blue-player-card" *ngIf="player_two">
+                <button mat-button disabled>{{player_two}}</button>
+            </div>
+        </div>
+        <div>
+            <button mat-stroked-button [disabled]="!isPlayerOne" (click)="changePlayers()"> Change players </button>
+        </div>
     </div>
-    <div class="main-wrapper" fxFlex="20" fxFlexAlign="stretch" fxLayoutGap="30px" fxLayout="column"
-        fxLayoutAlign="start center">
-        <button mat-stroked-button [disabled]="!isPlayerOne" (click)="changePlayers()"> Change players </button>
-    </div>
-    <div class="main-wrapper" fxFlex="20" fxFlexAlign="stretch" fxLayoutGap="30px" fxLayout="row"
-        fxLayoutAlign="center center">
-        <mat-slide-toggle [disabled]="!isPlayerOne" (change)="changeTime()" [(ngModel)]="isTimed">Is game timed</mat-slide-toggle> <br />
+    <div fxLayoutGap="20px" fxLayout="column" fxLayoutAlign="center center">
+        <mat-slide-toggle [disabled]="!isPlayerOne" (change)="changeTime()" [(ngModel)]="isTimed">Is game timed</mat-slide-toggle>
+        <div *ngIf="isTimed" fxLayoutGap="20px" fxLayout="row" fxLayoutAlign="center center">
         <mat-form-field appearance="fill">
           <mat-label>Red player time</mat-label>
           <mat-select (selectionChange)="changeTime()" [disabled]="!isTimed || !isPlayerOne" [(value)]="selectedTime1">
@@ -43,12 +49,15 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+          </div>
     </div>
     <div class="main-wrapper" fxFlexAlign="center" fxFlex="20" fxLayoutGap="40px" fxLayout="row" fxLayoutAlign="center center">
-        <mat-card class="mat-card-lobby"> {{isRanked}} </mat-card>
-        <mat-card>
+        <div class="user-card mat-card-lobby"> 
+            <button mat-button disabled>{{isRanked}}</button> 
+        </div>
+        <div class="user-card with-button">
             <button mat-button [disabled]="!isPlayerOne" (click)="changePrivacy()">{{isPrivate}}</button>
-             </mat-card>
+             </div>
     </div>
     <div class="main-wrapper" fxFlex="30" sfxLayout="column" fxLayoutAlign="center start">
         <button mat-stroked-button [disabled]="!isPlayerOne" color="accent" class="start-game-button" (click)="startGame()"> Start game </button>
