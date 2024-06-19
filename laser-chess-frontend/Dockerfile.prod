@@ -2,7 +2,7 @@ FROM node:16.10.0 AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
-RUN npm install -g @angular/cli
+RUN npm install -g @angular/cli@~12.2.3
 COPY . .
 
 RUN ng build
