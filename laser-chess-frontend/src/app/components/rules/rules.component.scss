@@ -1,13 +1,21 @@
-.main-wrapper{
+.main-wrapper {
   padding: 20px;
   height: min-content;
   overflow: hidden;
   scrollbar-width: none;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.card-element{
-  float:left;
-  width:fit-content;
+.laser-cards { }
+
+mat-card {
+  margin: 20px;
+}
+
+.card-element {
+  float: left;
+  width: fit-content;
 }
 
 .image {
@@ -17,16 +25,13 @@
   margin-right: 30px;
 }
 
-.name{
-  width: 200px;
+.name {
+  width: 140px;
 }
 
-mat-card{
-  margin: 20px;
-}
 
-h1{
-  margin-top: 35px;
+h1 {
+  margin-top: 15px;
 }
 
 img {
@@ -35,6 +40,6 @@ img {
   width: 50px;
 }
 
-.description{
+.description {
   font-size: 16px;
 }

@@ -1,178 +1,355 @@
 <div class="main-wrapper" fxLayout="column">
-
   <h1>Rules</h1>
   <h3>
-  Laser Tactics, is a chesslike strategy game for two players. The goal is to manipulate a laser-firing piece and various reflective objects to eliminate your opponent's king. As in traditional chess, there are an infinite number of ways to accomplish this.
-
-  There are eight basic types of pieces in Laser Tactics, and each has unique capabilities. Over time, you'll learn each piece's advantages and limitations. Obviously, the more you play Laser Tactics, the more you'll understand the pieces in your arsenal, which in turn will make you a better player. So let's start with a description of the pieces.
+    <p>
+      <strong>Laser Tactics</strong> is a chesslike strategy game for two players.
+    </p>
+    <p>
+      The <strong>goal</strong> is to manipulate a Laser-firing piece and various reflective objects <strong>to
+        eliminate your opponent's King</strong>.
+      As in traditional chess, there are an infinite number of ways to accomplish this.
+    </p>
+    <p>
+      There are <strong>eight</strong> basic types of pieces in Laser Tactics, and each has unique capabilities.
+      Over time, you'll learn each piece's advantages and limitations.
+      Obviously, the more you play Laser Tactics, the more you'll understand the pieces in your arsenal, which in turn
+      will make you a better player.
+    </p>
   </h3>
-
   <h1>A Geometric Army</h1>
   <h3>
-  The table below shows each piece and its name. Notice that some sides of certain pieces are highlighted with a different color. This indicates a reflective surface. When a laser beam strikes a reflective surface, it bounces off without harming the piece. But if a piece is hit by a laser on a nonreflective surface, it is destroyed.
+    <p>
+      The table below shows each piece and its name. Notice that some sides of certain pieces are highlighted with a
+      different color. This indicates a reflective surface. When a <strong>Laser Beam</strong> strikes a reflective
+      surface, it bounces off
+      without harming the piece. But if a piece is hit by a Laser on a nonreflective surface, it is destroyed.
+    </p>
 
-  A piece can be removed from the board if it is captured by an opposing piece. This is similar to traditional chess; to capture a piece, you simply move one of your own pieces onto its square.
+    <p>
+      A piece can be removed from the board if it is captured by an opposing piece. This is similar to traditional
+      chess;
+      to capture a piece, you simply move one of your own pieces onto its square.
+    </p>
 
-  In addition to their ability to move from square to square, pieces with reflective surfaces can also be rotated in place in 90-degree increments. This lets you orient the piece to protect it against opposing laser shots, or to set up bounce shots with your own laser.
-</h3>
-<mat-card fxLayout="row" fxLayoutAlign="center center">
-  <div class="card-element" class="name">
-    <h1>King</h1>
-  </div>
+    <p>
+      In addition to their ability to move from square to square, pieces with reflective surfaces can also be rotated in
+      place in 90-degree increments. This lets you orient the piece to protect it against opposing Laser shots, or to
+      set
+      up bounce shots with your own Laser.
+    </p>
+  </h3>
+  <div class="laser-cards">
+    <mat-card fxLayout="row" fxLayoutAlign="center center">
+      <div class="card-element" class="name">
+        <h1>King</h1>
+      </div>
 
-  <div class="card-element image">
-    <img src="assets/classic/KING_RED.svg"/>
-  </div>
+      <div class="card-element image">
+        <img src="assets/classic/King_RED.svg" />
+      </div>
 
-  <div class="card-element description">
-    The king is the most important piece in Laser Tactics. When the king is eliminated, the other player wins the game. Since it has no reflective surfaces, it can be destroyed by a laser from any angle. It can also be captured by an opposing piece. The king is not totally defenseless, however. It can capture any opposing piece by moving onto its square. But you can use it for a capture only once per turn.
-  </div>
+      <div class="card-element description">
+        <p>
+          The <strong>King</strong> is the most important piece in Laser Tactics.
+        </p>
+        <p>
+          <strong>When the King is eliminated, the other player wins the game.</strong>
+        </p>
+        <p>
+          Since it has no reflective surfaces, it can be destroyed by a Laser from any angle. It can also be captured
+          by an opposing piece. The King is not totally defenseless, however. It can capture any opposing piece by
+          moving
+          onto its square. But you can use it for a capture <strong>only once per turn</strong>
+        </p>
+      </div>
+      <div style="clear: both;"></div>
+    </mat-card>
+    <mat-card fxLayout="row" fxLayoutAlign="center center">
+      <div class="card-element name">
+        <h1>Laser</h1>
+      </div>
 
-  <div style="clear: both;"></div>
+      <div class="card-element image">
+        <img src="assets/classic/Laser_RED.svg" />
+      </div>
+      <div class="card-element description">
+        <p>
+          The second most important piece is the <strong>Laser</strong>.
+        </p>
+        <p>
+          This piece is your primary offensive weapon; it's the only piece
+          which can fire a <strong>Laser Beam</strong>.
+        </p>
+        <p>
+          To take aim, you can rotate it in place at 90-degree angles. Like the King, the Laser
+          is completely vulnerable to enemy Laser strikes, because it has no reflective surfaces. If you lose your
+          Laser,
+          the game is not over, but only the most skillful (or incredibly lucky) player can overcome its loss.
+        </p>
+      </div>
+      <div style="clear: both;"></div>
+    </mat-card>
+    <mat-card fxLayout="row" fxLayoutAlign="center center">
+      <div class="card-element name">
+        <h1>Hypercube</h1>
+      </div>
 
-</mat-card>
+      <div class="card-element image">
+        <img src="assets/classic/HYPER_CUBE_RED.svg" />
+      </div>
 
-<mat-card fxLayout="row" fxLayoutAlign="center center">
-  <div class="card-element name">
-    <h1>Laser</h1>
-  </div>
+      <div class="card-element description">
+        <p>
+        The <strong>Hypercube </strong>is an interesting piece. It can't harm an opposing piece directly, but may very well do so
+        indirectly.
+</p>
 
-  <div class="card-element image">
-    <img src="assets/classic/LASER_RED.svg"/>
-  </div>
+        <p>
+        When the Hypercube is moved onto another piece (even your own), that piece disappears from its
+        original position and reappears on a randomly selected empty square. This can happen only once per turn.
+</p>
 
-  <div class="card-element description">
-    The second most important piece is the laser. This piece is your primary offensive weapon; it's the only piece which can fire a laser shot. To take aim, you can rotate it in place at 90-degree angles. Like the king, the laser is completely vulnerable to enemy laser strikes, because it has no reflective surfaces. If you lose your laser, the game is not over, but only the most skillful (or incredibly lucky) player can overcome its loss.  </div>
-  <div style="clear: both;"></div>
+        <p>
+        The Hypercube can be a two-edged sword; it may relocate a piece to a vulnerable position, or it may make it possible
+        for the piece to capture an important opposing piece on the next move. The Hypercube has no reflective surfaces
+        and cannot be rotated. It is invulnerable to Laser shots, however, because it's made of transparent material - a
+        Laser Beam passes right through it. Remember that.
+</p>
+      </div>
 
-</mat-card>
+      <div style="clear: both;"></div>
+    </mat-card>
+    <mat-card fxLayout="row" fxLayoutAlign="center center">
+      <div class="card-element name">
+        <h1>Beam Splitter</h1>
+      </div>
 
-<mat-card fxLayout="row" fxLayoutAlign="center center">
-  <div class="card-element name">
-    <h1>Hypercube</h1>
-  </div>
+      <div class="card-element image">
+        <img src="assets/classic/BEAM_SPLITTER_RED.svg" />
+      </div>
 
-  <div class="card-element image">
-    <img src="assets/classic/HYPER_CUBE_RED.svg"/>
-  </div>
+      <div class="card-element description">
+        <p>
+        The <strong>Beam Splitter</strong> is another tricky piece.
+        </p>
+        <p>
+        When a Laser Beam strikes a splitter's vertex (the point opposite its base), the Beam splits in two.
+        The two new Beams travel in opposite directions, perpendicular to the original
+        Beam's path.
+        </p>
+        <p>
+        When a Laser shot hits one of the Beam splitter's reflective surfaces, it bounces off at a
+        90-degree
+        angle without splitting.
+        </p>
+        <p>
+        If the Beam splitter's base it hit by a Laser shot, it is destroyed. The Beam splitter
+        can be rotated.
+        </p>
+      </div>
+      <div style="clear: both;"></div>
+    </mat-card>
+    <mat-card fxLayout="row" fxLayoutAlign="center center">
+      <div class="card-element name">
+        <h1>Block</h1>
+      </div>
 
-  <div class="card-element description">
-    The hypercube is an interesting piece. It can't harm an opposing piece directly, but may very well do so indirectly. When the hypercube is moved onto another piece (even your own), that piece disappears from its original position and reappears on a randomly selected empty square. This can happen only once per turn. The hypercube can be a two-edged sword; it may relocate a piece to a vulnerable position, or it may make it possible for the piece to capture an important opposing piece on the next move. The hypercube has no reflective surfaces and cannot be rotated. It is invulnerable to laser shots, however, because it's made of transparent material--a laser beam passes right through it. Remember that.  </div>
+      <div class="card-element image">
+        <img src="assets/classic/BLOCK_RED.svg" />
+      </div>
 
-  <div style="clear: both;"></div>
+      <div class="card-element description">
+        <p>
+        The <strong>Blocks</strong> are fairly simple pieces. However, they may impose some complex situations.
+  </p>
+        <p>
+        A block <strong>can capture</strong> any opposing piece by moving onto that piece's square, much like a King.
+  </p>
+        <p>
+        But unlike a King, a block has one reflective
+        side and can be rotated as the situation demands. Therefore, Blocks can be used offensively or defensively.
+        A Laser Beam that hits the reflective surface of a block is deflected 180 degrees - bouncing the Beam back where it
+        came from.
+  </p>
 
-</mat-card>
-
-<mat-card fxLayout="row" fxLayoutAlign="center center">
-  <div class="card-element name">
-    <h1>Beam Splitter</h1>
-  </div>
-
-  <div class="card-element image">
-    <img src="assets/classic/BEAM_SPLITTER_RED.svg"/>
-  </div>
-
-  <div class="card-element description">
-The beam splitter is another tricky piece. When a laser beam strikes a splitter's vertex (the point opposite its base), the beam splits in two. The two new beams travel in opposite directions, perpendicular to the original beam's path. When a laser shot hits one of the beam splitter's reflective surfaces, it bounces off at a 90-degree angle without splitting. If the beam splitter's base it hit by a laser shot, it is destroyed. The beam splitter can be rotated.
-    </div>
-<div style="clear: both;"></div>
-
-</mat-card>
-
-<mat-card fxLayout="row" fxLayoutAlign="center center">
-  <div class="card-element name">
-    <h1>Block</h1>
-  </div>
-
-  <div class="card-element image">
-    <img src="assets/classic/BLOCK_RED.svg"/>
-  </div>
-
-  <div class="card-element description">
-    The blocks are fairly simple pieces. However, they may impose some complex situations. A block can capture any opposing piece by moving onto that piece's square, much like a king. But unlike a king, a block has one reflective side and can be rotated as the situation demands. Therefore, blocks can be used offensively or defensively. A laser beam that hits the reflective surface of a block is deflected 180 degrees--bouncing the beam back where it came from.
-
-  </div>
-  <div style="clear: both;"></div>
-
-  </mat-card>
-
-<mat-card fxLayout="row" fxLayoutAlign="center center">
-  <div class="card-element name">
-    <h1>Diagonal Mirror</h1>
-  </div>
-
-  <div class="card-element image">
-    <img src="assets/classic/DIAGONAL_MIRROR_RED.svg"/>
-  </div>
-
-  <div class="card-element description">
-    The blocks are fairly simple pieces. However, they may impose some complex situations. A block can capture any opposing piece by moving onto that piece's square, much like a king. But unlike a king, a block has one reflective side and can be rotated as the situation demands. Therefore, blocks can be used offensively or defensively. A laser beam that hits the reflective surface of a block is deflected 180 degrees--bouncing the beam back where it came from.
-  </div>
-  <div style="clear: both;"></div>
-
-  </mat-card>
-
-  <mat-card fxLayout="row" fxLayoutAlign="center center">
-    <div class="card-element name">
-      <h1>Mirror</h1>
-    </div>
-
-    <div class="card-element image">
-      <img src="assets/classic/MIRROR_RED.svg"/>
-    </div>
-
-    <div class="card-element description">
-      The horizontal mirrors and vertical mirrors (known collectively as straight mirrors) are also invulnerable to lasers due to their reflective surfaces. When a laser hits a straight mirror edgewise, the beam passes through it. Straight mirrors can be rotated to become either horizontal or vertical mirrors, but not diagonal mirrors.
-    </div>
-    <div style="clear: both;"></div>
+      </div>
+      <div style="clear: both;"></div>
 
     </mat-card>
 
     <mat-card fxLayout="row" fxLayoutAlign="center center">
       <div class="card-element name">
-        <h1>Triangular mirror</h1>
+        <h1>Diagonal Mirror</h1>
       </div>
 
       <div class="card-element image">
-        <img src="assets/classic/TRIANGULAR_MIRROR_RED.svg"/>
+        <img src="assets/classic/DIAGONAL_MIRROR_RED.svg" />
       </div>
 
       <div class="card-element description">
-        The triangular mirrors deflect laser beams just as diagonal mirrors do, but they are vulnerable to hits on their two nonreflective sides. A triangular mirror can be rotated in 90-degree increments. Triangular mirrors are worst type of mirror, yet you have them most on field. 6 for each player.
-        </div>
-        <div style="clear: both;"></div>
+        <p>
+        A <strong>Diagonal Mirror</strong> cannot be destroyed by a laser, because both of its sides are reflective.
+</p>
 
-      </mat-card>
-      <h3>
-      A turn consists of two moves. ... Moving a distance of one square takes one move; moving two squares takes two moves, although you can move a piece two squares in one step. Since you have only two moves per turn, the maximum distance a piece can be moved in one turn is two squares. ... Pieces can be moved forward, backward, left, or right, but not diagonally. You can effectively move a piece diagonally by using two moves--forward and right, for instance.
+        <p>
+        Diagonal mirrors can be removed from the board only when captured by a block or a king.
+        When a laser beam strikes a diagonal mirror, the beam is deflected 90 degrees. Diagonal mirrors can be flipped to their opposing diagonal, but cannot be rotated to face horizontally or vertically.
+</p>
+      </div>
+      <div style="clear: both;"></div>
+    </mat-card>
+    <mat-card fxLayout="row" fxLayoutAlign="center center">
+      <div class="card-element name">
+        <h1>Straight Mirror</h1>
+      </div>
 
-      You cannot move a piece onto a square occupied by another piece. The only exceptions are captures with blocks and kings, and moves of the hypercube as described above.
-      </h3>
-      <h1>Rotating A Piece</h1>
-      [If a piece is selected and rotated], the piece rotates 90 degrees (one quarter-turn) clockwise. You may continue rotating the piece to any desired position before deselecting it. Rotating a piece to face any direction takes only one move, and the move is subtracted after the piece is deselected. ... You can combine a rotation and a move in a single action. First, select the piece, then rotate the piece in the direction you wish it to face. Finally, move to any adjacent square (except a diagonal) as you would normally do. The piece moves to that square and faces in the direction you've chosen. Since rotating a piece and moving a piece each take one move, this uses up your turn.
+      <div class="card-element image">
+        <img src="assets/classic/MIRROR_RED.svg" />
+      </div>
 
-      <h1>Special Features</h1>
-      <h3>
-        At the center of the 9x9 board is a special square called a hypersquare. It absorbs laser beams and acts like a stationary hypercube. That is, if you try to move a piece onto it, the piece disappears from the original position and reappears on a randomly selected empty square. This can happen only once per turn, however. ...
-      Firing The Laser
-      ... When it's your turn, you can select ... to fire your laser. Firing your laser takes only one move, but can be done only once per turn. Therefore, you may want to use your first move in a turn to aim the laser, rotate a reflecting piece to set up a bounce shot, or move another piece into position.
+      <div class="card-element description">
+        <p>
+        The horizontal and vertical <strong>Mirrors</strong> (known collectively as Straight Mirrors) are also invulnerable to
+        Lasers due to their reflective surfaces.
+</p>
 
-      Of course, you won't necessarily be firing the laser on every turn. Much of the strategy in Laser Tactics involves moving and rotating your pieces to set up complex shots. It's important to realize that any laser hit on a piece's nonreflective or nontransparent surface will destroy that piece. You can destroy your own pieces just as easily as you can destroy your opponent's. You can even zap your own laser, particularly if you fire directly into the 180-degree reflective surface of a straight mirror or block, or if you fail to anticipate the effects of a beam splitter. Be forewarned.
-      </h3>
+        <p>
+        When a Laser hits a straight mirror edgewise, the Beam passes through it.
+</p>
+        <p>
 
-      <h1>Laser Tactics Strategy</h1>
-      <h3>
-      As in the conventional game of chess, much of the strategy in Laser Tactics revolves around thoughtful placement of your pieces. However, the character of the game differs from that of chess in many ways. The laser, for example, can strike at long distances and in more than one direction at once. And the hypercube adds an extra element of uncertainty. The best strategy for any particular game depends to a great extent on the skill and personality of your opponent. However, there are some general tips you may find helpful.
+        Straight mirrors can be rotated to become either horizontal or vertical mirrors, but not diagonal mirrors.
+</p>
+      </div>
+      <div style="clear: both;"></div>
+    </mat-card>
+    <mat-card fxLayout="row" fxLayoutAlign="center center">
+      <div class="card-element name">
+        <h1>Triangular Mirror</h1>
+      </div>
 
-      Get your mirrors out early. Use them to gain the fullest potential of your laser. Try to position mirror networks on both sides of the beam splitter so you can inflict as much damage as possible.
+      <div class="card-element image">
+        <img src="assets/classic/TRIANGULAR_MIRROR_RED.svg" />
+      </div>
 
-      Take advantage of the blocks. Since they ``control'' an area around them with their threat of capture, no other pieces can safely move within their range. Make your opponent work to displace them. Remember to rotate the reflective side of a block to the most probable direction of laser fire. If you can prevent a laser from destroying the block, your opponent will most likely have to gang up on it with two or more of his or her own blocks.
+      <div class="card-element description">
+        <p>
+        The <strong>Triangular Mirrors</strong> deflect Laser Beams just as Diagonal Mirrors do, but they are vulnerable to hits on their
+        two nonreflective sides.
+</p>
+        <p>
 
-      Use mirrors to protect your king. If you surround your king with straight and diagonal mirrors, there is no way it can be hit by a laser. Therefore, your opponent will have to break through your defense with blocks. (This is a pretty dirty trick, because when all of your opponent's blocks have been used, your king is almost invulnerable.) Defending your king with blocks is also a good strategy.
+        A triangular mirror can be rotated in 90-degree increments.
+</p>
 
-      The hypercube should be used sparingly, since you have no idea where a relocated piece will reappear. Most players use the hypercube as a last resort--if another piece is going to be destroyed anyway, it doesn't hurt to take a chance and relocate it with the hypercube. Also, if your opponent's king is encircled with mirrors, you can march right in with your king with your hypercube, followed by a block. This tactic may displace your opponent's defense, forcing him to evacuate the king from its mirrored fortress. Escorting the hypercube with an adjacent block prevents the opponent from attacking the hypercube with his or her king. Your opponent's only options will be to flee or be displaced.
-    </h3>
+        <p>
+        Triangular mirrors are worst type of mirror, yet you have them most on field.  6 for each player.
+</p>
+      </div>
+      <div style="clear: both;"></div>
+    </mat-card>
+  </div>
+  <h1>Taking A Turn</h1>
+  <h3>
+    <p>
+      A turn consists of <strong>two actions</strong>.
+    </p>
+    Available actions are:
+    <ul>
+      <li>Moving a piece</li>
+      <li>Rotating a piece</li>
+      <li>Shooting the Laser Beam <i>(available only once per turn)</i> </li>
+    </ul>
+    <p>
+      Moving a distance of one square takes one action.
+      Moving two squares takes two actions, although you can move a piece two squares in one step.
+    </p>
+    <p>
+      Pieces can be moved forward, backward, left, or right, but not diagonally.
+      You can effectively move a piece diagonally by using two moves - forward and right, for instance.
+    </p>
 
-    <a href="http://www.public.asu.edu/~checkma/laserchess/">Reference</a>
+    <p>
+      You cannot move a piece onto a square occupied by another piece. The only exceptions are captures with Blocks and
+      Kings, and moves of the Hypercube as described above.
+    </p>
+  </h3>
+  <h1>Rotating A Piece</h1>
+  <h3>
+    <p>
+    [If a piece is selected and rotated], the piece rotates 90 degrees in a selected direction.
+    You may continue rotating the piece to any desired position before deselecting it.
+</p>
+    <p>
+    <strong>Rotating</strong> a piece to face any direction takes <strong>only one action</strong>, and the move is subtracted after the piece is deselected.
+</p>
+  </h3>
+  <h1>Special Features</h1>
+  <h3>
+    <h2>Hypersquare</h2>
+    <p>
+      At the center of the 9x9 board is a special square called a <strong>Hypersquare</strong>.
+      It absorbs Laser Beams and acts like a stationary Hypercube.
+      That is, if you try to move a piece onto it, the piece disappears from the original position
+      and reappears on a randomly selected empty square. This can happen only once per turn, however.
+    </p>
+    <h2>Firing The Laser</h2>
+    <p>
+      When it's your turn, you can select [*] to fire your Laser. Firing your Laser takes only one move, but can be
+      done only once per turn. Therefore, you may want to use your first move in a turn to aim the Laser, rotate a
+      reflecting piece to set up a bounce shot, or move another piece into position.
+    </p>
+    <p>
+      Of course, you won't necessarily be firing the Laser on every turn. Much of the strategy in Laser Tactics involves
+      moving and rotating your pieces to set up complex shots. It's important to realize that any Laser hit on a piece's
+      nonreflective or nontransparent surface will destroy that piece. You can destroy your own pieces just as easily as
+      you can destroy your opponent's. You can even zap your own Laser, particularly if you fire directly into the
+      180-degree reflective surface of a straight mirror or block, or if you fail to anticipate the effects of a Beam
+      Splitter. Be forewarned.
+    </p>
+  </h3>
+  <h1>Laser Tactics Strategy</h1>
+  <h3>
+    <p>
+      As in the conventional game of chess, much of the strategy in Laser Tactics revolves around thoughtful placement
+      of
+      your pieces. However, the character of the game differs from that of chess in many ways. The Laser, for example,
+      can
+      strike at long distances and in more than one direction at once. And the Hypercube adds an extra element of
+      uncertainty. The best strategy for any particular game depends to a great extent on the skill and personality of
+      your opponent. However, there are some general tips you may find helpful.
+    </p>
 
+    <p>
+      Get your mirrors out early. Use them to gain the fullest potential of your Laser. Try to position mirror networks
+      on
+      both sides of the Beam Splitter so you can inflict as much damage as possible.
+    </p>
+
+    <p>
+      Take advantage of the Blocks. Since they "control" an area around them with their threat of capture, no other
+      pieces can safely move within their range. Make your opponent work to displace them. Remember to rotate the
+      reflective side of a block to the most probable direction of Laser fire. If you can prevent a Laser from
+      destroying
+      the block, your opponent will most likely have to gang up on it with two or more of his or her own Blocks.
+    </p>
+
+    <p>
+      Use mirrors to protect your King. If you surround your King with Straight and Diagonal Mirrors, there is no way it
+      can be hit by a Laser. Therefore, your opponent will have to break through your defense with Blocks. (This is a
+      pretty dirty trick, because when all of your opponent's Blocks have been used, your King is almost invulnerable.)
+      Defending your King with Blocks is also a good strategy.
+    </p>
+
+    <p>
+      The Hypercube should be used sparingly, since you have no idea where a relocated piece will reappear. Most players
+      use the Hypercube as a last resort - if another piece is going to be destroyed anyway, it doesn't hurt to take a
+      chance and relocate it with the Hypercube. Also, if your opponent's King is encircled with Mirrors, you can march
+      right in with your King with your Hypercube, followed by a Block.
+      This tactic may displace your opponent's defense, forcing him to evacuate the King from its mirrored fortress.
+      Escorting the Hypercube with an adjacent block prevents the opponent from attacKing the Hypercube with his or her King.
+      Your opponent's only options will be to flee or be displaced.
+    </p>
+  </h3>
+  <a href="http://www.public.asu.edu/~checkma/laserchess/">Reference</a>
 </div>
