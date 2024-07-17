@@ -14,6 +14,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.laser-tactics-front.rule=((Host(`krzysztofruczkowski.pl`) || Host(`www.krzysztofruczkowski.pl`)) && PathPrefix(`/laser-tactics/`))"
+      - "traefik.http.middlewares.laser-tactics-front-stripprefix.stripPrefix.prefixes=/laser-tactics"
+      - "traefik.http.routers.laser-tactics-front.middlewares=laser-tactics-front-stripprefix"
       - "traefik.http.routers.laser-tactics-front.tls=true"
       - "traefik.http.routers.laser-tactics-front.tls.certresolver=myresolver"
       - "traefik.http.services.laser-tactics-front.loadbalancer.server.port=80"
