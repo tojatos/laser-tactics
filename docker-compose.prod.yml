@@ -13,9 +13,7 @@ services:
       - fastapi
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laser-tactics-front.rule=((Host(`krzysztofruczkowski.pl`) || Host(`www.krzysztofruczkowski.pl`)) && PathPrefix(`/laser-tactics/`))"
-      - "traefik.http.middlewares.laser-tactics-front-stripprefix.stripPrefix.prefixes=/laser-tactics"
-      - "traefik.http.routers.laser-tactics-front.middlewares=laser-tactics-front-stripprefix"
+      - "traefik.http.routers.laser-tactics-front.rule=Host(`laserchess.krzysztofruczkowski.pl`)"
       - "traefik.http.routers.laser-tactics-front.tls=true"
       - "traefik.http.routers.laser-tactics-front.tls.certresolver=myresolver"
       - "traefik.http.services.laser-tactics-front.loadbalancer.server.port=80"
@@ -36,7 +34,7 @@ services:
       - HOST=0.0.0.0
       - PORT=80
       - ROOT_PATH=/laser-tactics-api
-      - FE_HOST=www.krzysztofruczkowski.pl/laser-tactics
+      - FE_HOST=laserchess.krzysztofruczkowski.pl
         # - VERIFY_MAIL_FROM=verification@lasertactics.online
         # - VERIFY_MAIL_USERNAME=verification@lasertactics.online
         # - VERIFY_MAIL_PASSWORD=Verify123!@#

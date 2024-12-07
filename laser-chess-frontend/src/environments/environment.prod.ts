@@ -5,5 +5,5 @@ export const environment = {
   CHAT_WEBSOCKET_URL: "ws://krzysztofruczkowski.pl/laser-tactics-api/chat",
   LOBBY_WEBSOCKET_URL: "wss://krzysztofruczkowski.pl/laser-tactics-api/lobby_ws",
   API_PREFIX: "/api/v1",
-  baseHref: "/laser-tactics/"
+  baseHref: "/"
 };

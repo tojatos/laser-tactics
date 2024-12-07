@@ -5,7 +5,7 @@ RUN npm install
 RUN npm install -g @angular/cli@~12.2.3
 COPY . .
 
-RUN ng build --prod --base-href=/laser-tactics
+RUN ng build --prod
 
 FROM nginx:1.21.3
 COPY --from=build /app/dist/laser-chess-frontend /usr/share/nginx/html

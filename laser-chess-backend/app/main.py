@@ -28,6 +28,7 @@ origins = [
     "http://localhost:2346",
     "https://krzysztofruczkowski.pl",
     "https://www.krzysztofruczkowski.pl",
+    "https://laserchess.krzysztofruczkowski.pl",
 ]
 
 app.add_middleware(
