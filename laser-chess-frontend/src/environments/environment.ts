@@ -9,7 +9,6 @@ export const environment = {
   CHAT_WEBSOCKET_URL: "ws://localhost/chat",
   LOBBY_WEBSOCKET_URL: "ws://localhost/lobby_ws",
   API_PREFIX: "/api/v1",
-  baseHref: "/"
 };
 
 /*
