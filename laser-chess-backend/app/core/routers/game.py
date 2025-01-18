@@ -87,5 +87,7 @@ async def websocket_endpoint(websocket: WebSocket,
                 await send_websocket_response(404)
     except WebSocketDisconnect:
         print('Websocked disconnected:', websocket.client)
+    except Exception as e:
+        print(f'Websocked Error: {e}')
+    finally:
         await manager.disconnect(websocket)
-        pass
