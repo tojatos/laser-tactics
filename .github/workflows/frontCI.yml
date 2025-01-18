@@ -7,12 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: npm install
         working-directory: ./laser-chess-frontend
         run: npm install --force
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+        uses: cypress-io/github-action@v5
         with:
           working-directory: ./laser-chess-frontend
           start: npm start

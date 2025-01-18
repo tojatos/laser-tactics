@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - improvements-server-side
   pull_request:
     branches:
       - main
@@ -11,9 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install Python 3
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install dependencies
@@ -26,4 +27,4 @@ jobs:
           cd laser-chess-backend
           coverage run -m pytest tests
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
