@@ -8,9 +8,8 @@ describe('SettingsBlockedUsersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SettingsBlockedUsersComponent ]
-    })
-    .compileComponents();
+      declarations: [SettingsBlockedUsersComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -1,20 +1,32 @@
-<div style="height: 100vh;">
-  <mat-toolbar color="primary" >
+<div style="height: 100vh">
+  <mat-toolbar color="primary">
     <mat-toolbar-row>
       <button mat-icon-button (click)="sidenav.toggle()" fxShow="true" fxHide.gt-sm>
         <mat-icon>menu</mat-icon>
       </button>
-      <span style="cursor:pointer" routerLink="">Laser Tactics</span>
+      <span style="cursor: pointer" routerLink="">Laser Tactics</span>
       <span class="spacer"></span>
-      <div fxShow="true" fxHide.lt-md="true" >
+      <div fxShow="true" fxHide.lt-md="true">
         <a href="#" mat-button routerLink="">Home</a>
         <a href="#" mat-button routerLink="ranking">Ranking</a>
         <a href="#" mat-button [routerLink]="lobby" (click)="joinRandomLobby(false)">Join game</a>
-        <a href="#" mat-button [routerLink]="lobby" (click)="joinRandomLobby(true)">Join ranked game</a>
+        <a href="#" mat-button [routerLink]="lobby" (click)="joinRandomLobby(true)"
+          >Join ranked game</a
+        >
         <a href="#" mat-button routerLink="rules">Rules</a>
-        <a href="#" *ngIf="!isLoggedin"  mat-button routerLink="login" routerLinkActive="active">Login</a>
-        <a href="#" *ngIf="!isLoggedin" mat-button mat-raised-button routerLink="register" routerLinkActive="active">Register</a>
-        <a mat-button *ngIf="isLoggedin" [matMenuTriggerFor]="user">{{username}}</a>
+        <a href="#" *ngIf="!isLoggedin" mat-button routerLink="login" routerLinkActive="active"
+          >Login</a
+        >
+        <a
+          href="#"
+          *ngIf="!isLoggedin"
+          mat-button
+          mat-raised-button
+          routerLink="register"
+          routerLinkActive="active"
+          >Register</a
+        >
+        <a mat-button *ngIf="isLoggedin" [matMenuTriggerFor]="user">{{ username }}</a>
         <mat-menu class="menu" #user="matMenu" xPosition="after">
           <span (mouseleave)="closeMenu()">
             <button mat-menu-item [routerLink]="['/users', username]">Profile</button>
@@ -31,14 +43,60 @@
       <mat-nav-list>
         <a href="#" mat-list-item routerLink="" (click)="sidenav.toggle()">Home</a>
         <a href="#" mat-list-item routerLink="ranking" (click)="sidenav.toggle()">Ranking</a>
-        <a href="#" mat-list-item  [routerLink]="lobby" (click)="joinRandomLobby(false)" (click)="sidenav.toggle()">Join game</a>
-        <a href="#" mat-list-item  [routerLink]="lobby" (click)="joinRandomLobby(true)" (click)="sidenav.toggle()">Join ranked game</a>
+        <a
+          href="#"
+          mat-list-item
+          [routerLink]="lobby"
+          (click)="joinRandomLobby(false)"
+          (click)="sidenav.toggle()"
+          >Join game</a
+        >
+        <a
+          href="#"
+          mat-list-item
+          [routerLink]="lobby"
+          (click)="joinRandomLobby(true)"
+          (click)="sidenav.toggle()"
+          >Join ranked game</a
+        >
         <a href="#" mat-list-item routerLink="rules" (click)="sidenav.toggle()">Rules</a>
-        <a href="#" *ngIf="!isLoggedin" mat-list-item routerLink="login" routerLinkActive="active" (click)="sidenav.toggle()">Login</a>
-        <a href="#" *ngIf="!isLoggedin" mat-list-item routerLink="register" routerLinkActive="active" (click)="sidenav.toggle()" >Register</a>
-        <a href="#" *ngIf="isLoggedin" mat-list-item [routerLink]="['/users', username]" (click)="sidenav.toggle()" >Profile</a>
-        <a href="#" *ngIf="isLoggedin" mat-list-item routerLink="settings" (click)="sidenav.toggle()">Settings</a>
-        <a href="#" *ngIf="isLoggedin" mat-list-item (click)="logout()" (click)="sidenav.toggle()">Logout</a>
+        <a
+          href="#"
+          *ngIf="!isLoggedin"
+          mat-list-item
+          routerLink="login"
+          routerLinkActive="active"
+          (click)="sidenav.toggle()"
+          >Login</a
+        >
+        <a
+          href="#"
+          *ngIf="!isLoggedin"
+          mat-list-item
+          routerLink="register"
+          routerLinkActive="active"
+          (click)="sidenav.toggle()"
+          >Register</a
+        >
+        <a
+          href="#"
+          *ngIf="isLoggedin"
+          mat-list-item
+          [routerLink]="['/users', username]"
+          (click)="sidenav.toggle()"
+          >Profile</a
+        >
+        <a
+          href="#"
+          *ngIf="isLoggedin"
+          mat-list-item
+          routerLink="settings"
+          (click)="sidenav.toggle()"
+          >Settings</a
+        >
+        <a href="#" *ngIf="isLoggedin" mat-list-item (click)="logout()" (click)="sidenav.toggle()"
+          >Logout</a
+        >
       </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content fxFlexFill>

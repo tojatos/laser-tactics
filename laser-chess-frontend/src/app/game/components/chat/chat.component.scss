@@ -1,22 +1,22 @@
-@import "src/styles.scss";
+@import 'src/styles.scss';
 
 .chat-box {
   width: 200px;
   height: 400px;
-  background-color: map_get($custom-palette,400);
+  background-color: map_get($custom-palette, 400);
   border: solid 1px white;
   overflow: hidden;
 }
 
 .close-button {
   margin-left: auto;
-  position:sticky;
+  position: sticky;
 }
 
 .chat-header {
   width: 100%;
   text-align: right;
-  background-color: map_get($custom-palette,100);
+  background-color: map_get($custom-palette, 100);
 }
 
 .chat-input {
@@ -54,7 +54,7 @@
 
 .my-message {
   margin-left: auto;
-  background-color: map_get($custom-palette,100);
+  background-color: map_get($custom-palette, 100);
 }
 
 .my-message-footer {
@@ -62,7 +62,7 @@
 }
 
 .opponent-message {
- background-color: black;
+  background-color: black;
 }
 
 .chat-input .mat-form-field-wrapper {

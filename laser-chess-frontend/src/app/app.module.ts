@@ -1,4 +1,4 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -26,7 +26,6 @@ import { ChangePasswordComponent } from './components/change-password/change-pas
 import { RankingComponent } from './components/ranking/ranking.component';
 import { RulesComponent } from './components/rules/rules.component';
 import { PieceCardComponent } from './components/piece-card/piece-card.component';
-
 
 @NgModule({
   declarations: [
@@ -57,11 +56,14 @@ import { PieceCardComponent } from './components/piece-card/piece-card.component
     FlexLayoutModule,
     FormsModule,
     ReactiveFormsModule,
-    FormsModule
-    ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, { provide: JWT_OPTIONS, useValue: JWT_OPTIONS }, JwtHelperService],
+    FormsModule,
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+    JwtHelperService,
+  ],
   bootstrap: [AppComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
-
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AppModule { }
+export class AppModule {}

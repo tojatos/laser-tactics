@@ -7,25 +7,26 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'app-ranking',
   templateUrl: './ranking.component.html',
-  styleUrls: ['./ranking.component.scss']
+  styleUrls: ['./ranking.component.scss'],
 })
 export class RankingComponent implements OnInit {
-
-  public topRanking: Ranking[] | undefined
+  public topRanking: Ranking[] | undefined;
   displayedColumns = ['position', 'username', 'rating'];
   dataSource = new MatTableDataSource<Ranking>();
-  fetched = false
+  fetched = false;
 
-  constructor(private router: Router, private userService: UserService) { }
+  constructor(
+    private router: Router,
+    private userService: UserService
+  ) {}
 
   async ngOnInit() {
-    const data = await this.userService.getTopRanking()
-    this.dataSource.data = data.splice(0, 10)
-    this.fetched = true
+    const data = await this.userService.getTopRanking();
+    this.dataSource.data = data.splice(0, 10);
+    this.fetched = true;
   }
 
   openProfile(user: Ranking) {
-    this.router.navigate(['/users', user.username])
+    this.router.navigate(['/users', user.username]);
   }
-
 }

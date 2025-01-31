@@ -3,14 +3,14 @@
   <h3>
     <p><strong>Laser Tactics</strong> is a chesslike strategy game for two players.</p>
     <p>
-      The <strong>goal</strong> is to manipulate a Laser-firing piece and various reflective objects 
+      The <strong>goal</strong> is to manipulate a Laser-firing piece and various reflective objects
       <strong>to eliminate your opponent's King</strong>.
     </p>
   </h3>
 
   <h1>A Geometric Army</h1>
   <div class="starting-image">
-    <img src="assets/laserchess_board_start.png" alt="Starting position">
+    <img src="assets/laserchess_board_start.png" alt="Starting position" />
     <p>Starting position</p>
   </div>
 
@@ -19,84 +19,92 @@
   </h3>
 
   <div class="laser-cards">
-    <app-piece-card 
-      name="King" 
+    <app-piece-card
+      name="King"
       image="assets/CLASSIC/KING_RED.svg"
       [description]="[
         'The King is the most important piece in Laser Tactics.',
         'When the King is eliminated, the other player wins.',
-        'It can capture enemy pieces by moving onto their square, but only once per turn.'
-      ]">
+        'It can capture enemy pieces by moving onto their square, but only once per turn.',
+      ]"
+    >
     </app-piece-card>
 
-    <app-piece-card 
-      name="Laser" 
+    <app-piece-card
+      name="Laser"
       image="assets/CLASSIC/LASER_RED.svg"
       [description]="[
         'The Laser is your primary offensive weapon.',
         'It can fire a Laser Beam and rotate in place at 90-degree angles.',
-        'Losing your Laser doesn’t end the game, but makes it much harder to win.'
-      ]">
+        'Losing your Laser doesn’t end the game, but makes it much harder to win.',
+      ]"
+    >
     </app-piece-card>
 
-    <app-piece-card 
-      name="Hypercube" 
+    <app-piece-card
+      name="Hypercube"
       image="assets/CLASSIC/HYPER_CUBE_RED.svg"
       [description]="[
         'The Hypercube can relocate other pieces.',
         'Moving onto another piece makes it disappear and reappear elsewhere.',
-        'It is invulnerable to Lasers but cannot be rotated.'
-      ]">
+        'It is invulnerable to Lasers but cannot be rotated.',
+      ]"
+    >
     </app-piece-card>
 
-    <app-piece-card 
-      name="Beam Splitter" 
+    <app-piece-card
+      name="Beam Splitter"
       image="assets/CLASSIC/BEAM_SPLITTER_RED.svg"
       [description]="[
         'The Beam Splitter divides a Laser into two beams.',
         'Hitting its vertex splits the Laser in opposite directions.',
-        'It reflects Lasers at 90-degree angles and can be rotated.'
-      ]">
+        'It reflects Lasers at 90-degree angles and can be rotated.',
+      ]"
+    >
     </app-piece-card>
 
-    <app-piece-card 
-      name="Block" 
+    <app-piece-card
+      name="Block"
       image="assets/CLASSIC/BLOCK_RED.svg"
       [description]="[
         'Blocks capture enemy pieces by moving onto them.',
         'They have one reflective side and can be rotated.',
-        'Lasers hitting the reflective side bounce back 180 degrees.'
-      ]">
+        'Lasers hitting the reflective side bounce back 180 degrees.',
+      ]"
+    >
     </app-piece-card>
 
-    <app-piece-card 
-      name="Diagonal Mirror" 
+    <app-piece-card
+      name="Diagonal Mirror"
       image="assets/CLASSIC/DIAGONAL_MIRROR_RED.svg"
       [description]="[
         'Diagonal Mirrors cannot be destroyed by Lasers.',
         'They can be removed only by capture.',
-        'They deflect Lasers by 90 degrees and can be flipped to their opposite diagonal.'
-      ]">
+        'They deflect Lasers by 90 degrees and can be flipped to their opposite diagonal.',
+      ]"
+    >
     </app-piece-card>
 
-    <app-piece-card 
-      name="Straight Mirror" 
+    <app-piece-card
+      name="Straight Mirror"
       image="assets/CLASSIC/MIRROR_RED.svg"
       [description]="[
         'Straight Mirrors are invulnerable to Lasers.',
         'Lasers hitting the edges pass through without deflection.',
-        'They can be rotated between horizontal and vertical orientations.'
-      ]">
+        'They can be rotated between horizontal and vertical orientations.',
+      ]"
+    >
     </app-piece-card>
 
-    <app-piece-card 
-      name="Triangular Mirror" 
+    <app-piece-card
+      name="Triangular Mirror"
       image="assets/CLASSIC/TRIANGULAR_MIRROR_RED.svg"
       [description]="[
         'Triangular Mirrors deflect Lasers like Diagonal Mirrors.',
         'However, they are vulnerable on two non-reflective sides.',
-        'They can rotate in 90-degree increments but remain fragile.'
-      ]">
+        'They can rotate in 90-degree increments but remain fragile.',
+      ]"
+    >
     </app-piece-card>
   </div>
 

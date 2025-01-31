@@ -1,28 +1,37 @@
-<div class="main-wrapper" fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="space-evenly stretch">
-    <div fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="center">
-        <a href="settings" mat-stroked-button color="accent"
-            >General settings</a>
-        <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
-        <a href="settings/password" mat-stroked-button color="accent">Password</a>
-    </div>
-    <div fxLayout="column" fxLayoutAlign="center center">
-        <mat-card class="box"  fxLayoutGap="30px" fxLayout="column" >
-            <mat-card-header>
-                <mat-card-title>General settings</mat-card-title>
-            </mat-card-header>
-            <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation">Animations
-            </mat-slide-toggle>
-            <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sound">Sounds
-            </mat-slide-toggle>
-            <mat-form-field appearance="fill">
-              <mat-label>Selected Theme</mat-label>
-              <mat-select [(ngModel)]="selectedTheme" (selectionChange)="changeThemeOption()" name="theme">
-                <mat-option *ngFor="let theme of themes" [value]="theme">
-                  {{theme}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-        </mat-card>
-    </div>
-
+<div
+  class="main-wrapper"
+  fxLayout="column"
+  fxLayout.gt-sm="row"
+  fxLayoutAlign="space-evenly stretch"
+>
+  <div fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="center">
+    <a href="settings" mat-stroked-button color="accent">General settings</a>
+    <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
+    <a href="settings/password" mat-stroked-button color="accent">Password</a>
+  </div>
+  <div fxLayout="column" fxLayoutAlign="center center">
+    <mat-card class="box" fxLayoutGap="30px" fxLayout="column">
+      <mat-card-header>
+        <mat-card-title>General settings</mat-card-title>
+      </mat-card-header>
+      <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation"
+        >Animations
+      </mat-slide-toggle>
+      <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sound"
+        >Sounds
+      </mat-slide-toggle>
+      <mat-form-field appearance="fill">
+        <mat-label>Selected Theme</mat-label>
+        <mat-select
+          [(ngModel)]="selectedTheme"
+          (selectionChange)="changeThemeOption()"
+          name="theme"
+        >
+          <mat-option *ngFor="let theme of themes" [value]="theme">
+            {{ theme }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card>
+  </div>
 </div>

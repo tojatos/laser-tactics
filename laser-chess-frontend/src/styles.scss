@@ -9,52 +9,56 @@
 @include mat.core();
 
 $custom-palette: (
-	50: #000000,
-  	100: #217180,
-  	200: #3b8ca5,
-	500: #4e4e4e,
-	400: #292929, 
-	  contrast: (
-    500: #4a4b4b, 
-    800: #f2fcff, 
+  50: #000000,
+  100: #217180,
+  200: #3b8ca5,
+  500: #4e4e4e,
+  400: #292929,
+  contrast: (
+    500: #4a4b4b,
+    800: #f2fcff,
     A400: #1c4f5c,
-    A500: #2a8197  
-  )
+    A500: #2a8197,
+  ),
 );
 
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$laser-chess-frontend-primary: mat-palette($custom-palette,100);
-$laser-chess-frontend-accent:  mat-palette($custom-palette,200);
-$laser-chess-frontend-contrast:  mat-palette($custom-palette,500);
+$laser-chess-frontend-primary: mat-palette($custom-palette, 100);
+$laser-chess-frontend-accent: mat-palette($custom-palette, 200);
+$laser-chess-frontend-contrast: mat-palette($custom-palette, 500);
 // The warn palette is optional (defaults to red).
 $laser-chess-frontend-warn: mat.define-palette(mat.$red-palette);
 
-
-
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
-$laser-chess-frontend-theme: mat.define-light-theme((
-  color: (
-    primary: $laser-chess-frontend-primary,
-    accent: $laser-chess-frontend-accent,
-    warn: $laser-chess-frontend-warn,
-	constrast: $laser-chess-frontend-contrast,
-  
-  background-color: mat-palette($custom-palette,50))
-));
+$laser-chess-frontend-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $laser-chess-frontend-primary,
+      accent: $laser-chess-frontend-accent,
+      warn: $laser-chess-frontend-warn,
+      constrast: $laser-chess-frontend-contrast,
 
+      background-color: mat-palette($custom-palette, 50),
+    ),
+  )
+);
 
 // $laser-chess-frontend-theme: mat.define-dark-theme((
 //   color: (
 //     primary: $laser-chess-frontend-primary,
 //     accent: $laser-chess-frontend-accent,
 //     warn: $laser-chess-frontend-warn,
-    
+
 //   )
 // ));
-$laser-chess-frontend-theme: mat-dark-theme($laser-chess-frontend-primary,$laser-chess-frontend-accent, $laser-chess-frontend-warn);
+$laser-chess-frontend-theme: mat-dark-theme(
+  $laser-chess-frontend-primary,
+  $laser-chess-frontend-accent,
+  $laser-chess-frontend-warn
+);
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
@@ -64,85 +68,88 @@ $laser-chess-frontend-theme: mat-dark-theme($laser-chess-frontend-primary,$laser
 
 html,
 body {
-	height: 100%;
-	min-height: 100%;
-	margin: 0;
-	padding: 0;
-
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-	height: 100%;
-	min-height: 100%;
-	background-color: #000000;
-	font-family: 'Roboto', sans-serif;
+  height: 100%;
+  min-height: 100%;
+  background-color: #000000;
+  font-family: 'Roboto', sans-serif;
 }
 
 .mat-app-background {
-	background-color: black;
-  }
-.background-primary { background-color: #000000; }
+  background-color: black;
+}
+.background-primary {
+  background-color: #000000;
+}
 .app-header {
-	justify-content: space-between;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	z-index: 2;
-	box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12);
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  box-shadow:
+    0 3px 5px -1px rgba(0, 0, 0, 0.2),
+    0 6px 10px 0 rgba(0, 0, 0, 0.14),
+    0 1px 18px 0 rgba(0, 0, 0, 0.12);
 }
 
 .main-wrapper {
-	// height: 1100px;
-	height: 100%;
-	background-color: black;
+  // height: 1100px;
+  height: 100%;
+  background-color: black;
 }
 
 .positronx {
-	text-decoration: none;
-	color: #000000;
+  text-decoration: none;
+  color: #000000;
 }
 
 .box {
-	position: relative;
-	top: 0;
-	opacity: 1;
-	float: left;
-	padding: 60px 50px 40px 50px;
-	width: 100%;
-	background: rgb(51, 51, 51);
-	border-radius: 10px;
-	transform: scale(1);
-	-webkit-transform: scale(1);
-	-ms-transform: scale(1);
-	z-index: 5;
-	max-width: 330px;
+  position: relative;
+  top: 0;
+  opacity: 1;
+  float: left;
+  padding: 60px 50px 40px 50px;
+  width: 100%;
+  background: rgb(51, 51, 51);
+  border-radius: 10px;
+  transform: scale(1);
+  -webkit-transform: scale(1);
+  -ms-transform: scale(1);
+  z-index: 5;
+  max-width: 330px;
 }
 
 .table-box {
-	position: relative;
-	top: 0;
-	opacity: 1;
-	float: left;
-	padding: 10px 20px 10px 20px;
-	width: 100%;
-	background: rgb(51, 51, 51);
-	border-radius: 10px;
-	transform: scale(1);
-	-webkit-transform: scale(1);
-	-ms-transform: scale(1);
-	z-index: 3;
-	max-width: 400px;
+  position: relative;
+  top: 0;
+  opacity: 1;
+  float: left;
+  padding: 10px 20px 10px 20px;
+  width: 100%;
+  background: rgb(51, 51, 51);
+  border-radius: 10px;
+  transform: scale(1);
+  -webkit-transform: scale(1);
+  -ms-transform: scale(1);
+  z-index: 3;
+  max-width: 400px;
 }
 
 .box.back {
-	transform: scale(.95);
-	-webkit-transform: scale(.95);
-	-ms-transform: scale(.95);
-	top: -20px;
-	opacity: .8;
-	z-index: -1;
-	
+  transform: scale(0.95);
+  -webkit-transform: scale(0.95);
+  -ms-transform: scale(0.95);
+  top: -20px;
+  opacity: 0.8;
+  z-index: -1;
 }
 
 // .box:before {
@@ -161,119 +168,118 @@ body {
 // }
 
 .main-wrapper .example-form {
-	min-width: 100%;
-	max-width: 300px;
-	width: 100%;
+  min-width: 100%;
+  max-width: 300px;
+  width: 100%;
 }
 
 .main-wrapper .example-full-width,
 .main-wrapper .btn-block {
-	width: 100%;
-	appearance: standard;
+  width: 100%;
+  appearance: standard;
 }
 
 .main-wrapper .mat-card-header {
-	text-align: center;
-	width: 100%;
-	display: block;
-	font-weight: 700;
-	margin-bottom: 30px;
+  text-align: center;
+  width: 100%;
+  display: block;
+  font-weight: 700;
+  margin-bottom: 30px;
 }
 
 .main-wrapper mat-card-header mat-card-title {
-	font-size: 30px;
-	margin: 0;
+  font-size: 30px;
+  margin: 0;
 }
 
 .main-wrapper mat-card {
-	padding: 45px 70px 55px;
+  padding: 45px 70px 55px;
 }
 
 .main-wrapper .mat-stroked-button {
-	border: 1px solid currentColor;
-	line-height: 54px;
-	background: #1f1f1f;
+  border: 1px solid currentColor;
+  line-height: 54px;
+  background: #1f1f1f;
 }
 
 .red-player-card {
-	background-color: #902b2b;
-	font-size: 20px;
-	border: 1px solid #410909;
+  background-color: #902b2b;
+  font-size: 20px;
+  border: 1px solid #410909;
 }
 
 .blue-player-card {
-	background-color: #276380;
-	font-size: 20px;
-	border: 1px solid #103d53;
+  background-color: #276380;
+  font-size: 20px;
+  border: 1px solid #103d53;
 }
 
 .mat-card-lobby-privacy {
-	cursor: pointer;
+  cursor: pointer;
 }
 
-
 .start-game-button {
-	transform: scale(1.6);
+  transform: scale(1.6);
 }
 
 .leave-lobby-button {
-	transform: scale(0.75);
+  transform: scale(0.75);
 }
 
 .refresh-icon {
-	cursor: pointer;
-	position: center;
+  cursor: pointer;
+  position: center;
 }
 
-.mat-header-cell, .mat-cell {
-	justify-content: center;
-  }
-
-  .mat-row .mat-cell {
-	border-bottom: 1px solid transparent;
-	border-top: 1px solid transparent;
-	cursor: pointer;
-  }
-
-  .mat-row:hover .mat-cell {
-	border-color: currentColor;
-  }
-  
-  .hover-button:hover{
-	background-color: #208d9725;
-  }
-
-  .menu {
-	border-radius: 0px;
-	margin-top: 13px;
-  }
-
-
-  input.input-box, textarea {
-	background: transparent;  
-	border-width:0px;
-	border:none;
-	color: rgb(255, 255, 255);
- }
- 
- ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-	color: rgb(255, 255, 255);
-	opacity: 1; /* Firefox */
-  }
-  
-  ::-ms-input-placeholder { /* Microsoft Edge */
-	color: rgb(255, 255, 255);
-  }
-
-  mat-list {
-    flex-grow: 1;
-	max-height: 400px;
-    overflow: auto;
+.mat-header-cell,
+.mat-cell {
+  justify-content: center;
 }
 
-  .menu-hidden {
-	display: none;
-  }
+.mat-row .mat-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+}
 
+.mat-row:hover .mat-cell {
+  border-color: currentColor;
+}
 
-  
+.hover-button:hover {
+  background-color: #208d9725;
+}
+
+.menu {
+  border-radius: 0px;
+  margin-top: 13px;
+}
+
+input.input-box,
+textarea {
+  background: transparent;
+  border-width: 0px;
+  border: none;
+  color: rgb(255, 255, 255);
+}
+
+::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: rgb(255, 255, 255);
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: rgb(255, 255, 255);
+}
+
+mat-list {
+  flex-grow: 1;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.menu-hidden {
+  display: none;
+}

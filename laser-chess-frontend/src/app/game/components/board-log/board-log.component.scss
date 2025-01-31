@@ -1,10 +1,10 @@
-@import "src/styles.scss";
+@import 'src/styles.scss';
 
 mat-selection-list {
-    overflow: auto;
-    min-width: 150px;
-    background-color: map_get($custom-palette,400);
-    scrollbar-width: none
+  overflow: auto;
+  min-width: 150px;
+  background-color: map_get($custom-palette, 400);
+  scrollbar-width: none;
 }
 
 mat-selection-list::-webkit-scrollbar {
@@ -12,14 +12,14 @@ mat-selection-list::-webkit-scrollbar {
 }
 
 button {
-    margin: 2%;
+  margin: 2%;
 }
 
-.btns{
-    margin: 10%;
-    text-align: center;
+.btns {
+  margin: 10%;
+  text-align: center;
 }
 
-mat-slide-toggle{
-  padding: 10%
+mat-slide-toggle {
+  padding: 10%;
 }

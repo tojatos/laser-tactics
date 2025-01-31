@@ -4,11 +4,11 @@
 
 export const environment = {
   production: false,
-  API_URL: "http://localhost",
-  WEBSOCKET_URL: "ws://localhost/ws",
-  CHAT_WEBSOCKET_URL: "ws://localhost/chat",
-  LOBBY_WEBSOCKET_URL: "ws://localhost/lobby_ws",
-  API_PREFIX: "/api/v1",
+  API_URL: 'http://localhost',
+  WEBSOCKET_URL: 'ws://localhost/ws',
+  CHAT_WEBSOCKET_URL: 'ws://localhost/chat',
+  LOBBY_WEBSOCKET_URL: 'ws://localhost/lobby_ws',
+  API_PREFIX: '/api/v1',
 };
 
 /*

@@ -7,32 +7,41 @@ import { AuthService } from 'src/app/auth/auth.service';
 @Component({
   selector: 'app-password-reminder',
   templateUrl: './password-reminder.component.html',
-  styleUrls: ['./password-reminder.component.scss']
+  styleUrls: ['./password-reminder.component.scss'],
 })
 export class PasswordReminderComponent {
-
   hide = true;
   form = new FormGroup({
-    email: new FormControl('',[Validators.required, Validators.email])
+    email: new FormControl('', [Validators.required, Validators.email]),
   });
-  constructor(private _snackBar: MatSnackBar,private authService: AuthService, private route: ActivatedRoute, private router: Router) { }
+  constructor(
+    private _snackBar: MatSnackBar,
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   openSnackBar(message: string) {
-    this._snackBar.open(message, "", {
-      duration: 1000
+    this._snackBar.open(message, '', {
+      duration: 1000,
     });
   }
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 
   onSubmit(): void {
-    const {email} = this.form.value;
-    if (!this.authService.isLoggedIn() &&  email ) {
-      this.authService.sendPasswordChangeRequest(email).then(res => {
-        this.openSnackBar("Email sent")
-      }).catch(err => console.error(err))
+    const { email } = this.form.value;
+    if (!this.authService.isLoggedIn() && email) {
+      this.authService
+        .sendPasswordChangeRequest(email)
+        .then((res) => {
+          this.openSnackBar('Email sent');
+        })
+        .catch((err) => console.error(err));
     }
   }
   get loggedIn() {
-    return this.authService.isLoggedIn()
+    return this.authService.isLoggedIn();
   }
 }

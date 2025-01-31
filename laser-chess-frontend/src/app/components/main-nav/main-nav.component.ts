@@ -13,63 +13,70 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'app-main-nav',
   templateUrl: './main-nav.component.html',
-  styleUrls: ['./main-nav.component.scss']
+  styleUrls: ['./main-nav.component.scss'],
 })
 export class MainNavComponent {
-
   @ViewChild(MatMenuTrigger)
   trigger!: MatMenuTrigger;
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.HandsetPortrait, Breakpoints.Small])
+  isHandset$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.HandsetPortrait, Breakpoints.Small])
     .pipe(
-      map(result => result.matches),
+      map((result) => result.matches),
       shareReplay()
     );
 
-  constructor(private router: Router, private breakpointObserver: BreakpointObserver, private authService: AuthService, private lobbyService: LobbyService, private userService: UserService) { }
+  constructor(
+    private router: Router,
+    private breakpointObserver: BreakpointObserver,
+    private authService: AuthService,
+    private lobbyService: LobbyService,
+    private userService: UserService
+  ) {}
 
-  lobby: any
-  username = ""
-  rating: any
+  lobby: any;
+  username = '';
+  rating: any;
 
   get isLoggedin() {
-    this.getUsername()
-    return this.authService.isLoggedIn()
+    this.getUsername();
+    return this.authService.isLoggedIn();
   }
 
   logout() {
-    this.authService.clearJWT()
-    this.router.navigate(['/'])
+    this.authService.clearJWT();
+    this.router.navigate(['/']);
   }
 
   getRating() {
-    this.userService.getUserMe().then(userData => {
-      this.rating = userData.rating
-    })
+    this.userService.getUserMe().then((userData) => {
+      this.rating = userData.rating;
+    });
   }
 
   async joinRandomLobby(isRanked = false) {
-
-    await this.userService.getUserMe().then(userData => {
-      this.rating = userData.rating
-    })
+    await this.userService.getUserMe().then((userData) => {
+      this.rating = userData.rating;
+    });
 
     if (this.rating < 300 && this.rating) {
-      this.lobby = await this.lobbyService.joinRandom(0, this.rating + 300, isRanked)
-    }
-    else if (this.rating) {
-      this.lobby = await this.lobbyService.joinRandom(this.rating - 300, this.rating + 300, isRanked)
+      this.lobby = await this.lobbyService.joinRandom(0, this.rating + 300, isRanked);
+    } else if (this.rating) {
+      this.lobby = await this.lobbyService.joinRandom(
+        this.rating - 300,
+        this.rating + 300,
+        isRanked
+      );
     }
 
-    this.router.navigate(['/lobby', this.lobby.game_id])
+    this.router.navigate(['/lobby', this.lobby.game_id]);
   }
 
   getUsername() {
-    this.username = this.authService.getUsername()
+    this.username = this.authService.getUsername();
   }
 
   closeMenu() {
-    this.trigger.closeMenu()
+    this.trigger.closeMenu();
   }
-
 }

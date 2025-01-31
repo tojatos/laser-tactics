@@ -19,27 +19,27 @@ import { RulesComponent } from './components/rules/rules.component';
 const routes: Routes = [
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
   },
   {
     path: 'login/forgot',
-    component: PasswordReminderComponent
+    component: PasswordReminderComponent,
   },
   {
     path: 'register',
-    component: RegisterComponent
+    component: RegisterComponent,
   },
   {
     path: 'change_password/:id',
-    component: ChangePasswordComponent
+    component: ChangePasswordComponent,
   },
   {
     path: 'game/:id',
-    component: GameComponent
+    component: GameComponent,
   },
   {
     path: 'users/:username',
-    component: UserPageComponent
+    component: UserPageComponent,
   },
   {
     path: 'settings',
@@ -53,34 +53,33 @@ const routes: Routes = [
   {
     path: 'settings/password',
     component: SettingsPasswordComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
   },
   {
     path: 'settings/blocked_users',
     component: SettingsBlockedUsersComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
   },
   {
     path: 'lobby/:id',
-    component: LobbyComponent
+    component: LobbyComponent,
   },
   {
     path: 'verify/:id',
-    component: VerifyComponent
+    component: VerifyComponent,
   },
   {
     path: 'rules',
-    component: RulesComponent
+    component: RulesComponent,
   },
   {
     path: '**',
     component: MainPageComponent,
-  }
-
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

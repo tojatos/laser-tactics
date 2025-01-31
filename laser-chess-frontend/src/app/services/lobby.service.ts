@@ -1,34 +1,48 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { createLobbyFullEndpoint, leaveLobbyFullEndpoint, joinLobbyFullEndpoint, lobbyFullEndpoint, startGameFullEndpoint, updateLobbyFullEndpoint, joinRandomLobbyFullEndpoint } from '../api-definitions';
+import {
+  createLobbyFullEndpoint,
+  leaveLobbyFullEndpoint,
+  joinLobbyFullEndpoint,
+  lobbyFullEndpoint,
+  startGameFullEndpoint,
+  updateLobbyFullEndpoint,
+  joinRandomLobbyFullEndpoint,
+} from '../api-definitions';
 import { Lobby } from '../app.models';
 import { StartGameRequest } from '../game/game.request.models';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LobbyService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getLobbies() {
-    return this.http.get<Lobby[]>(lobbyFullEndpoint()).toPromise()
+    return this.http.get<Lobby[]>(lobbyFullEndpoint()).toPromise();
   }
 
-  getLobbyById(id: string){
-    return this.http.get<Lobby>(lobbyFullEndpoint(id)).toPromise()
+  getLobbyById(id: string) {
+    return this.http.get<Lobby>(lobbyFullEndpoint(id)).toPromise();
   }
 
-  updateLobby(lobby: Lobby){
-    return this.http.patch<Lobby>(updateLobbyFullEndpoint(), lobby).toPromise()
+  updateLobby(lobby: Lobby) {
+    return this.http.patch<Lobby>(updateLobbyFullEndpoint(), lobby).toPromise();
   }
 
-  createLobby(){
-    return this.http.post<Lobby>(createLobbyFullEndpoint(), {}).toPromise()
+  createLobby() {
+    return this.http.post<Lobby>(createLobbyFullEndpoint(), {}).toPromise();
   }
 
-  startGame(game_id: string, player_one_id: string, player_two_id: string, is_rated: boolean, isTimed: boolean, time1: number, time2: number){
-
+  startGame(
+    game_id: string,
+    player_one_id: string,
+    player_two_id: string,
+    is_rated: boolean,
+    isTimed: boolean,
+    time1: number,
+    time2: number
+  ) {
     const req: StartGameRequest = {
       game_id: game_id,
       player_one_id: player_one_id,
@@ -36,22 +50,27 @@ export class LobbyService {
       is_rated: is_rated,
       is_timed: isTimed,
       player_one_time: time1,
-      player_two_time: time2
-    }
+      player_two_time: time2,
+    };
 
-    return this.http.post<any>(startGameFullEndpoint, req).toPromise()
+    return this.http.post<any>(startGameFullEndpoint, req).toPromise();
   }
 
-  joinLobby(lobby_id: string){
-    return this.http.patch<any>(joinLobbyFullEndpoint(), {game_id: lobby_id} ).toPromise()
+  joinLobby(lobby_id: string) {
+    return this.http.patch<any>(joinLobbyFullEndpoint(), { game_id: lobby_id }).toPromise();
   }
 
-  leaveLobby(lobby_id: string){
-    return this.http.patch<any>(leaveLobbyFullEndpoint(), {game_id: lobby_id}).toPromise()
+  leaveLobby(lobby_id: string) {
+    return this.http.patch<any>(leaveLobbyFullEndpoint(), { game_id: lobby_id }).toPromise();
   }
 
-  joinRandom(rating_lower_bound: number, rating_higher_bound: number, is_rated: boolean){
-    return this.http.post<any>(joinRandomLobbyFullEndpoint(), {'rating_lower_bound': rating_lower_bound, 'rating_higher_bound': rating_higher_bound, "is_rated": is_rated}).toPromise()
+  joinRandom(rating_lower_bound: number, rating_higher_bound: number, is_rated: boolean) {
+    return this.http
+      .post<any>(joinRandomLobbyFullEndpoint(), {
+        rating_lower_bound: rating_lower_bound,
+        rating_higher_bound: rating_higher_bound,
+        is_rated: is_rated,
+      })
+      .toPromise();
   }
-
 }

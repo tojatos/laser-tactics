@@ -8,83 +8,84 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'app-settings-blocked-users',
   templateUrl: './settings-blocked-users.component.html',
-  styleUrls: ['./settings-blocked-users.component.scss']
+  styleUrls: ['./settings-blocked-users.component.scss'],
 })
 export class SettingsBlockedUsersComponent implements OnInit {
+  constructor(
+    private _snackBar: MatSnackBar,
+    private userService: UserService,
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
- 
-  constructor(private _snackBar: MatSnackBar, private userService: UserService, private route: ActivatedRoute, private authService: AuthService, private router: Router) { }
-
-  username: string | undefined
-  blocked: string[] | undefined
+  username: string | undefined;
+  blocked: string[] | undefined;
   form = new FormGroup({
-    input: new FormControl('')
+    input: new FormControl(''),
   });
-  empty = true
+  empty = true;
 
   openSnackBar(message: string) {
-    this._snackBar.open(message, "", {
-      duration: 1500
+    this._snackBar.open(message, '', {
+      duration: 1500,
     });
   }
-  
+
   ngOnInit(): void {
     this.loadData();
   }
 
   loadData() {
-    this.route.params.subscribe(async params => {
-    this.userService.getBlockedUsers().then(userData => {
-      this.blocked = userData
-      if (this.blocked?.length != 0) {
-        this.empty =false
-      }
-    })
-    })
+    this.route.params.subscribe(async (params) => {
+      this.userService.getBlockedUsers().then((userData) => {
+        this.blocked = userData;
+        if (this.blocked?.length != 0) {
+          this.empty = false;
+        }
+      });
+    });
   }
 
   get isInBlocked() {
     if (this.blocked) {
       if (this.blocked.includes(this.username!)) {
-        return true
-      }
-      else return false
-    }
-    else return false
+        return true;
+      } else return false;
+    } else return false;
   }
 
   getIsInBlocked(name: string) {
     if (this.blocked) {
       if (this.blocked.includes(name)) {
-        return true
-      }
-      else return false
-    }
-    else return false
+        return true;
+      } else return false;
+    } else return false;
   }
-  goToProfile(name: string){
-    this.router.navigate(['/users', name])
-    this.loadData()
-  }
-  
-  async blockUser(name: string){
-    this.openSnackBar(`Blocked user ${name}`)
-    await this.userService.blockUser(name)
-    this.loadData()
+  goToProfile(name: string) {
+    this.router.navigate(['/users', name]);
+    this.loadData();
   }
 
-  async unblockUser(name: string){
-    this.openSnackBar(`Unblocked user ${name}`)
-    this.userService.unblockUser(name)
-    this.loadData()
+  async blockUser(name: string) {
+    this.openSnackBar(`Blocked user ${name}`);
+    await this.userService.blockUser(name);
+    this.loadData();
   }
 
-  get f() { return this.form.controls; }
+  async unblockUser(name: string) {
+    this.openSnackBar(`Unblocked user ${name}`);
+    this.userService.unblockUser(name);
+    this.loadData();
+  }
+
+  get f() {
+    return this.form.controls;
+  }
 
   onSubmit(): void {
     if (this.authService.isLoggedIn() && this.form.value.input) {
       this.blockUser(this.form.value.input);
     }
   }
-
 }

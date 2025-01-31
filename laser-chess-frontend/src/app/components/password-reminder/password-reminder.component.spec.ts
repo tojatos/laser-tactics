@@ -8,9 +8,8 @@ describe('PasswordReminderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PasswordReminderComponent ]
-    })
-    .compileComponents();
+      declarations: [PasswordReminderComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

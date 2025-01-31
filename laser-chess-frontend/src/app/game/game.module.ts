@@ -19,16 +19,24 @@ import { ClockComponent } from './components/clock/clock.component';
 import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
-  declarations: [GameComponent, BoardComponent, BoardActionsComponent, BoardActionsComponent, BoardLogComponent, ClockComponent, ChatComponent],
+  declarations: [
+    GameComponent,
+    BoardComponent,
+    BoardActionsComponent,
+    BoardActionsComponent,
+    BoardLogComponent,
+    ClockComponent,
+    ChatComponent,
+  ],
   imports: [
     CommonModule,
     HttpClientModule,
     MaterialModule,
     FlexLayoutModule,
     FormsModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   exports: [GameComponent],
-  providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor]
+  providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor],
 })
-export class GameModule { }
+export class GameModule {}

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { MatSidenavModule } from '@angular/material/sidenav'
-import { MatToolbarModule } from '@angular/material/toolbar'
-import { MatListModule } from '@angular/material/list'
-import { MatIconModule } from '@angular/material/icon'
-import { MatButtonModule } from '@angular/material/button'
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CdkTreeModule } from '@angular/cdk/tree';
@@ -32,7 +32,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 const MaterialComponents = [
   MatSidenavModule,
@@ -67,11 +67,11 @@ const MaterialComponents = [
   MatRadioModule,
   MatDatepickerModule,
   MatTooltipModule,
-  MatSlideToggleModule
-]
+  MatSlideToggleModule,
+];
 
 @NgModule({
   imports: [MaterialComponents],
-  exports: [MaterialComponents]
+  exports: [MaterialComponents],
 })
-export class MaterialModule { }
+export class MaterialModule {}
