@@ -2,16 +2,20 @@ services:
   angular:
     build: ./laser-chess-frontend
     image: tojatos/laser-tactics-frontend-dev
-    restart: always
+    restart: unless-stopped
     ports:
-      - '8080:8080'
+      - '8080:8080'  # ng serve
+      - '49153:49153' # Webpack live reload
     depends_on:
       - fastapi
+    volumes:
+      - ./laser-chess-frontend:/app  # Mount source code
+      - /app/node_modules  # Prevent overwriting node_modules
 
   fastapi:
     build: ./laser-chess-backend
     image: tojatos/laser-tactics-backend-dev
-    restart: always
+    restart:  unless-stopped
     command: python -m app.main
     ports:
       - 80:80
@@ -25,7 +29,7 @@ services:
       - FE_HOST=localhost::8080
 
   db:
-    restart: always
+    restart: unless-stopped
     image: postgres:13.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/

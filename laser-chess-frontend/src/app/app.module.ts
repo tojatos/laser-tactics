@@ -25,6 +25,7 @@ import { VerifyComponent } from './components/verify/verify.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { RankingComponent } from './components/ranking/ranking.component';
 import { RulesComponent } from './components/rules/rules.component';
+import { PieceCardComponent } from './components/piece-card/piece-card.component';
 
 
 @NgModule({
@@ -44,6 +45,7 @@ import { RulesComponent } from './components/rules/rules.component';
     ChangePasswordComponent,
     RankingComponent,
     RulesComponent,
+    PieceCardComponent,
   ],
   imports: [
     BrowserModule,
