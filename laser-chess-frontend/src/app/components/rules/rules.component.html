@@ -14,11 +14,20 @@
     <p>Starting position</p>
   </div>
 
-  <h3>
-    <p>The table below shows each piece and its name...</p>
-  </h3>
-
   <div class="laser-cards">
+    <app-piece-card
+      name="Laser"
+      image="assets/CLASSIC/LASER_RED.svg"
+      [description]="[
+        'The Laser is your primary offensive weapon.',
+        'It can fire a Laser Beam and rotate in place at 90-degree angles.',
+        'When a Laser Beam strikes a reflective surface, it bounces off without harming the piece. But if a piece is hit by a Laser on a nonreflective surface, it is destroyed.',
+        'Firing your Laser takes only one move, but can be done only once per turn.',
+        'Losing your Laser doesn’t end the game, but makes it much harder to win.',
+      ]"
+    >
+    </app-piece-card>
+
     <app-piece-card
       name="King"
       image="assets/CLASSIC/KING_RED.svg"
@@ -31,45 +40,23 @@
     </app-piece-card>
 
     <app-piece-card
-      name="Laser"
-      image="assets/CLASSIC/LASER_RED.svg"
-      [description]="[
-        'The Laser is your primary offensive weapon.',
-        'It can fire a Laser Beam and rotate in place at 90-degree angles.',
-        'Losing your Laser doesn’t end the game, but makes it much harder to win.',
-      ]"
-    >
-    </app-piece-card>
-
-    <app-piece-card
-      name="Hypercube"
-      image="assets/CLASSIC/HYPER_CUBE_RED.svg"
-      [description]="[
-        'The Hypercube can relocate other pieces.',
-        'Moving onto another piece makes it disappear and reappear elsewhere.',
-        'It is invulnerable to Lasers but cannot be rotated.',
-      ]"
-    >
-    </app-piece-card>
-
-    <app-piece-card
-      name="Beam Splitter"
-      image="assets/CLASSIC/BEAM_SPLITTER_RED.svg"
-      [description]="[
-        'The Beam Splitter divides a Laser into two beams.',
-        'Hitting its vertex splits the Laser in opposite directions.',
-        'It reflects Lasers at 90-degree angles and can be rotated.',
-      ]"
-    >
-    </app-piece-card>
-
-    <app-piece-card
       name="Block"
       image="assets/CLASSIC/BLOCK_RED.svg"
       [description]="[
         'Blocks capture enemy pieces by moving onto them.',
         'They have one reflective side and can be rotated.',
         'Lasers hitting the reflective side bounce back 180 degrees.',
+      ]"
+    >
+    </app-piece-card>
+
+    <app-piece-card
+      name="Triangular Mirror"
+      image="assets/CLASSIC/TRIANGULAR_MIRROR_RED.svg"
+      [description]="[
+        'Triangular Mirrors deflect Lasers like Diagonal Mirrors.',
+        'However, they are vulnerable on two non-reflective sides.',
+        'They can rotate in 90-degree increments but remain fragile.',
       ]"
     >
     </app-piece-card>
@@ -97,27 +84,86 @@
     </app-piece-card>
 
     <app-piece-card
-      name="Triangular Mirror"
-      image="assets/CLASSIC/TRIANGULAR_MIRROR_RED.svg"
+      name="Beam Splitter"
+      image="assets/CLASSIC/BEAM_SPLITTER_RED.svg"
       [description]="[
-        'Triangular Mirrors deflect Lasers like Diagonal Mirrors.',
-        'However, they are vulnerable on two non-reflective sides.',
-        'They can rotate in 90-degree increments but remain fragile.',
+        'The Beam Splitter divides a Laser into two beams.',
+        'Hitting its vertex splits the Laser in opposite directions.',
+        'It reflects Lasers at 90-degree angles and can be rotated.',
+      ]"
+    >
+    </app-piece-card>
+
+    <app-piece-card
+      name="Hypercube"
+      image="assets/CLASSIC/HYPER_CUBE_RED.svg"
+      [description]="[
+        'The Hypercube can relocate other pieces.',
+        'Moving onto another piece makes it disappear and reappear elsewhere.',
+        'It is invulnerable to Lasers but cannot be rotated.',
+      ]"
+    >
+    </app-piece-card>
+
+    <app-piece-card
+      name="Hypersquare"
+      image="assets/CLASSIC/HYPER_SQUARE.svg"
+      [description]="[
+        'The Hypersquare does not belong to anyone.',
+        'It absorbs Laser Beams.',
+        'It acts like a stationary Hypercube. That is, if you try to move a piece onto it, the piece disappears from the original position and reappears on a randomly selected empty square. This can happen only once per turn.',
       ]"
     >
     </app-piece-card>
   </div>
 
   <h1>Laser Tactics Strategy</h1>
-  <h3>
-    <p>Some general strategy tips:</p>
-    <ul>
-      <li>Position mirrors early to maximize your Laser’s effectiveness.</li>
-      <li>Use Blocks to control areas and make movement difficult for your opponent.</li>
-      <li>Protect your King with Mirrors or Blocks.</li>
-      <li>Use the Hypercube strategically—it can either help or hinder your game.</li>
-    </ul>
-  </h3>
+  <h2>General</h2>
+  <p>
+    As in the conventional game of chess, much of the strategy in Laser Tactics revolves around
+    thoughtful placement of your pieces. However, the character of the game differs from that of
+    chess in many ways. The Laser, for example, can strike at long distances and in more than one
+    direction at once. And the Hypercube adds an extra element of uncertainty. The best strategy for
+    any particular game depends to a great extent on the skill and personality of your opponent.
+    However, there are some general tips you may find helpful.
+  </p>
+  <p>
+    Get your mirrors out early. Use them to gain the fullest potential of your Laser. Try to
+    position mirror networks on both sides of the Beam Splitter so you can inflict as much damage as
+    possible.
+  </p>
+  <p>
+    Take advantage of the Blocks. Since they "control" an area around them with their threat of
+    capture, no other pieces can safely move within their range. Make your opponent work to displace
+    them. Remember to rotate the reflective side of a block to the most probable direction of Laser
+    fire. If you can prevent a Laser from destroying the block, your opponent will most likely have
+    to gang up on it with two or more of his or her own Blocks.
+  </p>
+  <p>
+    Use mirrors to protect your King. If you surround your King with Straight and Diagonal Mirrors,
+    there is no way it can be hit by a Laser. Therefore, your opponent will have to break through
+    your defense with Blocks. (This is a pretty dirty trick, because when all of your opponent's
+    Blocks have been used, your King is almost invulnerable.) Defending your King with Blocks is
+    also a good strategy.
+  </p>
+  <p>
+    The Hypercube should be used sparingly, since you have no idea where a relocated piece will
+    reappear. Most players use the Hypercube as a last resort - if another piece is going to be
+    destroyed anyway, it doesn't hurt to take a chance and relocate it with the Hypercube. Also, if
+    your opponent's King is encircled with Mirrors, you can march right in with your King with your
+    Hypercube, followed by a Block. This tactic may displace your opponent's defense, forcing him to
+    evacuate the King from its mirrored fortress. Escorting the Hypercube with an adjacent block
+    prevents the opponent from attacKing the Hypercube with his or her King. Your opponent's only
+    options will be to flee or be displaced.
+  </p>
+
+  <h2>Summary</h2>
+  <ul>
+    <li>Position mirrors early to maximize your Laser’s effectiveness.</li>
+    <li>Use Blocks to control areas and make movement difficult for your opponent.</li>
+    <li>Protect your King with Mirrors or Blocks.</li>
+    <li>Use the Hypercube strategically—it can either help or hinder your game.</li>
+  </ul>
 
   <a href="http://www.public.asu.edu/~checkma/laserchess/">Reference</a>
 </div>
