@@ -1,3 +1,45 @@
+/* General Styling for All Headings */
+h1,
+h2,
+h3 {
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 10px;
+}
+
+/* Main Section Headings */
+h1 {
+  font-size: 28px;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #666; /* Subtle underline */
+  padding-bottom: 5px;
+  margin-top: 30px;
+  text-transform: none;
+}
+
+/* Subsection Headings */
+h2 {
+  font-size: 22px;
+  color: #ddd; /* Lighter than h1 */
+  margin-top: 25px;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+
+/* Minor Headings */
+h3 {
+  font-size: 18px;
+  color: #bbb; /* Even lighter */
+  font-weight: normal;
+  text-transform: none;
+}
+
+/* Additional Enhancements */
+h1:first-child {
+  margin-top: 0; /* Ensures first h1 isn't pushed down */
+}
+
 .main-wrapper {
   padding: 20px;
   height: min-content;
@@ -37,4 +79,21 @@
     font-style: italic;
     margin-top: 5px;
   }
+}
+.reference-link {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #4da6ff; /* Light blue for visibility */
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1px solid #4da6ff;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.reference-link:hover {
+  background-color: #4da6ff;
+  color: white;
 }
