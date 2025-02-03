@@ -1,24 +1,17 @@
 import {
   HttpClient,
-  HttpErrorResponse,
-  HttpEvent,
-  HttpHandler,
   HttpHeaders,
-  HttpRequest,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tokenPayload, UserToken } from '../app.models';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { FormControl } from '@angular/forms';
-import { analyzeAndValidateNgModules } from '@angular/compiler';
-import { environment } from 'src/environments/environment';
 import {
   tokenFullEndpoint,
   usersFullEndpoint,
   userFullEndpoint,
   emailFullEndpoint,
 } from '../api-definitions';
-// import * as moment from "moment"
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +21,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private jwtHelper: JwtHelperService
+    private jwtHelper: JwtHelperService,
+    private router: Router,
   ) {}
 
   async login(login: string, pass: string): Promise<UserToken> {
@@ -109,5 +103,10 @@ export class AuthService {
     } else {
       return '';
     }
+  }
+
+  logout() {
+    this.clearJWT();
+    this.router.navigate(['/']);
   }
 }

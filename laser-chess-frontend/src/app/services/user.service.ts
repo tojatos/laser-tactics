@@ -29,7 +29,8 @@ export class UserService {
     return undefined;
   }
 
-  getUserMe() {
+
+  getUserMe(): Promise<User> {
     return this.http.get<User>(userFullEndpoint('me/info')).toPromise();
   }
 

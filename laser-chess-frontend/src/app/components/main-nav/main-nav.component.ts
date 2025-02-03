@@ -44,8 +44,7 @@ export class MainNavComponent {
   }
 
   logout() {
-    this.authService.clearJWT();
-    this.router.navigate(['/']);
+    this.authService.logout();
   }
 
   getRating() {
