@@ -68,5 +68,8 @@
     "karma-jasmine-html-reporter": "~1.7.0",
     "prettier": "^3.4.2",
     "typescript": "~4.3.5"
+  },
+  "volta": {
+    "node": "16.10.0"
   }
 }
