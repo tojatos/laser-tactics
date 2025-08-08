@@ -1,31 +1,43 @@
-# LaserChessFrontend
+## LaserChess Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.3.
+Angular 12 app for Laser Tactics.
 
-## Dependencies installation
+### Requirements
+- Node 16.x (project pins 16.10.0 via Volta)
+- npm
 
-To install all dependencies run `npm install`
+### Install
+- npm install
 
-## Development server
+### Run
+- npm run start:dev
+  - Starts dev server at http://localhost:8080 using `src/environments/environment.ts`.
+- npm run start:prod
+  - Starts dev server with production config using `src/environments/environment.prod.ts`.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+### Build
+- npm run build
+  - Production build to `dist/laser-chess-frontend/`.
+- npm run watch
+  - Dev build in watch mode.
 
-## Code scaffolding
+### Test & Quality
+- npm run test
+  - Unit tests (Karma).
+- npm run lint
+  - ESLint checks.
+- npm run format
+  - Prettier formatting.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### E2E (Cypress)
+- npm run cypress:open
+- npm run cypress:run
+  - Base URL is http://localhost:8080 (see `cypress.json`).
+  - Run the app first (start:dev or start:prod).
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Environment configuration
+- REST and WS endpoints come from:
+  - `src/environments/environment.ts`
+  - `src/environments/environment.prod.ts`
+- Endpoints are composed in `src/app/api-definitions.ts`.
+- Use `start:dev` vs `start:prod` to switch environments during development.
