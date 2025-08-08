@@ -24,6 +24,7 @@ export class MainPageComponent implements OnInit {
   user: User | undefined;
   public lobbies: Lobby[] | undefined;
   displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
+  errorMessage: string | null = null;
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -46,22 +47,29 @@ export class MainPageComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const data = await this.lobbyService.getLobbies();
-    this.dataSource.data = sortBy(
-      data.filter(
-        (res) =>
-          !res.is_private &&
-          res.lobby_status == LobbyStatus.CREATED &&
-          new Date().getTime() - new Date(res.lobby_creation_date).getTime() < 3600000 * 8
-      ),
-      ['id']
-    ).slice(-8);
-    this.fetched = true;
-    if (this.isLoggedin) {
-      this.userService.getUserMe().then((userData) => {
-        this.user = userData;
-        this.verified = this.user.is_verified!;
-      });
+    try {
+      this.errorMessage = null;
+      const data = await this.lobbyService.getLobbies();
+      this.dataSource.data = sortBy(
+        data.filter(
+          (res) =>
+            !res.is_private &&
+            res.lobby_status == LobbyStatus.CREATED &&
+            new Date().getTime() - new Date(res.lobby_creation_date).getTime() < 3600000 * 8
+        ),
+        ['id']
+      ).slice(-8);
+      this.fetched = true;
+      if (this.isLoggedin) {
+        this.userService.getUserMe().then((userData) => {
+          this.user = userData;
+          this.verified = this.user.is_verified!;
+        });
+      }
+    } catch (e) {
+      this.errorMessage = 'Server temporarily unavailable';
+      this.dataSource.data = [];
+      this.fetched = false;
     }
   }
 
@@ -90,17 +98,24 @@ export class MainPageComponent implements OnInit {
 
   async refreshList() {
     this.fetched = false;
-    const data = await this.lobbyService.getLobbies();
-    this.dataSource.data = sortBy(
-      data.filter(
-        (res) =>
-          !res.is_private &&
-          res.lobby_status == LobbyStatus.CREATED &&
-          new Date().getTime() - new Date(res.lobby_creation_date).getTime() < 3600000 * 4
-      ),
-      ['id']
-    ).slice(-8);
-    this.fetched = true;
+    try {
+      this.errorMessage = null;
+      const data = await this.lobbyService.getLobbies();
+      this.dataSource.data = sortBy(
+        data.filter(
+          (res) =>
+            !res.is_private &&
+            res.lobby_status == LobbyStatus.CREATED &&
+            new Date().getTime() - new Date(res.lobby_creation_date).getTime() < 3600000 * 4
+        ),
+        ['id']
+      ).slice(-8);
+      this.fetched = true;
+    } catch (e) {
+      this.errorMessage = 'Server temporarily unavailable';
+      this.dataSource.data = [];
+      this.fetched = false;
+    }
   }
 
   async createLobby() {

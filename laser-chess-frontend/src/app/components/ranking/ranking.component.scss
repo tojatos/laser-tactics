@@ -1,0 +1,22 @@
+.status-screen {
+  min-height: 40vh;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.status-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  margin-bottom: 12px;
+}
+
+.status-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.status-subtitle {
+  margin-top: 8px;
+  opacity: 0.8;
+}

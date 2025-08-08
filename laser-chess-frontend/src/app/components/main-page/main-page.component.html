@@ -1,5 +1,16 @@
+<div *ngIf="errorMessage" class="status-screen" fxLayout="column" fxLayoutAlign="center center">
+  <mat-icon color="warn" class="status-icon">warning</mat-icon>
+  <h2 class="status-title">{{ errorMessage }}</h2>
+  <p class="status-subtitle">Please try again in a moment.</p>
+</div>
+
+<div *ngIf="!errorMessage && !fetched" class="status-screen" fxLayout="column" fxLayoutAlign="center center">
+  <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+  <h3 class="status-title">Loading...</h3>
+</div>
+
 <div
-  *ngIf="fetched"
+  *ngIf="!errorMessage && fetched"
   class="main-wrapper"
   fxLayout="column"
   fxLayout.gt-sm="column"

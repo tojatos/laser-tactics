@@ -14,6 +14,7 @@ export class RankingComponent implements OnInit {
   displayedColumns = ['position', 'username', 'rating'];
   dataSource = new MatTableDataSource<Ranking>();
   fetched = false;
+  errorMessage: string | null = null;
 
   constructor(
     private router: Router,
@@ -21,9 +22,16 @@ export class RankingComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    const data = await this.userService.getTopRanking();
-    this.dataSource.data = data.splice(0, 10);
-    this.fetched = true;
+    try {
+      this.errorMessage = null;
+      const data = await this.userService.getTopRanking();
+      this.dataSource.data = data.splice(0, 10);
+      this.fetched = true;
+    } catch (e) {
+      this.errorMessage = 'Server temporarily unavailable';
+      this.dataSource.data = [];
+      this.fetched = false;
+    }
   }
 
   openProfile(user: Ranking) {

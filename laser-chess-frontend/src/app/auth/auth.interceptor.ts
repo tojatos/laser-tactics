@@ -15,7 +15,18 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private _snackBar: MatSnackBar) {}
 
   private handleError(error: HttpErrorResponse) {
-    this.showSnackbar(error.error.detail);
+    let message = 'An unexpected error occurred';
+    if (error.status === 0) {
+      message = 'Server temporarily unavailable';
+    } else if (error?.error?.detail) {
+      message = error.error.detail;
+    } else if (typeof error?.error === 'string' && error.error.trim()) {
+      message = error.error;
+    } else if (error?.message) {
+      message = error.message;
+    }
+
+    this.showSnackbar(message);
     return throwError(error);
   }
 
