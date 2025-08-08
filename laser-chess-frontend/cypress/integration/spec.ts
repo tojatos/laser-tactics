@@ -45,8 +45,8 @@ describe('Gameplay tests', () => {
       .get('canvas')
       .wait(100)
       .window()
-      .then(win => { //get component
-          angular = (win as any).ng
+      .then(win => {
+          angular = (win as any).ng // will work only in dev mode
       })
       .then(() => cy.document()).wait(500)
       .then((doc) => {

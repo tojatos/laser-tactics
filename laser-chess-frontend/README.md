@@ -30,10 +30,10 @@ Angular 12 app for Laser Tactics.
   - Prettier formatting.
 
 ### E2E (Cypress)
+- Run the app first (start:dev ONLY! prod version won't work).
 - npm run cypress:open
 - npm run cypress:run
   - Base URL is http://localhost:8080 (see `cypress.json`).
-  - Run the app first (start:dev or start:prod).
 
 ### Environment configuration
 - REST and WS endpoints come from:
