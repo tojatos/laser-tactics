@@ -27,6 +27,15 @@ async def get_lobbies(skip: int = 0, limit: int = 100, db: Session = Depends(get
     return lobbies
 
 
+@router.get("/current", response_model=schemas.CurrentLobbyResponse)
+async def get_current_lobby(current_user: schemas.User = Depends(get_current_active_user),
+                           db: Session = Depends(get_db)):
+    lobbies = crud.get_user_in_created_lobbies(db=db, user=current_user)
+    if len(lobbies) > 0:
+        return schemas.CurrentLobbyResponse(game_id=lobbies[0].game_id)
+    return schemas.CurrentLobbyResponse()
+
+
 @router.get("/{game_id}", response_model=schemas.Lobby)
 async def get_lobby(game_id: str,
                     db: Session = Depends(get_db)):

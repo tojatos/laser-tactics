@@ -7,6 +7,7 @@ export const userEndpoint = '/users';
 export const friendsEndpoint = '/users/me/friends';
 export const tokenEndpoint = '/token';
 export const lobbyEndpoint = '/lobby';
+export const currentLobbyEndpoint = '/lobby/current';
 export const updateLobbyEndpoint = '/lobby/update';
 export const createLobbyEndpoint = '/lobby/create';
 export const joinLobbyEndpoint = '/lobby/join';
@@ -46,6 +47,7 @@ export const friendsFullEndpoint = (id = ''): string =>
   fullEndpoint(friendsEndpoint, id ? `/${id}` : '');
 export const lobbyFullEndpoint = (id = ''): string =>
   fullEndpoint(lobbyEndpoint, id ? `/${id}` : '');
+export const currentLobbyFullEndpoint = fullEndpoint(currentLobbyEndpoint);
 export const settingsFullEndpoint = fullEndpoint(settingsEndpoint);
 export const updateLobbyFullEndpoint = (id = ''): string =>
   fullEndpoint(updateLobbyEndpoint, id ? `/${id}` : '');

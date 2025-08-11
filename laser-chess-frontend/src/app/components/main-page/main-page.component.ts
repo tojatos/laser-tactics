@@ -47,6 +47,11 @@ export class MainPageComponent implements OnInit {
   }
 
   async ngOnInit() {
+    const shouldReturn = await this.checkAndRedirectToCurrentLobby();
+    if (shouldReturn) {
+      return;
+    }
+
     try {
       this.errorMessage = null;
       const data = await this.lobbyService.getLobbies();
@@ -71,6 +76,24 @@ export class MainPageComponent implements OnInit {
       this.dataSource.data = [];
       this.fetched = false;
     }
+  }
+
+  private async checkAndRedirectToCurrentLobby(): Promise<boolean> {
+    if (!this.isLoggedin) {
+      return false;
+    }
+
+    try {
+      const currentLobby = await this.lobbyService.getCurrentLobby();
+      if (currentLobby?.game_id) {
+        this.router.navigate(['/lobby', currentLobby.game_id]);
+        return true;
+      }
+    } catch (e) {
+      console.warn('Could not check current lobby status:', e);
+    }
+
+    return false;
   }
 
   openLobby(lobby: Lobby) {

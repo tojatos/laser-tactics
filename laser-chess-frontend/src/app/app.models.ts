@@ -98,3 +98,7 @@ export interface Ranking {
   registration_date: string;
   rating: number;
 }
+
+export interface CurrentLobbyResponse {
+  game_id: string | null;
+}

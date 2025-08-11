@@ -5,11 +5,12 @@ import {
   leaveLobbyFullEndpoint,
   joinLobbyFullEndpoint,
   lobbyFullEndpoint,
+  currentLobbyFullEndpoint,
   startGameFullEndpoint,
   updateLobbyFullEndpoint,
   joinRandomLobbyFullEndpoint,
 } from '../api-definitions';
-import { Lobby } from '../app.models';
+import { Lobby, CurrentLobbyResponse } from '../app.models';
 import { StartGameRequest } from '../game/game.request.models';
 
 @Injectable({
@@ -24,6 +25,10 @@ export class LobbyService {
 
   getLobbyById(id: string) {
     return this.http.get<Lobby>(lobbyFullEndpoint(id)).toPromise();
+  }
+
+  getCurrentLobby() {
+    return this.http.get<CurrentLobbyResponse>(currentLobbyFullEndpoint).toPromise();
   }
 
   updateLobby(lobby: Lobby) {

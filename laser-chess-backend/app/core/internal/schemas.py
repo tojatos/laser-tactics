@@ -286,3 +286,7 @@ class JoinRandomRequest(BaseModel):
     rating_lower_bound: int
     rating_higher_bound: int
     is_rated: bool
+
+
+class CurrentLobbyResponse(BaseModel):
+    game_id: Optional[str] = None
