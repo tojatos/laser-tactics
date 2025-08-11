@@ -165,11 +165,19 @@ class ConnectionManager:
             except KeyError:
                 pass
 
+    async def send_json_or_abort(self, game_id: str, websocket: WebSocket, data: any):
+        try:
+            await websocket.send_json(data)
+        except RuntimeError:
+            # WebSocket connection closed, remove it from observers
+            if game_id in self.game_observers:
+                self.game_observers[game_id].discard(websocket)
+
     async def notify(self, game_id: str, data: any):
         if game_id not in self.game_observers:
             return
 
-        coroutines = [websocket.send_json(data) for websocket in self.game_observers[game_id]]
+        coroutines = [self.send_json_or_abort(game_id, websocket, data) for websocket in self.game_observers[game_id].copy()]
         await asyncio.gather(*coroutines)
 
     def get_observers(self, game_id: str):
