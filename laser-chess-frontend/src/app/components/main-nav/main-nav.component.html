@@ -29,9 +29,18 @@
         <a mat-button *ngIf="isLoggedin" [matMenuTriggerFor]="user">{{ username }}</a>
         <mat-menu class="menu" #user="matMenu" xPosition="after">
           <span (mouseleave)="closeMenu()">
-            <button mat-menu-item [routerLink]="['/users', username]">Profile</button>
-            <button mat-menu-item routerLink="settings">Settings</button>
-            <button mat-menu-item (click)="logout()">Logout</button>
+            <button mat-menu-item [routerLink]="['/users', username]">
+              <mat-icon>person</mat-icon>
+              <span>Profile</span>
+            </button>
+            <button mat-menu-item routerLink="settings">
+              <mat-icon>settings</mat-icon>
+              <span>Settings</span>
+            </button>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>power_settings_new</mat-icon>
+              <span>Logout</span>
+            </button>
           </span>
         </mat-menu>
       </div>
@@ -84,7 +93,9 @@
           mat-list-item
           [routerLink]="['/users', username]"
           (click)="sidenav.toggle()"
-          >Profile</a
+          >
+          <mat-icon matListItemIcon>person</mat-icon>
+          Profile</a
         >
         <a
           href="#"
@@ -92,10 +103,14 @@
           mat-list-item
           routerLink="settings"
           (click)="sidenav.toggle()"
-          >Settings</a
+          >
+          <mat-icon matListItemIcon>settings</mat-icon>
+          Settings</a
         >
         <a href="#" *ngIf="isLoggedin" mat-list-item (click)="logout()" (click)="sidenav.toggle()"
-          >Logout</a
+          >
+          <mat-icon matListItemIcon>power_settings_new</mat-icon>
+          Logout</a
         >
       </mat-nav-list>
     </mat-sidenav>
