@@ -25,6 +25,10 @@ export class MainPageComponent implements OnInit {
   public lobbies: Lobby[] | undefined;
   displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
   errorMessage: string | null = null;
+  
+  // Game creation options
+  isRanked = false;
+  isPrivate = false;
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -141,30 +145,19 @@ export class MainPageComponent implements OnInit {
     }
   }
 
-  async createLobby() {
+  async createGameWithOptions() {
     this.lobby = await this.lobbyService.createLobby();
-    this.router.navigate(['/lobby', this.lobby.game_id]);
-  }
-
-  async createPrivateLobby() {
-    this.lobby = await this.lobbyService.createLobby();
-    this.lobby.is_private = true;
-    this.lobbyService.updateLobby(this.lobby);
-    this.router.navigate(['/lobby', this.lobby.game_id]);
-  }
-
-  async createRankedLobby() {
-    this.lobby = await this.lobbyService.createLobby();
-    this.lobby.is_ranked = true;
-    this.lobbyService.updateLobby(this.lobby);
-    this.router.navigate(['/lobby', this.lobby.game_id]);
-  }
-
-  async createPrivateRankedLobby() {
-    this.lobby = await this.lobbyService.createLobby();
-    this.lobby.is_ranked = true;
-    this.lobby.is_private = true;
-    this.lobbyService.updateLobby(this.lobby);
+    
+    if (this.isRanked || this.isPrivate) {
+      if (this.isRanked) {
+        this.lobby.is_ranked = true;
+      }
+      if (this.isPrivate) {
+        this.lobby.is_private = true;
+      }
+      this.lobbyService.updateLobby(this.lobby);
+    }
+    
     this.router.navigate(['/lobby', this.lobby.game_id]);
   }
 

@@ -24,3 +24,36 @@
   margin-top: 8px;
   opacity: 0.8;
 }
+
+.game-options {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 200px;
+}
+
+.options-title {
+  margin: 0 0 15px 0;
+  color: rgba(255, 255, 255, 0.87);
+  font-weight: 500;
+  text-align: center;
+}
+
+.game-option {
+  color: rgba(255, 255, 255, 0.87);
+  
+  ::ng-deep .mat-slide-toggle-label {
+    color: rgba(255, 255, 255, 0.87);
+  }
+  
+  ::ng-deep .mat-slide-toggle-content {
+    color: rgba(255, 255, 255, 0.87);
+  }
+}
+
+.start-game-button {
+  margin-top: 10px;
+  font-weight: 500;
+  min-height: 40px;
+}
