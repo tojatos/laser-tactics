@@ -2,12 +2,13 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+const port = 7171;
 export const environment = {
   production: false,
-  API_URL: 'http://localhost',
-  WEBSOCKET_URL: 'ws://localhost/ws',
-  CHAT_WEBSOCKET_URL: 'ws://localhost/chat',
-  LOBBY_WEBSOCKET_URL: 'ws://localhost/lobby_ws',
+  API_URL: `http://localhost:${port}`,
+  WEBSOCKET_URL: `ws://localhost:${port}/ws`,
+  CHAT_WEBSOCKET_URL: `ws://localhost:${port}/chat`,
+  LOBBY_WEBSOCKET_URL: `ws://localhost:${port}/lobby_ws`,
   API_PREFIX: '/api/v1',
 };
 
