@@ -57,3 +57,174 @@
   font-weight: 500;
   min-height: 40px;
 }
+
+// Simplified lobby table styles
+.main-content {
+  width: 100%;
+  padding: 20px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    gap: 20px !important;
+    align-items: center !important;
+  }
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+  
+  @media (max-width: 768px) {
+    flex: none !important;
+    width: 100%;
+  }
+}
+
+.controls-container {
+  @media (max-width: 768px) {
+    flex: none !important;
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+.lobby-table {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 800px;
+  height: 500px;
+  
+  @media (max-width: 900px) {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.table-row {
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid transparent !important;
+  
+  &:hover {
+    background: rgba(59, 140, 165, 0.3) !important;
+    border-top: 1px solid transparent !important;
+    border-color: transparent !important;
+  }
+  
+  .mat-cell {
+    color: rgba(255, 255, 255, 0.87);
+    border-bottom: none;
+    border-top: none !important;
+  }
+}
+
+.mat-header-row {
+  background: rgba(59, 140, 165, 0.3);
+  
+  .mat-header-cell {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    border-bottom: none;
+  }
+}
+
+.ranked-mode-text {
+  color: #ffd700 !important;
+  font-weight: 600;
+}
+
+.players-cell {
+  min-width: 200px;
+}
+
+.players-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+// Game name alignment
+.mat-cell:first-child {
+  text-align: left;
+}
+
+.mat-header-cell:first-child {
+  text-align: left;
+}
+
+// Player alignment improvements
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.player-name {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  &.waiting-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+  }
+}
+
+.vs-divider {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.player-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  
+  &.red-player {
+    color: #ff4444;
+  }
+  
+  &.blue-player {
+    color: #4488ff;
+  }
+  
+  &.waiting-player {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.waiting-slot {
+  opacity: 0.7;
+}
+
+.join-button {
+  // Simple button, no fancy effects
+}
+
+.refresh-icon {
+  // Simple icon, no rotation
+}
+
+// Override Material Design table border defaults
+.lobby-table {
+  ::ng-deep {
+    .mat-row:hover {
+      border-top: none !important;
+      border-color: transparent !important;
+    }
+    
+    .mat-cell {
+      border-top: none !important;
+    }
+    
+    .mat-row {
+      border-top: none !important;
+    }
+  }
+}

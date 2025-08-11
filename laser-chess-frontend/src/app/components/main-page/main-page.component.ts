@@ -23,7 +23,7 @@ export class MainPageComponent implements OnInit {
   verified = false;
   user: User | undefined;
   public lobbies: Lobby[] | undefined;
-  displayedColumns = ['name', 'player_one_username', 'player_two_username', 'Mode', 'join'];
+  displayedColumns = ['name', 'players', 'Mode', 'join'];
   errorMessage: string | null = null;
   
   // Game creation options
@@ -164,5 +164,29 @@ export class MainPageComponent implements OnInit {
   sendVerifyEmail() {
     this.openSnackBar('Email sent');
     this.authService.sendVerficationMail(this.authService.getUsername());
+  }
+
+  getRedPlayer(lobby: Lobby): string | null {
+    if (!lobby.starting_position_reversed) {
+      return lobby.player_one_username || null;
+    } else {
+      return lobby.player_two_username || null;
+    }
+  }
+
+  getBluePlayer(lobby: Lobby): string | null {
+    if (!lobby.starting_position_reversed) {
+      return lobby.player_two_username || null;
+    } else {
+      return lobby.player_one_username || null;
+    }
+  }
+
+  hasRedPlayer(lobby: Lobby): boolean {
+   return this.getRedPlayer(lobby) !== null;
+  }
+
+  hasBluePlayer(lobby: Lobby): boolean {
+    return this.getBluePlayer(lobby) !== null;
   }
 }
