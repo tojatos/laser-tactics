@@ -6,12 +6,12 @@ import {
   OnDestroy,
   Output,
   SimpleChanges,
-  ViewChild,
 } from '@angular/core';
-import { MatSelectionList } from '@angular/material/list';
 import { cloneDeep } from 'lodash';
-import { GameEvent, GameState } from '../../game.models';
+import { GameEvent, GameState, UserEvent, PieceMovedEvent, PieceRotatedEvent, TeleportEvent } from '../../game.models';
 import { GameEvents } from '../../src/Utils/Enums';
+
+type Coordinates = { x: number; y: number };
 
 @Component({
   selector: 'app-board-log',
@@ -19,50 +19,46 @@ import { GameEvents } from '../../src/Utils/Enums';
   styleUrls: ['./board-log.component.scss'],
 })
 export class BoardLogComponent implements OnChanges, OnDestroy {
-  @ViewChild('userEvents')
-  logList: MatSelectionList | undefined;
 
-  @Input() gameState: GameState | undefined;
+  @Input() gameState?: GameState;
   @Input() maxHeight = 300;
   @Input() gameFinished = false;
   @Input() isSpectator = false;
-  @Output() gameLogEmitter = new EventEmitter();
-  @Output() gameReturnEmitter = new EventEmitter();
-  @Output() giveUpEmitter = new EventEmitter();
-  @Output() drawEmitter = new EventEmitter();
+  @Output() gameLogEmitter = new EventEmitter<[GameEvent[], boolean]>();
+  @Output() gameReturnEmitter = new EventEmitter<void>();
+  @Output() giveUpEmitter = new EventEmitter<void>();
+  @Output() drawEmitter = new EventEmitter<void>();
 
   notationList: string[] = [];
-  validGameState: GameState | undefined;
+  validGameState?: GameState;
   userEventChains: GameEvent[][] = [];
   spectableHistory = true;
   currentHistorySelection = -1;
+  selectedMoveIndex = -1;
+
+  private readonly EXCLUDED_EVENT_TYPES = [
+    GameEvents.OFFER_DRAW_EVENT,
+    GameEvents.GIVE_UP_EVENT,
+    GameEvents.TIMEOUT_EVENT
+  ] as const;
+
+  private readonly USER_EVENT_TYPES = [
+    GameEvents.PIECE_MOVED_EVENT,
+    GameEvents.PIECE_ROTATED_EVENT,
+    GameEvents.LASER_SHOT_EVENT,
+    GameEvents.OFFER_DRAW_EVENT,
+    GameEvents.GIVE_UP_EVENT,
+    GameEvents.TIMEOUT_EVENT
+  ] as const;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.gameState) {
-      this.notationList = [];
-      this.userEventChains = [];
-      const newChange = <GameState>changes.gameState.currentValue;
-      if (newChange && newChange.game_events.length > 0) {
-        this.validGameState = cloneDeep(this.gameState);
-        if (this.validGameState) {
-          this.validGameState.user_events = this.validGameState.user_events.filter(
-            (ue) =>
-              ue.event_type != GameEvents.OFFER_DRAW_EVENT &&
-              ue.event_type != GameEvents.GIVE_UP_EVENT &&
-              ue.event_type != GameEvents.TIMEOUT_EVENT
-          );
-          this.validGameState.game_events = this.validGameState.game_events.filter(
-            (ge) =>
-              ge.event_type != GameEvents.OFFER_DRAW_EVENT &&
-              ge.event_type != GameEvents.GIVE_UP_EVENT &&
-              ge.event_type != GameEvents.TIMEOUT_EVENT
-          );
-          this.divideArrayOnUserEventChains();
-          this.validGameState.user_events.forEach((_, i) => {
-            this.notationList.push(this.eventNotation(i));
-          });
-        }
-      }
+    if (!changes.gameState?.currentValue) return;
+    
+    this.resetState();
+    const newGameState = changes.gameState.currentValue as GameState;
+    
+    if (newGameState?.game_events?.length > 0) {
+      this.processGameState();
     }
   }
 
@@ -71,90 +67,156 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     this.gameReturnEmitter.emit();
   }
 
+  private resetState(): void {
+    this.notationList = [];
+    this.userEventChains = [];
+    this.selectedMoveIndex = -1;
+  }
+
+  getMoveGroups(): { redMoves: (string | undefined)[]; blueMoves: (string | undefined)[] }[] {
+    const groups: { redMoves: (string | undefined)[]; blueMoves: (string | undefined)[] }[] = [];
+    
+    for (let i = 0; i < this.notationList.length; i += 4) {
+      groups.push({
+        redMoves: [
+          this.notationList[i],      // Red move 1
+          this.notationList[i + 1]   // Red move 2
+        ],
+        blueMoves: [
+          this.notationList[i + 2],  // Blue move 1
+          this.notationList[i + 3]   // Blue move 2
+        ]
+      });
+    }
+    
+    return groups;
+  }
+
+  isSelectedMove(moveIndex: number): boolean {
+    return this.selectedMoveIndex === moveIndex;
+  }
+
+  private processGameState(): void {
+    this.validGameState = cloneDeep(this.gameState);
+    if (!this.validGameState) return;
+
+    // Filter excluded events inline
+    this.validGameState.user_events = this.filterEvents(this.validGameState.user_events);
+    this.validGameState.game_events = this.filterEvents(this.validGameState.game_events);
+    
+    this.divideArrayOnUserEventChains();
+    this.notationList = this.validGameState.user_events.map((_, i) => this.eventNotation(i));
+  }
+
+  private filterEvents<T extends { event_type: GameEvents }>(events: T[]): T[] {
+    return events.filter(event => 
+      !(this.EXCLUDED_EVENT_TYPES as readonly GameEvents[]).includes(event.event_type)
+    );
+  }
+
   buildEvent(gameEvents: GameEvent[], spectableHistory: boolean): void {
     this.gameLogEmitter.emit([gameEvents, spectableHistory]);
   }
 
   returnToCurrentEvent(): void {
-    this.logList?.deselectAll();
     this.currentHistorySelection = -1;
+    this.selectedMoveIndex = -1;
     this.gameReturnEmitter.emit();
   }
 
-  onSelection(e: number): void {
-    if (this.validGameState) {
-      if (e < this.currentHistorySelection) this.currentHistorySelection = -1;
-      if (e == this.userEventChains.length - 1) this.returnToCurrentEvent();
-      else
-        this.gameLogEmitter.emit([
-          this.userEventChains.slice(0, e + 1).flat(),
-          this.spectableHistory,
-        ]);
+  onSelection(eventIndex: number): void {
+    if (!this.validGameState || eventIndex >= this.notationList.length) return;
+
+    this.selectedMoveIndex = eventIndex;
+
+    if (eventIndex < this.currentHistorySelection) {
+      this.currentHistorySelection = -1;
+    }
+
+    if (eventIndex === this.userEventChains.length - 1) {
+      this.returnToCurrentEvent();
+    } else {
+      const selectedEvents = this.userEventChains.slice(0, eventIndex + 1).flat();
+      this.gameLogEmitter.emit([selectedEvents, this.spectableHistory]);
     }
   }
 
-  animatedHistorySelectionStep() {
+  animatedHistorySelectionStep(): void {
     this.currentHistorySelection++;
-    if (this.logList && this.currentHistorySelection > -1) {
-      const listOption = this.logList.options.get(this.currentHistorySelection);
-      if (listOption) listOption.selected = true;
-    }
+    this.selectedMoveIndex = this.currentHistorySelection;
   }
 
   divideArrayOnUserEventChains(): void {
     this.validGameState?.user_events.forEach(() => {
-      let search = 0;
+      if (!this.validGameState) return;
+      
+      let userEventCount = 0;
       let iterator = 0;
-      if (this.validGameState) {
-        while (search < 2 && iterator < this.validGameState.game_events.length + 1) {
-          if (this.isUserEvent(this.validGameState?.game_events[iterator++])) search++;
+      
+      while (userEventCount < 2 && iterator < this.validGameState.game_events.length + 1) {
+        if (this.isUserEvent(this.validGameState.game_events[iterator++])) {
+          userEventCount++;
         }
-        this.userEventChains.push(this.validGameState.game_events.splice(0, iterator - 1));
       }
+      
+      this.userEventChains.push(this.validGameState.game_events.splice(0, iterator - 1));
     });
   }
 
   eventNotation(place: number): string {
-    const lastEvents = this.userEventChains[place];
-    const subEventTeleport = lastEvents?.find((le) => le.event_type == GameEvents.TELEPORT_EVENT);
-    const subEventTaken = lastEvents?.find((le) => le.event_type == GameEvents.PIECE_TAKEN_EVENT);
+    const eventChain = this.userEventChains[place];
+    if (!eventChain?.length) return '?';
 
-    if (lastEvents) {
-      const lastUserEvent = lastEvents[0];
-      if (subEventTeleport?.event_type == GameEvents.TELEPORT_EVENT) {
-        if (lastUserEvent.event_type == GameEvents.PIECE_MOVED_EVENT)
-          return `${lastUserEvent.moved_from.x}_${lastUserEvent.moved_from.y} -
-          ${lastUserEvent.moved_to.x}_${lastUserEvent.moved_to.y}
-          (${subEventTeleport.teleported_to.x}_${subEventTeleport.teleported_to.y})`;
-      } else if (subEventTaken?.event_type == GameEvents.PIECE_TAKEN_EVENT) {
-        if (lastUserEvent.event_type == GameEvents.PIECE_MOVED_EVENT)
-          return `${lastUserEvent.moved_from.x}_${lastUserEvent.moved_from.y} x ${lastUserEvent.moved_to.x}_${lastUserEvent.moved_to.y} `;
-      } else if (lastUserEvent.event_type == GameEvents.LASER_SHOT_EVENT) return 'LASER';
-      else if (lastUserEvent.event_type == GameEvents.PIECE_MOVED_EVENT)
-        return `${lastUserEvent.moved_from.x}_${lastUserEvent.moved_from.y} -
-        ${lastUserEvent.moved_to.x}_${lastUserEvent.moved_to.y}`;
-      else if (lastUserEvent.event_type == GameEvents.PIECE_ROTATED_EVENT)
-        return `${lastUserEvent.rotated_piece_at.x}_${lastUserEvent.rotated_piece_at.y} (${lastUserEvent.rotation})`;
+    const [primaryEvent] = eventChain;
+    const teleportEvent = eventChain.find(e => e.event_type === GameEvents.TELEPORT_EVENT);
+    const captureEvent = eventChain.find(e => e.event_type === GameEvents.PIECE_TAKEN_EVENT);
+
+    if (teleportEvent && primaryEvent.event_type === GameEvents.PIECE_MOVED_EVENT) {
+      return this.createMoveNotation(primaryEvent as PieceMovedEvent, teleportEvent as TeleportEvent);
     }
-    return 'Unknown notation';
+
+    if (captureEvent && primaryEvent.event_type === GameEvents.PIECE_MOVED_EVENT) {
+      return this.createMoveNotation(primaryEvent as PieceMovedEvent, undefined, true);
+    }
+
+    switch (primaryEvent.event_type) {
+      case GameEvents.LASER_SHOT_EVENT:
+        return 'L';
+      case GameEvents.PIECE_MOVED_EVENT:
+        return this.createMoveNotation(primaryEvent as PieceMovedEvent);
+      case GameEvents.PIECE_ROTATED_EVENT:
+        const rotation = primaryEvent as PieceRotatedEvent;
+        return `${this.formatCoords(rotation.rotated_piece_at)}↻${rotation.rotation}°`;
+      default:
+        return '?';
+    }
   }
 
-  giveUp(): void {
-    this.giveUpEmitter.emit();
+  private createMoveNotation(
+    moveEvent: PieceMovedEvent, 
+    teleportEvent?: TeleportEvent, 
+    isCapture = false
+  ): string {
+    const from = this.formatCoords(moveEvent.moved_from);
+    const to = this.formatCoords(moveEvent.moved_to);
+    const connector = isCapture ? 'x' : '-';
+    const base = `${from}${connector}${to}`;
+    
+    return teleportEvent 
+      ? `${base}(${this.formatCoords(teleportEvent.teleported_to)})`
+      : base;
   }
 
-  draw(): void {
-    this.drawEmitter.emit();
+  private formatCoords({ x, y }: Coordinates): string {
+    return `${x}${y}`;
   }
 
-  isUserEvent(gameEvent: GameEvent | undefined): boolean {
-    return (
-      gameEvent?.event_type == GameEvents.PIECE_MOVED_EVENT ||
-      gameEvent?.event_type == GameEvents.PIECE_ROTATED_EVENT ||
-      gameEvent?.event_type == GameEvents.LASER_SHOT_EVENT ||
-      gameEvent?.event_type == GameEvents.OFFER_DRAW_EVENT ||
-      gameEvent?.event_type == GameEvents.GIVE_UP_EVENT ||
-      gameEvent?.event_type == GameEvents.TIMEOUT_EVENT
-    );
+  giveUp = (): void => this.giveUpEmitter.emit();
+  draw = (): void => this.drawEmitter.emit();
+
+  isUserEvent(gameEvent?: GameEvent): boolean {
+    return gameEvent ? 
+      (this.USER_EVENT_TYPES as readonly GameEvents[]).includes(gameEvent.event_type) : 
+      false;
   }
 }

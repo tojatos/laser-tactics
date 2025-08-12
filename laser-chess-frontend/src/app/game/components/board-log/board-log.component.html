@@ -1,18 +1,34 @@
-<h3>Game logs</h3>
-<mat-slide-toggle (change)="(!spectableHistory)" [(ngModel)]="spectableHistory"
+<!-- <mat-slide-toggle (change)="(!spectableHistory)" [(ngModel)]="spectableHistory"
   >Animated</mat-slide-toggle
->
+> -->
 <br />
-<mat-selection-list
-  #userEvents
-  [style.height.px]="maxHeight"
-  (selectionChange)="onSelection(userEvents.selectedOptions.selected[0]?.value)"
-  [multiple]="false"
->
-  <mat-list-option *ngFor="let elem of notationList; let i = index" [value]="i">
-    {{ elem }}
-  </mat-list-option>
-</mat-selection-list>
+<div class="game-log-container" [style.height.px]="maxHeight">
+  <div class="moves-table">
+    <div class="move-row" *ngFor="let moveGroup of getMoveGroups(); let groupIndex = index">
+      <div class="turn-number">{{ groupIndex + 1 }}</div>
+      <div class="move-cell red-moves">
+        <span class="move" 
+              [class.selected]="isSelectedMove(groupIndex * 4)"
+              (click)="onSelection(groupIndex * 4)"
+              *ngIf="moveGroup.redMoves[0]">{{ moveGroup.redMoves[0] }}</span>
+        <span class="move" 
+              [class.selected]="isSelectedMove(groupIndex * 4 + 1)"
+              (click)="onSelection(groupIndex * 4 + 1)"
+              *ngIf="moveGroup.redMoves[1]">{{ moveGroup.redMoves[1] }}</span>
+      </div>
+      <div class="move-cell blue-moves">
+        <span class="move" 
+              [class.selected]="isSelectedMove(groupIndex * 4 + 2)"
+              (click)="onSelection(groupIndex * 4 + 2)"
+              *ngIf="moveGroup.blueMoves[0]">{{ moveGroup.blueMoves[0] }}</span>
+        <span class="move" 
+              [class.selected]="isSelectedMove(groupIndex * 4 + 3)"
+              (click)="onSelection(groupIndex * 4 + 3)"
+              *ngIf="moveGroup.blueMoves[1]">{{ moveGroup.blueMoves[1] }}</span>
+      </div>
+    </div>
+  </div>
+</div>
 <div *ngIf="!isSpectator">
   <div class="btns" *ngIf="!gameFinished">
     <button mat-icon-button matTooltip="Give up" (click)="giveUp()">

@@ -66,6 +66,11 @@ $laser-chess-frontend-theme: mat-dark-theme(
 @include angular-material-theme($laser-chess-frontend-theme);
 /* You can add global styles to this file, and also import other style files */
 
+/* Apply border-box globally for more predictable sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   height: 100%;

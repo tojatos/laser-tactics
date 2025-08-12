@@ -1,5 +1,5 @@
 <app-chat #chatComponent [myUsername]="this.game.authService.getUsername()"></app-chat>
-<h1 class="float">
+<h1 class="game-title">
   {{ parseGamePhase(game.gamePhase) }}
   <span
     *ngIf="game.gamePhase !== 'DRAW' && game.gamePhase !== 'NOT_STARTED'"
@@ -22,9 +22,10 @@
     </mat-select>
   </mat-form-field>
 </div>
-<div style="clear: both"></div>
-<div [style.width.px]="displayedContainerWidth" [style.height.px]="containerHeight">
-  <div class="float">
+
+<div class="game-layout" [style.width.px]="displayedContainerWidth" [style.height.px]="containerHeight">
+  <!-- Main Game Area -->
+  <div class="game-main">
     <div class="boardText">
       <div class="sliders">
         <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation"
@@ -58,6 +59,7 @@
         </span>
       </h3>
     </div>
+    
     <div
       [style.width.px]="containerWidth"
       [style.height.px]="containerHeight"
@@ -69,6 +71,7 @@
         [ngStyle]="{ 'background-image': backgroundBoardUrl }"
       ></canvas>
     </div>
+    
     <div class="boardText">
       <div class="sliders">
         <div class="btns" *ngIf="isHandset && game.gamePhase === 'STARTED'">
@@ -103,6 +106,7 @@
         </span>
       </h3>
     </div>
+    
     <div *ngIf="this.game.isInitiated">
       <app-board-actions
         (buttonPressEmitter)="buttonPressEvent($event)"
@@ -115,19 +119,20 @@
       ></app-board-actions>
     </div>
   </div>
-  <app-board-log
-    class="float"
-    #logs
-    *ngIf="!isHandset"
-    #logsComponent
-    [gameState]="game.gameService.lastMessage"
-    [maxHeight]="containerHeight * 0.9"
-    [gameFinished]="game.gamePhase !== 'STARTED'"
-    [isSpectator]="isSpectator"
-    (gameLogEmitter)="buildEvent($event)"
-    (gameReturnEmitter)="returnToCurrentEvent()"
-    (giveUpEmitter)="game.giveUp()"
-    (drawEmitter)="game.offerDraw()"
-  ></app-board-log>
-  <div style="clear: both"></div>
+
+  <!-- Game Log Sidebar -->
+  <div class="game-sidebar" *ngIf="!isHandset">
+    <app-board-log
+      #logs
+      #logsComponent
+      [gameState]="game.gameService.lastMessage"
+      [maxHeight]="containerHeight * 0.9"
+      [gameFinished]="game.gamePhase !== 'STARTED'"
+      [isSpectator]="isSpectator"
+      (gameLogEmitter)="buildEvent($event)"
+      (gameReturnEmitter)="returnToCurrentEvent()"
+      (giveUpEmitter)="game.giveUp()"
+      (drawEmitter)="game.offerDraw()"
+    ></app-board-log>
+  </div>
 </div>
