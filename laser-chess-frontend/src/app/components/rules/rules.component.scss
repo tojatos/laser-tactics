@@ -1,43 +1,38 @@
-/* General Styling for All Headings */
 h1,
 h2,
 h3 {
   font-family: 'Arial', sans-serif;
   font-weight: bold;
   color: white;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-/* Main Section Headings */
 h1 {
-  font-size: 28px;
+  font-size: 24px;
   letter-spacing: 0.5px;
-  border-bottom: 2px solid #666; /* Subtle underline */
+  border-bottom: 2px solid #666;
   padding-bottom: 5px;
-  margin-top: 30px;
+  margin-top: 20px;
   text-transform: none;
 }
 
-/* Subsection Headings */
 h2 {
-  font-size: 22px;
-  color: #ddd; /* Lighter than h1 */
-  margin-top: 25px;
+  font-size: 20px;
+  color: #ddd;
+  margin-top: 20px;
   letter-spacing: 0.2px;
   text-transform: none;
 }
 
-/* Minor Headings */
 h3 {
-  font-size: 18px;
-  color: #bbb; /* Even lighter */
+  font-size: 16px;
+  color: #bbb;
   font-weight: normal;
   text-transform: none;
 }
 
-/* Additional Enhancements */
 h1:first-child {
-  margin-top: 0; /* Ensures first h1 isn't pushed down */
+  margin-top: 0;
 }
 
 .main-wrapper {
@@ -45,55 +40,360 @@ h1:first-child {
   height: min-content;
   overflow: hidden;
   scrollbar-width: none;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  background-color: #222; /* Dark background for better contrast */
+  background-color: #222;
   color: white;
   border-radius: 10px;
-  padding: 30px;
+  padding: 25px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.laser-cards {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  width: 100%; /* Ensures proper alignment */
+.rules-tabs {
+  margin-top: 0;
+  
+  ::ng-deep .mat-tab-group {
+    background-color: transparent;
+  }
+  
+  ::ng-deep .mat-tab-header {
+    border-bottom: 1px solid #444;
+    height: 40px;
+  }
+  
+  ::ng-deep .mat-tab-label {
+    color: #bbb !important;
+    font-weight: 500;
+    opacity: 0.7;
+    min-width: 100px;
+    height: 40px;
+    font-size: 14px;
+    padding: 0 16px;
+  }
+  
+  ::ng-deep .mat-tab-label-active {
+    color: #4da6ff !important;
+    opacity: 1;
+  }
+  
+  ::ng-deep .mat-ink-bar {
+    background-color: #4da6ff;
+    height: 2px;
+  }
+  
+  ::ng-deep .mat-tab-body-content {
+    overflow-x: hidden;
+  }
 }
 
-/* Ensuring the "Starting Position" image stays centered */
+.tab-content {
+  padding: 15px 0;
+  min-height: 400px;
+}
+
+.source-footer {
+  margin-top: 20px;
+  padding: 12px 15px;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  border-top: 2px solid #444;
+}
+
+.source-footer span {
+  color: #bbb;
+  margin-right: 8px;
+}
+
+.reference-link {
+  display: inline;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4da6ff;
+  text-decoration: none;
+  padding: 4px 8px;
+  border: 1px solid #4da6ff;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+.reference-link:hover {
+  background-color: #4da6ff;
+  color: white;
+}
+
+.goal-paragraph {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.goal-icon {
+  color: #ffcc66;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.overview-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 20px;
+  align-items: start;
+}
+
+.quick-reference {
+  margin-top: 0;
+}
+
+.quick-ref-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.quick-ref-item {
+  background-color: #2a2a2a;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #4da6ff;
+}
+
+.quick-ref-item h3 {
+  margin-top: 0;
+  color: #4da6ff;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.quick-ref-item p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.intro-section,
+.board-section,
+.pieces-section,
+.gameplay-section,
+.rotation-section,
+.strategy-section {
+  margin-bottom: 25px;
+}
+
+.intro-section p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.laser-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 15px;
+  width: 100%;
+  margin: 20px 0;
+}
+
 .starting-image {
   text-align: center;
-  padding: 20px;
+  padding: 10px;
+  margin: 0;
 
   img {
-    width: 85%;
-    max-width: 600px;
+    width: 90%;
+    max-width: 350px;
     height: auto;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   }
 
   p {
     font-style: italic;
-    margin-top: 5px;
+    margin-top: 8px;
+    font-size: 13px;
   }
 }
-.reference-link {
-  display: inline-block;
-  font-size: 16px;
-  font-weight: bold;
-  color: #4da6ff; /* Light blue for visibility */
-  text-decoration: none;
-  padding: 8px 12px;
-  border: 1px solid #4da6ff;
-  border-radius: 5px;
-  transition: all 0.3s ease-in-out;
+
+.gameplay-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 15px;
 }
 
-/* Hover effect */
-.reference-link:hover {
-  background-color: #4da6ff;
-  color: white;
+.actions-section,
+.movement-section {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #4da6ff;
+}
+
+.actions-section h3,
+.movement-section h3 {
+  margin-top: 0;
+  color: #4da6ff;
+  font-weight: bold;
+}
+
+.strategy-content {
+  margin-top: 15px;
+}
+
+.strategy-item {
+  background-color: #2a2a2a;
+  padding: 18px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #66cc66;
+}
+
+.strategy-item h3 {
+  margin-top: 0;
+  color: #66cc66;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.strategy-summary {
+  background-color: #2a2a2a;
+  padding: 18px;
+  border-radius: 8px;
+  border-left: 4px solid #ffcc66;
+}
+
+.strategy-summary h3 {
+  margin-top: 0;
+  color: #ffcc66;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.rotation-section {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #ff6666;
+  margin-top: 20px;
+}
+
+.rotation-section h2 {
+  margin-top: 0;
+  color: #ff6666;
+  border-bottom: 2px solid #ff6666;
+  padding-bottom: 8px;
+}
+
+@media (max-width: 1024px) {
+  .laser-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .main-wrapper {
+    max-width: 900px;
+  }
+  
+  .gameplay-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .overview-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .quick-ref-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+  
+  .starting-image img {
+    width: 60%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-wrapper {
+    padding: 15px;
+    max-width: 100%;
+  }
+  
+  .tab-content {
+    padding: 12px 0;
+  }
+  
+  .overview-content {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .starting-image {
+    padding: 8px;
+    margin: 8px 0;
+  }
+  
+  .starting-image img {
+    width: 70%;
+    max-width: 280px;
+  }
+  
+  .goal-paragraph {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .goal-icon {
+    font-size: 18px;
+    margin-top: 2px;
+  }
+  
+  h1 {
+    font-size: 20px;
+  }
+  
+  h2 {
+    font-size: 18px;
+  }
+  
+  .actions-section,
+  .movement-section,
+  .strategy-item,
+  .strategy-summary,
+  .rotation-section,
+  .quick-ref-item {
+    padding: 15px;
+  }
+  
+  .rules-tabs ::ng-deep .mat-tab-label {
+    min-width: 70px;
+    font-size: 13px;
+    height: 36px;
+    padding: 0 12px;
+  }
+  
+  .rules-tabs ::ng-deep .mat-tab-header {
+    height: 36px;
+  }
+  
+  .quick-ref-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .source-footer {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .reference-link {
+    font-size: 13px;
+    padding: 3px 6px;
+  }
 }

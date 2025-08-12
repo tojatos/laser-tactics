@@ -7,40 +7,37 @@ mat-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
-  margin: 20px;
+  padding: 15px;
+  margin: 10px;
   width: 100%;
-  max-width: 800px;
-  min-height: 130px;
+  max-width: 100%;
+  min-height: 100px;
   background-color: #333;
   color: white;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
-/* Left section (Name + Image) */
 .card-left {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1; /* Takes up 20% */
-  max-width: 25%; /* Ensures the left side does not grow too much */
+  flex: 1;
+  max-width: 20%;
   text-align: center;
 }
 
-/* Name styling */
 .name {
-  font-size: 1.3em;
+  font-size: 1.1em;
   font-weight: bold;
   margin-bottom: 5px;
 }
 
-/* Image container */
 .image {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -52,27 +49,44 @@ mat-card {
   display: block;
 }
 
-/* Right section (Description) */
 .card-right {
-  flex: 3; /* Takes up 75% */
+  flex: 4;
   text-align: left;
-  font-size: 14px;
-  line-height: 1.5;
-  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.4;
+  padding-left: 15px;
+}
+
+.card-right p {
+  margin: 6px 0;
 }
 
 @media (max-width: 768px) {
   mat-card {
     flex-direction: column;
     text-align: center;
+    min-height: auto;
+    padding: 12px;
   }
 
   .card-left {
     width: 100%;
-    margin-bottom: 10px;
+    max-width: 100%;
+    margin-bottom: 8px;
   }
 
   .card-right {
     text-align: center;
+    padding-left: 0;
+    font-size: 12px;
+  }
+  
+  .image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .name {
+    font-size: 1em;
   }
 }
