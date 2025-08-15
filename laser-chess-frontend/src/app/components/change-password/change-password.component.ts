@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
-  FormControl,
-  FormGroup,
+  UntypedFormControl,
+  UntypedFormGroup,
   FormGroupDirective,
   NgForm,
   ValidationErrors,
@@ -24,8 +24,8 @@ export class ChangePasswordComponent implements OnInit {
   hide = true;
   hide2 = true;
   hide3 = true;
-  form = new FormGroup({
-    new_password: new FormControl('', [Validators.required]),
+  form = new UntypedFormGroup({
+    new_password: new UntypedFormControl('', [Validators.required]),
   });
   token: string | undefined;
 

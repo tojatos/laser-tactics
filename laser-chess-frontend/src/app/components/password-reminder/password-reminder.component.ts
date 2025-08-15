@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -11,8 +11,8 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class PasswordReminderComponent {
   hide = true;
-  form = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+  form = new UntypedFormGroup({
+    email: new UntypedFormControl('', [Validators.required, Validators.email]),
   });
   constructor(
     private _snackBar: MatSnackBar,

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
-import { FormControl, Validators, FormGroup } from '@angular/forms';
+import { UntypedFormControl, Validators, UntypedFormGroup } from '@angular/forms';
 import { LoginEmitterService } from 'src/app/services/login-emitter.service';
 
 @Component({
@@ -13,9 +13,9 @@ export class LoginComponent {
   @Output() public changeLoginState: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   hide = true;
-  form = new FormGroup({
-    username: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
+  form = new UntypedFormGroup({
+    username: new UntypedFormControl('', [Validators.required]),
+    password: new UntypedFormControl('', [Validators.required]),
   });
   isLoggedIn = false;
   constructor(

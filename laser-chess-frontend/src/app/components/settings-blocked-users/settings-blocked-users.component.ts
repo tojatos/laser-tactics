@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -21,8 +21,8 @@ export class SettingsBlockedUsersComponent implements OnInit {
 
   username: string | undefined;
   blocked: string[] | undefined;
-  form = new FormGroup({
-    input: new FormControl(''),
+  form = new UntypedFormGroup({
+    input: new UntypedFormControl(''),
   });
   empty = true;
 

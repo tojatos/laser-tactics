@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -36,8 +36,8 @@ export class UserPageComponent {
 
   displayedColumns = ['Date', 'Opponent', 'Result'];
 
-  form = new FormGroup({
-    input: new FormControl(''),
+  form = new UntypedFormGroup({
+    input: new UntypedFormControl(''),
   });
   openSnackBar(message: string) {
     this._snackBar.open(message, '', {
