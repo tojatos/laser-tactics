@@ -65,9 +65,13 @@
   background-color: black;
 }
 
-.chat-input .mat-form-field-wrapper {
+.chat-input .mat-mdc-text-field-wrapper {
   margin-bottom: -1.25em;
   margin-top: -1.25em;
+}
+
+.mat-mdc-form-field-infix {
+  padding: 0 !important;
 }
 
 .chat-input input {

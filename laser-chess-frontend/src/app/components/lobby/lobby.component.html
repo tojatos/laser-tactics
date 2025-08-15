@@ -42,6 +42,7 @@
       
       <div class="players-grid">
         <mat-card 
+          appearance="outlined" 
           class="player-card red-player" 
           [class.clickable]="!player_one && !isPlayerInLobby"
           (click)="!player_one && !isPlayerInLobby && joinLobby()"
@@ -76,6 +77,7 @@
         </div>
 
         <mat-card 
+          appearance="outlined" 
           class="player-card blue-player" 
           [class.clickable]="!player_two && !isPlayerInLobby"
           (click)="!player_two && !isPlayerInLobby && joinLobby()"
@@ -178,9 +180,9 @@
           <div class="setting-content">
             <div class="info-row">
               <span class="info-label">Mode:</span>
-              <mat-chip class="type-chip" [class.ranked]="isRanked === 'Ranked'">
+              <mat-chip-option class="type-chip" [class.ranked]="isRanked === 'Ranked'">
                 {{ isRanked }}
-              </mat-chip>
+              </mat-chip-option>
             </div>
             
             <div class="info-row">

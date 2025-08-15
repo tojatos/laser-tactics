@@ -1,12 +1,12 @@
 <div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-  <mat-card class="box">
+  <mat-card appearance="outlined" class="box">
     <mat-card-header>
       <mat-card-title>Register</mat-card-title>
     </mat-card-header>
 
     <form class="example-form" [formGroup]="form" *ngIf="!loggedIn" (ngSubmit)="onSubmit()">
       <mat-card-content>
-        <mat-form-field class="example-full-width" appearance="standard" required>
+        <mat-form-field class="example-full-width" required>
           <mat-label>Username</mat-label>
           <input matInput formControlName="username" type="text" maxlength="20" />
         </mat-form-field>
@@ -23,13 +23,13 @@
             mat-icon-button
             matSuffix
             (click)="hide = !hide"
-            attr.aria-label="'Hide password'"
-            attr.aria-pressed="hide"
+            aria-label="'Hide password'"
+            aria-pressed="hide"
           >
             <mat-icon class="icon-display">{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
         </mat-form-field>
-        <mat-form-field class="example-full-width" appearance="standard" required>
+        <mat-form-field class="example-full-width" required>
           <mat-label>Email</mat-label>
           <input
             type="email"

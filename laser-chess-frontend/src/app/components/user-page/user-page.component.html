@@ -22,7 +22,7 @@
     <h3>Rating :{{ rating }}</h3>
   </div>
   <div fxLayout="row" fxLayoutAlign="space-evenly strech">
-    <mat-card class="box">
+    <mat-card appearance="outlined" class="box">
       <mat-list>
         <h3 matLine *ngIf="!empty">Statistics</h3>
         <mat-list-item>Drawrate: {{ stats?.drawrate }}</mat-list-item>
@@ -34,7 +34,7 @@
         <mat-list-item>Wins: {{ stats?.wins }}</mat-list-item>
       </mat-list>
     </mat-card>
-    <mat-card class="box">
+    <mat-card appearance="outlined" class="box">
       <h3 matLine>Game history</h3>
       <mat-table [dataSource]="dataSource" class="table">
         <ng-container matColumnDef="Date">
@@ -58,7 +58,7 @@
     </mat-card>
   </div>
   <div *ngIf="isOwner" fxLayout="row" fxLayoutAlign="space-evenly strech">
-    <mat-card class="box">
+    <mat-card appearance="outlined" class="box">
       <mat-list class="list">
         <h3 matLine *ngIf="!empty">Friend list</h3>
         <h3 matLine *ngIf="empty">Friend list empty</h3>
@@ -90,7 +90,7 @@
       </form></mat-card
     >
 
-    <mat-card class="box">
+    <mat-card appearance="outlined" class="box">
       <h3 matLine *ngIf="!empty_req">Friend request list</h3>
       <h3 matLine *ngIf="empty_req">Friend request list empty</h3>
       <mat-list *ngIf="isOwner">

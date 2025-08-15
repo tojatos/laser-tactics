@@ -42,12 +42,11 @@
 
 .game-option {
   color: rgba(255, 255, 255, 0.87);
-  
-  ::ng-deep .mat-slide-toggle-label {
+  ::ng-deep .mat-mdc-slide-toggle .mdc-form-field {
     color: rgba(255, 255, 255, 0.87);
   }
   
-  ::ng-deep .mat-slide-toggle-content {
+  ::ng-deep .mat-mdc-slide-toggle .mdc-label {
     color: rgba(255, 255, 255, 0.87);
   }
 }
@@ -112,17 +111,17 @@
     border-color: transparent !important;
   }
   
-  .mat-cell {
+  .mat-mdc-cell {
     color: rgba(255, 255, 255, 0.87);
     border-bottom: none;
     border-top: none !important;
   }
 }
 
-.mat-header-row {
+.mat-mdc-header-row {
   background: rgba(59, 140, 165, 0.3);
   
-  .mat-header-cell {
+  .mat-mdc-header-cell {
     color: rgba(255, 255, 255, 0.95);
     font-weight: 600;
     border-bottom: none;
@@ -146,11 +145,11 @@
 }
 
 // Game name alignment
-.mat-cell:first-child {
+.mat-mdc-cell:first-child {
   text-align: left;
 }
 
-.mat-header-cell:first-child {
+.mat-mdc-header-cell:first-child {
   text-align: left;
 }
 
@@ -214,16 +213,16 @@
 // Override Material Design table border defaults
 .lobby-table {
   ::ng-deep {
-    .mat-row:hover {
+    .mat-mdc-row:hover {
       border-top: none !important;
       border-color: transparent !important;
     }
     
-    .mat-cell {
+    .mat-mdc-cell {
       border-top: none !important;
     }
     
-    .mat-row {
+    .mat-mdc-row {
       border-top: none !important;
     }
   }

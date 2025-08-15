@@ -298,22 +298,27 @@
   
   .time-field {
     width: 100%;
-    
-    ::ng-deep .mat-form-field-outline {
-      color: rgba(255, 255, 255, 0.3);
+    ::ng-deep .mat-mdc-form-field .mdc-notched-outline__leading,
+    ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch,
+    ::ng-deep .mat-mdc-form-field .mdc-notched-outline__trailing {
+      border-color: rgba(255, 255, 255, 0.3);
     }
     
-    ::ng-deep .mat-form-field-label {
+    ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
       color: rgba(255, 255, 255, 0.7);
     }
     
-    ::ng-deep .mat-select-value {
+    ::ng-deep .mat-mdc-select-value {
       color: white;
     }
   }
 }
 
-::ng-deep .mat-slide-toggle-label {
+::ng-deep .mat-mdc-slide-toggle .mdc-form-field {
+  color: white;
+}
+
+::ng-deep .mat-mdc-slide-toggle .mdc-label {
   color: white;
 }
 

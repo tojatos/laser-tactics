@@ -6,6 +6,15 @@
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
+// TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
+//  The following line adds:
+//    1. Default typography styles for all components
+//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
+//  If you specify typography styles for the components you use elsewhere, you should delete this line.
+//  If you don't need the default component typographies but still want the hierarchy styles,
+//  you can delete this line and instead use:
+//    `@include mat.legacy-typography-hierarchy(mat.define-typography-config());`
+@include mat.all-component-typographies();
 @include mat.core();
 
 $custom-palette: (
@@ -34,37 +43,31 @@ $laser-chess-frontend-warn: mat.define-palette(mat.$red-palette);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
-$laser-chess-frontend-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: $laser-chess-frontend-primary,
-      accent: $laser-chess-frontend-accent,
-      warn: $laser-chess-frontend-warn,
-      constrast: $laser-chess-frontend-contrast,
-
-      background-color: mat-palette($custom-palette, 50),
-    ),
-  )
-);
-
-// $laser-chess-frontend-theme: mat.define-dark-theme((
-//   color: (
-//     primary: $laser-chess-frontend-primary,
-//     accent: $laser-chess-frontend-accent,
-//     warn: $laser-chess-frontend-warn,
-
+// Light theme (commented out since we're using dark theme below)
+// $laser-chess-frontend-theme: mat.define-light-theme(
+//   (
+//     color: (
+//       primary: $laser-chess-frontend-primary,
+//       accent: $laser-chess-frontend-accent,
+//       warn: $laser-chess-frontend-warn,
+//       constrast: $laser-chess-frontend-contrast,
+//
+//       background-color: mat-palette($custom-palette, 50),
+//     ),
 //   )
-// ));
-$laser-chess-frontend-theme: mat-dark-theme(
-  $laser-chess-frontend-primary,
-  $laser-chess-frontend-accent,
-  $laser-chess-frontend-warn
-);
+// );
+
+$laser-chess-frontend-theme: mat.define-dark-theme((
+  color: (
+    primary: $laser-chess-frontend-primary,
+    accent: $laser-chess-frontend-accent,
+    warn: $laser-chess-frontend-warn,
+  )
+));
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
-//@include mat.all-component-themes($laser-chess-frontend-theme);
-@include angular-material-theme($laser-chess-frontend-theme);
+@include mat.all-component-themes($laser-chess-frontend-theme);
 /* You can add global styles to this file, and also import other style files */
 
 /* Apply border-box globally for more predictable sizing */
@@ -167,7 +170,7 @@ body {
   appearance: standard;
 }
 
-.main-wrapper .mat-card-header {
+.main-wrapper .mat-mdc-card-header {
   text-align: center;
   width: 100%;
   display: block;
@@ -184,7 +187,7 @@ body {
   padding: 45px 70px 55px;
 }
 
-.main-wrapper .mat-stroked-button {
+.main-wrapper .mat-mdc-outlined-button {
   border: 1px solid currentColor;
   line-height: 54px;
   background: #1f1f1f;
@@ -202,10 +205,6 @@ body {
   border: 1px solid #103d53;
 }
 
-.mat-card-lobby-privacy {
-  cursor: pointer;
-}
-
 .start-game-button {
   transform: scale(1.6);
 }
@@ -219,18 +218,18 @@ body {
   position: center;
 }
 
-.mat-header-cell,
-.mat-cell {
+.mat-mdc-header-cell,
+.mat-mdc-cell {
   justify-content: center;
 }
 
-.mat-row .mat-cell {
+.mat-mdc-row .mat-mdc-cell {
   border-bottom: 1px solid transparent;
   border-top: 1px solid transparent;
   cursor: pointer;
 }
 
-.mat-row:hover .mat-cell {
+.mat-mdc-row:hover .mat-mdc-cell {
   border-color: currentColor;
 }
 

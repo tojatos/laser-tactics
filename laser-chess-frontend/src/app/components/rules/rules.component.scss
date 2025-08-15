@@ -52,26 +52,27 @@ h1:first-child {
 .rules-tabs {
   margin-top: 0;
   
-  ::ng-deep .mat-tab-group {
+  ::ng-deep .mat-mdc-tab-group {
     background-color: transparent;
   }
   
-  ::ng-deep .mat-tab-header {
+  ::ng-deep .mat-mdc-tab-header {
     border-bottom: 1px solid #444;
     height: 40px;
   }
-  
-  ::ng-deep .mat-tab-label {
+  ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
     color: #bbb !important;
     font-weight: 500;
     opacity: 0.7;
-    min-width: 100px;
-    height: 40px;
     font-size: 14px;
-    padding: 0 16px;
   }
   
-  ::ng-deep .mat-tab-label-active {
+  ::ng-deep .mat-mdc-tab {
+    min-width: 100px;
+    height: 40px;
+    padding: 0 16px;
+  }
+  ::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
     color: #4da6ff !important;
     opacity: 1;
   }
@@ -80,8 +81,7 @@ h1:first-child {
     background-color: #4da6ff;
     height: 2px;
   }
-  
-  ::ng-deep .mat-tab-body-content {
+  ::ng-deep .mat-mdc-tab-body-content {
     overflow-x: hidden;
   }
 }
@@ -371,15 +371,17 @@ h1:first-child {
   .quick-ref-item {
     padding: 15px;
   }
-  
-  .rules-tabs ::ng-deep .mat-tab-label {
-    min-width: 70px;
+  .rules-tabs ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
     font-size: 13px;
+  }
+  
+  .rules-tabs ::ng-deep .mat-mdc-tab {
+    min-width: 70px;
     height: 36px;
     padding: 0 12px;
   }
   
-  .rules-tabs ::ng-deep .mat-tab-header {
+  .rules-tabs ::ng-deep .mat-mdc-tab-header {
     height: 36px;
   }
   
