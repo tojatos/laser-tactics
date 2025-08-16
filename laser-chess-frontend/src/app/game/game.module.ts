@@ -5,7 +5,7 @@ import { BoardComponent } from './components/board/board.component';
 import { Board } from './src/GameStateData/Board';
 import { Resources } from './src/Display/Resources';
 import { EventsExecutor } from './src/Controller/EventsExecutor';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { Game } from './src/Controller/Game';
 import { Animations } from './src/Display/Animations';
 import { Drawings } from './src/Display/Drawings';
@@ -18,25 +18,18 @@ import { AppRoutingModule } from '../app-routing.module';
 import { ClockComponent } from './components/clock/clock.component';
 import { ChatComponent } from './components/chat/chat.component';
 
-@NgModule({
-  declarations: [
-    GameComponent,
-    BoardComponent,
-    BoardActionsComponent,
-    BoardActionsComponent,
-    BoardLogComponent,
-    ClockComponent,
-    ChatComponent,
-  ],
-  imports: [
-    CommonModule,
-    HttpClientModule,
-    MaterialModule,
-    FlexLayoutModule,
-    FormsModule,
-    AppRoutingModule,
-  ],
-  exports: [GameComponent],
-  providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor],
-})
+@NgModule({ declarations: [
+        GameComponent,
+        BoardComponent,
+        BoardActionsComponent,
+        BoardActionsComponent,
+        BoardLogComponent,
+        ClockComponent,
+        ChatComponent,
+    ],
+    exports: [GameComponent], imports: [CommonModule,
+        MaterialModule,
+        FlexLayoutModule,
+        FormsModule,
+        AppRoutingModule], providers: [Game, Board, Drawings, Animations, Resources, EventsExecutor, provideHttpClient(withInterceptorsFromDi())] })
 export class GameModule {}

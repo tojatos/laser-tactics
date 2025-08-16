@@ -8,7 +8,7 @@ import { MaterialModule } from './material/material.module';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
 import { LoginComponent } from './components/login/login.component';
 import { GameModule } from './game/game.module';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { UserPageComponent } from './components/user-page/user-page.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -27,43 +27,37 @@ import { RankingComponent } from './components/ranking/ranking.component';
 import { RulesComponent } from './components/rules/rules.component';
 import { PieceCardComponent } from './components/piece-card/piece-card.component';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    MainNavComponent,
-    LoginComponent,
-    UserPageComponent,
-    RegisterComponent,
-    MainPageComponent,
-    LobbyComponent,
-    SettingsComponent,
-    SettingsPasswordComponent,
-    PasswordReminderComponent,
-    SettingsBlockedUsersComponent,
-    VerifyComponent,
-    ChangePasswordComponent,
-    RankingComponent,
-    RulesComponent,
-    PieceCardComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MaterialModule,
-    GameModule,
-    HttpClientModule,
-    FlexLayoutModule,
-    FormsModule,
-    ReactiveFormsModule,
-    FormsModule,
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
-    JwtHelperService,
-  ],
-  bootstrap: [AppComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-})
+@NgModule({ declarations: [
+        AppComponent,
+        MainNavComponent,
+        LoginComponent,
+        UserPageComponent,
+        RegisterComponent,
+        MainPageComponent,
+        LobbyComponent,
+        SettingsComponent,
+        SettingsPasswordComponent,
+        PasswordReminderComponent,
+        SettingsBlockedUsersComponent,
+        VerifyComponent,
+        ChangePasswordComponent,
+        RankingComponent,
+        RulesComponent,
+        PieceCardComponent,
+    ],
+    bootstrap: [AppComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA], imports: [BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MaterialModule,
+        GameModule,
+        FlexLayoutModule,
+        FormsModule,
+        ReactiveFormsModule,
+        FormsModule], providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+        JwtHelperService,
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule {}

@@ -1,7 +1,4 @@
-import {
-  HttpClient,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tokenPayload, UserToken } from '../app.models';
 import { JwtHelperService } from '@auth0/angular-jwt';
