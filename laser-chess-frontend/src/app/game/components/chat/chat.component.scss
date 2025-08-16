@@ -1,9 +1,10 @@
-@import 'src/styles.scss';
+@use 'src/styles.scss' as styles;
+@use "sass:map";
 
 .chat-box {
   width: 200px;
   height: 400px;
-  background-color: map_get($custom-palette, 400);
+  background-color: map.get(styles.$custom-palette, 400);
   border: solid 1px white;
   overflow: hidden;
 }
@@ -16,7 +17,7 @@
 .chat-header {
   width: 100%;
   text-align: right;
-  background-color: map_get($custom-palette, 100);
+  background-color: map.get(styles.$custom-palette, 100);
 }
 
 .chat-input {
@@ -54,7 +55,7 @@
 
 .my-message {
   margin-left: auto;
-  background-color: map_get($custom-palette, 100);
+  background-color: map.get(styles.$custom-palette, 100);
 }
 
 .my-message-footer {
@@ -68,10 +69,6 @@
 .chat-input .mat-mdc-text-field-wrapper {
   margin-bottom: -1.25em;
   margin-top: -1.25em;
-}
-
-.mat-mdc-form-field-infix {
-  padding: 0 !important;
 }
 
 .chat-input input {
