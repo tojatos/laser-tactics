@@ -27,7 +27,7 @@
     "@angular/platform-browser": "^20.1.7",
     "@angular/platform-browser-dynamic": "^20.1.7",
     "@angular/router": "^20.1.7",
-    "@auth0/angular-jwt": "^5.0.2",
+    "@auth0/angular-jwt": "5.0.2",
     "@types/lodash": "^4.14.176",
     "chance": "^1.1.8",
     "core-js": "^3.19.2",
