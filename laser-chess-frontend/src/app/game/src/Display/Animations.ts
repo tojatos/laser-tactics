@@ -7,7 +7,7 @@ import { EventsColors, PieceType } from '../Utils/Enums';
 import { Piece } from '../GameStateData/Piece';
 import { Canvas } from './Canvas/Canvas';
 import { Drawings } from './Drawings';
-import * as Chance from 'chance';
+import Chance from 'chance';
 
 @Injectable()
 export class Animations {
