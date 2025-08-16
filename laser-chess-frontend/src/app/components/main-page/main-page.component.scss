@@ -1,47 +1,354 @@
-.text {
-  color: #ffffff;
+// Main container similar to lobby
+.main-page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  padding: 15px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.status-screen {
-  min-height: 40vh;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.87);
+// Header section
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.status-icon {
-  font-size: 48px;
-  height: 48px;
-  width: 48px;
-  margin-bottom: 12px;
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.status-title {
+.main-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: #3b8ca5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.main-title {
   margin: 0;
-  font-weight: 600;
+  font-size: 2.2rem;
+  font-weight: 300;
+  background: linear-gradient(45deg, #3b8ca5, #217180);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.status-subtitle {
-  margin-top: 8px;
-  opacity: 0.8;
+.main-subtitle {
+  margin: 0;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 300;
+}
+
+.verification-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-radius: 6px;
+  color: #ff9800;
+  font-size: 0.9rem;
+  
+  mat-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+// Main content layout
+.main-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+  align-items: start;
+}
+
+// Card styling similar to lobby
+.lobbies-card,
+.creation-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(59, 140, 165, 0.05);
+  
+  mat-icon {
+    color: #3b8ca5;
+    font-size: 1.3rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: white;
+    flex: 1;
+  }
+}
+
+.card-content {
+  padding: 0;
+}
+
+.refresh-btn {
+  color: #3b8ca5;
+  
+  &:hover {
+    background: rgba(59, 140, 165, 0.1);
+  }
+  
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Lobbies table styling
+.lobbies-table {
+  width: 100%;
+  background: transparent;
+  
+  .mat-mdc-header-row {
+    background: rgba(59, 140, 165, 0.1);
+    border-bottom: 2px solid #3b8ca5;
+    
+    .mat-mdc-header-cell {
+      border-bottom: none;
+      color: white;
+      font-weight: 600;
+      padding: 16px 20px;
+      
+      .header-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        mat-icon {
+          color: #3b8ca5;
+          font-size: 1.1rem;
+          width: 1.1rem;
+          height: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+  
+  .mat-mdc-row {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(59, 140, 165, 0.1);
+    }
+    
+    .mat-mdc-cell {
+      border-bottom: none;
+      color: white;
+      padding: 16px 20px;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+// Player display styling
+.players-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+}
+
+.player-slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  
+  &.filled {
+    background: rgba(59, 140, 165, 0.1);
+  }
+}
+
+.player-icon {
+  font-size: 1.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &.red-player {
+    color: #d32f2f;
+  }
+  
+  &.blue-player {
+    color: #1976d2;
+  }
+  
+  &.waiting-player {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.player-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  &.waiting-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    font-weight: 400;
+  }
+}
+
+.vs-divider {
+  font-size: 0.8rem;
+  color: #3b8ca5;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(59, 140, 165, 0.1);
+}
+
+// Mode badge styling
+.mode-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  &.ranked {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border-color: rgba(255, 193, 7, 0.3);
+  }
+}
+
+// Join button styling
+.join-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Game creation section styling
+.creation-card {
+  height: fit-content;
 }
 
 .game-options {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-width: 200px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.options-title {
-  margin: 0 0 15px 0;
-  color: rgba(255, 255, 255, 0.87);
-  font-weight: 500;
-  text-align: center;
+.option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  .option-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: white;
+    font-size: 0.95rem;
+    
+    mat-icon {
+      color: #3b8ca5;
+      font-size: 1.1rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
-.game-option {
-  color: rgba(255, 255, 255, 0.87);
+.game-toggle {
+  margin-left: 16px;
+  
+  .toggle-label {
+    color: rgba(255, 255, 255, 0.87);
+    font-size: 0.9rem;
+  }
+  
   ::ng-deep .mat-mdc-slide-toggle .mdc-form-field {
     color: rgba(255, 255, 255, 0.87);
   }
@@ -51,179 +358,143 @@
   }
 }
 
-.start-game-button {
-  margin-top: 10px;
-  font-weight: 500;
-  min-height: 40px;
-}
-
-// Simplified lobby table styles
-.main-content {
-  width: 100%;
-  padding: 20px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column !important;
-    gap: 20px !important;
-    align-items: center !important;
-  }
-}
-
-.table-container {
+.create-btn {
   display: flex;
+  align-items: center;
   justify-content: center;
-  
-  @media (max-width: 768px) {
-    flex: none !important;
-    width: 100%;
-  }
-}
-
-.controls-container {
-  @media (max-width: 768px) {
-    flex: none !important;
-    width: 100%;
-    max-width: 300px;
-  }
-}
-
-.lobby-table {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 800px;
-  height: 500px;
-  
-  @media (max-width: 900px) {
-    width: 100%;
-    height: auto;
-  }
-}
-
-.table-row {
-  cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: 1px solid transparent !important;
+  gap: 8px;
+  height: 48px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(59, 140, 165, 0.3);
+  transition: all 0.3s ease;
+  margin-top: 8px;
   
   &:hover {
-    background: rgba(59, 140, 165, 0.3) !important;
-    border-top: 1px solid transparent !important;
-    border-color: transparent !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 140, 165, 0.4);
   }
   
-  .mat-mdc-cell {
-    color: rgba(255, 255, 255, 0.87);
-    border-bottom: none;
-    border-top: none !important;
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
-.mat-mdc-header-row {
-  background: rgba(59, 140, 165, 0.3);
-  
-  .mat-mdc-header-cell {
-    color: rgba(255, 255, 255, 0.95);
-    font-weight: 600;
-    border-bottom: none;
-  }
+// Status screens
+.status-screen {
+  min-height: 60vh;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.87);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.ranked-mode-text {
-  color: #ffd700 !important;
+.status-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-title {
+  margin: 0;
   font-weight: 600;
+  color: white;
 }
 
-.players-cell {
-  min-width: 200px;
+.status-subtitle {
+  margin-top: 8px;
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.players-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-}
-
-// Game name alignment
-.mat-mdc-cell:first-child {
-  text-align: left;
-}
-
-.mat-mdc-header-cell:first-child {
-  text-align: left;
-}
-
-// Player alignment improvements
-.player-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 80px;
-}
-
-.player-name {
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+// Responsive design
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
   
-  &.waiting-text {
-    color: rgba(255, 255, 255, 0.5);
-    font-style: italic;
+  .creation-section {
+    order: -1;
   }
 }
 
-.vs-divider {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.player-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  
-  &.red-player {
-    color: #ff4444;
+@media (max-width: 768px) {
+  .main-page-container {
+    padding: 12px;
   }
   
-  &.blue-player {
-    color: #4488ff;
+  .main-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    margin-bottom: 20px;
   }
   
-  &.waiting-player {
-    color: rgba(255, 255, 255, 0.4);
+  .main-title {
+    font-size: 1.8rem;
   }
-}
-
-.waiting-slot {
-  opacity: 0.7;
-}
-
-.join-button {
-  // Simple button, no fancy effects
-}
-
-.refresh-icon {
-  // Simple icon, no rotation
-}
-
-// Override Material Design table border defaults
-.lobby-table {
-  ::ng-deep {
-    .mat-mdc-row:hover {
-      border-top: none !important;
-      border-color: transparent !important;
-    }
-    
+  
+  .main-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .main-content {
+    gap: 15px;
+  }
+  
+  .card-header,
+  .game-options {
+    padding: 16px 20px;
+  }
+  
+  .lobbies-table {
+    .mat-mdc-header-cell,
     .mat-mdc-cell {
-      border-top: none !important;
+      padding: 12px 16px;
+      font-size: 0.85rem;
     }
-    
-    .mat-mdc-row {
-      border-top: none !important;
-    }
+  }
+  
+  .players-container {
+    flex-direction: column;
+    gap: 6px;
+    min-width: auto;
+  }
+  
+  .vs-divider {
+    order: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-page-container {
+    padding: 8px;
+  }
+  
+  .main-title {
+    font-size: 1.5rem;
+  }
+  
+  .players-container {
+    font-size: 0.8rem;
+  }
+  
+  .player-slot {
+    min-width: 70px;
   }
 }

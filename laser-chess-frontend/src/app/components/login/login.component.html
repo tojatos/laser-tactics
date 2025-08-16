@@ -1,46 +1,86 @@
-<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-  <mat-card appearance="outlined" class="box">
-    <mat-card-header>
-      <mat-card-title>Login</mat-card-title>
-    </mat-card-header>
-
-    @if (!isLoggedIn) {
-      <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <mat-card-content>
-          <mat-form-field class="example-full-width" required>
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" type="text" maxlength="20" />
-          </mat-form-field>
-          <mat-form-field class="example-full-width" apearance="standard" required>
-            <mat-label>Password</mat-label>
-            <input
-              matInput
-              formControlName="password"
-              maxlength="30"
-              [type]="hide ? 'password' : 'text'"
-              />
-              <button
-                type="button"
-                mat-icon-button
-                matSuffix
-                (click)="hide = !hide"
-                aria-label="'Hide password'"
-                aria-pressed="hide"
-                >
-                <mat-icon class="icon-display">{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-            </mat-form-field>
-          </mat-card-content>
-          <button mat-stroked-button color="accent" class="btn-block">Login</button>
-          <div class="form-group"></div>
-        </form>
-      }
-      <mat-label
-        class="label-pass"
-        style="cursor: pointer"
-        fxLayoutAlign="end start"
-        routerLink="forgot"
-        >Forgot password?</mat-label
-        >
-      </mat-card>
+<div class="login-container">
+  <!-- Header Section -->
+  <div class="login-header">
+    <div class="title-section">
+      <mat-icon class="login-icon">login</mat-icon>
+      <h1 class="login-title">Welcome Back</h1>
+      <p class="login-subtitle">Sign in to your account</p>
     </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <mat-card appearance="outlined" class="login-card">
+      <div class="card-header">
+        <mat-icon>account_circle</mat-icon>
+        <h2>Login</h2>
+      </div>
+
+      @if (!isLoggedIn) {
+        <div class="card-content">
+          <form class="login-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="form-fields">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Username</mat-label>
+                <input 
+                  matInput 
+                  formControlName="username" 
+                  type="text" 
+                  maxlength="20"
+                  placeholder="Enter your username" />
+                <mat-icon matPrefix>person</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Password</mat-label>
+                <input
+                  matInput
+                  formControlName="password"
+                  maxlength="30"
+                  [type]="hide ? 'password' : 'text'"
+                  placeholder="Enter your password" />
+                <mat-icon matPrefix>lock</mat-icon>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matSuffix
+                  (click)="hide = !hide"
+                  aria-label="Toggle password visibility"
+                  aria-pressed="hide"
+                  class="password-toggle">
+                  <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+
+            <div class="form-actions">
+              <button mat-raised-button color="accent" type="submit" class="login-btn">
+                <mat-icon>login</mat-icon>
+                Login
+              </button>
+
+              <div class="additional-links">
+                <a routerLink="forgot" class="forgot-link">
+                  <mat-icon>help</mat-icon>
+                  Forgot password?
+                </a>
+                <a routerLink="/register" class="register-link">
+                  <mat-icon>person_add</mat-icon>
+                  Don't have an account? Register
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <div class="card-content">
+          <div class="success-state">
+            <mat-icon>check_circle</mat-icon>
+            <h3>Welcome back!</h3>
+            <p>You are successfully logged in.</p>
+          </div>
+        </div>
+      }
+    </mat-card>
+  </div>
+</div>

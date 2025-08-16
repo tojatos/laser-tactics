@@ -1,49 +1,93 @@
-<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-  <mat-card appearance="outlined" class="box">
-    <mat-card-header>
-      <mat-card-title>Register</mat-card-title>
-    </mat-card-header>
-
-    @if (!loggedIn) {
-      <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <mat-card-content>
-          <mat-form-field class="example-full-width" required>
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" type="text" maxlength="20" />
-          </mat-form-field>
-          <mat-form-field class="example-full-width" apearance="standard" required>
-            <mat-label>Password</mat-label>
-            <input
-              matInput
-              formControlName="password"
-              maxlength="30"
-              [type]="hide ? 'password' : 'text'"
-              />
-              <button
-                type="button"
-                mat-icon-button
-                matSuffix
-                (click)="hide = !hide"
-                aria-label="'Hide password'"
-                aria-pressed="hide"
-                >
-                <mat-icon class="icon-display">{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-            </mat-form-field>
-            <mat-form-field class="example-full-width" required>
-              <mat-label>Email</mat-label>
-              <input
-                type="email"
-                matInput
-                formControlName="email"
-                placeholder="Ex. pat@example.com"
-                maxlength="30"
-                />
-              </mat-form-field>
-            </mat-card-content>
-            <button mat-stroked-button color="accent" class="btn-block">Register</button>
-            <div class="form-group"></div>
-          </form>
-        }
-      </mat-card>
+<div class="register-container">
+  <!-- Header Section -->
+  <div class="register-header">
+    <div class="title-section">
+      <mat-icon class="register-icon">person_add</mat-icon>
+      <h1 class="register-title">Join the Game</h1>
+      <p class="register-subtitle">Create your account to start playing</p>
     </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <mat-card appearance="outlined" class="register-card">
+      <div class="card-header">
+        <mat-icon>app_registration</mat-icon>
+        <h2>Create Account</h2>
+      </div>
+
+      @if (!loggedIn) {
+        <div class="card-content">
+          <form class="register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="form-fields">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Username</mat-label>
+                <input 
+                  matInput 
+                  formControlName="username" 
+                  type="text" 
+                  maxlength="20"
+                  placeholder="Choose a username" />
+                <mat-icon matPrefix>person</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email</mat-label>
+                <input
+                  type="email"
+                  matInput
+                  formControlName="email"
+                  placeholder="Enter your email"
+                  maxlength="50" />
+                <mat-icon matPrefix>email</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Password</mat-label>
+                <input
+                  matInput
+                  formControlName="password"
+                  maxlength="30"
+                  [type]="hide ? 'password' : 'text'"
+                  placeholder="Create a password" />
+                <mat-icon matPrefix>lock</mat-icon>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matSuffix
+                  (click)="hide = !hide"
+                  aria-label="Toggle password visibility"
+                  aria-pressed="hide"
+                  class="password-toggle">
+                  <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+
+            <div class="form-actions">
+              <button mat-raised-button color="accent" type="submit" class="register-btn">
+                <mat-icon>person_add</mat-icon>
+                Create Account
+              </button>
+
+              <div class="additional-links">
+                <a routerLink="/login" class="login-link">
+                  <mat-icon>login</mat-icon>
+                  Already have an account? Sign in
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <div class="card-content">
+          <div class="success-state">
+            <mat-icon>check_circle</mat-icon>
+            <h3>Welcome to the game!</h3>
+            <p>Your account has been created successfully.</p>
+          </div>
+        </div>
+      }
+    </mat-card>
+  </div>
+</div>

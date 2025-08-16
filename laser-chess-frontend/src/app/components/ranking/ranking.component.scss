@@ -1,7 +1,183 @@
+// Main container similar to lobby
+.ranking-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  padding: 15px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header section
+.ranking-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  
+  h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 300;
+    background: linear-gradient(45deg, #3b8ca5, #217180);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  mat-icon {
+    color: #3b8ca5;
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+// Main content area
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.ranking-section {
+  width: 100%;
+  max-width: 900px;
+}
+
+// Card styling similar to lobby
+.ranking-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+// Table styling
+.ranking-table {
+  width: 100%;
+  background: transparent;
+  
+  // Header styling
+  .mat-mdc-header-row {
+    background: rgba(59, 140, 165, 0.1);
+    border-bottom: 2px solid #3b8ca5;
+    
+    .mat-mdc-header-cell {
+      border-bottom: none;
+      color: white;
+      font-weight: 600;
+      padding: 16px 24px;
+      
+      .header-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        mat-icon {
+          color: #3b8ca5;
+          font-size: 1.1rem;
+          width: 1.1rem;
+          height: 1.1rem;
+        }
+      }
+    }
+  }
+  
+  // Row styling
+  .mat-mdc-row {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(59, 140, 165, 0.1);
+      transform: translateX(2px);
+    }
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .mat-mdc-cell {
+      border-bottom: none;
+      color: white;
+      padding: 16px 24px;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Specific cell styling
+.position-cell {
+  .position-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    font-size: 1.1rem;
+    
+    &.top-rank {
+      background: linear-gradient(45deg, #ffd700, #ffed4e);
+      color: #1a1a1a;
+      box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    }
+  }
+}
+
+.username-cell {
+  .username {
+    font-weight: 500;
+    color: white;
+    
+    &:hover {
+      color: #3b8ca5;
+    }
+  }
+}
+
+.rating-cell {
+  .rating-value {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: rgba(59, 140, 165, 0.2);
+    border-radius: 16px;
+    font-weight: 600;
+    color: #3b8ca5;
+    border: 1px solid rgba(59, 140, 165, 0.3);
+  }
+}
+
+// Status screens
 .status-screen {
   min-height: 40vh;
   text-align: center;
   color: rgba(255, 255, 255, 0.87);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .status-icon {
@@ -14,9 +190,72 @@
 .status-title {
   margin: 0;
   font-weight: 600;
+  color: white;
 }
 
 .status-subtitle {
   margin-top: 8px;
   opacity: 0.8;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .ranking-container {
+    padding: 12px;
+  }
+  
+  .ranking-header {
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    h1 {
+      font-size: 1.5rem;
+    }
+    
+    mat-icon {
+      font-size: 1.8rem;
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+  
+  .ranking-table {
+    .mat-mdc-header-cell,
+    .mat-mdc-cell {
+      padding: 12px 16px;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .position-cell .position-number {
+    min-width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ranking-container {
+    padding: 8px;
+  }
+  
+  .ranking-table {
+    .mat-mdc-header-cell,
+    .mat-mdc-cell {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+    
+    .header-cell {
+      gap: 4px;
+      
+      mat-icon {
+        font-size: 1rem;
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
 }

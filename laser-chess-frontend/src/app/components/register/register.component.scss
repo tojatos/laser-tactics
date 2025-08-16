@@ -1,3 +1,325 @@
-.icon-display {
-  transform: scale(1.4);
+// Main container similar to lobby
+.register-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  padding: 15px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Header section
+.register-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.register-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #3b8ca5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-title {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 300;
+  background: linear-gradient(45deg, #3b8ca5, #217180);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.register-subtitle {
+  margin: 0;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 300;
+}
+
+// Main content
+.main-content {
+  width: 100%;
+  max-width: 450px;
+}
+
+// Card styling similar to lobby
+.register-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 30px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(59, 140, 165, 0.05);
+  
+  mat-icon {
+    color: #3b8ca5;
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: white;
+  }
+}
+
+.card-content {
+  padding: 30px;
+}
+
+// Form styling
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.full-width {
+  width: 100%;
+  
+  ::ng-deep .mat-mdc-form-field .mdc-notched-outline__leading,
+  ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch,
+  ::ng-deep .mat-mdc-form-field .mdc-notched-outline__trailing {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  ::ng-deep .mat-mdc-form-field:hover .mdc-notched-outline__leading,
+  ::ng-deep .mat-mdc-form-field:hover .mdc-notched-outline__notch,
+  ::ng-deep .mat-mdc-form-field:hover .mdc-notched-outline__trailing {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+  ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+  ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+    border-color: #3b8ca5;
+  }
+  
+  ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+    color: #3b8ca5;
+  }
+  
+  ::ng-deep .mat-mdc-form-field input {
+    color: white;
+  }
+  
+  ::ng-deep .mat-mdc-form-field .mat-mdc-form-field-icon-prefix mat-icon {
+    color: #3b8ca5;
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.password-toggle {
+  color: rgba(255, 255, 255, 0.6);
+  
+  &:hover {
+    color: #3b8ca5;
+  }
+  
+  mat-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Form actions
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.register-btn {
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(59, 140, 165, 0.3);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 140, 165, 0.4);
+  }
+  
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Additional links
+.additional-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.login-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #3b8ca5;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    color: #217180;
+  }
+  
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Success state
+.success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    color: #4caf50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: white;
+  }
+  
+  p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .register-container {
+    padding: 12px;
+  }
+  
+  .register-header {
+    margin-bottom: 30px;
+  }
+  
+  .register-title {
+    font-size: 2rem;
+  }
+  
+  .register-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .main-content {
+    max-width: 100%;
+  }
+  
+  .card-header,
+  .card-content {
+    padding: 20px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container {
+    padding: 8px;
+  }
+  
+  .register-title {
+    font-size: 1.7rem;
+  }
+  
+  .card-header,
+  .card-content {
+    padding: 16px 20px;
+  }
+  
+  .form-fields {
+    gap: 16px;
+  }
 }

@@ -1,154 +1,279 @@
-<div class="main-wrapper" fxLayout="column" fxLayoutAlign="center" fxLayoutGap="30px">
-  @if (!isOwner) {
-    <div fxLayout="row" fxLayoutAlign="end start" fxFlex="20">
-      <mat-icon [matMenuTriggerFor]="user">more_vert</mat-icon>
-      <mat-menu class="menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
-        @if (!isInFriends) {
-          <button mat-menu-item (click)="sendRequest(username!)">
-            Send friend request
-          </button>
-        }
-        @if (isInFriends) {
-          <button mat-menu-item (click)="unfriend(username!)">Unfriend</button>
-        }
-        @if (!isInBlocked) {
-          <button mat-menu-item (click)="blockUser(username!)">Block</button>
-        }
-        @if (isInBlocked) {
-          <button mat-menu-item (click)="unblockUser(username!)">Unblock</button>
-        }
-      </mat-menu>
+<div class="user-page-container">
+  <!-- Header Section -->
+  <div class="user-header">
+    <div class="user-title-section">
+      <mat-icon class="user-icon">account_circle</mat-icon>
+      <div class="title-content">
+        <h1 class="user-title">{{ username }}</h1>
+        <div class="user-rating">
+          <mat-icon>star</mat-icon>
+          <span>Rating: {{ rating }}</span>
+        </div>
+      </div>
     </div>
-  }
-  @if (isOwner) {
-    <div
-      fxLayout="row"
-      fxLayoutAlign="end start"
-      fxFlex="15"
-      fxLayoutGap="20px"
-    ></div>
-  }
-  <div fxLayout="column" fxLayoutAlign="center center" fxFlex="5" fxLayoutGap="20px">
-    <h1>{{ username }}</h1>
-    <h3>Rating :{{ rating }}</h3>
+
+    @if (!isOwner) {
+      <div class="user-actions">
+        <button mat-icon-button [matMenuTriggerFor]="user" class="action-menu-btn">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu class="user-menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
+          @if (!isInFriends) {
+            <button mat-menu-item (click)="sendRequest(username!)">
+              <mat-icon>person_add</mat-icon>
+              <span>Send friend request</span>
+            </button>
+          }
+          @if (isInFriends) {
+            <button mat-menu-item (click)="unfriend(username!)">
+              <mat-icon>person_remove</mat-icon>
+              <span>Unfriend</span>
+            </button>
+          }
+          @if (!isInBlocked) {
+            <button mat-menu-item (click)="blockUser(username!)">
+              <mat-icon>block</mat-icon>
+              <span>Block</span>
+            </button>
+          }
+          @if (isInBlocked) {
+            <button mat-menu-item (click)="unblockUser(username!)">
+              <mat-icon>check_circle</mat-icon>
+              <span>Unblock</span>
+            </button>
+          }
+        </mat-menu>
+      </div>
+    }
   </div>
-  <div fxLayout="row" fxLayoutAlign="space-evenly strech">
-    <mat-card appearance="outlined" class="box">
-      <mat-list>
-        @if (!empty) {
-          <h3 matLine>Statistics</h3>
-        }
-        <mat-list-item>Drawrate: {{ stats?.drawrate }}</mat-list-item>
-        <mat-list-item>Draws: {{ stats?.draws }}</mat-list-item>
-        <mat-list-item>Loses: {{ stats?.loses }}</mat-list-item>
-        <mat-list-item>Winrate: {{ stats?.winrate }}</mat-list-item>
-        <mat-list-item>Winrate as player 1: {{ stats?.winrate_as_p1 }}</mat-list-item>
-        <mat-list-item>Winrate as player 2: {{ stats?.winrate_as_p2 }}</mat-list-item>
-        <mat-list-item>Wins: {{ stats?.wins }}</mat-list-item>
-      </mat-list>
-    </mat-card>
-    <mat-card appearance="outlined" class="box">
-      <h3 matLine>Game history</h3>
-      <mat-table [dataSource]="dataSource" class="table">
-        <ng-container matColumnDef="Date">
-          <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{ getDate(element.game_end_date) }} </mat-cell>
-        </ng-container>
 
-        <ng-container matColumnDef="Opponent">
-          <mat-header-cell *matHeaderCellDef> Opponent </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{ getOpponent(element) }} </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="Result">
-          <mat-header-cell *matHeaderCellDef> Result </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{ getResult(element) }} </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns" (click)="goToGame(row)"></mat-row>
-      </mat-table>
-    </mat-card>
-  </div>
-  @if (isOwner) {
-    <div fxLayout="row" fxLayoutAlign="space-evenly strech">
-      <mat-card appearance="outlined" class="box">
-        <mat-list class="list">
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Row: Statistics and Game History -->
+    <div class="content-row">
+      <!-- Statistics Card -->
+      <mat-card appearance="outlined" class="info-card stats-card">
+        <div class="card-header">
+          <mat-icon>analytics</mat-icon>
+          <h2>Statistics</h2>
+        </div>
+        <div class="card-content">
           @if (!empty) {
-            <h3 matLine>Friend list</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">Win Rate</span>
+                <span class="stat-value primary">{{ stats?.winrate }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Wins</span>
+                <span class="stat-value success">{{ stats?.wins }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Losses</span>
+                <span class="stat-value error">{{ stats?.loses }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Draws</span>
+                <span class="stat-value neutral">{{ stats?.draws }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Draw Rate</span>
+                <span class="stat-value">{{ stats?.drawrate }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Win Rate as Red</span>
+                <span class="stat-value">{{ stats?.winrate_as_p1 }}%</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Win Rate as Blue</span>
+                <span class="stat-value">{{ stats?.winrate_as_p2 }}%</span>
+              </div>
+            </div>
+          } @else {
+            <div class="empty-state">
+              <mat-icon>info</mat-icon>
+              <span>No statistics available</span>
+            </div>
           }
-          @if (empty) {
-            <h3 matLine>Friend list empty</h3>
+        </div>
+      </mat-card>
+
+      <!-- Game History Card -->
+      <mat-card appearance="outlined" class="info-card history-card">
+        <div class="card-header">
+          <mat-icon>history</mat-icon>
+          <h2>Game History</h2>
+        </div>
+        <div class="card-content">
+          @if (dataSource.data && dataSource.data.length > 0) {
+            <mat-table [dataSource]="dataSource" class="history-table">
+              <ng-container matColumnDef="Date">
+                <mat-header-cell *matHeaderCellDef>
+                  <div class="header-cell">
+                    <mat-icon>calendar_today</mat-icon>
+                    Date
+                  </div>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="date-cell">
+                  {{ getDate(element.game_end_date) }}
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="Opponent">
+                <mat-header-cell *matHeaderCellDef>
+                  <div class="header-cell">
+                    <mat-icon>person</mat-icon>
+                    Opponent
+                  </div>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="opponent-cell">
+                  {{ getOpponent(element) }}
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="Result">
+                <mat-header-cell *matHeaderCellDef>
+                  <div class="header-cell">
+                    <mat-icon>emoji_events</mat-icon>
+                    Result
+                  </div>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="result-cell">
+                  <span class="result-badge" [class]="getResultClass(element)">
+                    {{ getResult(element) }}
+                  </span>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns" (click)="goToGame(row)" class="history-row"></mat-row>
+            </mat-table>
+          } @else {
+            <div class="empty-state">
+              <mat-icon>sports_esports</mat-icon>
+              <span>No games played yet</span>
+            </div>
           }
-          @for (friend of friends; track friend) {
-            <mat-list-item>
-              <button mat-button (click)="goToProfile(friend)">{{ friend }}</button>
-              <mat-icon class="icon-right" [matMenuTriggerFor]="friends">more_vert</mat-icon>
-              <mat-menu class="menu" #friends="matMenu" xPosition="before" [overlapTrigger]="false">
-                <button mat-menu-item (click)="goToProfile(friend)">Profile</button>
-                @if (getIsInFriends(friend)) {
-                  <button mat-menu-item (click)="unfriend(friend)">
-                    Unfriend
-                  </button>
+        </div>
+      </mat-card>
+    </div>
+
+    @if (isOwner) {
+      <!-- Bottom Row: Friends and Friend Requests (Owner Only) -->
+      <div class="content-row">
+        <!-- Friends Card -->
+        <mat-card appearance="outlined" class="info-card friends-card">
+          <div class="card-header">
+            <mat-icon>people</mat-icon>
+            <h2>Friends</h2>
+          </div>
+          <div class="card-content">
+            @if (!empty) {
+              <div class="friends-list">
+                @for (friend of friends; track friend) {
+                  <div class="friend-item">
+                    <button mat-button class="friend-btn" (click)="goToProfile(friend)">
+                      <mat-icon>person</mat-icon>
+                      <span>{{ friend }}</span>
+                    </button>
+                    <button mat-icon-button [matMenuTriggerFor]="friends" class="friend-menu-btn">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu class="friend-menu" #friends="matMenu" xPosition="before" [overlapTrigger]="false">
+                      <button mat-menu-item (click)="goToProfile(friend)">
+                        <mat-icon>account_circle</mat-icon>
+                        <span>Profile</span>
+                      </button>
+                      @if (getIsInFriends(friend)) {
+                        <button mat-menu-item (click)="unfriend(friend)">
+                          <mat-icon>person_remove</mat-icon>
+                          <span>Unfriend</span>
+                        </button>
+                      }
+                      @if (!getIsInBlocked(friend)) {
+                        <button mat-menu-item (click)="blockUser(friend)">
+                          <mat-icon>block</mat-icon>
+                          <span>Block</span>
+                        </button>
+                      }
+                      @if (getIsInBlocked(friend)) {
+                        <button mat-menu-item (click)="unblockUser(friend)">
+                          <mat-icon>check_circle</mat-icon>
+                          <span>Unblock</span>
+                        </button>
+                      }
+                    </mat-menu>
+                  </div>
                 }
-                @if (!getIsInBlocked(friend)) {
-                  <button mat-menu-item (click)="blockUser(friend)">
-                    Block
-                  </button>
+              </div>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>person_add</mat-icon>
+                <span>No friends yet</span>
+              </div>
+            }
+            
+            <form class="add-friend-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+              <mat-form-field appearance="outline" class="friend-input">
+                <mat-label>Add Friend</mat-label>
+                <input formControlName="input" matInput placeholder="Enter username" />
+                <mat-icon matPrefix>person_search</mat-icon>
+              </mat-form-field>
+              <button mat-raised-button color="accent" type="submit" class="add-friend-btn">
+                <mat-icon>person_add</mat-icon>
+                Add
+              </button>
+            </form>
+          </div>
+        </mat-card>
+
+        <!-- Friend Requests Card -->
+        <mat-card appearance="outlined" class="info-card requests-card">
+          <div class="card-header">
+            <mat-icon>notifications</mat-icon>
+            <h2>Friend Requests</h2>
+          </div>
+          <div class="card-content">
+            @if (!empty_req) {
+              <div class="requests-list">
+                @for (request of friendsRequests; track request) {
+                  <div class="request-item">
+                    <div class="request-info">
+                      <mat-icon>person</mat-icon>
+                      <span class="username">{{ request.user_one_username }}</span>
+                    </div>
+                    <div class="request-actions">
+                      <button
+                        mat-button
+                        color="accent"
+                        class="request-btn accept"
+                        (click)="acceptFriendRequest(request.id)"
+                      >
+                        <mat-icon>check</mat-icon>
+                        Accept
+                      </button>
+                      <button
+                        mat-button
+                        color="warn"
+                        class="request-btn decline"
+                        (click)="declineFriendRequest(request.id)"
+                      >
+                        <mat-icon>close</mat-icon>
+                        Decline
+                      </button>
+                    </div>
+                  </div>
                 }
-                @if (getIsInBlocked(friend)) {
-                  <button mat-menu-item (click)="unblockUser(friend)">
-                    Unblock
-                  </button>
-                }
-              </mat-menu>
-            </mat-list-item>
-          }
-        </mat-list>
-        <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-          <mat-form-field class="example-full-width" appearance="fill">
-            <mat-label>Username</mat-label>
-            <input formControlName="input" matInput #box />
-          </mat-form-field>
-          <button mat-stroked-button color="accent" class="btn-block">Add friend</button>
-        </form></mat-card
-        >
-        <mat-card appearance="outlined" class="box">
-          @if (!empty_req) {
-            <h3 matLine>Friend request list</h3>
-          }
-          @if (empty_req) {
-            <h3 matLine>Friend request list empty</h3>
-          }
-          @if (isOwner) {
-            <mat-list>
-              @for (request of friendsRequests; track request) {
-                <mat-list-item>
-                  <a matLine>{{ request.user_one_username }}</a>
-                  <button
-                    mat-button
-                    color="accent"
-                    class="req-buttons"
-                    (click)="acceptFriendRequest(request.id)"
-                    >
-                    Accept
-                  </button>
-                  <button
-                    mat-button
-                    color="warn"
-                    class="req-buttons"
-                    (click)="declineFriendRequest(request.id)"
-                    >
-                    Decline
-                  </button>
-                </mat-list-item>
-              }
-            </mat-list>
-          }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>inbox</mat-icon>
+                <span>No pending requests</span>
+              </div>
+            }
+          </div>
         </mat-card>
       </div>
     }
-    @if (!isOwner) {
-      <div fxFlex="20" fxLayout="row" fxLayoutAlign="space-evenly strech"></div>
-    }
   </div>
+</div>

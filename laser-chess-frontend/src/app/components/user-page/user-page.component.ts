@@ -217,6 +217,27 @@ export class UserPageComponent {
     return '';
   }
 
+  getResultClass(history: UserHistory): string {
+    if (this.authService.getUsername() == history.player_one_username) {
+      if (history.result == 'PLAYER_ONE_WIN') {
+        return 'win';
+      }
+      if (history.result == 'DRAW') {
+        return 'draw';
+      }
+      return 'loss';
+    } else if (this.authService.getUsername() == history.player_two_username) {
+      if (history.result == 'PLAYER_TWO_WIN') {
+        return 'win';
+      }
+      if (history.result == 'DRAW') {
+        return 'draw';
+      }
+      return 'loss';
+    }
+    return '';
+  }
+
   goToGame(history: UserHistory) {
     this.router.navigate(['game', history.game_id]);
   }

@@ -1,35 +1,78 @@
 @if (errorMessage) {
-  <div class="status-screen" fxLayout="column" fxLayoutAlign="center center">
-    <mat-icon color="warn" class="status-icon">warning</mat-icon>
-    <h2 class="status-title">{{ errorMessage }}</h2>
-    <p class="status-subtitle">Please try again in a moment.</p>
+  <div class="ranking-container">
+    <div class="status-screen" fxLayout="column" fxLayoutAlign="center center">
+      <mat-icon color="warn" class="status-icon">warning</mat-icon>
+      <h2 class="status-title">{{ errorMessage }}</h2>
+      <p class="status-subtitle">Please try again in a moment.</p>
+    </div>
   </div>
 }
 
 @if (!errorMessage && !fetched) {
-  <div class="status-screen" fxLayout="column" fxLayoutAlign="center center">
-    <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
-    <h3 class="status-title">Loading...</h3>
+  <div class="ranking-container">
+    <div class="status-screen" fxLayout="column" fxLayoutAlign="center center">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+      <h3 class="status-title">Loading...</h3>
+    </div>
   </div>
 }
 
 @if (!errorMessage && fetched) {
-  <div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
-    <mat-table [dataSource]="dataSource" class="table-box">
-      <ng-container matColumnDef="position">
-        <mat-header-cell *matHeaderCellDef> Position </mat-header-cell>
-        <mat-cell *matCellDef="let element; let i = index"> {{ i + 1 }} </mat-cell>
-      </ng-container>
-      <ng-container matColumnDef="username">
-        <mat-header-cell *matHeaderCellDef> Username </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{ element.username }} </mat-cell>
-      </ng-container>
-      <ng-container matColumnDef="rating">
-        <mat-header-cell *matHeaderCellDef> Rating </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{ element.rating }} </mat-cell>
-      </ng-container>
-      <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-      <mat-row (click)="openProfile(row)" *matRowDef="let row; columns: displayedColumns"></mat-row>
-    </mat-table>
+  <div class="ranking-container">
+    <!-- Header Section -->
+    <div class="ranking-header">
+      <div class="section-title">
+        <mat-icon>emoji_events</mat-icon>
+        <h1>Player Rankings</h1>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="ranking-section">
+        <mat-card appearance="outlined" class="ranking-card">
+          <mat-table [dataSource]="dataSource" class="ranking-table">
+            <ng-container matColumnDef="position">
+              <mat-header-cell *matHeaderCellDef> 
+                <div class="header-cell">
+                  <mat-icon>trophy</mat-icon>
+                  Position
+                </div>
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element; let i = index" class="position-cell"> 
+                <span class="position-number" [class.top-rank]="i < 3">{{ i + 1 }}</span>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="username">
+              <mat-header-cell *matHeaderCellDef> 
+                <div class="header-cell">
+                  <mat-icon>person</mat-icon>
+                  Player
+                </div>
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element" class="username-cell"> 
+                <span class="username">{{ element.username }}</span>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="rating">
+              <mat-header-cell *matHeaderCellDef> 
+                <div class="header-cell">
+                  <mat-icon>star</mat-icon>
+                  Rating
+                </div>
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element" class="rating-cell"> 
+                <span class="rating-value">{{ element.rating }}</span>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="table-header"></mat-header-row>
+            <mat-row (click)="openProfile(row)" *matRowDef="let row; columns: displayedColumns" class="table-row"></mat-row>
+          </mat-table>
+        </mat-card>
+      </div>
+    </div>
   </div>
 }
