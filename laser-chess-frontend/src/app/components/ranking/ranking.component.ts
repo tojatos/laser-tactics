@@ -5,9 +5,10 @@ import { Ranking } from 'src/app/app.models';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
-  selector: 'app-ranking',
-  templateUrl: './ranking.component.html',
-  styleUrls: ['./ranking.component.scss'],
+    selector: 'app-ranking',
+    templateUrl: './ranking.component.html',
+    styleUrls: ['./ranking.component.scss'],
+    standalone: false
 })
 export class RankingComponent implements OnInit {
   public topRanking: Ranking[] | undefined;

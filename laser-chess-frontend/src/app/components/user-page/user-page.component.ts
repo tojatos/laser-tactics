@@ -9,9 +9,10 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
-  selector: 'app-user-page',
-  templateUrl: './user-page.component.html',
-  styleUrls: ['./user-page.component.scss'],
+    selector: 'app-user-page',
+    templateUrl: './user-page.component.html',
+    styleUrls: ['./user-page.component.scss'],
+    standalone: false
 })
 export class UserPageComponent {
   constructor(

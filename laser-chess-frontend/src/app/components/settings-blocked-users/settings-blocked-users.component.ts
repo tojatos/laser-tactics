@@ -6,9 +6,10 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
-  selector: 'app-settings-blocked-users',
-  templateUrl: './settings-blocked-users.component.html',
-  styleUrls: ['./settings-blocked-users.component.scss'],
+    selector: 'app-settings-blocked-users',
+    templateUrl: './settings-blocked-users.component.html',
+    styleUrls: ['./settings-blocked-users.component.scss'],
+    standalone: false
 })
 export class SettingsBlockedUsersComponent implements OnInit {
   constructor(

@@ -14,9 +14,10 @@ import { GameEvents } from '../../src/Utils/Enums';
 type Coordinates = { x: number; y: number };
 
 @Component({
-  selector: 'app-board-log',
-  templateUrl: './board-log.component.html',
-  styleUrls: ['./board-log.component.scss'],
+    selector: 'app-board-log',
+    templateUrl: './board-log.component.html',
+    styleUrls: ['./board-log.component.scss'],
+    standalone: false
 })
 export class BoardLogComponent implements OnChanges, OnDestroy {
 

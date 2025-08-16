@@ -5,9 +5,10 @@ import { UntypedFormControl, Validators, UntypedFormGroup } from '@angular/forms
 import { LoginEmitterService } from 'src/app/services/login-emitter.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: false
 })
 export class LoginComponent {
   @Output() public changeLoginState: EventEmitter<boolean> = new EventEmitter<boolean>();

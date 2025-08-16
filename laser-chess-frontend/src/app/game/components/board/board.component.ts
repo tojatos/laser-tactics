@@ -21,9 +21,10 @@ import { BoardLogComponent } from '../board-log/board-log.component';
 import { ChatComponent } from '../chat/chat.component';
 
 @Component({
-  selector: 'app-board',
-  templateUrl: './board.component.html',
-  styleUrls: ['./board.component.scss'],
+    selector: 'app-board',
+    templateUrl: './board.component.html',
+    styleUrls: ['./board.component.scss'],
+    standalone: false
 })
 export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true })

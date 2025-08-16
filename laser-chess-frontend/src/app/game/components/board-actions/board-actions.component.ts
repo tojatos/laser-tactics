@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-board-actions',
-  templateUrl: './board-actions.component.html',
-  styleUrls: ['./board-actions.component.scss'],
+    selector: 'app-board-actions',
+    templateUrl: './board-actions.component.html',
+    styleUrls: ['./board-actions.component.scss'],
+    standalone: false
 })
 export class BoardActionsComponent {
   @Input() containerWidth = 0;

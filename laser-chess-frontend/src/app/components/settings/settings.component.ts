@@ -4,9 +4,10 @@ import { Settings } from 'src/app/app.models';
 import { Theme } from 'src/app/game/src/Utils/Enums';
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
+    selector: 'app-settings',
+    templateUrl: './settings.component.html',
+    styleUrls: ['./settings.component.scss'],
+    standalone: false
 })
 export class SettingsComponent implements OnInit {
   animation = false;

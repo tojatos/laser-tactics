@@ -29,9 +29,10 @@ function getByValue(map: Map<any, any>, searchValue: any) {
 }
 
 @Component({
-  selector: 'app-lobby',
-  templateUrl: './lobby.component.html',
-  styleUrls: ['./lobby.component.scss'],
+    selector: 'app-lobby',
+    templateUrl: './lobby.component.html',
+    styleUrls: ['./lobby.component.scss'],
+    standalone: false
 })
 export class LobbyComponent implements OnInit, OnDestroy {
   constructor(

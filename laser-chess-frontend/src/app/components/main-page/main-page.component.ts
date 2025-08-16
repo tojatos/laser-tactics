@@ -11,9 +11,10 @@ import { UserService } from 'src/app/services/user.service';
 import { LobbyStatus } from '../lobby/lobby.component';
 
 @Component({
-  selector: 'app-main-page',
-  templateUrl: './main-page.component.html',
-  styleUrls: ['./main-page.component.scss'],
+    selector: 'app-main-page',
+    templateUrl: './main-page.component.html',
+    styleUrls: ['./main-page.component.scss'],
+    standalone: false
 })
 export class MainPageComponent implements OnInit {
   dataSource = new MatTableDataSource<Lobby>();

@@ -11,9 +11,10 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
-  selector: 'app-main-nav',
-  templateUrl: './main-nav.component.html',
-  styleUrls: ['./main-nav.component.scss'],
+    selector: 'app-main-nav',
+    templateUrl: './main-nav.component.html',
+    styleUrls: ['./main-nav.component.scss'],
+    standalone: false
 })
 export class MainNavComponent {
   @ViewChild(MatMenuTrigger)

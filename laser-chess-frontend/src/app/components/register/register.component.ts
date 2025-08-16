@@ -4,9 +4,10 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { UntypedFormControl, Validators, UntypedFormGroup } from '@angular/forms';
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
+    selector: 'app-register',
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.scss'],
+    standalone: false
 })
 export class RegisterComponent {
   hide = true;

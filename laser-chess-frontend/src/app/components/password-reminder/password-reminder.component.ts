@@ -5,9 +5,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
-  selector: 'app-password-reminder',
-  templateUrl: './password-reminder.component.html',
-  styleUrls: ['./password-reminder.component.scss'],
+    selector: 'app-password-reminder',
+    templateUrl: './password-reminder.component.html',
+    styleUrls: ['./password-reminder.component.scss'],
+    standalone: false
 })
 export class PasswordReminderComponent {
   hide = true;

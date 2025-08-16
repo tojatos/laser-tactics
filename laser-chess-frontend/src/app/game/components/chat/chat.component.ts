@@ -4,10 +4,11 @@ import { ChatWebsocketService } from '../../services/chat.service';
 import { EventEmitterService } from '../../services/event-emitter.service';
 
 @Component({
-  selector: 'app-chat',
-  templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-chat',
+    templateUrl: './chat.component.html',
+    styleUrls: ['./chat.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ChatComponent {
   @ViewChild('msg')
