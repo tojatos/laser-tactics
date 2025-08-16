@@ -2,7 +2,6 @@
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
 // Plus imports for other components in your app.
-@import '@angular/material/theming';
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
@@ -35,9 +34,9 @@ $custom-palette: (
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$laser-chess-frontend-primary: mat-palette($custom-palette, 100);
-$laser-chess-frontend-accent: mat-palette($custom-palette, 200);
-$laser-chess-frontend-contrast: mat-palette($custom-palette, 500);
+$laser-chess-frontend-primary: mat.define-palette($custom-palette, 100);
+$laser-chess-frontend-accent: mat.define-palette($custom-palette, 200);
+$laser-chess-frontend-contrast: mat.define-palette($custom-palette, 500);
 // The warn palette is optional (defaults to red).
 $laser-chess-frontend-warn: mat.define-palette(mat.$red-palette);
 
