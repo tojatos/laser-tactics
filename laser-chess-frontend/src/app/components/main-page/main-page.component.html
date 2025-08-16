@@ -1,145 +1,153 @@
-<div *ngIf="errorMessage" class="status-screen" fxLayout="column" fxLayoutAlign="center center">
-  <mat-icon color="warn" class="status-icon">warning</mat-icon>
-  <h2 class="status-title">{{ errorMessage }}</h2>
-  <p class="status-subtitle">Please try again in a moment.</p>
-</div>
-
-<div *ngIf="!errorMessage && !fetched" class="status-screen" fxLayout="column" fxLayoutAlign="center center">
-  <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
-  <h3 class="status-title">Loading...</h3>
-</div>
-
-<div
-  *ngIf="!errorMessage && fetched"
-  class="main-wrapper"
-  fxLayout="column"
-  fxLayout.gt-sm="column"
-  fxLayoutGap="20px"
-  fxLayoutAlign="start stretch"
->
-  <div
-    *ngIf="!verified && isLoggedin"
-    fxLayout="column"
-    fxFlexAlign="center"
-    fxFlex="20"
-    fxLayoutGap="20px"
-    fxLayoutAlign="center"
-  >
-    <!-- <h1 class = "text">You need to verify your account </h1>
-  <button  mat-stroked-button (click)="sendVerifyEmail()">Click to send email</button> -->
+@if (errorMessage) {
+  <div class="status-screen" fxLayout="column" fxLayoutAlign="center center">
+    <mat-icon color="warn" class="status-icon">warning</mat-icon>
+    <h2 class="status-title">{{ errorMessage }}</h2>
+    <p class="status-subtitle">Please try again in a moment.</p>
   </div>
+}
+
+@if (!errorMessage && !fetched) {
+  <div class="status-screen" fxLayout="column" fxLayoutAlign="center center">
+    <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+    <h3 class="status-title">Loading...</h3>
+  </div>
+}
+
+@if (!errorMessage && fetched) {
   <div
-    *ngIf="verified && isLoggedin"
+    class="main-wrapper"
     fxLayout="column"
-    fxFlexAlign="center"
-    fxFlex="20"
+    fxLayout.gt-sm="column"
     fxLayoutGap="20px"
-    fxLayoutAlign="center"
-  ></div>
-  <div
-    *ngIf="!isLoggedin"
-    fxLayout="column"
-    fxFlexAlign="center"
-    fxFlex="20"
-    fxLayoutGap="20px"
-    fxLayoutAlign="center"
-  ></div>
-  <div *ngIf="fetched" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="30px" class="main-content">
-    <div 
-      fxLayout="column"
-      fxLayoutAlign="start center"
-      fxFlex="75"
-      class="table-container"
+    fxLayoutAlign="start stretch"
     >
-      <mat-table [dataSource]="dataSource" class="lobby-table">
-        <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef> Game name </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="players">
-          <mat-header-cell *matHeaderCellDef> Players </mat-header-cell>
-          <mat-cell *matCellDef="let element" class="players-cell">
-            <div class="players-container">
-              <!-- Red Player (First) -->
-              <div class="player-info" *ngIf="hasRedPlayer(element)">
-                <mat-icon class="player-icon red-player">account_circle</mat-icon>
-                <span class="player-name">{{ getRedPlayer(element) }}</span>
-              </div>
-              <div class="player-info waiting-slot" *ngIf="!hasRedPlayer(element)">
-                <mat-icon class="player-icon waiting-player">hourglass_empty</mat-icon>
-                <span class="player-name waiting-text">Waiting...</span>
-              </div>
-              
-              <div class="vs-divider">vs</div>
-              
-              <!-- Blue Player (Second) -->
-              <div class="player-info" *ngIf="hasBluePlayer(element)">
-                <mat-icon class="player-icon blue-player">account_circle</mat-icon>
-                <span class="player-name">{{ getBluePlayer(element) }}</span>
-              </div>
-              <div class="player-info waiting-slot" *ngIf="!hasBluePlayer(element)">
-                <mat-icon class="player-icon waiting-player">hourglass_empty</mat-icon>
-                <span class="player-name waiting-text">Waiting...</span>
-              </div>
-            </div>
-          </mat-cell>
-        </ng-container>
-
-                  <ng-container matColumnDef="Mode">
-            <mat-header-cell *matHeaderCellDef> Mode </mat-header-cell>
-            <mat-cell *matCellDef="let element" [class.ranked-mode-text]="element.is_ranked"> 
-              {{ getMode(element.is_ranked) }}
-            </mat-cell>
-          </ng-container>
-
-        <ng-container matColumnDef="join">
-          <mat-header-cell *matHeaderCellDef>
-            <mat-icon mat-button class="refresh-icon" color="accent" (click)="refreshList()">refresh</mat-icon>
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <button mat-button class="join-button" color="accent" (click)="joinLobby(row)">
-              Join
-            </button>
-          </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-        <mat-row (click)="openLobby(row)" *matRowDef="let row; columns: displayedColumns" class="table-row"></mat-row>
-      </mat-table>
-    </div>
-    
-    <div 
-      fxLayout="column"
-      fxLayoutAlign="start center"
-      fxFlex="25"
-      class="controls-container"
-    >
-      <div fxLayout="column" fxLayoutGap="15px" class="game-options">
-        <h3 class="options-title">New Game</h3>
-        
-        <mat-slide-toggle 
-          [(ngModel)]="isRanked" 
-          color="accent"
-          class="game-option">
-          Ranked
-        </mat-slide-toggle>
-        
-        <mat-slide-toggle 
-          [(ngModel)]="isPrivate" 
-          color="accent"
-          class="game-option">
-          Private
-        </mat-slide-toggle>
-        
-        <button 
-          mat-raised-button 
-          color="accent" 
-          (click)="createGameWithOptions()"
-          class="start-game-button">
-          Start
-        </button>
+    @if (!verified && isLoggedin) {
+      <div
+        fxLayout="column"
+        fxFlexAlign="center"
+        fxFlex="20"
+        fxLayoutGap="20px"
+        fxLayoutAlign="center"
+        >
+        <!-- <h1 class = "text">You need to verify your account </h1>
+        <button  mat-stroked-button (click)="sendVerifyEmail()">Click to send email</button> -->
       </div>
-    </div>
+    }
+    @if (verified && isLoggedin) {
+      <div
+        fxLayout="column"
+        fxFlexAlign="center"
+        fxFlex="20"
+        fxLayoutGap="20px"
+        fxLayoutAlign="center"
+      ></div>
+    }
+    @if (!isLoggedin) {
+      <div
+        fxLayout="column"
+        fxFlexAlign="center"
+        fxFlex="20"
+        fxLayoutGap="20px"
+        fxLayoutAlign="center"
+      ></div>
+    }
+    @if (fetched) {
+      <div fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="30px" class="main-content">
+        <div
+          fxLayout="column"
+          fxLayoutAlign="start center"
+          fxFlex="75"
+          class="table-container"
+          >
+          <mat-table [dataSource]="dataSource" class="lobby-table">
+            <ng-container matColumnDef="name">
+              <mat-header-cell *matHeaderCellDef> Game name </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="players">
+              <mat-header-cell *matHeaderCellDef> Players </mat-header-cell>
+              <mat-cell *matCellDef="let element" class="players-cell">
+                <div class="players-container">
+                  <!-- Red Player (First) -->
+                  @if (hasRedPlayer(element)) {
+                    <div class="player-info">
+                      <mat-icon class="player-icon red-player">account_circle</mat-icon>
+                      <span class="player-name">{{ getRedPlayer(element) }}</span>
+                    </div>
+                  }
+                  @if (!hasRedPlayer(element)) {
+                    <div class="player-info waiting-slot">
+                      <mat-icon class="player-icon waiting-player">hourglass_empty</mat-icon>
+                      <span class="player-name waiting-text">Waiting...</span>
+                    </div>
+                  }
+                  <div class="vs-divider">vs</div>
+                  <!-- Blue Player (Second) -->
+                  @if (hasBluePlayer(element)) {
+                    <div class="player-info">
+                      <mat-icon class="player-icon blue-player">account_circle</mat-icon>
+                      <span class="player-name">{{ getBluePlayer(element) }}</span>
+                    </div>
+                  }
+                  @if (!hasBluePlayer(element)) {
+                    <div class="player-info waiting-slot">
+                      <mat-icon class="player-icon waiting-player">hourglass_empty</mat-icon>
+                      <span class="player-name waiting-text">Waiting...</span>
+                    </div>
+                  }
+                </div>
+              </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="Mode">
+              <mat-header-cell *matHeaderCellDef> Mode </mat-header-cell>
+              <mat-cell *matCellDef="let element" [class.ranked-mode-text]="element.is_ranked">
+                {{ getMode(element.is_ranked) }}
+              </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="join">
+              <mat-header-cell *matHeaderCellDef>
+                <mat-icon mat-button class="refresh-icon" color="accent" (click)="refreshList()">refresh</mat-icon>
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <button mat-button class="join-button" color="accent" (click)="joinLobby(row)">
+                  Join
+                </button>
+              </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+            <mat-row (click)="openLobby(row)" *matRowDef="let row; columns: displayedColumns" class="table-row"></mat-row>
+          </mat-table>
+        </div>
+        <div
+          fxLayout="column"
+          fxLayoutAlign="start center"
+          fxFlex="25"
+          class="controls-container"
+          >
+          <div fxLayout="column" fxLayoutGap="15px" class="game-options">
+            <h3 class="options-title">New Game</h3>
+            <mat-slide-toggle
+              [(ngModel)]="isRanked"
+              color="accent"
+              class="game-option">
+              Ranked
+            </mat-slide-toggle>
+            <mat-slide-toggle
+              [(ngModel)]="isPrivate"
+              color="accent"
+              class="game-option">
+              Private
+            </mat-slide-toggle>
+            <button
+              mat-raised-button
+              color="accent"
+              (click)="createGameWithOptions()"
+              class="start-game-button">
+              Start
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   </div>
-</div>
+}

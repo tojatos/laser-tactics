@@ -1,24 +1,26 @@
 <app-chat #chatComponent [myUsername]="this.game.authService.getUsername()"></app-chat>
 <h1 class="game-title">
   {{ parseGamePhase(game.gamePhase) }}
-  <span
-    *ngIf="game.gamePhase !== 'DRAW' && game.gamePhase !== 'NOT_STARTED'"
-    [style.color]="game.whoseTurn === 'PLAYER_ONE' ? 'red' : 'blue'"
-  >
-    ■
-  </span>
+  @if (game.gamePhase !== 'DRAW' && game.gamePhase !== 'NOT_STARTED') {
+    <span
+      [style.color]="game.whoseTurn === 'PLAYER_ONE' ? 'red' : 'blue'"
+      >
+      ■
+    </span>
+  }
 </h1>
 <div class="spectators">
   <mat-form-field appearance="fill">
     <mat-label>Spectators: {{ spectatorsNum }}</mat-label>
     <mat-select (selectionChange)="goToProfile($event.value)">
-      <mat-option
-        *ngFor="let spectator of filteredSpectators"
-        [value]="spectator"
-        [disabled]="spectator?.includes('anonymous')"
-      >
-        {{ spectator }}
-      </mat-option>
+      @for (spectator of filteredSpectators; track spectator) {
+        <mat-option
+          [value]="spectator"
+          [disabled]="spectator?.includes('anonymous')"
+          >
+          {{ spectator }}
+        </mat-option>
+      }
     </mat-select>
   </mat-form-field>
 </div>
@@ -30,109 +32,119 @@
       <div class="sliders">
         <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation"
           >Animations</mat-slide-toggle
-        >
-        <br />
-        <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds"
-          >Sounds</mat-slide-toggle
-        >
-      </div>
-      <app-clock
-        *ngIf="isTimed"
-        [serverTime]="game.playerTimes[1]"
-        [isActive]="game.activeTurn[1]"
-        (timeoutEmitter)="game.notifyTimeout()"
-      ></app-clock>
-      <h3>
-        <i matTooltip="View profile"
-          ><a [routerLink]="['/users', game.playerNames[1]]">{{ game.playerNames[1] }}</a></i
-        >
-        ({{ game.playerRankings[1] }})
-        <span
-          *ngIf="game.playerRankingsChanges[1]"
-          [ngStyle]="{ color: game.playerRankingsChanges[1] < 0 ? 'green' : 'red' }"
-        >
-          {{
-            game.playerRankingsChanges[1] < 0
-              ? '▲' + game.playerRankingsChanges[1] * -1
-              : '▼' + game.playerRankingsChanges[1]
-          }}
-        </span>
-      </h3>
-    </div>
-    
-    <div
-      [style.width.px]="containerWidth"
-      [style.height.px]="containerHeight"
-      class="game-container"
-    >
-      <canvas
-        #canvas
-        class="gameCanvas"
-        [ngStyle]="{ 'background-image': backgroundBoardUrl }"
-      ></canvas>
-    </div>
-    
-    <div class="boardText">
-      <div class="sliders">
-        <div class="btns" *ngIf="isHandset && game.gamePhase === 'STARTED'">
-          <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()">
-            <mat-icon>flag</mat-icon>
-          </button>
-          <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()">
-            <mat-icon>volunteer_activism</mat-icon>
-          </button>
-        </div>
-      </div>
-      <app-clock
-        *ngIf="isTimed"
-        [serverTime]="game.playerTimes[0]"
-        [isActive]="game.activeTurn[0]"
-        (timeoutEmitter)="game.notifyTimeout()"
-      ></app-clock>
-      <h3>
-        <i matTooltip="View profile"
-          ><a [routerLink]="['/users', game.playerNames[0]]">{{ game.playerNames[0] }}</a></i
-        >
-        ({{ game.playerRankings[0] }})
-        <span
-          *ngIf="game.playerRankingsChanges[0]"
-          [ngStyle]="{ color: game.playerRankingsChanges[0] < 0 ? 'green' : 'red' }"
-        >
-          {{
-            game.playerRankingsChanges[0] < 0
-              ? '▲' + game.playerRankingsChanges[0] * -1
-              : '▼' + game.playerRankingsChanges[0]
-          }}
-        </span>
-      </h3>
-    </div>
-    
-    <div *ngIf="this.game.isInitiated">
-      <app-board-actions
-        (buttonPressEmitter)="buttonPressEvent($event)"
-        [containerHeight]="containerHeight"
-        [containerWidth]="containerWidth"
-        [rotationPossible]="rotationPossibleInfo"
-        [acceptPossible]="acceptPossibleInfo"
-        [laserPossible]="laserPossibleInfo"
-        fxLayoutAlign="center"
-      ></app-board-actions>
-    </div>
-  </div>
+          >
+          <br />
+          <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds"
+            >Sounds</mat-slide-toggle
+            >
+          </div>
+          @if (isTimed) {
+            <app-clock
+              [serverTime]="game.playerTimes[1]"
+              [isActive]="game.activeTurn[1]"
+              (timeoutEmitter)="game.notifyTimeout()"
+            ></app-clock>
+          }
+          <h3>
+            <i matTooltip="View profile"
+              ><a [routerLink]="['/users', game.playerNames[1]]">{{ game.playerNames[1] }}</a></i
+              >
+              ({{ game.playerRankings[1] }})
+              @if (game.playerRankingsChanges[1]) {
+                <span
+                  [ngStyle]="{ color: game.playerRankingsChanges[1] < 0 ? 'green' : 'red' }"
+                  >
+                  {{
+                  game.playerRankingsChanges[1] < 0
+                  ? '▲' + game.playerRankingsChanges[1] * -1
+                  : '▼' + game.playerRankingsChanges[1]
+                  }}
+                </span>
+              }
+            </h3>
+          </div>
 
-  <!-- Game Log Sidebar -->
-  <div class="game-sidebar" *ngIf="!isHandset">
-    <app-board-log
-      #logs
-      #logsComponent
-      [gameState]="game.gameService.lastMessage"
-      [maxHeight]="containerHeight * 0.9"
-      [gameFinished]="game.gamePhase !== 'STARTED'"
-      [isSpectator]="isSpectator"
-      (gameLogEmitter)="buildEvent($event)"
-      (gameReturnEmitter)="returnToCurrentEvent()"
-      (giveUpEmitter)="game.giveUp()"
-      (drawEmitter)="game.offerDraw()"
-    ></app-board-log>
-  </div>
-</div>
+          <div
+            [style.width.px]="containerWidth"
+            [style.height.px]="containerHeight"
+            class="game-container"
+            >
+            <canvas
+              #canvas
+              class="gameCanvas"
+              [ngStyle]="{ 'background-image': backgroundBoardUrl }"
+            ></canvas>
+          </div>
+
+          <div class="boardText">
+            <div class="sliders">
+              @if (isHandset && game.gamePhase === 'STARTED') {
+                <div class="btns">
+                  <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()">
+                    <mat-icon>flag</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()">
+                    <mat-icon>volunteer_activism</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+            @if (isTimed) {
+              <app-clock
+                [serverTime]="game.playerTimes[0]"
+                [isActive]="game.activeTurn[0]"
+                (timeoutEmitter)="game.notifyTimeout()"
+              ></app-clock>
+            }
+            <h3>
+              <i matTooltip="View profile"
+                ><a [routerLink]="['/users', game.playerNames[0]]">{{ game.playerNames[0] }}</a></i
+                >
+                ({{ game.playerRankings[0] }})
+                @if (game.playerRankingsChanges[0]) {
+                  <span
+                    [ngStyle]="{ color: game.playerRankingsChanges[0] < 0 ? 'green' : 'red' }"
+                    >
+                    {{
+                    game.playerRankingsChanges[0] < 0
+                    ? '▲' + game.playerRankingsChanges[0] * -1
+                    : '▼' + game.playerRankingsChanges[0]
+                    }}
+                  </span>
+                }
+              </h3>
+            </div>
+
+            @if (this.game.isInitiated) {
+              <div>
+                <app-board-actions
+                  (buttonPressEmitter)="buttonPressEvent($event)"
+                  [containerHeight]="containerHeight"
+                  [containerWidth]="containerWidth"
+                  [rotationPossible]="rotationPossibleInfo"
+                  [acceptPossible]="acceptPossibleInfo"
+                  [laserPossible]="laserPossibleInfo"
+                  fxLayoutAlign="center"
+                ></app-board-actions>
+              </div>
+            }
+          </div>
+
+          <!-- Game Log Sidebar -->
+          @if (!isHandset) {
+            <div class="game-sidebar">
+              <app-board-log
+                #logs
+                #logsComponent
+                [gameState]="game.gameService.lastMessage"
+                [maxHeight]="containerHeight * 0.9"
+                [gameFinished]="game.gamePhase !== 'STARTED'"
+                [isSpectator]="isSpectator"
+                (gameLogEmitter)="buildEvent($event)"
+                (gameReturnEmitter)="returnToCurrentEvent()"
+                (giveUpEmitter)="game.giveUp()"
+                (drawEmitter)="game.offerDraw()"
+              ></app-board-log>
+            </div>
+          }
+        </div>

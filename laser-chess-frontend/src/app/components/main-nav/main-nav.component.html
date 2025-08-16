@@ -12,110 +12,121 @@
         <a href="#" mat-button [routerLink]="lobby" (click)="joinRandomLobby(false)">Join game</a>
         <a href="#" mat-button [routerLink]="lobby" (click)="joinRandomLobby(true)"
           >Join ranked game</a
-        >
-        <a href="#" mat-button routerLink="rules">Rules</a>
-        <a href="#" *ngIf="!isLoggedin" mat-button routerLink="login" routerLinkActive="active"
-          >Login</a
-        >
-        <a
-          href="#"
-          *ngIf="!isLoggedin"
-          mat-button
-          mat-raised-button
-          routerLink="register"
-          routerLinkActive="active"
-          >Register</a
-        >
-        <a mat-button *ngIf="isLoggedin" [matMenuTriggerFor]="user">{{ username }}</a>
-        <mat-menu class="menu" #user="matMenu" xPosition="after">
-          <span (mouseleave)="closeMenu()">
-            <button mat-menu-item [routerLink]="['/users', username]">
-              <mat-icon>person</mat-icon>
-              <span>Profile</span>
-            </button>
-            <button mat-menu-item routerLink="settings">
-              <mat-icon>settings</mat-icon>
-              <span>Settings</span>
-            </button>
-            <button mat-menu-item (click)="logout()">
-              <mat-icon>power_settings_new</mat-icon>
-              <span>Logout</span>
-            </button>
-          </span>
-        </mat-menu>
-      </div>
-    </mat-toolbar-row>
-  </mat-toolbar>
+          >
+          <a href="#" mat-button routerLink="rules">Rules</a>
+          @if (!isLoggedin) {
+            <a href="#" mat-button routerLink="login" routerLinkActive="active"
+              >Login</a
+              >
+            }
+            @if (!isLoggedin) {
+              <a
+                href="#"
+                mat-button
+                mat-raised-button
+                routerLink="register"
+                routerLinkActive="active"
+                >Register</a
+                >
+              }
+              @if (isLoggedin) {
+                <a mat-button [matMenuTriggerFor]="user">{{ username }}</a>
+              }
+              <mat-menu class="menu" #user="matMenu" xPosition="after">
+                <span (mouseleave)="closeMenu()">
+                  <button mat-menu-item [routerLink]="['/users', username]">
+                    <mat-icon>person</mat-icon>
+                    <span>Profile</span>
+                  </button>
+                  <button mat-menu-item routerLink="settings">
+                    <mat-icon>settings</mat-icon>
+                    <span>Settings</span>
+                  </button>
+                  <button mat-menu-item (click)="logout()">
+                    <mat-icon>power_settings_new</mat-icon>
+                    <span>Logout</span>
+                  </button>
+                </span>
+              </mat-menu>
+            </div>
+          </mat-toolbar-row>
+        </mat-toolbar>
 
-  <mat-sidenav-container fxFlexFill>
-    <mat-sidenav #sidenav fxLayout="column">
-      <mat-nav-list>
-        <a href="#" mat-list-item routerLink="" (click)="sidenav.toggle()">Home</a>
-        <a href="#" mat-list-item routerLink="ranking" (click)="sidenav.toggle()">Ranking</a>
-        <a
-          href="#"
-          mat-list-item
-          [routerLink]="lobby"
-          (click)="joinRandomLobby(false)"
-          (click)="sidenav.toggle()"
-          >Join game</a
-        >
-        <a
-          href="#"
-          mat-list-item
-          [routerLink]="lobby"
-          (click)="joinRandomLobby(true)"
-          (click)="sidenav.toggle()"
-          >Join ranked game</a
-        >
-        <a href="#" mat-list-item routerLink="rules" (click)="sidenav.toggle()">Rules</a>
-        <a
-          href="#"
-          *ngIf="!isLoggedin"
-          mat-list-item
-          routerLink="login"
-          routerLinkActive="active"
-          (click)="sidenav.toggle()"
-          >Login</a
-        >
-        <a
-          href="#"
-          *ngIf="!isLoggedin"
-          mat-list-item
-          routerLink="register"
-          routerLinkActive="active"
-          (click)="sidenav.toggle()"
-          >Register</a
-        >
-        <a
-          href="#"
-          *ngIf="isLoggedin"
-          mat-list-item
-          [routerLink]="['/users', username]"
-          (click)="sidenav.toggle()"
-          >
-          <mat-icon matListItemIcon>person</mat-icon>
-          Profile</a
-        >
-        <a
-          href="#"
-          *ngIf="isLoggedin"
-          mat-list-item
-          routerLink="settings"
-          (click)="sidenav.toggle()"
-          >
-          <mat-icon matListItemIcon>settings</mat-icon>
-          Settings</a
-        >
-        <a href="#" *ngIf="isLoggedin" mat-list-item (click)="logout()" (click)="sidenav.toggle()"
-          >
-          <mat-icon matListItemIcon>power_settings_new</mat-icon>
-          Logout</a
-        >
-      </mat-nav-list>
-    </mat-sidenav>
-    <mat-sidenav-content fxFlexFill>
-      <router-outlet></router-outlet>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-</div>
+        <mat-sidenav-container fxFlexFill>
+          <mat-sidenav #sidenav fxLayout="column">
+            <mat-nav-list>
+              <a href="#" mat-list-item routerLink="" (click)="sidenav.toggle()">Home</a>
+              <a href="#" mat-list-item routerLink="ranking" (click)="sidenav.toggle()">Ranking</a>
+              <a
+                href="#"
+                mat-list-item
+                [routerLink]="lobby"
+                (click)="joinRandomLobby(false)"
+                (click)="sidenav.toggle()"
+                >Join game</a
+                >
+                <a
+                  href="#"
+                  mat-list-item
+                  [routerLink]="lobby"
+                  (click)="joinRandomLobby(true)"
+                  (click)="sidenav.toggle()"
+                  >Join ranked game</a
+                  >
+                  <a href="#" mat-list-item routerLink="rules" (click)="sidenav.toggle()">Rules</a>
+                  @if (!isLoggedin) {
+                    <a
+                      href="#"
+                      mat-list-item
+                      routerLink="login"
+                      routerLinkActive="active"
+                      (click)="sidenav.toggle()"
+                      >Login</a
+                      >
+                    }
+                    @if (!isLoggedin) {
+                      <a
+                        href="#"
+                        mat-list-item
+                        routerLink="register"
+                        routerLinkActive="active"
+                        (click)="sidenav.toggle()"
+                        >Register</a
+                        >
+                      }
+                      @if (isLoggedin) {
+                        <a
+                          href="#"
+                          mat-list-item
+                          [routerLink]="['/users', username]"
+                          (click)="sidenav.toggle()"
+                          >
+                          <mat-icon matListItemIcon>person</mat-icon>
+                          Profile</a
+                          >
+                        }
+                        @if (isLoggedin) {
+                          <a
+                            href="#"
+                            mat-list-item
+                            routerLink="settings"
+                            (click)="sidenav.toggle()"
+                            >
+                            <mat-icon matListItemIcon>settings</mat-icon>
+                            Settings</a
+                            >
+                          }
+                          @if (isLoggedin) {
+                            <a href="#" mat-list-item (click)="logout()" (click)="sidenav.toggle()"
+                              >
+                              <mat-icon matListItemIcon>power_settings_new</mat-icon>
+                              Logout</a
+                              >
+                            }
+                          </mat-nav-list>
+                        </mat-sidenav>
+                        <mat-sidenav-content fxFlexFill>
+                          <router-outlet></router-outlet>
+                        </mat-sidenav-content>
+                      </mat-sidenav-container>
+                    </div>

@@ -6,201 +6,218 @@
       <div class="title-content">
         <h1 class="lobby-title">Game Lobby</h1>
         <div class="lobby-name-edit">
-          <input 
+          <input
             class="lobby-name-input"
-            #nameInput 
+            #nameInput
             [value]="name"
             (keyup.enter)="onEnter(nameInput.value)"
             (blur)="onEnter(nameInput.value)"
             placeholder="Enter lobby name..."
-          >
-          <mat-icon class="edit-icon">edit</mat-icon>
-        </div>
-      </div>
-    </div>
-    <button 
-      mat-raised-button 
-      color="warn" 
-      class="leave-lobby-btn"
-      (click)="leaveLobby()"
-    >
-      <mat-icon>exit_to_app</mat-icon>
-      Leave
-    </button>
-  </div>
-
-  <!-- Main Content Grid -->
-  <div class="main-content">
-    <!-- Left Side: Players Section -->
-    <div class="players-section">
-      <div class="section-header">
-        <h2 class="section-title">
-          <mat-icon>people</mat-icon>
-          Players
-        </h2>
-      </div>
-      
-      <div class="players-grid">
-        <mat-card 
-          appearance="outlined" 
-          class="player-card red-player" 
-          [class.clickable]="!player_one && !isPlayerInLobby"
-          (click)="!player_one && !isPlayerInLobby && joinLobby()"
-        >
-          <div class="player-content">
-            <mat-icon class="player-icon">person</mat-icon>
-            <div class="player-info">
-              <div class="player-label">Red</div>
-              <div class="player-name" *ngIf="player_one; else joinPrompt">
-                {{ player_one }}
-              </div>
-              <ng-template #joinPrompt>
-                <div class="join-text" *ngIf="!isPlayerInLobby">Click to join</div>
-                <div class="empty-slot" *ngIf="isPlayerInLobby">Empty slot</div>
-              </ng-template>
-            </div>
-          </div>
-        </mat-card>
-
-        <div class="vs-divider">
-          <span class="vs-text">VS</span>
-          <button 
-            mat-icon-button 
-            [disabled]="!isPlayerOne" 
-            (click)="changePlayers()"
-            class="swap-btn"
-            matTooltip="Swap"
-            matTooltipPosition="below"
-          >
-            <mat-icon>swap_horiz</mat-icon>
-          </button>
-        </div>
-
-        <mat-card 
-          appearance="outlined" 
-          class="player-card blue-player" 
-          [class.clickable]="!player_two && !isPlayerInLobby"
-          (click)="!player_two && !isPlayerInLobby && joinLobby()"
-        >
-          <div class="player-content">
-            <mat-icon class="player-icon">person</mat-icon>
-            <div class="player-info">
-              <div class="player-label">Blue</div>
-              <div class="player-name" *ngIf="player_two; else joinPrompt2">
-                {{ player_two }}
-              </div>
-              <ng-template #joinPrompt2>
-                <div class="join-text" *ngIf="!isPlayerInLobby">Click to join</div>
-                <div class="empty-slot" *ngIf="isPlayerInLobby">Empty slot</div>
-              </ng-template>
-            </div>
-          </div>
-        </mat-card>
-      </div>
-
-      <div class="start-game-section">
-        <button
-          mat-raised-button
-          color="accent"
-          [disabled]="!isPlayerOne || !player_one || !player_two"
-          (click)="startGame()"
-          class="start-game-btn"
-        >
-          <mat-icon>play_arrow</mat-icon>
-          Start Game
-        </button>
-        
-        <div class="start-hint" *ngIf="!player_one || !player_two">
-          <mat-icon>info</mat-icon>
-          <span>Both players must join to start</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Side: Settings Section -->
-    <div class="settings-section">
-      <h2 class="section-title">
-        <mat-icon>settings</mat-icon>
-        Settings
-      </h2>
-      
-      <div class="settings-grid">
-        <!-- Time Settings -->
-        <div class="setting-group">
-          <div class="setting-header">
-            <mat-icon>timer</mat-icon>
-            <span>Time Control</span>
-          </div>
-          <div class="setting-content">
-            <mat-slide-toggle 
-              [disabled]="!isPlayerOne" 
-              (change)="changeTime()" 
-              [(ngModel)]="isTimed"
-              color="accent"
             >
-              Timed Game
-            </mat-slide-toggle>
-            
-            <div class="time-controls" *ngIf="isTimed">
-              <mat-form-field appearance="outline" class="time-field">
-                <mat-label>Red Time</mat-label>
-                <mat-select
-                  (selectionChange)="changeTime()"
-                  [disabled]="!isTimed || !isPlayerOne"
-                  [(value)]="selectedTime1"
-                >
-                  <mat-option *ngFor="let time of times1" [value]="time">
-                    {{ time }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              
-              <mat-form-field appearance="outline" class="time-field">
-                <mat-label>Blue Time</mat-label>
-                <mat-select
-                  (selectionChange)="changeTime()"
-                  [disabled]="!isTimed || !isPlayerOne"
-                  [(value)]="selectedTime2"
-                >
-                  <mat-option *ngFor="let time of times2" [value]="time">
-                    {{ time }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
+            <mat-icon class="edit-icon">edit</mat-icon>
           </div>
         </div>
+      </div>
+      <button
+        mat-raised-button
+        color="warn"
+        class="leave-lobby-btn"
+        (click)="leaveLobby()"
+        >
+        <mat-icon>exit_to_app</mat-icon>
+        Leave
+      </button>
+    </div>
 
-        <!-- Game Type Settings -->
-        <div class="setting-group">
-          <div class="setting-header">
-            <mat-icon>emoji_events</mat-icon>
-            <span>Game Type</span>
-          </div>
-          <div class="setting-content">
-            <div class="info-row">
-              <span class="info-label">Mode:</span>
-              <mat-chip-option class="type-chip" [class.ranked]="isRanked === 'Ranked'">
-                {{ isRanked }}
-              </mat-chip-option>
+    <!-- Main Content Grid -->
+    <div class="main-content">
+      <!-- Left Side: Players Section -->
+      <div class="players-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <mat-icon>people</mat-icon>
+            Players
+          </h2>
+        </div>
+
+        <div class="players-grid">
+          <mat-card
+            appearance="outlined"
+            class="player-card red-player"
+            [class.clickable]="!player_one && !isPlayerInLobby"
+            (click)="!player_one && !isPlayerInLobby && joinLobby()"
+            >
+            <div class="player-content">
+              <mat-icon class="player-icon">person</mat-icon>
+              <div class="player-info">
+                <div class="player-label">Red</div>
+                @if (player_one) {
+                  <div class="player-name">
+                    {{ player_one }}
+                  </div>
+                } @else {
+                  @if (!isPlayerInLobby) {
+                    <div class="join-text">Click to join</div>
+                  }
+                  @if (isPlayerInLobby) {
+                    <div class="empty-slot">Empty slot</div>
+                  }
+                }
+              </div>
             </div>
-            
-            <div class="info-row">
-              <span class="info-label">Visibility:</span>
-              <button 
-                mat-stroked-button 
-                [disabled]="!isPlayerOne" 
-                (click)="changePrivacy()"
-                class="privacy-btn"
-                [class.private]="isPrivate === 'Private'"
+          </mat-card>
+
+          <div class="vs-divider">
+            <span class="vs-text">VS</span>
+            <button
+              mat-icon-button
+              [disabled]="!isPlayerOne"
+              (click)="changePlayers()"
+              class="swap-btn"
+              matTooltip="Swap"
+              matTooltipPosition="below"
               >
-                <mat-icon>{{ isPrivate === 'Private' ? 'lock' : 'public' }}</mat-icon>
-                {{ isPrivate }}
-              </button>
+              <mat-icon>swap_horiz</mat-icon>
+            </button>
+          </div>
+
+          <mat-card
+            appearance="outlined"
+            class="player-card blue-player"
+            [class.clickable]="!player_two && !isPlayerInLobby"
+            (click)="!player_two && !isPlayerInLobby && joinLobby()"
+            >
+            <div class="player-content">
+              <mat-icon class="player-icon">person</mat-icon>
+              <div class="player-info">
+                <div class="player-label">Blue</div>
+                @if (player_two) {
+                  <div class="player-name">
+                    {{ player_two }}
+                  </div>
+                } @else {
+                  @if (!isPlayerInLobby) {
+                    <div class="join-text">Click to join</div>
+                  }
+                  @if (isPlayerInLobby) {
+                    <div class="empty-slot">Empty slot</div>
+                  }
+                }
+              </div>
+            </div>
+          </mat-card>
+        </div>
+
+        <div class="start-game-section">
+          <button
+            mat-raised-button
+            color="accent"
+            [disabled]="!isPlayerOne || !player_one || !player_two"
+            (click)="startGame()"
+            class="start-game-btn"
+            >
+            <mat-icon>play_arrow</mat-icon>
+            Start Game
+          </button>
+
+          @if (!player_one || !player_two) {
+            <div class="start-hint">
+              <mat-icon>info</mat-icon>
+              <span>Both players must join to start</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right Side: Settings Section -->
+      <div class="settings-section">
+        <h2 class="section-title">
+          <mat-icon>settings</mat-icon>
+          Settings
+        </h2>
+
+        <div class="settings-grid">
+          <!-- Time Settings -->
+          <div class="setting-group">
+            <div class="setting-header">
+              <mat-icon>timer</mat-icon>
+              <span>Time Control</span>
+            </div>
+            <div class="setting-content">
+              <mat-slide-toggle
+                [disabled]="!isPlayerOne"
+                (change)="changeTime()"
+                [(ngModel)]="isTimed"
+                color="accent"
+                >
+                Timed Game
+              </mat-slide-toggle>
+
+              @if (isTimed) {
+                <div class="time-controls">
+                  <mat-form-field appearance="outline" class="time-field">
+                    <mat-label>Red Time</mat-label>
+                    <mat-select
+                      (selectionChange)="changeTime()"
+                      [disabled]="!isTimed || !isPlayerOne"
+                      [(value)]="selectedTime1"
+                      >
+                      @for (time of times1; track time) {
+                        <mat-option [value]="time">
+                          {{ time }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="time-field">
+                    <mat-label>Blue Time</mat-label>
+                    <mat-select
+                      (selectionChange)="changeTime()"
+                      [disabled]="!isTimed || !isPlayerOne"
+                      [(value)]="selectedTime2"
+                      >
+                      @for (time of times2; track time) {
+                        <mat-option [value]="time">
+                          {{ time }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Game Type Settings -->
+          <div class="setting-group">
+            <div class="setting-header">
+              <mat-icon>emoji_events</mat-icon>
+              <span>Game Type</span>
+            </div>
+            <div class="setting-content">
+              <div class="info-row">
+                <span class="info-label">Mode:</span>
+                <mat-chip-option class="type-chip" [class.ranked]="isRanked === 'Ranked'">
+                  {{ isRanked }}
+                </mat-chip-option>
+              </div>
+
+              <div class="info-row">
+                <span class="info-label">Visibility:</span>
+                <button
+                  mat-stroked-button
+                  [disabled]="!isPlayerOne"
+                  (click)="changePrivacy()"
+                  class="privacy-btn"
+                  [class.private]="isPrivate === 'Private'"
+                  >
+                  <mat-icon>{{ isPrivate === 'Private' ? 'lock' : 'public' }}</mat-icon>
+                  {{ isPrivate }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>

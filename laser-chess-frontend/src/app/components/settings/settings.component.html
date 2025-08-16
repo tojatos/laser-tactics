@@ -3,7 +3,7 @@
   fxLayout="column"
   fxLayout.gt-sm="row"
   fxLayoutAlign="space-evenly stretch"
->
+  >
   <div fxLayout="column" fxFlexAlign="center" fxFlex="20" fxLayoutGap="30px" fxLayoutAlign="center">
     <a href="settings" mat-stroked-button color="accent">General settings</a>
     <a href="settings/blocked_users" mat-stroked-button color="accent">Blocked users</a>
@@ -26,10 +26,12 @@
           [(ngModel)]="selectedTheme"
           (selectionChange)="changeThemeOption()"
           name="theme"
-        >
-          <mat-option *ngFor="let theme of themes" [value]="theme">
-            {{ theme }}
-          </mat-option>
+          >
+          @for (theme of themes; track theme) {
+            <mat-option [value]="theme">
+              {{ theme }}
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
     </mat-card>

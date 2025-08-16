@@ -1,41 +1,55 @@
 <!-- <mat-slide-toggle (change)="(!spectableHistory)" [(ngModel)]="spectableHistory"
-  >Animated</mat-slide-toggle
+>Animated</mat-slide-toggle
 > -->
 <br />
 <div class="game-log-container" [style.height.px]="maxHeight">
   <div class="moves-table">
-    <div class="move-row" *ngFor="let moveGroup of getMoveGroups(); let groupIndex = index">
-      <div class="turn-number">{{ groupIndex + 1 }}</div>
-      <div class="move-cell red-moves">
-        <span class="move" 
+    @for (moveGroup of getMoveGroups(); track moveGroup; let groupIndex = $index) {
+      <div class="move-row">
+        <div class="turn-number">{{ groupIndex + 1 }}</div>
+        <div class="move-cell red-moves">
+          @if (moveGroup.redMoves[0]) {
+            <span class="move"
               [class.selected]="isSelectedMove(groupIndex * 4)"
               (click)="onSelection(groupIndex * 4)"
-              *ngIf="moveGroup.redMoves[0]">{{ moveGroup.redMoves[0] }}</span>
-        <span class="move" 
+            >{{ moveGroup.redMoves[0] }}</span>
+          }
+          @if (moveGroup.redMoves[1]) {
+            <span class="move"
               [class.selected]="isSelectedMove(groupIndex * 4 + 1)"
               (click)="onSelection(groupIndex * 4 + 1)"
-              *ngIf="moveGroup.redMoves[1]">{{ moveGroup.redMoves[1] }}</span>
-      </div>
-      <div class="move-cell blue-moves">
-        <span class="move" 
+            >{{ moveGroup.redMoves[1] }}</span>
+          }
+        </div>
+        <div class="move-cell blue-moves">
+          @if (moveGroup.blueMoves[0]) {
+            <span class="move"
               [class.selected]="isSelectedMove(groupIndex * 4 + 2)"
               (click)="onSelection(groupIndex * 4 + 2)"
-              *ngIf="moveGroup.blueMoves[0]">{{ moveGroup.blueMoves[0] }}</span>
-        <span class="move" 
+            >{{ moveGroup.blueMoves[0] }}</span>
+          }
+          @if (moveGroup.blueMoves[1]) {
+            <span class="move"
               [class.selected]="isSelectedMove(groupIndex * 4 + 3)"
               (click)="onSelection(groupIndex * 4 + 3)"
-              *ngIf="moveGroup.blueMoves[1]">{{ moveGroup.blueMoves[1] }}</span>
+            >{{ moveGroup.blueMoves[1] }}</span>
+          }
+        </div>
       </div>
-    </div>
+    }
   </div>
 </div>
-<div *ngIf="!isSpectator">
-  <div class="btns" *ngIf="!gameFinished">
-    <button mat-icon-button matTooltip="Give up" (click)="giveUp()">
-      <mat-icon>flag</mat-icon>
-    </button>
-    <button mat-icon-button matTooltip="Offer draw" (click)="draw()">
-      <mat-icon>volunteer_activism</mat-icon>
-    </button>
+@if (!isSpectator) {
+  <div>
+    @if (!gameFinished) {
+      <div class="btns">
+        <button mat-icon-button matTooltip="Give up" (click)="giveUp()">
+          <mat-icon>flag</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Offer draw" (click)="draw()">
+          <mat-icon>volunteer_activism</mat-icon>
+        </button>
+      </div>
+    }
   </div>
-</div>
+}

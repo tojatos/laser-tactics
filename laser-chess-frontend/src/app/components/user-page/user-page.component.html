@@ -1,22 +1,33 @@
 <div class="main-wrapper" fxLayout="column" fxLayoutAlign="center" fxLayoutGap="30px">
-  <div *ngIf="!isOwner" fxLayout="row" fxLayoutAlign="end start" fxFlex="20">
-    <mat-icon [matMenuTriggerFor]="user">more_vert</mat-icon>
-    <mat-menu class="menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
-      <button mat-menu-item *ngIf="!isInFriends" (click)="sendRequest(username!)">
-        Send friend request
-      </button>
-      <button mat-menu-item *ngIf="isInFriends" (click)="unfriend(username!)">Unfriend</button>
-      <button mat-menu-item *ngIf="!isInBlocked" (click)="blockUser(username!)">Block</button>
-      <button mat-menu-item *ngIf="isInBlocked" (click)="unblockUser(username!)">Unblock</button>
-    </mat-menu>
-  </div>
-  <div
-    *ngIf="isOwner"
-    fxLayout="row"
-    fxLayoutAlign="end start"
-    fxFlex="15"
-    fxLayoutGap="20px"
-  ></div>
+  @if (!isOwner) {
+    <div fxLayout="row" fxLayoutAlign="end start" fxFlex="20">
+      <mat-icon [matMenuTriggerFor]="user">more_vert</mat-icon>
+      <mat-menu class="menu" #user="matMenu" xPosition="before" [overlapTrigger]="false">
+        @if (!isInFriends) {
+          <button mat-menu-item (click)="sendRequest(username!)">
+            Send friend request
+          </button>
+        }
+        @if (isInFriends) {
+          <button mat-menu-item (click)="unfriend(username!)">Unfriend</button>
+        }
+        @if (!isInBlocked) {
+          <button mat-menu-item (click)="blockUser(username!)">Block</button>
+        }
+        @if (isInBlocked) {
+          <button mat-menu-item (click)="unblockUser(username!)">Unblock</button>
+        }
+      </mat-menu>
+    </div>
+  }
+  @if (isOwner) {
+    <div
+      fxLayout="row"
+      fxLayoutAlign="end start"
+      fxFlex="15"
+      fxLayoutGap="20px"
+    ></div>
+  }
   <div fxLayout="column" fxLayoutAlign="center center" fxFlex="5" fxLayoutGap="20px">
     <h1>{{ username }}</h1>
     <h3>Rating :{{ rating }}</h3>
@@ -24,7 +35,9 @@
   <div fxLayout="row" fxLayoutAlign="space-evenly strech">
     <mat-card appearance="outlined" class="box">
       <mat-list>
-        <h3 matLine *ngIf="!empty">Statistics</h3>
+        @if (!empty) {
+          <h3 matLine>Statistics</h3>
+        }
         <mat-list-item>Drawrate: {{ stats?.drawrate }}</mat-list-item>
         <mat-list-item>Draws: {{ stats?.draws }}</mat-list-item>
         <mat-list-item>Loses: {{ stats?.loses }}</mat-list-item>
@@ -57,64 +70,85 @@
       </mat-table>
     </mat-card>
   </div>
-  <div *ngIf="isOwner" fxLayout="row" fxLayoutAlign="space-evenly strech">
-    <mat-card appearance="outlined" class="box">
-      <mat-list class="list">
-        <h3 matLine *ngIf="!empty">Friend list</h3>
-        <h3 matLine *ngIf="empty">Friend list empty</h3>
-        <mat-list-item *ngFor="let friend of friends">
-          <button mat-button (click)="goToProfile(friend)">{{ friend }}</button>
-          <mat-icon class="icon-right" [matMenuTriggerFor]="friends">more_vert</mat-icon>
-          <mat-menu class="menu" #friends="matMenu" xPosition="before" [overlapTrigger]="false">
-            <button mat-menu-item (click)="goToProfile(friend)">Profile</button>
-            <button mat-menu-item *ngIf="getIsInFriends(friend)" (click)="unfriend(friend)">
-              Unfriend
-            </button>
-            <button mat-menu-item *ngIf="!getIsInBlocked(friend)" (click)="blockUser(friend)">
-              Block
-            </button>
-            <button mat-menu-item *ngIf="getIsInBlocked(friend)" (click)="unblockUser(friend)">
-              Unblock
-            </button>
-          </mat-menu>
-        </mat-list-item>
-      </mat-list>
-
-      <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <mat-form-field class="example-full-width" appearance="fill">
-          <mat-label>Username</mat-label>
-          <input formControlName="input" matInput #box />
-        </mat-form-field>
-
-        <button mat-stroked-button color="accent" class="btn-block">Add friend</button>
-      </form></mat-card
-    >
-
-    <mat-card appearance="outlined" class="box">
-      <h3 matLine *ngIf="!empty_req">Friend request list</h3>
-      <h3 matLine *ngIf="empty_req">Friend request list empty</h3>
-      <mat-list *ngIf="isOwner">
-        <mat-list-item *ngFor="let request of friendsRequests">
-          <a matLine>{{ request.user_one_username }}</a>
-          <button
-            mat-button
-            color="accent"
-            class="req-buttons"
-            (click)="acceptFriendRequest(request.id)"
-          >
-            Accept
-          </button>
-          <button
-            mat-button
-            color="warn"
-            class="req-buttons"
-            (click)="declineFriendRequest(request.id)"
-          >
-            Decline
-          </button>
-        </mat-list-item>
-      </mat-list>
-    </mat-card>
+  @if (isOwner) {
+    <div fxLayout="row" fxLayoutAlign="space-evenly strech">
+      <mat-card appearance="outlined" class="box">
+        <mat-list class="list">
+          @if (!empty) {
+            <h3 matLine>Friend list</h3>
+          }
+          @if (empty) {
+            <h3 matLine>Friend list empty</h3>
+          }
+          @for (friend of friends; track friend) {
+            <mat-list-item>
+              <button mat-button (click)="goToProfile(friend)">{{ friend }}</button>
+              <mat-icon class="icon-right" [matMenuTriggerFor]="friends">more_vert</mat-icon>
+              <mat-menu class="menu" #friends="matMenu" xPosition="before" [overlapTrigger]="false">
+                <button mat-menu-item (click)="goToProfile(friend)">Profile</button>
+                @if (getIsInFriends(friend)) {
+                  <button mat-menu-item (click)="unfriend(friend)">
+                    Unfriend
+                  </button>
+                }
+                @if (!getIsInBlocked(friend)) {
+                  <button mat-menu-item (click)="blockUser(friend)">
+                    Block
+                  </button>
+                }
+                @if (getIsInBlocked(friend)) {
+                  <button mat-menu-item (click)="unblockUser(friend)">
+                    Unblock
+                  </button>
+                }
+              </mat-menu>
+            </mat-list-item>
+          }
+        </mat-list>
+        <form class="example-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Username</mat-label>
+            <input formControlName="input" matInput #box />
+          </mat-form-field>
+          <button mat-stroked-button color="accent" class="btn-block">Add friend</button>
+        </form></mat-card
+        >
+        <mat-card appearance="outlined" class="box">
+          @if (!empty_req) {
+            <h3 matLine>Friend request list</h3>
+          }
+          @if (empty_req) {
+            <h3 matLine>Friend request list empty</h3>
+          }
+          @if (isOwner) {
+            <mat-list>
+              @for (request of friendsRequests; track request) {
+                <mat-list-item>
+                  <a matLine>{{ request.user_one_username }}</a>
+                  <button
+                    mat-button
+                    color="accent"
+                    class="req-buttons"
+                    (click)="acceptFriendRequest(request.id)"
+                    >
+                    Accept
+                  </button>
+                  <button
+                    mat-button
+                    color="warn"
+                    class="req-buttons"
+                    (click)="declineFriendRequest(request.id)"
+                    >
+                    Decline
+                  </button>
+                </mat-list-item>
+              }
+            </mat-list>
+          }
+        </mat-card>
+      </div>
+    }
+    @if (!isOwner) {
+      <div fxFlex="20" fxLayout="row" fxLayoutAlign="space-evenly strech"></div>
+    }
   </div>
-  <div *ngIf="!isOwner" fxFlex="20" fxLayout="row" fxLayoutAlign="space-evenly strech"></div>
-</div>

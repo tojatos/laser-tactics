@@ -1,39 +1,44 @@
-<button
-  [matBadge]="unreadMessages"
-  [matBadgeHidden]="unreadMessages < 1"
-  *ngIf="!isOpened"
-  mat-fab
-  color="primary"
-  (click)="openChat()"
->
-  <mat-icon>chat_bubble</mat-icon>
-</button>
+@if (!isOpened) {
+  <button
+    [matBadge]="unreadMessages"
+    [matBadgeHidden]="unreadMessages < 1"
+    mat-fab
+    color="primary"
+    (click)="openChat()"
+    >
+    <mat-icon>chat_bubble</mat-icon>
+  </button>
+}
 
-<div *ngIf="isOpened" class="chat-box">
-  <div class="chat-header">
-    <button mat-icon-button class="close-button" (click)="isOpened = false">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-
-  <div class="message-container" #msg>
-    <div *ngFor="let msg of messages">
-      <div class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">
-        {{ msg.payload }}
-      </div>
-      <div
-        class="message-footer"
-        [ngClass]="isMyMessage(msg) ? 'my-message-footer' : 'opponent-message-footer'"
-      >
-        {{ msg.username }}
-      </div>
+@if (isOpened) {
+  <div class="chat-box">
+    <div class="chat-header">
+      <button mat-icon-button class="close-button" (click)="isOpened = false">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
+    <div class="message-container" #msg>
+      @for (msg of messages; track msg) {
+        <div>
+          <div class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">
+            {{ msg.payload }}
+          </div>
+          <div
+            class="message-footer"
+            [ngClass]="isMyMessage(msg) ? 'my-message-footer' : 'opponent-message-footer'"
+            >
+            {{ msg.username }}
+          </div>
+        </div>
+      }
+    </div>
+    @if (myUsername) {
+      <mat-form-field class="chat-input">
+        <input matInput autocomplete="off" (keydown.enter)="sendMessage()" [(ngModel)]="message" />
+        <button mat-icon-button matSuffix (click)="sendMessage()" [disabled]="!message">
+          <mat-icon>send</mat-icon>
+        </button>
+      </mat-form-field>
+    }
   </div>
-
-  <mat-form-field *ngIf="myUsername" class="chat-input">
-    <input matInput autocomplete="off" (keydown.enter)="sendMessage()" [(ngModel)]="message" />
-    <button mat-icon-button matSuffix (click)="sendMessage()" [disabled]="!message">
-      <mat-icon>send</mat-icon>
-    </button>
-  </mat-form-field>
-</div>
+}
