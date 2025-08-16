@@ -72,13 +72,13 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "laser-chess-frontend:build:production"
+              "buildTarget": "laser-chess-frontend:build:production"
             },
             "development": {
-              "browserTarget": "laser-chess-frontend:build:development",
               "liveReload": true,
               "hmr": true,
-              "poll": 2000
+              "poll": 2000,
+              "buildTarget": "laser-chess-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -86,7 +86,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "laser-chess-frontend:build"
+            "buildTarget": "laser-chess-frontend:build"
           }
         },
         "test": {
