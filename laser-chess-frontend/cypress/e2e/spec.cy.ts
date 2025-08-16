@@ -1,4 +1,4 @@
-import { Subject } from "rxjs/internal/Subject";
+import { Subject } from "rxjs";
 
 const subject = new Subject<any>()
 
@@ -50,19 +50,19 @@ describe('Gameplay tests', () => {
       })
       .then(() => cy.document()).wait(500)
       .then((doc) => {
-        cy.get('.mat-snack-bar-container').then(sb => {
-        sb.hide()
+        // cy.get('.mat-snack-bar-container').then(sb => {
+        // sb.hide()
         gameComponent = angular.getComponent(doc.querySelector("app-board"))
         gameComponent.game.gameService.closeConnection()
         gameComponent.game.gameService.getSubject().unsubscribe()
         cy.stub(gameComponent.game.gameService, "getSubject").returns(subject)
         gameComponent.game.gameService.connect("test")
-      })
+      // })
       })
     .then(() => {
-    cy.get('#mat-slide-toggle-1 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
+    cy.get('[data-cy="mat-slide-toggle-1"], #mat-slide-toggle-1, mat-slide-toggle').first()
     .should('not.be.checked')
-    .get('#mat-slide-toggle-2 > .mat-slide-toggle-label > .mat-slide-toggle-bar')
+    .get('[data-cy="mat-slide-toggle-2"], #mat-slide-toggle-2, mat-slide-toggle').eq(1)
       subject.next(data)
       cy.get(gameComponent.game.board.cells).should('have.length.above', 0)
       .get('app-board-actions').should('be.visible')
@@ -118,7 +118,7 @@ it('Test rotation', () => {
     cy.spy(gameComponent.game.board, "rotatePiece")
 
     cy.get('canvas').click(pressPosition.canvasCoordinates.x, pressPosition.canvasCoordinates.y)
-    .get('.mat-selection-list').click()
+    .get('mat-selection-list, .mat-selection-list, .mat-mdc-selection-list').click()
     .then(() => {
       cy.get('app-board-actions > :nth-child(1)').click().then(() => {
         expect(gameComponent.game.gameActions.rotation).to.be.equal(270)
@@ -147,7 +147,7 @@ it('Test rotation', () => {
       .click().get('app-board-actions > :nth-child(3)').click().then(() => {
         cy.fixture("rotateGameState.json").then(res => {
         subject.next(res)
-        expect(gameComponent.game.gameService.rotatePiece).to.be.have.been.calledOnce
+        expect(gameComponent.game.gameService.rotatePiece).to.have.been.calledOnce
         expect(gameComponent.game.board.rotatePiece).to.have.been.calledOnce
       })
     })
@@ -202,8 +202,8 @@ it('Test logs', () => {
   expect(beamSplitterPosition.piece.piece_type).to.be.equal("BEAM_SPLITTER")
   expect(beamSplitterPosition.piece.rotation_degree).to.be.equal(90)
 
-  cy.get("#mat-slide-toggle-3 > .mat-slide-toggle-label > .mat-slide-toggle-bar").click().then(() =>{
-  cy.get('[ng-reflect-value="0"] > .mat-list-item-content').click().then(() => {
+  cy.get('[data-cy="mat-slide-toggle-3"], #mat-slide-toggle-3, mat-slide-toggle').eq(2).click().then(() =>{
+  cy.get('[ng-reflect-value="0"] .mat-list-item-content, [ng-reflect-value="0"] > .mat-list-item-content, [ng-reflect-value="0"] .mdc-list-item__content').click().then(() => {
 
     const teleportPosition = getCell(gameComponent, 5, 5)
     const teleportOrigin = getCell(gameComponent, 2, 0)
@@ -215,7 +215,7 @@ it('Test logs', () => {
     expect(hyperOrigin.piece.piece_type).to.be.equal("HYPER_CUBE")
     expect(beamSplitterPosition.piece.piece_type).to.be.equal("BEAM_SPLITTER")
     expect(beamSplitterPosition.piece.rotation_degree).to.be.equal(0)
-    cy.get('[ng-reflect-value="2"] > .mat-list-item-content').click().fixture("teleportGameState.json").then(res => {
+    cy.get('[ng-reflect-value="2"] .mat-list-item-content, [ng-reflect-value="2"] > .mat-list-item-content, [ng-reflect-value="2"] .mdc-list-item__content').click().fixture("teleportGameState.json").then(res => {
         subject.next(res)
         const teleportPosition = getCell(gameComponent, 5, 5)
         const teleportOrigin = getCell(gameComponent, 2, 0)
@@ -234,16 +234,16 @@ it('Test logs', () => {
 
 it('Test give up', () => {
   cy.spy(gameComponent.game.gameService, "giveUp")
-  cy.get('[mattooltip="Give up"] > .mat-button-wrapper > .mat-icon').click().then(() => {
-    expect(gameComponent.game.gameService.giveUp).to.be.calledOnce
+  cy.get('[mattooltip="Give up"] .mat-icon, [mattooltip="Give up"] > .mat-button-wrapper > .mat-icon, [mattooltip="Give up"] .mdc-button__icon').click().then(() => {
+    expect(gameComponent.game.gameService.giveUp).to.have.been.calledOnce
   })
 })
 
 
-it('Test draw offer', () => {
+  it('Test draw offer', () => {
   cy.spy(gameComponent.game.gameService, "offerDraw")
-  cy.get('[mattooltip="Offer draw"] > .mat-button-wrapper > .mat-icon').click().then(() => {
-    expect(gameComponent.game.gameService.offerDraw).to.be.calledOnce
+  cy.get('[mattooltip="Offer draw"] .mat-icon, [mattooltip="Offer draw"] > .mat-button-wrapper > .mat-icon, [mattooltip="Offer draw"] .mdc-button__icon').click().then(() => {
+    expect(gameComponent.game.gameService.offerDraw).to.have.been.calledOnce
   })
 })
 
@@ -251,14 +251,14 @@ it('Test draw offer', () => {
 it('Test draw offer recieve', () => {
   cy.spy(gameComponent.game.gameService, "offerDraw")
   cy.spy(gameComponent.game.gameService, "showDrawOffer")
-  cy.stub(gameComponent.game.gameService.isPlayer).returns(true)
+  cy.stub(gameComponent.game.gameService, "isPlayer").returns(true)
   cy.stub(gameComponent.game.gameService, "animationsToShow").returns("1")
 
   cy.fixture("gameStateWithDrawOffer.json").then(res => {
     subject.next(res)
-    cy.get(".swal2-confirm").click().then(() => {
-      expect(gameComponent.game.gameService.showDrawOffer).to.be.calledOnce
-      expect(gameComponent.game.gameService.offerDraw).to.be.calledOnce
+    cy.get(".swal2-confirm, .swal2-styled.swal2-confirm").click().then(() => {
+      expect(gameComponent.game.gameService.showDrawOffer).to.have.been.calledOnce
+      expect(gameComponent.game.gameService.offerDraw).to.have.been.calledOnce
     })
   })
 })
@@ -283,7 +283,7 @@ it('Test laser', () => {
       cy.then(() => {
         expect(gameComponent.game.gameService.shootLaser).to.have.been.calledOnce
         expect(gameComponent.game.eventsExecutor.executeLaserAnimations).to.have.been.calledOnce
-        cy.wrap(gameComponent.game.board.removePiece, {timeout: 2000}).should(fun => expect(fun).to.be.calledOnce)
+        cy.wrap(gameComponent.game.board.removePiece, {timeout: 2000}).should(fun => expect(fun).to.have.been.calledOnce)
       })
     })
   })
