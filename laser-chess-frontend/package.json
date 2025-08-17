@@ -62,7 +62,9 @@
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
+    "karma-puppeteer-launcher": "^1.0.4",
     "prettier": "^3.4.2",
+    "puppeteer": "^24.16.2",
     "typescript": "~5.8.3"
   },
   "volta": {
