@@ -36,6 +36,10 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   spectableHistory = true;
   currentHistorySelection = -1;
   selectedMoveIndex = -1;
+  
+  // Cache move groups to avoid recalculation on every change detection
+  private _moveGroups: { redMoves: (string | undefined)[]; blueMoves: (string | undefined)[] }[] = [];
+  private _lastNotationListLength = 0;
 
   private readonly EXCLUDED_EVENT_TYPES = [
     GameEvents.OFFER_DRAW_EVENT,
@@ -72,25 +76,31 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     this.notationList = [];
     this.userEventChains = [];
     this.selectedMoveIndex = -1;
+    this._moveGroups = [];
+    this._lastNotationListLength = 0;
   }
 
   getMoveGroups(): { redMoves: (string | undefined)[]; blueMoves: (string | undefined)[] }[] {
-    const groups: { redMoves: (string | undefined)[]; blueMoves: (string | undefined)[] }[] = [];
-    
-    for (let i = 0; i < this.notationList.length; i += 4) {
-      groups.push({
-        redMoves: [
-          this.notationList[i],      // Red move 1
-          this.notationList[i + 1]   // Red move 2
-        ],
-        blueMoves: [
-          this.notationList[i + 2],  // Blue move 1
-          this.notationList[i + 3]   // Blue move 2
-        ]
-      });
+    // Only recalculate if notation list has changed
+    if (this.notationList.length !== this._lastNotationListLength) {
+      this._lastNotationListLength = this.notationList.length;
+      this._moveGroups = [];
+      
+      for (let i = 0; i < this.notationList.length; i += 4) {
+        this._moveGroups.push({
+          redMoves: [
+            this.notationList[i],      // Red move 1
+            this.notationList[i + 1]   // Red move 2
+          ],
+          blueMoves: [
+            this.notationList[i + 2],  // Blue move 1
+            this.notationList[i + 3]   // Blue move 2
+          ]
+        });
+      }
     }
     
-    return groups;
+    return this._moveGroups;
   }
 
   isSelectedMove(moveIndex: number): boolean {
@@ -214,6 +224,16 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
 
   giveUp = (): void => this.giveUpEmitter.emit();
   draw = (): void => this.drawEmitter.emit();
+  
+  // Track function for @for loop to avoid recreation of DOM elements
+  trackMoveGroup(index: number, moveGroup: any): number {
+    return index;
+  }
+  
+  // Stable function to get turn number to avoid expression changed after checked error
+  getTurnNumber(groupIndex: number): number {
+    return groupIndex + 1;
+  }
 
   isUserEvent(gameEvent?: GameEvent): boolean {
     return gameEvent ? 

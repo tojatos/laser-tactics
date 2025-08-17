@@ -166,21 +166,18 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   parseGamePhase(gamePhase: GamePhase): string {
     switch (gamePhase) {
-      case GamePhase.STARTED: {
-        if (this.game.whoseTurn == PlayerType.PLAYER_ONE) return "Red player's turn";
-        else if (this.game.whoseTurn == PlayerType.PLAYER_TWO) return "Blue player's turn";
-        else return 'Game started - turn unknown';
-      }
+      case GamePhase.STARTED:
+        return 'Game in Progress';
       case GamePhase.DRAW:
-        return 'Draw';
+        return 'Game Ended - Draw';
       case GamePhase.PLAYER_ONE_VICTORY:
-        return 'Red player wins!';
+        return 'Game Ended - Red Player Wins!';
       case GamePhase.PLAYER_TWO_VICTORY:
-        return 'Blue player wins!';
+        return 'Game Ended - Blue Player Wins!';
       case GamePhase.NOT_STARTED:
-        return 'Game not started';
+        return 'Game Not Started';
       default:
-        return 'Loading data...';
+        return 'Loading Game...';
     }
   }
 
@@ -228,5 +225,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
   get isTimed(): boolean {
     return this.game.isTimed;
+  }
+
+  // Track function for spectators to avoid recreation of DOM elements
+  trackSpectator(index: number, spectator: string | null): number {
+    return index;
   }
 }

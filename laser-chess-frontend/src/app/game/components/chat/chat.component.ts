@@ -68,4 +68,9 @@ export class ChatComponent {
       this.scrollDownToBottom();
     }
   }
+
+  // Track function for messages to avoid recreation of DOM elements
+  trackMessage(index: number, msg: any): number {
+    return index;
+  }
 }

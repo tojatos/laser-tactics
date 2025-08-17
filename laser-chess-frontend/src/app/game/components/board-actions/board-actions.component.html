@@ -2,35 +2,35 @@
   mat-raised-button
   [disabled]="!rotationPossible"
   (click)="sendButtonPressInfo('left')"
-  [style.height.px]="height"
-  [style.width.px]="width"
+  matTooltip="Rotate piece counter-clockwise"
+  matTooltipPosition="above"
 >
-  <mat-icon [style.font-size.px]="height">arrow_back</mat-icon>
+  <mat-icon>arrow_back</mat-icon>
 </button>
 <button
   mat-raised-button
   [disabled]="!laserPossible"
   (click)="sendButtonPressInfo('laser')"
-  [style.height.px]="height"
-  [style.width.px]="width"
+  matTooltip="Fire laser"
+  matTooltipPosition="above"
 >
-  <mat-icon [style.font-size.px]="height">light_mode</mat-icon>
+  <mat-icon>light_mode</mat-icon>
 </button>
 <button
   mat-raised-button
   [disabled]="!acceptPossible"
   (click)="sendButtonPressInfo('accept')"
-  [style.height.px]="height"
-  [style.width.px]="width"
+  matTooltip="Confirm move"
+  matTooltipPosition="above"
 >
-  <mat-icon [style.font-size.px]="height">done</mat-icon>
+  <mat-icon>done</mat-icon>
 </button>
 <button
   mat-raised-button
   [disabled]="!rotationPossible"
   (click)="sendButtonPressInfo('right')"
-  [style.height.px]="height"
-  [style.width.px]="width"
+  matTooltip="Rotate piece clockwise"
+  matTooltipPosition="above"
 >
-  <mat-icon [style.font-size.px]="height">arrow_forward</mat-icon>
+  <mat-icon>arrow_forward</mat-icon>
 </button>

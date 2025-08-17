@@ -4,9 +4,9 @@
 <br />
 <div class="game-log-container" [style.height.px]="maxHeight">
   <div class="moves-table">
-    @for (moveGroup of getMoveGroups(); track moveGroup; let groupIndex = $index) {
+    @for (moveGroup of getMoveGroups(); track trackMoveGroup($index, moveGroup); let groupIndex = $index) {
       <div class="move-row">
-        <div class="turn-number">{{ groupIndex + 1 }}</div>
+        <div class="turn-number">{{ getTurnNumber(groupIndex) }}</div>
         <div class="move-cell red-moves">
           @if (moveGroup.redMoves[0]) {
             <span class="move"

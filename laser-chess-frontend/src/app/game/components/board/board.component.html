@@ -1,150 +1,288 @@
+<!-- Chat Component -->
 <app-chat #chatComponent [myUsername]="this.game.authService.getUsername()"></app-chat>
-<h1 class="game-title">
-  {{ parseGamePhase(game.gamePhase) }}
-  @if (game.gamePhase !== 'DRAW' && game.gamePhase !== 'NOT_STARTED') {
-    <span
-      [style.color]="game.whoseTurn === 'PLAYER_ONE' ? 'red' : 'blue'"
-      >
-      ■
-    </span>
-  }
-</h1>
-<div class="spectators">
-  <mat-form-field appearance="fill">
-    <mat-label>Spectators: {{ spectatorsNum }}</mat-label>
-    <mat-select (selectionChange)="goToProfile($event.value)">
-      @for (spectator of filteredSpectators; track spectator) {
-        <mat-option
-          [value]="spectator"
-          [disabled]="spectator?.includes('anonymous')"
-          >
-          {{ spectator }}
-        </mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-</div>
 
-<div class="game-layout" [style.width.px]="displayedContainerWidth" [style.height.px]="containerHeight">
+<div class="game-layout-container">
+    <!-- Game Header Card -->
+    <mat-card appearance="outlined" class="game-header-card">
+    <div class="card-header">
+      <mat-icon>sports_esports</mat-icon>
+      <div class="game-status">
+        @if (game.gamePhase === 'STARTED') {
+          <div class="turn-display" [class.red-turn]="game.whoseTurn === 'PLAYER_ONE'" [class.blue-turn]="game.whoseTurn === 'PLAYER_TWO'">
+            <span class="player-name">{{ game.whoseTurn === 'PLAYER_ONE' ? 'RED' : 'BLUE' }}</span>
+            <div class="turn-label">TURN</div>
+          </div>
+        } @else {
+          <h2 class="game-phase">{{ parseGamePhase(game.gamePhase) }}</h2>
+        }
+      </div>
+      
+      <!-- Spectators Info -->
+      <div class="spectators-section">
+        <mat-form-field appearance="outline" class="spectators-field">
+          <mat-label>
+            <mat-icon>visibility</mat-icon>
+            Spectators ({{ spectatorsNum }})
+          </mat-label>
+          <mat-select (selectionChange)="goToProfile($event.value)">
+            @for (spectator of filteredSpectators; track trackSpectator($index, spectator)) {
+              <mat-option
+                [value]="spectator"
+                [disabled]="spectator?.includes('anonymous')">
+                {{ spectator }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-card>
+
   <!-- Main Game Area -->
-  <div class="game-main">
-    <div class="boardText">
-      <div class="sliders">
-        <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation"
-          >Animations</mat-slide-toggle
-          >
-          <br />
-          <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds"
-            >Sounds</mat-slide-toggle
-            >
-          </div>
-          @if (isTimed) {
-            <app-clock
-              [serverTime]="game.playerTimes[1]"
-              [isActive]="game.activeTurn[1]"
-              (timeoutEmitter)="game.notifyTimeout()"
-            ></app-clock>
+  <div class="game-main-area">
+    <!-- Left: Game Board and Controls -->
+    <div class="game-left-section">
+      <!-- Game Board Card -->
+      <mat-card appearance="outlined" class="game-board-card">
+        <div class="board-container" [style.width.px]="containerWidth" [style.height.px]="containerHeight">
+          <canvas
+            #canvas
+            class="gameCanvas"
+            [ngStyle]="{ 'background-image': backgroundBoardUrl }">
+          </canvas>
+          @if (!game.isInitiated) {
+            <div class="board-loading-overlay">
+              <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+              <p>Loading board...</p>
+            </div>
           }
-          <h3>
-            <i matTooltip="View profile"
-              ><a [routerLink]="['/users', game.playerNames[1]]">{{ game.playerNames[1] }}</a></i
-              >
-              ({{ game.playerRankings[1] }})
-              @if (game.playerRankingsChanges[1]) {
-                <span
-                  [ngStyle]="{ color: game.playerRankingsChanges[1] < 0 ? 'green' : 'red' }"
-                  >
-                  {{
-                  game.playerRankingsChanges[1] < 0
-                  ? '▲' + game.playerRankingsChanges[1] * -1
-                  : '▼' + game.playerRankingsChanges[1]
-                  }}
-                </span>
+        </div>
+        
+        <!-- Game Controls inside board card -->
+        @if (this.game.isInitiated) {
+          <div class="controls-container">
+            <app-board-actions
+              (buttonPressEmitter)="buttonPressEvent($event)"
+              [rotationPossible]="rotationPossibleInfo"
+              [acceptPossible]="acceptPossibleInfo"
+              [laserPossible]="laserPossibleInfo">
+            </app-board-actions>
+          </div>
+        }
+      </mat-card>
+    </div>
+
+    <!-- Right Sidebar -->
+    @if (!isHandset) {
+      <div class="game-right-sidebar">
+        <!-- Top Player Info -->
+        <mat-card appearance="outlined" class="player-card top-player">
+          <div class="card-content player-info">
+            <div class="player-details">
+              <div class="player-avatar">
+                <mat-icon class="avatar-icon blue-player">account_circle</mat-icon>
+              </div>
+              <div class="player-name-section">
+                <a [routerLink]="['/users', game.playerNames[1]]" class="player-name">
+                  {{ game.playerNames[1] }}
+                </a>
+                <div class="player-rating">
+                  <mat-icon>star</mat-icon>
+                  <span>{{ game.playerRankings[1] }}</span>
+                  @if (game.playerRankingsChanges[1]) {
+                    <span class="rating-change" [class.rating-up]="game.playerRankingsChanges[1] < 0" [class.rating-down]="game.playerRankingsChanges[1] > 0">
+                      {{ game.playerRankingsChanges[1] < 0 ? '▲' + (game.playerRankingsChanges[1] * -1) : '▼' + game.playerRankingsChanges[1] }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+            @if (isTimed) {
+              <div class="player-clock">
+                <app-clock
+                  [serverTime]="game.playerTimes[1]"
+                  [isActive]="game.activeTurn[1]"
+                  (timeoutEmitter)="game.notifyTimeout()">
+                </app-clock>
+              </div>
+            }
+          </div>
+        </mat-card>
+
+        <!-- Game Log -->
+        <mat-card appearance="outlined" class="game-log-card">
+          <div class="card-header">
+            <mat-icon>history</mat-icon>
+            <h3>Game Log</h3>
+          </div>
+          <div class="card-content log-content">
+            <app-board-log
+              #logs
+              #logsComponent
+              [gameState]="game.gameService.lastMessage"
+              [maxHeight]="containerHeight * 0.6"
+              [gameFinished]="game.gamePhase !== 'STARTED'"
+              [isSpectator]="isSpectator"
+              (gameLogEmitter)="buildEvent($event)"
+              (gameReturnEmitter)="returnToCurrentEvent()"
+              (giveUpEmitter)="game.giveUp()"
+              (drawEmitter)="game.offerDraw()">
+            </app-board-log>
+          </div>
+        </mat-card>
+
+        <!-- Bottom Player Info -->
+        <mat-card appearance="outlined" class="player-card bottom-player">
+          <div class="card-content player-info">
+            <div class="player-details">
+              <div class="player-avatar">
+                <mat-icon class="avatar-icon red-player">account_circle</mat-icon>
+              </div>
+              <div class="player-name-section">
+                <a [routerLink]="['/users', game.playerNames[0]]" class="player-name">
+                  {{ game.playerNames[0] }}
+                </a>
+                <div class="player-rating">
+                  <mat-icon>star</mat-icon>
+                  <span>{{ game.playerRankings[0] }}</span>
+                  @if (game.playerRankingsChanges[0]) {
+                    <span class="rating-change" [class.rating-up]="game.playerRankingsChanges[0] < 0" [class.rating-down]="game.playerRankingsChanges[0] > 0">
+                      {{ game.playerRankingsChanges[0] < 0 ? '▲' + (game.playerRankingsChanges[0] * -1) : '▼' + game.playerRankingsChanges[0] }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+            @if (isTimed) {
+              <div class="player-clock">
+                <app-clock
+                  [serverTime]="game.playerTimes[0]"
+                  [isActive]="game.activeTurn[0]"
+                  (timeoutEmitter)="game.notifyTimeout()">
+                </app-clock>
+              </div>
+            }
+          </div>
+        </mat-card>
+
+        <!-- Settings Card -->
+        <mat-card appearance="outlined" class="settings-card">
+          <div class="card-header">
+            <mat-icon>settings</mat-icon>
+            <h3>Settings</h3>
+          </div>
+          <div class="card-content">
+            <div class="settings-section">
+              <div class="setting-group">
+                <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation" color="accent">
+                  <span class="toggle-label">
+                    <mat-icon>animation</mat-icon>
+                    Animations
+                  </span>
+                </mat-slide-toggle>
+              </div>
+              <div class="setting-group">
+                <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds" color="accent">
+                  <span class="toggle-label">
+                    <mat-icon>volume_up</mat-icon>
+                    Sounds
+                  </span>
+                </mat-slide-toggle>
+              </div>
+            </div>
+            
+
+          </div>
+        </mat-card>
+      </div>
+    }
+
+    <!-- Mobile Layout -->
+    @if (isHandset) {
+      <div class="mobile-layout">
+        <!-- Player Info Cards for Mobile -->
+        <div class="mobile-players">
+          <mat-card appearance="outlined" class="player-card mobile-player">
+            <div class="card-content player-info">
+              <div class="player-details">
+                <div class="player-avatar">
+                  <mat-icon class="avatar-icon blue-player">account_circle</mat-icon>
+                </div>
+                <div class="player-name-section">
+                  <a [routerLink]="['/users', game.playerNames[1]]" class="player-name">
+                    {{ game.playerNames[1] }}
+                  </a>
+                  <div class="player-rating">
+                    <mat-icon>star</mat-icon>
+                    <span>{{ game.playerRankings[1] }}</span>
+                  </div>
+                </div>
+              </div>
+              @if (isTimed) {
+                <div class="player-clock">
+                  <app-clock [serverTime]="game.playerTimes[1]" [isActive]="game.activeTurn[1]" (timeoutEmitter)="game.notifyTimeout()"></app-clock>
+                </div>
               }
-            </h3>
-          </div>
+            </div>
+          </mat-card>
 
-          <div
-            [style.width.px]="containerWidth"
-            [style.height.px]="containerHeight"
-            class="game-container"
-            >
-            <canvas
-              #canvas
-              class="gameCanvas"
-              [ngStyle]="{ 'background-image': backgroundBoardUrl }"
-            ></canvas>
-          </div>
+          <mat-card appearance="outlined" class="player-card mobile-player">
+            <div class="card-content player-info">
+              <div class="player-details">
+                <div class="player-avatar">
+                  <mat-icon class="avatar-icon red-player">account_circle</mat-icon>
+                </div>
+                <div class="player-name-section">
+                  <a [routerLink]="['/users', game.playerNames[0]]" class="player-name">
+                    {{ game.playerNames[0] }}
+                  </a>
+                  <div class="player-rating">
+                    <mat-icon>star</mat-icon>
+                    <span>{{ game.playerRankings[0] }}</span>
+                  </div>
+                </div>
+              </div>
+              @if (isTimed) {
+                <div class="player-clock">
+                  <app-clock [serverTime]="game.playerTimes[0]" [isActive]="game.activeTurn[0]" (timeoutEmitter)="game.notifyTimeout()"></app-clock>
+                </div>
+              }
+            </div>
+          </mat-card>
+        </div>
 
-          <div class="boardText">
-            <div class="sliders">
-              @if (isHandset && game.gamePhase === 'STARTED') {
-                <div class="btns">
-                  <button mat-icon-button matTooltip="Give up" (click)="game.giveUp()">
+        <!-- Mobile Settings -->
+        <mat-card appearance="outlined" class="settings-card mobile-settings">
+          <div class="card-header">
+            <mat-icon>settings</mat-icon>
+            <h3>Settings & Actions</h3>
+          </div>
+          <div class="card-content">
+            <div class="mobile-controls">
+              <div class="settings-row">
+                <mat-slide-toggle (change)="changeAnimationShowOption()" [(ngModel)]="animation" color="accent">
+                  Animations
+                </mat-slide-toggle>
+                <mat-slide-toggle (change)="changeSoundOption()" [(ngModel)]="sounds" color="accent">
+                  Sounds
+                </mat-slide-toggle>
+              </div>
+              @if (!isSpectator && game.gamePhase === 'STARTED') {
+                <div class="mobile-actions">
+                  <button mat-raised-button color="warn" class="mobile-action-btn" (click)="game.giveUp()">
                     <mat-icon>flag</mat-icon>
+                    Give Up
                   </button>
-                  <button mat-icon-button matTooltip="Offer draw" (click)="game.offerDraw()">
+                  <button mat-raised-button color="accent" class="mobile-action-btn" (click)="game.offerDraw()">
                     <mat-icon>volunteer_activism</mat-icon>
+                    Offer Draw
                   </button>
                 </div>
               }
             </div>
-            @if (isTimed) {
-              <app-clock
-                [serverTime]="game.playerTimes[0]"
-                [isActive]="game.activeTurn[0]"
-                (timeoutEmitter)="game.notifyTimeout()"
-              ></app-clock>
-            }
-            <h3>
-              <i matTooltip="View profile"
-                ><a [routerLink]="['/users', game.playerNames[0]]">{{ game.playerNames[0] }}</a></i
-                >
-                ({{ game.playerRankings[0] }})
-                @if (game.playerRankingsChanges[0]) {
-                  <span
-                    [ngStyle]="{ color: game.playerRankingsChanges[0] < 0 ? 'green' : 'red' }"
-                    >
-                    {{
-                    game.playerRankingsChanges[0] < 0
-                    ? '▲' + game.playerRankingsChanges[0] * -1
-                    : '▼' + game.playerRankingsChanges[0]
-                    }}
-                  </span>
-                }
-              </h3>
-            </div>
-
-            @if (this.game.isInitiated) {
-              <div>
-                <app-board-actions
-                  (buttonPressEmitter)="buttonPressEvent($event)"
-                  [containerHeight]="containerHeight"
-                  [containerWidth]="containerWidth"
-                  [rotationPossible]="rotationPossibleInfo"
-                  [acceptPossible]="acceptPossibleInfo"
-                  [laserPossible]="laserPossibleInfo"
-                  fxLayoutAlign="center"
-                ></app-board-actions>
-              </div>
-            }
           </div>
-
-          <!-- Game Log Sidebar -->
-          @if (!isHandset) {
-            <div class="game-sidebar">
-              <app-board-log
-                #logs
-                #logsComponent
-                [gameState]="game.gameService.lastMessage"
-                [maxHeight]="containerHeight * 0.9"
-                [gameFinished]="game.gamePhase !== 'STARTED'"
-                [isSpectator]="isSpectator"
-                (gameLogEmitter)="buildEvent($event)"
-                (gameReturnEmitter)="returnToCurrentEvent()"
-                (giveUpEmitter)="game.giveUp()"
-                (drawEmitter)="game.offerDraw()"
-              ></app-board-log>
-            </div>
-          }
-        </div>
+        </mat-card>
+      </div>
+    }
+  </div>
+</div>

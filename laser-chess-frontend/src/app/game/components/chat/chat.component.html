@@ -18,7 +18,7 @@
       </button>
     </div>
     <div class="message-container" #msg>
-      @for (msg of messages; track msg) {
+      @for (msg of messages; track trackMessage($index, msg)) {
         <div>
           <div class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">
             {{ msg.payload }}

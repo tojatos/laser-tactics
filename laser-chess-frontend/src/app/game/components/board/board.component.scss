@@ -1,7 +1,428 @@
+// Board loading overlay
+.board-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  gap: 16px;
+  
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 300;
+  }
+  
+  mat-progress-spinner {
+    ::ng-deep circle {
+      stroke: #3b8ca5;
+    }
+  }
+}
+
+// Status screen for loading
+.status-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 20px;
+  
+  .status-title {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin: 0;
+    background: linear-gradient(135deg, #3b8ca5 0%, #5fb3d3 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .status-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-weight: 300;
+  }
+  
+  mat-progress-spinner {
+    ::ng-deep circle {
+      stroke: #3b8ca5;
+    }
+  }
+}
+
+// Game layout container
+.game-layout-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+// Card styling similar to lobby
+.game-header-card,
+.player-card,
+.game-board-card,
+.controls-card,
+.game-log-card,
+.settings-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(59, 140, 165, 0.05);
+  
+  mat-icon {
+    color: #3b8ca5;
+    font-size: 1.3rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  h2, h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: white;
+    flex: 1;
+  }
+}
+
+.card-content {
+  padding: 20px;
+}
+
+// Game header styling
+.game-header-card {
+  .card-header {
+    justify-content: space-between;
+    padding: 20px 24px;
+  }
+}
+
+.game-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  
+  .game-phase {
+    font-size: 1.4rem;
+    font-weight: 300;
+    margin: 0;
+    background: linear-gradient(135deg, #3b8ca5 0%, #5fb3d3 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+  
+  .turn-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    border: 2px solid;
+    background: rgba(0, 0, 0, 0.2);
+    
+    &.red-turn {
+      border-color: #f44336;
+      background: rgba(244, 67, 54, 0.1);
+      
+      .player-name {
+        color: #f44336;
+      }
+      
+      .turn-label {
+        color: rgba(244, 67, 54, 0.7);
+      }
+    }
+    
+    &.blue-turn {
+      border-color: #2196f3;
+      background: rgba(33, 150, 243, 0.1);
+      
+      .player-name {
+        color: #2196f3;
+      }
+      
+      .turn-label {
+        color: rgba(33, 150, 243, 0.7);
+      }
+    }
+    
+    .player-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    
+    .turn-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+  }
+}
+
+
+
+.spectators-section {
+  min-width: 200px;
+  
+  .spectators-field {
+    width: 100%;
+    
+    ::ng-deep .mat-mdc-form-field .mdc-notched-outline__leading,
+    ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch,
+    ::ng-deep .mat-mdc-form-field .mdc-notched-outline__trailing {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+      color: rgba(255, 255, 255, 0.7);
+      
+      mat-icon {
+        color: #3b8ca5;
+        font-size: 1rem;
+        margin-right: 6px;
+      }
+    }
+    
+    ::ng-deep .mat-mdc-select-value {
+      color: white;
+    }
+  }
+}
+
+// Main game area layout
+.game-main-area {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.game-left-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.game-right-sidebar {
+  flex: 0 0 320px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Player card styling
+.player-card {
+  width: 100%;
+  
+  .player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+  }
+}
+
+.player-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.player-avatar {
+  .avatar-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &.red-player {
+      color: #d32f2f;
+    }
+    
+    &.blue-player {
+      color: #1976d2;
+    }
+  }
+}
+
+.player-name-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-name {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    color: #3b8ca5;
+  }
+}
+
+.player-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  
+  mat-icon {
+    color: #ffc107;
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.rating-change {
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  
+  &.rating-up {
+    color: #4caf50;
+  }
+  
+  &.rating-down {
+    color: #f44336;
+  }
+}
+
+.player-clock {
+  display: flex;
+  align-items: center;
+}
+
+// Game board styling
+.game-board-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 16px;
+}
+
+.board-container {
+  position: relative;
+  border: 3px solid rgba(59, 140, 165, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.controls-container {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+  
+  ::ng-deep app-board-actions {
+    display: flex;
+    gap: 5px;
+    
+    button {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+      padding: 0;
+      background: rgba(59, 140, 165, 0.8);
+      border: 1px solid rgba(59, 140, 165, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover:not([disabled]) {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        background: rgba(59, 140, 165, 0.9);
+      }
+      
+      &[disabled] {
+        opacity: 0.4;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .mat-button-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        line-height: 1;
+      }
+      
+      mat-icon {
+        color: white;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 1;
+        margin: 0;
+      }
+    }
+  }
+}
+
 .gameCanvas {
   background-size: cover;
   z-index: 1;
   position: absolute;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .animCanvas {
@@ -14,104 +435,296 @@
   z-index: 2;
 }
 
-.game-container {
-  position: relative;
-  cursor: pointer;
-  border: solid 5px white;
-  -webkit-tap-highlight-color: transparent;
+
+
+// Game log styling (keeping original appearance)
+.game-log-card {
+  .log-content {
+    padding: 0;
+  }
 }
 
-.game-layout {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
+::ng-deep app-board-log {
+  // Keep original game log styling
+  .game-log-container {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow-y: auto;
+    padding: 8px;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(59, 140, 165, 0.5);
+      border-radius: 3px;
+    }
+  }
+  
+  .moves-table {
+    padding: 0;
+  }
+  
+  .move-row {
+    display: flex;
+    gap: 4px;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: center;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  
+  .turn-number {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+    font-size: 0.8rem;
+    min-width: 25px;
+    text-align: center;
+  }
+  
+  .move-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    
+    &.red-moves {
+      .move {
+        color: #ff6b6b;
+        background: rgba(255, 107, 107, 0.1);
+        border-left: 2px solid #d32f2f;
+      }
+    }
+    
+    &.blue-moves {
+      .move {
+        color: #4dabf7;
+        background: rgba(77, 171, 247, 0.1);
+        border-left: 2px solid #1976d2;
+      }
+    }
+  }
+  
+  .move {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.87);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    &.selected {
+      background: rgba(59, 140, 165, 0.4) !important;
+      color: white;
+      font-weight: 600;
+    }
+  }
+  
+  .btns {
+    display: flex;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    
+    button {
+      color: rgba(255, 255, 255, 0.8);
+      
+      &:hover {
+        color: #3b8ca5;
+      }
+    }
+  }
 }
 
-.game-main {
-  flex: 0 0 auto;
+// Settings and actions styling
+.settings-section {
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 
-.game-sidebar {
-  flex: 0 0 320px;
-  min-width: 320px;
-  padding-top: 20px;
-}
-
-.game-title {
-  margin-bottom: 16px;
-  text-align: center;
-}
-
-.boardText {
+.setting-group {
   display: flex;
-  justify-content: space-between;
-  padding: 0;
-  margin-top: 1%;
-  margin-bottom: -1%;
-  margin-right: 2%;
+  align-items: center;
+  
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.87);
+    
+    mat-icon {
+      color: #3b8ca5;
+      font-size: 1.1rem;
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+  }
+  
+  ::ng-deep .mat-mdc-slide-toggle .mdc-form-field {
+    color: rgba(255, 255, 255, 0.87);
+  }
+  
+  ::ng-deep .mat-mdc-slide-toggle .mdc-label {
+    color: rgba(255, 255, 255, 0.87);
+  }
 }
 
-mat-icon {
-  transform: scale(0.9);
-}
 
-.btns {
-  margin-top: 10%;
-}
 
-a {
-  color: white;
-}
-
-.sliders {
-  margin-top: -3%;
-  min-width: 100px;
-}
-
-.app-clock {
-  margin: 0 auto;
-}
-
-.spectators {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10;
-}
-
+// Chat styling
 app-chat {
   position: fixed;
-  bottom: 0;
-  right: 0;
-  margin: 20px;
+  bottom: 20px;
+  right: 20px;
   z-index: 100;
+}
+
+// Mobile layout
+.mobile-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-players {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-settings {
+  .mobile-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .settings-row {
+    display: flex;
+    gap: 20px;
+    
+    ::ng-deep .mat-mdc-slide-toggle .mdc-form-field {
+      color: rgba(255, 255, 255, 0.87);
+    }
+  }
+  
+  .mobile-actions {
+    display: flex;
+    gap: 12px;
+    
+    .mobile-action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      
+      mat-icon {
+        font-size: 1rem;
+      }
+    }
+  }
 }
 
 // Responsive design
 @media (max-width: 1200px) {
-  .game-layout {
+  .game-main-area {
     flex-direction: column;
     align-items: center;
   }
   
-  .game-sidebar {
-    flex: none;
+  .game-right-sidebar {
     width: 100%;
     max-width: 600px;
-    padding-top: 20px;
+    flex: none;
   }
 }
 
 @media (max-width: 768px) {
-  .game-sidebar {
-    display: none;
+  .game-layout-container {
+    gap: 12px;
   }
   
-  .spectators {
-    position: static;
-    margin-bottom: 16px;
+  .game-header-card .card-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .game-status {
+    align-items: center;
+  }
+  
+  .spectators-section {
+    min-width: auto;
+  }
+  
+  .player-card .player-info {
+    flex-direction: column;
+    gap: 12px;
     text-align: center;
+  }
+  
+  .player-details {
+    justify-content: center;
+  }
+  
+  .game-main-area {
+    gap: 12px;
+  }
+  
+  .card-header,
+  .card-content {
+    padding: 12px 16px;
+  }
+  
+  app-chat {
+    bottom: 10px;
+    right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-details {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .player-avatar .avatar-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .game-phase {
+    font-size: 1.2rem;
+  }
+  
+  .settings-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .mobile-actions {
+    flex-direction: column !important;
+    
+    .mobile-action-btn {
+      justify-content: center;
+    }
   }
 }
