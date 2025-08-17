@@ -124,9 +124,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     this.game.changeSoundOption(this.sounds);
   }
 
-  goToProfile(user: string) {
-    void this.router.navigate(['/users', user]);
-  }
+
 
   buttonPressEvent(event: string): void {
     switch (event) {
@@ -230,5 +228,29 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   // Track function for spectators to avoid recreation of DOM elements
   trackSpectator(index: number, spectator: string | null): number {
     return index;
+  }
+
+  // Get filtered spectators excluding players
+  getFilteredSpectators(): Array<string> {
+    const playerNames = [this.game.playerNames[0], this.game.playerNames[1]];
+    const nonNullSpectators = this.spectators.filter((spec) => spec != null) as Array<string>;
+    const filteredSpecs = nonNullSpectators.filter((spec) => !playerNames.includes(spec));
+    
+    const anonymousCount = this.spectators.filter((spec) => spec == null).length;
+    if (anonymousCount > 0) {
+      filteredSpecs.push(`${anonymousCount} anonymous`);
+    }
+    
+    return filteredSpecs;
+  }
+
+  // Get count of spectators excluding players  
+  getSpectatorCount(): number {
+    const playerNames = [this.game.playerNames[0], this.game.playerNames[1]];
+    const nonNullSpectators = this.spectators.filter((spec) => spec != null) as Array<string>;
+    const filteredCount = nonNullSpectators.filter((spec) => !playerNames.includes(spec)).length;
+    const anonymousCount = this.spectators.filter((spec) => spec == null).length;
+    
+    return filteredCount + (anonymousCount > 0 ? 1 : 0); // Count anonymous as 1 group
   }
 }

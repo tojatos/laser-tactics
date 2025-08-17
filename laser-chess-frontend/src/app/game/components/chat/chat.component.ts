@@ -12,12 +12,11 @@ import { EventEmitterService } from '../../services/event-emitter.service';
 })
 export class ChatComponent {
   @ViewChild('msg')
-  myScrollContainer: ElementRef<Window> | undefined;
+  myScrollContainer: ElementRef | undefined;
 
   @Input() myUsername: string | undefined;
   messages: Array<ChatMessage> = [];
   message = '';
-  unreadMessages = -1;
   gameId = '';
 
   constructor(
@@ -34,23 +33,17 @@ export class ChatComponent {
     this.gameId = gameId;
   }
 
-  isOpened = false;
-
   setChat(messages: Array<ChatMessage>) {
-    if (!this.isOpened) this.unreadMessages++;
     this.messages = messages;
+    this.scrollDownToBottom();
   }
 
   scrollDownToBottom() {
     setTimeout(() => {
-      this.myScrollContainer?.nativeElement.scrollTo(0, 1000);
+      if (this.myScrollContainer?.nativeElement) {
+        this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
+      }
     }, 10);
-  }
-
-  openChat() {
-    this.unreadMessages = 0;
-    this.isOpened = true;
-    this.scrollDownToBottom();
   }
 
   isMyMessage(msg: ChatMessage) {
@@ -58,12 +51,12 @@ export class ChatComponent {
   }
 
   sendMessage() {
-    if (this.myUsername && this.message) {
+    if (this.myUsername && this.message?.trim()) {
       this.messages.push({
         username: this.myUsername,
-        payload: this.message,
+        payload: this.message.trim(),
       });
-      this.chatService.sendMessage(this.gameId, this.message);
+      this.chatService.sendMessage(this.gameId, this.message.trim());
       this.message = '';
       this.scrollDownToBottom();
     }
