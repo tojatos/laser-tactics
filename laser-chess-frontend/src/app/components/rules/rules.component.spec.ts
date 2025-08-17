@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { RulesComponent } from './rules.component';
+import { PieceCardComponent } from '../piece-card/piece-card.component';
 
 describe('RulesComponent', () => {
   let component: RulesComponent;
@@ -8,7 +11,9 @@ describe('RulesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RulesComponent],
+      declarations: [RulesComponent, PieceCardComponent],
+      imports: [NoopAnimationsModule],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 

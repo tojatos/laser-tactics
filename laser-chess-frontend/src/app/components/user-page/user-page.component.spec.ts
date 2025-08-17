@@ -1,4 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatMenuModule } from '@angular/material/menu';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { UserPageComponent } from './user-page.component';
 
@@ -9,6 +16,14 @@ describe('UserPageComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [UserPageComponent],
+      imports: [NoopAnimationsModule, MatMenuModule],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        JwtHelperService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
