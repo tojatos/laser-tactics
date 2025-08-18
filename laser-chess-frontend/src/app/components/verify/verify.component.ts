@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 
@@ -9,11 +9,14 @@ import { AuthService } from 'src/app/auth/auth.service';
     standalone: false
 })
 export class VerifyComponent implements OnInit {
-  constructor(
-    private route: ActivatedRoute,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   token: string | undefined;
   ngOnInit(): void {

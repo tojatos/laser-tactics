@@ -35,7 +35,7 @@ export class GameCanvas extends Canvas {
     if (this.ctx) {
       this.ctx.canvas.addEventListener('click', (e) => this.canvasOnclick(e, board), false);
       this.ctx.canvas.addEventListener('mousemove', (e) => this.canvasHover(e, board), false);
-      this.drawings.drawGame(this, board.cells, this.isReversed);
+      this.drawings.drawGame(this, board.cells, this.isReversed, board);
       this.mediator = new GameMediator(this, gameActions);
     }
   }
@@ -46,7 +46,7 @@ export class GameCanvas extends Canvas {
 
   async onClickEvent(mousePos: Coordinates, board: Board): Promise<void> {
     if (!this.interactable) return;
-    this.drawings.drawGame(this, board.cells, this.isReversed);
+    this.drawings.drawGame(this, board.cells, this.isReversed, board);
     const selectedCell = board.getSelectableCellByCoordinates(
       mousePos.x,
       mousePos.y,
@@ -73,7 +73,7 @@ export class GameCanvas extends Canvas {
 
   private async selectableCellEvent(selectedCell: Cell | undefined, board: Board) {
     this.interactable = false;
-    this.drawings.drawGame(this, board.cells, this.isReversed);
+    this.drawings.drawGame(this, board.cells, this.isReversed, board);
     if (board.selectedCell && selectedCell && this.mediator?.currentRotation == 0) {
       await this.makeAMoveEvent(
         selectedCell.coordinates,
@@ -92,7 +92,7 @@ export class GameCanvas extends Canvas {
       this.unselectCellEvent(board);
     } else {
       this.unselectCellEvent(board);
-      this.drawings.drawGame(this, board.cells, this.isReversed);
+      this.drawings.drawGame(this, board.cells, this.isReversed, board);
       this.interactable = true;
     }
   }
@@ -106,20 +106,21 @@ export class GameCanvas extends Canvas {
       const hoveredOver = board.getCellByCoordinates(mousePos.x, mousePos.y);
       if (hoveredOver && hoveredOver != this.hoveredCell) {
         if (board.selectedCell.possibleMoves(board)?.includes(hoveredOver)) {
-          this.drawings.drawSingleCell(this, hoveredOver, this.isReversed);
+          this.drawings.drawSingleCell(this, hoveredOver, this.isReversed, board);
           this.drawings.highlightCell(
             this,
             hoveredOver,
             this.isReversed,
             hoveredOver.piece || undefined,
-            EventsColors.MOVE_EVENT
+            EventsColors.MOVE_EVENT,
+            board
           );
         } else {
           if (
             this.hoveredCell &&
             board.selectedCell.possibleMoves(board)?.includes(this.hoveredCell)
           ) {
-            this.drawings.drawSingleCell(this, this.hoveredCell, this.isReversed);
+            this.drawings.drawSingleCell(this, this.hoveredCell, this.isReversed, board);
             this.drawings.showPossibleMove(
               this,
               this.hoveredCell,
@@ -161,12 +162,12 @@ export class GameCanvas extends Canvas {
       this.blockSize = newSize;
       this.ctx.canvas.width = COLS * this.blockSize;
       this.ctx.canvas.height = ROWS * this.blockSize;
-      this.drawings.drawGame(this, board.cells, this.isReversed);
+      this.drawings.drawGame(this, board.cells, this.isReversed, board);
     }
   }
 
   redrawGame(board: Board): void {
-    this.drawings.drawGame(this, board.cells, this.isReversed);
+    this.drawings.drawGame(this, board.cells, this.isReversed, board);
     this.interactable = true;
   }
 
@@ -177,7 +178,8 @@ export class GameCanvas extends Canvas {
       selectedCell,
       this.isReversed,
       selectedCell.piece || undefined,
-      EventsColors.MOVE_EVENT
+      EventsColors.MOVE_EVENT,
+      board
     );
     selectedCell.piece
       ?.getPossibleMoves(board, selectedCell)

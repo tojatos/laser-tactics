@@ -1,4 +1,4 @@
-import { Injectable, QueryList } from '@angular/core';
+import { Injectable, QueryList, inject } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
 import { EventEmitterService } from 'src/app/game/services/event-emitter.service';
 import { UserService } from 'src/app/services/user.service';
@@ -23,6 +23,16 @@ enum analyzeModes {
 
 @Injectable()
 export class Game {
+  gameService = inject(GameWebsocketService);
+  private userService = inject(UserService);
+  authService = inject(AuthService);
+  eventEmitter = inject(EventEmitterService);
+  private eventsExecutor = inject(EventsExecutor);
+  private board = inject(Board);
+  private drawings = inject(Drawings);
+  private animations = inject(Animations);
+  private resources = inject(Resources);
+
   gameCanvas: GameCanvas | undefined;
   gameActions: GameActions | undefined;
   gameId: string | undefined;
@@ -44,17 +54,7 @@ export class Game {
   clocks: QueryList<ClockComponent> | undefined;
   lastPassedGameStateSize = 0;
 
-  constructor(
-    public gameService: GameWebsocketService,
-    private userService: UserService,
-    public authService: AuthService,
-    public eventEmitter: EventEmitterService,
-    private eventsExecutor: EventsExecutor,
-    private board: Board,
-    private drawings: Drawings,
-    private animations: Animations,
-    private resources: Resources
-  ) {
+  constructor() {
     this.eventEmitter.subsRefresh.asObservable().subscribe((gameState) => {
       void this.refreshGameState(<GameState>gameState);
     });

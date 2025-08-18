@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   createLobbyFullEndpoint,
   leaveLobbyFullEndpoint,
@@ -17,7 +17,12 @@ import { StartGameRequest } from '../game/game.request.models';
   providedIn: 'root',
 })
 export class LobbyService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   getLobbies() {
     return this.http.get<Lobby[]>(lobbyFullEndpoint()).toPromise();

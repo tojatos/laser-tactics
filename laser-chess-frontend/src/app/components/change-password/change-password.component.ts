@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -22,6 +22,11 @@ import { UserService } from 'src/app/services/user.service';
     standalone: false
 })
 export class ChangePasswordComponent implements OnInit {
+  private userService = inject(UserService);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   hide = true;
   hide2 = true;
   hide3 = true;
@@ -30,12 +35,10 @@ export class ChangePasswordComponent implements OnInit {
   });
   token: string | undefined;
 
-  constructor(
-    private userService: UserService,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {

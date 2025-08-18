@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { tokenPayload, UserToken } from '../app.models';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import {
@@ -14,13 +14,16 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
+  private http = inject(HttpClient);
+  private jwtHelper = inject(JwtHelperService);
+  private router = inject(Router);
+
   idToken = 'access_token';
 
-  constructor(
-    private http: HttpClient,
-    private jwtHelper: JwtHelperService,
-    private router: Router,
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   async login(login: string, pass: string): Promise<UserToken> {
     const options = {

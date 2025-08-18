@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -6,7 +6,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private _snackBar: MatSnackBar) {}
+  private _snackBar = inject(MatSnackBar);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   private handleError(error: HttpErrorResponse) {
     let message = 'An unexpected error occurred';

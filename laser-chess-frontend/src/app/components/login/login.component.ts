@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UntypedFormControl, Validators, UntypedFormGroup } from '@angular/forms';
@@ -11,6 +11,11 @@ import { LoginEmitterService } from 'src/app/services/login-emitter.service';
     standalone: false
 })
 export class LoginComponent {
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private loginEmitter = inject(LoginEmitterService);
+
   @Output() public changeLoginState: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   hide = true;
@@ -19,12 +24,10 @@ export class LoginComponent {
     password: new UntypedFormControl('', [Validators.required]),
   });
   isLoggedIn = false;
-  constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private loginEmitter: LoginEmitterService
-  ) {}
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+  constructor() {}
 
   get f() {
     return this.form.controls;

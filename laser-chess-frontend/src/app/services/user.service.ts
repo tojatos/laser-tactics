@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { friendsFullEndpoint, settingsFullEndpoint, userFullEndpoint } from '../api-definitions';
 import { FriendRequest, Ranking, Settings, User, UserHistory } from '../app.models';
 
@@ -7,7 +7,12 @@ import { FriendRequest, Ranking, Settings, User, UserHistory } from '../app.mode
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   changePassword(oldPassword: string, newPassword: string) {
     return this.http

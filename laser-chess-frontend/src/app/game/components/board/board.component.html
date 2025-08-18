@@ -34,7 +34,7 @@
           <div class="card-content spectators-content">
             @if (getFilteredSpectators().length > 0) {
               <div class="spectators-list">
-                @for (spectator of getFilteredSpectators(); track trackSpectator($index, spectator)) {
+                @for (spectator of getFilteredSpectators(); track trackSpectator(spectator)) {
                   <div class="spectator-item" [class.anonymous]="spectator?.includes('anonymous')">
                     <mat-icon class="spectator-icon">account_circle</mat-icon>
                     <span class="spectator-name">{{ spectator }}</span>
@@ -232,7 +232,7 @@
           <div class="card-content spectators-content">
             @if (getFilteredSpectators().length > 0) {
               <div class="spectators-list mobile-spectators">
-                @for (spectator of getFilteredSpectators(); track trackSpectator($index, spectator)) {
+                @for (spectator of getFilteredSpectators(); track trackSpectator(spectator)) {
                   <div class="spectator-item" [class.anonymous]="spectator?.includes('anonymous')">
                     <mat-icon class="spectator-icon">account_circle</mat-icon>
                     <span class="spectator-name">{{ spectator }}</span>

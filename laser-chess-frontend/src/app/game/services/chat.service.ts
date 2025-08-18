@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from 'rxjs/webSocket';
 import {
@@ -31,11 +31,11 @@ type ChatWrapper = {
   providedIn: 'root',
 })
 export class ChatWebsocketService {
-  constructor(
-    private authService: AuthService,
-    private _snackBar: MatSnackBar,
-    private eventEmitter: EventEmitterService
-  ) {}
+  private authService = inject(AuthService);
+  private _snackBar = inject(MatSnackBar);
+  private eventEmitter = inject(EventEmitterService);
+
+  constructor() {}
 
   subject = webSocket<unknown>(environment.CHAT_WEBSOCKET_URL);
 

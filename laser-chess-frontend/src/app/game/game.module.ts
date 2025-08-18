@@ -22,7 +22,6 @@ import { ChatComponent } from './components/chat/chat.component';
         GameComponent,
         BoardComponent,
         BoardActionsComponent,
-        BoardActionsComponent,
         BoardLogComponent,
         ClockComponent,
         ChatComponent,

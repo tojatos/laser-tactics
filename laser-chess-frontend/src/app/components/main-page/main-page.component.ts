@@ -1,5 +1,5 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,6 +17,14 @@ import { LobbyStatus } from '../lobby/lobby.component';
     standalone: false
 })
 export class MainPageComponent implements OnInit {
+  private _snackBar = inject(MatSnackBar);
+  private _liveAnnouncer = inject(LiveAnnouncer);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private lobbyService = inject(LobbyService);
+  private router = inject(Router);
+  private userService = inject(UserService);
+
   dataSource = new MatTableDataSource<Lobby>();
   fetched = false;
   lobby: Lobby | undefined;
@@ -31,15 +39,10 @@ export class MainPageComponent implements OnInit {
   isRanked = false;
   isPrivate = false;
 
-  constructor(
-    private _snackBar: MatSnackBar,
-    private _liveAnnouncer: LiveAnnouncer,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private lobbyService: LobbyService,
-    private router: Router,
-    private userService: UserService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   openSnackBar(message: string) {
     this._snackBar.open(message, '', {

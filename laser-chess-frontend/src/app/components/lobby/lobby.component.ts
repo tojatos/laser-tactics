@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Lobby } from 'src/app/app.models';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -35,12 +35,15 @@ function getByValue(map: Map<any, any>, searchValue: any) {
     standalone: false
 })
 export class LobbyComponent implements OnInit, OnDestroy {
-  constructor(
-    private lobbyService: LobbyService,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+  private lobbyService = inject(LobbyService);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   lobbyId: string | undefined;
   lobby: Lobby | undefined;

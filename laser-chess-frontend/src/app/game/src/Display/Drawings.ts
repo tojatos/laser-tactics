@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Coordinates } from '../../game.models';
 import { Cell } from '../GameStateData/Cell';
+import { Board } from '../GameStateData/Board';
 import { PIECE_SIZE_SCALE } from '../Utils/Constants';
 import { Piece } from '../GameStateData/Piece';
 import { Canvas } from './Canvas/Canvas';
@@ -9,10 +10,10 @@ import { Canvas } from './Canvas/Canvas';
 export class Drawings {
   laserThickness = 5;
 
-  drawGame(canvas: Canvas, cells: Cell[], isReversed: boolean): void {
+  drawGame(canvas: Canvas, cells: Cell[], isReversed: boolean, board?: Board): void {
     this.clearBoard(canvas);
     cells.forEach((c) => {
-      if (c.piece) this.drawPiece(canvas, c.piece, isReversed);
+      if (c.piece) this.drawPiece(canvas, c.piece, isReversed, board);
     });
   }
 
@@ -25,7 +26,7 @@ export class Drawings {
     }
   }
 
-  drawPiece(canvas: Canvas, piece: Piece, isReverse: boolean): void {
+  drawPiece(canvas: Canvas, piece: Piece, isReverse: boolean, board?: Board): void {
     if (canvas.ctx) {
       canvas.ctx.save();
       const position = isReverse
@@ -38,7 +39,7 @@ export class Drawings {
       const rotation = isReverse ? (piece.rotation_degree + 180) % 360 : piece.rotation_degree;
       canvas.ctx.translate(position.x, position.y);
       canvas.ctx.rotate((rotation / 180) * Math.PI);
-      const pieceImage = canvas.resources.getPieceFromMap(piece);
+      const pieceImage = canvas.resources.getPieceFromMap(piece, board);
       if (pieceImage)
         canvas.ctx.drawImage(
           pieceImage,
@@ -56,7 +57,8 @@ export class Drawings {
     cell: Cell | undefined,
     isReverse: boolean,
     piece: Piece | undefined = undefined,
-    color: string
+    color: string,
+    board?: Board
   ): void {
     if (cell && canvas.ctx) {
       canvas.ctx.save();
@@ -79,13 +81,13 @@ export class Drawings {
       canvas.ctx.fillStyle = color;
       canvas.ctx.fill();
       canvas.ctx.restore();
-      if (piece) this.drawPiece(canvas, piece, isReverse);
+      if (piece) this.drawPiece(canvas, piece, isReverse, board);
     }
   }
 
-  drawSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean): void {
+  drawSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean, board?: Board): void {
     this.clearSingleCell(canvas, cell, isReverse);
-    if (cell.piece) this.drawPiece(canvas, cell.piece, isReverse);
+    if (cell.piece) this.drawPiece(canvas, cell.piece, isReverse, board);
   }
 
   clearSingleCell(canvas: Canvas, cell: Cell, isReverse: boolean): void {

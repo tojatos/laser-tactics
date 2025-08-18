@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
@@ -17,6 +17,12 @@ import { UserService } from 'src/app/services/user.service';
     standalone: false
 })
 export class MainNavComponent {
+  private router = inject(Router);
+  private breakpointObserver = inject(BreakpointObserver);
+  private authService = inject(AuthService);
+  private lobbyService = inject(LobbyService);
+  private userService = inject(UserService);
+
   @ViewChild(MatMenuTrigger)
   trigger!: MatMenuTrigger;
 
@@ -27,13 +33,10 @@ export class MainNavComponent {
       shareReplay()
     );
 
-  constructor(
-    private router: Router,
-    private breakpointObserver: BreakpointObserver,
-    private authService: AuthService,
-    private lobbyService: LobbyService,
-    private userService: UserService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   lobby: any;
   username = '';

@@ -1,19 +1,10 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  HostListener,
-  OnDestroy,
-  QueryList,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { GameEvent } from '../../game.models';
 import { COLS, ROWS } from '../../src/Utils/Constants';
-import { GamePhase, PlayerType, Theme } from '../../src/Utils/Enums';
+import { GamePhase, Theme } from '../../src/Utils/Enums';
 import { Game } from '../../src/Controller/Game';
 import { clone } from 'lodash';
 import { ClockComponent } from '../clock/clock.component';
@@ -27,6 +18,12 @@ import { ChatComponent } from '../chat/chat.component';
     standalone: false
 })
 export class BoardComponent implements AfterViewInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private authService = inject(AuthService);
+  game = inject(Game);
+
   @ViewChild('canvas', { static: true })
   canvasGame!: ElementRef<HTMLCanvasElement>;
 
@@ -52,13 +49,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   filteredSpectators: Array<string | null> = [];
   spectatorsNum = 4;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private userService: UserService,
-    private authService: AuthService,
-    public game: Game
-  ) {}
+  constructor() {}
 
   async ngAfterViewInit(): Promise<void> {
     if (this.authService.isLoggedIn()) {
@@ -95,7 +86,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
       this.game.eventEmitter.subsSpectators.asObservable().subscribe((spectators) => {
         this.spectators = spectators as Array<string | null>;
-        this.filteredSpectators = this.spectators.filter((spec) => spec != null) as Array<string>;
+        this.filteredSpectators = this.spectators.filter((spec) => spec != null);
         this.filteredSpectators.push(
           `${this.spectators.filter((spec) => spec == null).length.toString()} anonymous`
         );
@@ -226,14 +217,14 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   }
 
   // Track function for spectators to avoid recreation of DOM elements
-  trackSpectator(index: number, spectator: string | null): number {
-    return index;
+  trackSpectator(spectator: string): string {
+    return spectator;
   }
 
   // Get filtered spectators excluding players
   getFilteredSpectators(): Array<string> {
     const playerNames = [this.game.playerNames[0], this.game.playerNames[1]];
-    const nonNullSpectators = this.spectators.filter((spec) => spec != null) as Array<string>;
+    const nonNullSpectators = this.spectators.filter((spec) => spec != null);
     const filteredSpecs = nonNullSpectators.filter((spec) => !playerNames.includes(spec));
     
     const anonymousCount = this.spectators.filter((spec) => spec == null).length;
@@ -247,7 +238,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   // Get count of spectators excluding players  
   getSpectatorCount(): number {
     const playerNames = [this.game.playerNames[0], this.game.playerNames[1]];
-    const nonNullSpectators = this.spectators.filter((spec) => spec != null) as Array<string>;
+    const nonNullSpectators = this.spectators.filter((spec) => spec != null);
     const filteredCount = nonNullSpectators.filter((spec) => !playerNames.includes(spec)).length;
     const anonymousCount = this.spectators.filter((spec) => spec == null).length;
     

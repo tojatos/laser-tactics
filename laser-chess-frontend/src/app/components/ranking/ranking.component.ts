@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Ranking } from 'src/app/app.models';
@@ -11,16 +11,19 @@ import { UserService } from 'src/app/services/user.service';
     standalone: false
 })
 export class RankingComponent implements OnInit {
+  private router = inject(Router);
+  private userService = inject(UserService);
+
   public topRanking: Ranking[] | undefined;
   displayedColumns = ['position', 'username', 'rating'];
   dataSource = new MatTableDataSource<Ranking>();
   fetched = false;
   errorMessage: string | null = null;
 
-  constructor(
-    private router: Router,
-    private userService: UserService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   async ngOnInit() {
     try {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,16 +11,19 @@ import { AuthService } from 'src/app/auth/auth.service';
     standalone: false
 })
 export class PasswordReminderComponent {
+  private _snackBar = inject(MatSnackBar);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   hide = true;
   form = new UntypedFormGroup({
     email: new UntypedFormControl('', [Validators.required, Validators.email]),
   });
-  constructor(
-    private _snackBar: MatSnackBar,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+  constructor() {}
 
   openSnackBar(message: string) {
     this._snackBar.open(message, '', {

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { cloneDeep } from 'lodash';
 import { Coordinates } from '../../game.models';
 import { Board } from '../GameStateData/Board';
@@ -11,7 +11,9 @@ import Chance from 'chance';
 
 @Injectable()
 export class Animations {
-  constructor(private drawings: Drawings) {}
+  private drawings = inject(Drawings);
+
+  constructor() {}
 
   async movePiece(
     canvas: Canvas,
@@ -62,18 +64,18 @@ export class Animations {
           origin.piece?.piece_type == PieceType.HYPER_SQUARE) &&
         origin.auxiliaryPiece
       )
-        void canvas.resources.teleport().play();
+        canvas.resources.playTeleport();
       else if (
         destination.piece &&
         origin.piece?.piece_type != PieceType.HYPER_CUBE &&
         destination.piece?.piece_type != PieceType.HYPER_SQUARE
       )
-        void canvas.resources.take().play();
-      else void canvas.resources.move().play();
+        canvas.resources.playTake();
+      else canvas.resources.playMove();
     }
 
     const intervalAction = () => {
-      this.drawings.drawGame(canvas, validCellsArray, isReverse);
+      this.drawings.drawGame(canvas, validCellsArray, isReverse, board);
       this.changePosition(piece, originCoordinates, destinationCoordinates, redrawDistance, fun);
       let color = EventsColors.MOVE_EVENT;
       if (
@@ -82,7 +84,7 @@ export class Animations {
         origin.auxiliaryPiece
       ) {
         color = EventsColors.TELEPORT_EVENT;
-        this.drawings.drawPiece(canvas, origin.piece, isReverse);
+        this.drawings.drawPiece(canvas, origin.piece, isReverse, board);
       }
       if (
         destination.piece &&
@@ -90,20 +92,20 @@ export class Animations {
         destination.piece?.piece_type != PieceType.HYPER_SQUARE
       )
         color = EventsColors.PIECE_TAKEN;
-      this.drawings.highlightCell(canvas, origin, isReverse, piece, color);
-      this.drawings.highlightCell(canvas, destination, isReverse, piece, color);
-      this.drawings.drawPiece(canvas, piece, isReverse);
+      this.drawings.highlightCell(canvas, origin, isReverse, piece, color, board);
+      this.drawings.highlightCell(canvas, destination, isReverse, piece, color, board);
+      this.drawings.drawPiece(canvas, piece, isReverse, board);
     };
 
     const lastAction = () => {
-      this.drawings.drawGame(canvas, validCellsArray, isReverse);
+      this.drawings.drawGame(canvas, validCellsArray, isReverse, board);
       piece.currentCoordinates = destination.canvasCoordinates;
       if (
         (origin.piece?.piece_type == PieceType.HYPER_CUBE ||
           origin.piece?.piece_type == PieceType.HYPER_SQUARE) &&
         origin.auxiliaryPiece
       ) {
-        this.drawings.drawGame(canvas, validCellsArray, isReverse);
+        this.drawings.drawGame(canvas, validCellsArray, isReverse, board);
         this.drawings.highlightCell(
           canvas,
           origin,
@@ -118,7 +120,7 @@ export class Animations {
           undefined,
           EventsColors.TELEPORT_EVENT
         );
-        this.drawings.drawPiece(canvas, piece, isReverse);
+        this.drawings.drawPiece(canvas, piece, isReverse, board);
       } else {
         let color = EventsColors.MOVE_EVENT;
         if (
@@ -127,8 +129,8 @@ export class Animations {
           destination.piece?.piece_type != PieceType.HYPER_SQUARE
         )
           color = EventsColors.PIECE_TAKEN;
-        this.drawings.highlightCell(canvas, origin, isReverse, undefined, color);
-        this.drawings.highlightCell(canvas, destination, isReverse, piece, color);
+        this.drawings.highlightCell(canvas, origin, isReverse, undefined, color, board);
+        this.drawings.highlightCell(canvas, destination, isReverse, piece, color, board);
       }
     };
 
@@ -173,20 +175,20 @@ export class Animations {
     const validCellsArray = this.cellsExcludingPieces(board, [atCell]);
     const desiredPiecePosition = piece.rotation_degree + byDegrees;
 
-    if (enableSounds) void canvas.resources.rotate().play();
+    if (enableSounds) canvas.resources.playRotate();
 
     const intervalAction = () => {
-      this.drawings.drawGame(canvas, validCellsArray, isReverse);
+      this.drawings.drawGame(canvas, validCellsArray, isReverse, board);
       piece.rotation_degree += degreesPerFrame;
-      this.drawings.highlightCell(canvas, atCell, isReverse, piece, EventsColors.ROTATE_EVENT);
-      this.drawings.drawPiece(canvas, piece, isReverse);
+      this.drawings.highlightCell(canvas, atCell, isReverse, piece, EventsColors.ROTATE_EVENT, board);
+      this.drawings.drawPiece(canvas, piece, isReverse, board);
     };
 
     const lastAction = () => {
       if (piece.rotation_degree < 0) piece.rotation_degree = 360 + piece.rotation_degree;
       piece.rotation_degree = desiredPiecePosition % 360;
-      this.drawings.drawGame(canvas, validCellsArray, isReverse);
-      this.drawings.highlightCell(canvas, atCell, isReverse, piece, EventsColors.ROTATE_EVENT);
+      this.drawings.drawGame(canvas, validCellsArray, isReverse, board);
+      this.drawings.highlightCell(canvas, atCell, isReverse, piece, EventsColors.ROTATE_EVENT, board);
     };
 
     if (!showAnimations)
@@ -231,7 +233,7 @@ export class Animations {
     const fromCell = board.getCellByCoordinates(positions[0][0].x, positions[0][0].y);
 
     if (enableSounds) {
-      if (fromCell?.piece?.piece_type == PieceType.LASER) void canvas.resources.deflect().play();
+      if (fromCell?.piece?.piece_type == PieceType.LASER) canvas.resources.playDeflect();
 
       if (
         showAnimations &&
@@ -241,7 +243,7 @@ export class Animations {
           fromCell?.piece?.piece_type == PieceType.TRIANGULAR_MIRROR ||
           fromCell?.piece?.piece_type == PieceType.BLOCK)
       )
-        void canvas.resources.deflect().play();
+        canvas.resources.playDeflect();
     }
 
     const lastAction = () => {
@@ -265,7 +267,7 @@ export class Animations {
         const lasers = board.cells.filter((bc) => bc.piece?.piece_type == PieceType.LASER);
         if (lasers) {
           lasers.forEach((l) => {
-            if (l.piece) this.drawings.drawPiece(canvas, l.piece, isReverse);
+            if (l.piece) this.drawings.drawPiece(canvas, l.piece, isReverse, board);
           });
         }
       }
@@ -338,13 +340,13 @@ export class Animations {
     enableSounds: boolean
   ): Promise<void> {
     if (showAnimations) {
-      if (enableSounds) void canvas.resources.destroy().play();
+      if (enableSounds) canvas.resources.playDestroy();
 
       const newAnimationCanvas = canvas.createAdditionalCanvasElement();
       const cell = board.getCellByCoordinates(at.x, at.y);
 
       if (newAnimationCanvas && cell?.piece)
-        void this.incinerationEffect(newAnimationCanvas, cell, isReverse);
+        void this.incinerationEffect(newAnimationCanvas, cell, isReverse, board);
     }
 
     return new Promise<void>((resolve) => {
@@ -356,17 +358,18 @@ export class Animations {
           pieceToDestroy,
           isReverse,
           undefined,
-          EventsColors.PIECE_DESTROYED
+          EventsColors.PIECE_DESTROYED,
+          board
         );
         resolve();
       } else console.error('There is no piece to destroy');
     });
   }
 
-  async incinerationEffect(canvas: Canvas, cell: Cell, isReverse: boolean): Promise<void> {
+  async incinerationEffect(canvas: Canvas, cell: Cell, isReverse: boolean, board?: Board): Promise<void> {
     if (cell && cell.piece) {
       const pixelSize = 3;
-      this.drawings.drawPiece(canvas, cell.piece, isReverse);
+      this.drawings.drawPiece(canvas, cell.piece, isReverse, board);
       const cellData = this.drawings.getPieceIndividualPixels(canvas, cell, pixelSize, isReverse);
       const intervals = 30;
 

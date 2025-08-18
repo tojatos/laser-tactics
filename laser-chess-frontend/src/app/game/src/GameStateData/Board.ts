@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
 import { BoardInterface, Coordinates, GameEvent, GameState } from '../../game.models';
 import { Cell } from './Cell';
@@ -6,6 +6,8 @@ import { GameEvents, PieceType, PlayerType } from '../Utils/Enums';
 
 @Injectable()
 export class Board implements BoardInterface {
+  private authService = inject(AuthService);
+
   cells: Cell[] = [];
   selectedCell: Cell | undefined;
   currentTurn = 0;
@@ -14,7 +16,7 @@ export class Board implements BoardInterface {
   gameId: string | undefined;
   blockSize: number | undefined;
 
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
   initBoard(gameState: GameState, blockSize: number): void {
     this.blockSize = blockSize;
@@ -92,7 +94,7 @@ export class Board implements BoardInterface {
     return this.cells.find(
       (c) =>
         c.piece?.piece_type == PieceType.LASER &&
-        c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player)
+        c.piece.piece_owner == player
     );
   }
 
@@ -102,12 +104,12 @@ export class Board implements BoardInterface {
       return this.cells.find(
         (c) =>
           c.piece?.piece_type == PieceType.LASER &&
-          c.piece.piece_owner == this.parsePlayerIdToPlayerNumber(player)
+          c.piece.piece_owner == player
       );
     return this.cells.find(
       (c) =>
         c.piece?.piece_type == PieceType.LASER &&
-        c.piece.piece_owner != this.parsePlayerIdToPlayerNumber(player)
+        c.piece.piece_owner != player
     );
   }
 
@@ -155,10 +157,33 @@ export class Board implements BoardInterface {
   }
 
   parsePlayerIdToPlayerNumber(playerId: string | undefined): PlayerType {
-    if (playerId == this.playerOne) return PlayerType.PLAYER_ONE;
-    else if (playerId == this.playerTwo) return PlayerType.PLAYER_TWO;
-
+    if (!playerId) {
+      console.warn(`⚠️ Player ID is undefined/null/empty`);
+      return PlayerType.NONE;
+    }
+    
+    if (!this.playerOne || !this.playerTwo) {
+      console.warn(`⚠️ Board player IDs not properly initialized:`, {
+        playerOne: this.playerOne,
+        playerTwo: this.playerTwo
+      });
+      return PlayerType.NONE;
+    }
+    
+    const isPlayerOne = this.comparePlayerIds(playerId, this.playerOne);
+    const isPlayerTwo = this.comparePlayerIds(playerId, this.playerTwo);
+    
+    if (isPlayerOne) return PlayerType.PLAYER_ONE;
+    if (isPlayerTwo) return PlayerType.PLAYER_TWO;
+    
+    console.warn(`❌ Player ID "${playerId}" doesn't match either player ["${this.playerOne}", "${this.playerTwo}"]`);
     return PlayerType.NONE;
+  }
+  
+  private comparePlayerIds(id1: string, id2: string): boolean {
+    const trimmedId1 = id1.trim();
+    const trimmedId2 = id2.trim();
+    return trimmedId1 === trimmedId2;
   }
 
   setInitialGameState(initialGameState: GameState, blockSize: number): void {

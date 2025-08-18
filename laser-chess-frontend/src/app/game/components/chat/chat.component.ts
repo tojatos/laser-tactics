@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, ViewEncapsulation, inject } from '@angular/core';
 import { ChatMessage } from '../../game.models';
 import { ChatWebsocketService } from '../../services/chat.service';
 import { EventEmitterService } from '../../services/event-emitter.service';
@@ -11,6 +11,9 @@ import { EventEmitterService } from '../../services/event-emitter.service';
     standalone: false
 })
 export class ChatComponent {
+  private eventEmitter = inject(EventEmitterService);
+  private chatService = inject(ChatWebsocketService);
+
   @ViewChild('msg')
   myScrollContainer: ElementRef | undefined;
 
@@ -19,10 +22,7 @@ export class ChatComponent {
   message = '';
   gameId = '';
 
-  constructor(
-    private eventEmitter: EventEmitterService,
-    private chatService: ChatWebsocketService
-  ) {
+  constructor() {
     this.eventEmitter.subsChat.asObservable().subscribe((chatMessages) => {
       this.setChat(<Array<ChatMessage>>chatMessages);
     });
@@ -40,8 +40,9 @@ export class ChatComponent {
 
   scrollDownToBottom() {
     setTimeout(() => {
-      if (this.myScrollContainer?.nativeElement) {
-        this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
+      const element = this.myScrollContainer?.nativeElement as HTMLElement;
+      if (element) {
+        element.scrollTop = element.scrollHeight;
       }
     }, 10);
   }
@@ -63,7 +64,7 @@ export class ChatComponent {
   }
 
   // Track function for messages to avoid recreation of DOM elements
-  trackMessage(index: number, msg: any): number {
-    return index;
+  trackMessage(msg: ChatMessage): any {
+    return msg.username + '_' + msg.payload; // Use a unique identifier
   }
 }

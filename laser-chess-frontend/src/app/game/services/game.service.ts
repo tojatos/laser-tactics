@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { webSocket } from 'rxjs/webSocket';
 import {
@@ -39,12 +39,12 @@ type websocketRequest = {
   providedIn: 'root',
 })
 export class GameWebsocketService {
-  constructor(
-    private authService: AuthService,
-    private _snackBar: MatSnackBar,
-    private eventEmitter: EventEmitterService,
-    private http: HttpClient
-  ) {}
+  private authService = inject(AuthService);
+  private _snackBar = inject(MatSnackBar);
+  private eventEmitter = inject(EventEmitterService);
+  private http = inject(HttpClient);
+
+  constructor() {}
 
   subject = webSocket<unknown>(environment.WEBSOCKET_URL);
 

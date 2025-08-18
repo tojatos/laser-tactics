@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,13 +12,16 @@ import { UserService } from 'src/app/services/user.service';
     standalone: false
 })
 export class SettingsBlockedUsersComponent implements OnInit {
-  constructor(
-    private _snackBar: MatSnackBar,
-    private userService: UserService,
-    private route: ActivatedRoute,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private _snackBar = inject(MatSnackBar);
+  private userService = inject(UserService);
+  private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   username: string | undefined;
   blocked: string[] | undefined;

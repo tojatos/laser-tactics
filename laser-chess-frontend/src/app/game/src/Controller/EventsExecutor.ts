@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { groupBy, values } from 'lodash';
 import { AuthService } from 'src/app/auth/auth.service';
 import {
@@ -23,12 +23,12 @@ type PathInfo = {
 
 @Injectable()
 export class EventsExecutor {
-  constructor(
-    private gameService: GameWebsocketService,
-    private authService: AuthService,
-    private drawings: Drawings,
-    private animations: Animations
-  ) {}
+  private gameService = inject(GameWebsocketService);
+  private authService = inject(AuthService);
+  private drawings = inject(Drawings);
+  private animations = inject(Animations);
+
+  constructor() {}
 
   eventsQueue: GameEvent[] = [];
   eventsExecutionTimeout = 500;
@@ -66,7 +66,7 @@ export class EventsExecutor {
         if (
           board.gameId &&
           event.event_type == GameEvents.OFFER_DRAW_EVENT &&
-          event.player != board.playerNum &&
+          board.parsePlayerIdToPlayerNumber(event.player) != board.playerNum &&
           board.isPlayer(this.authService.getUsername())
         )
           this.gameService.showDrawOffer(board.gameId);
@@ -140,7 +140,7 @@ export class EventsExecutor {
           this.gameService.increaseAnimationEvents();
         }
 
-        this.drawings.drawGame(canvas, board.cells, canvas.isReversed);
+        this.drawings.drawGame(canvas, board.cells, canvas.isReversed, board);
         allDestroyedPieceEventsAfterLastLaserShot.forEach(
           (pde) =>
             void this.animations.pieceDestroyedAnimation(

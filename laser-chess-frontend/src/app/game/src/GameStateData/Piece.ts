@@ -13,7 +13,9 @@ export class Piece implements PieceInterface {
   constructor(owner: string, pieceType: string, rotation_degree: number, coordinates: Coordinates) {
     this.piece_owner = owner;
     this.rotation_degree = rotation_degree;
-    this.piece_type = pieceType in PieceType ? (<never>PieceType)[pieceType] : PieceType.UNKNOWN;
+    this.piece_type = Object.values(PieceType).includes(pieceType as PieceType) 
+      ? pieceType as PieceType 
+      : PieceType.UNKNOWN;
     this.currentCoordinates = coordinates;
   }
 
@@ -31,13 +33,13 @@ export class Piece implements PieceInterface {
     );
   }
 
-  private cellFilterFunction(type: string) {
-    if (type == PieceType.BLOCK)
+  private cellFilterFunction(type: PieceType) {
+    if (type === PieceType.BLOCK)
       return (c: Cell | undefined) => c != undefined && c.piece?.piece_owner != this.piece_owner;
-    else if (type == PieceType.HYPER_CUBE)
+    else if (type === PieceType.HYPER_CUBE)
       return (c: Cell | undefined) =>
         c != undefined && (!this.special_move_made || c.piece == null);
-    else if (type == PieceType.KING)
+    else if (type === PieceType.KING)
       return (c: Cell | undefined) =>
         c != undefined &&
         ((!this.special_move_made && c.piece?.piece_owner != this.piece_owner) || c.piece == null);

@@ -8,7 +8,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { cloneDeep } from 'lodash';
-import { GameEvent, GameState, UserEvent, PieceMovedEvent, PieceRotatedEvent, TeleportEvent } from '../../game.models';
+import { GameEvent, GameState, PieceMovedEvent, TeleportEvent } from '../../game.models';
 import { GameEvents } from '../../src/Utils/Enums';
 
 type Coordinates = { x: number; y: number };
@@ -183,20 +183,20 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
     const captureEvent = eventChain.find(e => e.event_type === GameEvents.PIECE_TAKEN_EVENT);
 
     if (teleportEvent && primaryEvent.event_type === GameEvents.PIECE_MOVED_EVENT) {
-      return this.createMoveNotation(primaryEvent as PieceMovedEvent, teleportEvent as TeleportEvent);
+      return this.createMoveNotation(primaryEvent, teleportEvent);
     }
 
     if (captureEvent && primaryEvent.event_type === GameEvents.PIECE_MOVED_EVENT) {
-      return this.createMoveNotation(primaryEvent as PieceMovedEvent, undefined, true);
+      return this.createMoveNotation(primaryEvent, undefined, true);
     }
 
     switch (primaryEvent.event_type) {
       case GameEvents.LASER_SHOT_EVENT:
         return 'L';
       case GameEvents.PIECE_MOVED_EVENT:
-        return this.createMoveNotation(primaryEvent as PieceMovedEvent);
+        return this.createMoveNotation(primaryEvent);
       case GameEvents.PIECE_ROTATED_EVENT:
-        const rotation = primaryEvent as PieceRotatedEvent;
+        const rotation = primaryEvent;
         return `${this.formatCoords(rotation.rotated_piece_at)}↻${rotation.rotation}°`;
       default:
         return '?';
@@ -226,8 +226,8 @@ export class BoardLogComponent implements OnChanges, OnDestroy {
   draw = (): void => this.drawEmitter.emit();
   
   // Track function for @for loop to avoid recreation of DOM elements
-  trackMoveGroup(index: number, moveGroup: any): number {
-    return index;
+  trackMoveGroup(moveGroup: { redMoves: (string | undefined)[]; blueMoves: (string | undefined)[] }): string {
+    return moveGroup.redMoves.join(',') + '|' + moveGroup.blueMoves.join(',');
   }
   
   // Stable function to get turn number to avoid expression changed after checked error

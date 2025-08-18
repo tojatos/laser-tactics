@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { Settings } from 'src/app/app.models';
 import { Theme } from 'src/app/game/src/Utils/Enums';
@@ -10,6 +10,8 @@ import { Theme } from 'src/app/game/src/Utils/Enums';
     standalone: false
 })
 export class SettingsComponent implements OnInit {
+  private userService = inject(UserService);
+
   animation = false;
   sound = false;
   userSettings: Settings | undefined;
@@ -17,7 +19,10 @@ export class SettingsComponent implements OnInit {
   themes = Object.values(Theme);
   selectedTheme = Theme.CLASSIC;
 
-  constructor(private userService: UserService) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit() {
     this.userService

@@ -7,7 +7,7 @@
   </div>
   
   <div class="message-container" #msg>
-    @for (msg of messages; track trackMessage($index, msg)) {
+    @for (msg of messages; track trackMessage(msg)) {
       <div class="message-wrapper">
         <div class="message" [ngClass]="isMyMessage(msg) ? 'my-message' : 'opponent-message'">
           {{ msg.payload }}
@@ -43,7 +43,7 @@
           mat-icon-button 
           matSuffix 
           (click)="sendMessage()" 
-          [disabled]="!message?.trim()"
+          [disabled]="!message.trim()"
           color="primary"
         >
           <mat-icon>send</mat-icon>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
@@ -15,13 +15,16 @@ import { UserService } from 'src/app/services/user.service';
     standalone: false
 })
 export class UserPageComponent {
-  constructor(
-    private _snackBar: MatSnackBar,
-    private userService: UserService,
-    private route: ActivatedRoute,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private _snackBar = inject(MatSnackBar);
+  private userService = inject(UserService);
+  private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   user: User | undefined;
   username: string | undefined;
